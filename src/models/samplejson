@@ -1,0 +1,432 @@
+{
+    "modifiedBy": null,
+    "name": "dealeradmin",
+    "slug": "dealeradmin",
+    "createdBy": {
+        "$oid": "61e8359db9e8e30888ee331a"
+    },
+    "resources": [
+        {
+            "group": "Dashboard",
+            "resourceId": "6212984eebcdb6945bd3ea8c",
+            "resourceName": "Dashboard",
+            "resourceSlug": "dashboard",
+            "isResourceShow": true,
+            "isMasterResource": true,
+            "rights": [
+                {
+                    "rightSlug": "view",
+                    "rightName": "View",
+                    "isRightShow": false,
+                    "access": true,
+                    "isDeleted": false
+                }
+            ]
+        },
+        {
+            "group": "Setups",
+            "modifiedBy": null,
+            "resourceId": {
+                "$oid": "6201a16f050f141cfcf2b8e8"
+            },
+            "resourceName": "users",
+            "resourceSlug": "users",
+            "isResourceShow": true,
+            "isMasterResource": false,
+            "rights": [
+                {
+                    "rightSlug": "create-user",
+                    "rightName": "Add User",
+                    "isRightShow": true,
+                    "access": true,
+                    "isDeleted": false
+                },
+                {
+                    "rightSlug": "update-user",
+                    "rightName": "Edit User",
+                    "isRightShow": false,
+                    "access": true,
+                    "isDeleted": false
+                },
+                {
+                    "rightSlug": "read-all-user",
+                    "rightName": "View All",
+                    "isRightShow": true,
+                    "access": true,
+                    "isDeleted": false
+                },
+                {
+                    "rightSlug": "read-user",
+                    "rightName": "View User",
+                    "isRightShow": false,
+                    "access": true,
+                    "isDeleted": false
+                },
+                {
+                    "rightSlug": "get-user-by-token",
+                    "rightName": "Get User By Token",
+                    "isRightShow": false,
+                    "access": true,
+                    "isDeleted": false
+                }
+            ]
+        },
+        {
+            "group": "Setups",
+            "modifiedBy": null,
+            "resourceId": {
+                "$oid": "6201a16f050f141cfcf2b8ea"
+            },
+            "resourceName": "sources",
+            "resourceSlug": "sources",
+            "isResourceShow": true,
+            "isMasterResource": false,
+            "rights": [
+                {
+                    "rightSlug": "create-source",
+                    "rightName": "Add Source",
+                    "isRightShow": true,
+                    "access": true,
+                    "isDeleted": false
+                },
+                {
+                    "rightSlug": "read-source",
+                    "rightName": "View Source",
+                    "isRightShow": false,
+                    "access": true,
+                    "isDeleted": false
+                },
+                {
+                    "rightSlug": "update-source",
+                    "rightName": "Edit Source",
+                    "isRightShow": false,
+                    "access": true,
+                    "isDeleted": false
+                },
+                {
+                    "rightSlug": "delete-source",
+                    "rightName": "Delete Source",
+                    "isRightShow": false,
+                    "access": true,
+                    "isDeleted": false
+                },
+                {
+                    "rightSlug": "read-all-sources",
+                    "rightName": "View All Sources",
+                    "isRightShow": true,
+                    "access": true,
+                    "isDeleted": false
+                }
+            ]
+        },
+        {
+            "group": "Setups",
+            "modifiedBy": null,
+            "resourceId": {
+                "$oid": "6201a16f050f141cfcf2b8eb"
+            },
+            "resourceName": "fars",
+            "resourceSlug": "fars",
+            "isResourceShow": true,
+            "isMasterResource": false,
+            "rights": [
+                {
+                    "rightSlug": "create-far",
+                    "rightName": "Add Far",
+                    "isRightShow": true,
+                    "access": true,
+                    "isDeleted": false
+                },
+                {
+                    "rightSlug": "read-far",
+                    "rightName": "View Far",
+                    "isRightShow": false,
+                    "access": true,
+                    "isDeleted": false
+                },
+                {
+                    "rightSlug": "update-far",
+                    "rightName": "Edit Far",
+                    "isRightShow": false,
+                    "access": true,
+                    "isDeleted": false
+                },
+                {
+                    "rightSlug": "delete-far",
+                    "rightName": "Delete Fars",
+                    "isRightShow": false,
+                    "access": true,
+                    "isDeleted": false
+                },
+                {
+                    "rightSlug": "read-all-fars",
+                    "rightName": "View All Fars",
+                    "isRightShow": true,
+                    "access": true,
+                    "isDeleted": false
+                }
+            ]
+        },
+        {
+            "group": "Setups",
+            "modifiedBy": null,
+            "resourceId": {
+                "$oid": "620f808d377b3fd29e10c04e"
+            },
+            "resourceName": "enquirystatuses",
+            "resourceSlug": "enquirystatuses",
+            "isResourceShow": true,
+            "isMasterResource": false,
+            "rights": [
+                {
+                    "rightSlug": "create-enquirystatus",
+                    "rightName": "Add Enquiry Status",
+                    "isRightShow": true,
+                    "access": true,
+                    "isDeleted": false
+                },
+                {
+                    "rightSlug": "read-enquirystatus",
+                    "rightName": "View Enquiry Status",
+                    "isRightShow": false,
+                    "access": true,
+                    "isDeleted": false
+                },
+                {
+                    "rightSlug": "update-enquirystatus",
+                    "rightName": "Edit Enquiry Status",
+                    "isRightShow": false,
+                    "access": true,
+                    "isDeleted": false
+                },
+                {
+                    "rightSlug": "delete-enquirystatus",
+                    "rightName": "Delete Enquiry Status",
+                    "isRightShow": false,
+                    "access": true,
+                    "isDeleted": false
+                },
+                {
+                    "rightSlug": "read-all-enquirystatuses",
+                    "rightName": "View All Enquiry Statuses",
+                    "isRightShow": true,
+                    "access": true,
+                    "isDeleted": false
+                }
+            ]
+        },
+        {
+            "group": "Setups",
+            "modifiedBy": null,
+            "resourceId": {
+                "$oid": "620f8a39377b3fd29e10c050"
+            },
+            "resourceName": "custinterests",
+            "resourceSlug": "custinterests",
+            "isResourceShow": true,
+            "isMasterResource": false,
+            "rights": [
+                {
+                    "rightSlug": "create-custinterest",
+                    "rightName": "Add Customer Interest",
+                    "isRightShow": true,
+                    "access": true,
+                    "isDeleted": false
+                },
+                {
+                    "rightSlug": "read-custinterest",
+                    "rightName": "View Customer Interest",
+                    "isRightShow": false,
+                    "access": true,
+                    "isDeleted": false
+                },
+                {
+                    "rightSlug": "update-custinterest",
+                    "rightName": "Edit Customer Interest",
+                    "isRightShow": false,
+                    "access": true,
+                    "isDeleted": false
+                },
+                {
+                    "rightSlug": "delete-custinterest",
+                    "rightName": "Delete Customer Interest",
+                    "isRightShow": false,
+                    "access": true,
+                    "isDeleted": false
+                },
+                {
+                    "rightSlug": "read-all-custinterests",
+                    "rightName": "View All Customer Interests",
+                    "isRightShow": true,
+                    "access": true,
+                    "isDeleted": false
+                }
+            ]
+        },
+        {
+            "group": "Setups",
+            "modifiedBy": null,
+            "resourceId": {
+                "$oid": "620f8b72377b3fd29e10c052"
+            },
+            "resourceName": "bankdetails",
+            "resourceSlug": "bankdetails",
+            "isResourceShow": true,
+            "isMasterResource": false,
+            "rights": [
+                {
+                    "rightSlug": "create-bankdetail",
+                    "rightName": "Add Bank Detail",
+                    "isRightShow": true,
+                    "access": true,
+                    "isDeleted": false
+                },
+                {
+                    "rightSlug": "read-bankdetail",
+                    "rightName": "View Bank Detail",
+                    "isRightShow": false,
+                    "access": true,
+                    "isDeleted": false
+                },
+                {
+                    "rightSlug": "update-bankdetail",
+                    "rightName": "Edit Bank Detail",
+                    "isRightShow": false,
+                    "access": true,
+                    "isDeleted": false
+                },
+                {
+                    "rightSlug": "delete-bankdetail",
+                    "rightName": "Delete Bank Detail",
+                    "isRightShow": false,
+                    "access": true,
+                    "isDeleted": false
+                },
+                {
+                    "rightSlug": "read-all-bankdetails",
+                    "rightName": "View All Bank Details",
+                    "isRightShow": true,
+                    "access": true,
+                    "isDeleted": false
+                }
+            ]
+        },
+        {
+            "group": "Setups",
+            "modifiedBy": null,
+            "resourceId": {
+                "$oid": "620f8b72377b3fd29e10c052"
+            },
+            "resourceName": "enquirypurposes",
+            "resourceSlug": "enquirypurposes",
+            "isResourceShow": true,
+            "isMasterResource": false,
+            "rights": [
+                {
+                    "rightSlug": "create-enquirypurpose",
+                    "rightName": "Add Enquiry Purpose",
+                    "isRightShow": true,
+                    "access": true,
+                    "isDeleted": false
+                },
+                {
+                    "rightSlug": "read-enquirypurpose",
+                    "rightName": "View Enquiry Purpose",
+                    "isRightShow": false,
+                    "access": true,
+                    "isDeleted": false
+                },
+                {
+                    "rightSlug": "update-enquirypurpose",
+                    "rightName": "Edit Enquiry Purpose",
+                    "isRightShow": false,
+                    "access": true,
+                    "isDeleted": false
+                },
+                {
+                    "rightSlug": "delete-enquirypurpose",
+                    "rightName": "Delete Enquiry Purpose",
+                    "isRightShow": false,
+                    "access": true,
+                    "isDeleted": false
+                },
+                {
+                    "rightSlug": "read-all-enquirypurposes",
+                    "rightName": "View All Enquiry Purposes",
+                    "isRightShow": true,
+                    "access": true,
+                    "isDeleted": false
+                }
+            ]
+        },
+        {
+            "group": "Enquiry",
+            "modifiedBy": null,
+            "resourceId": {
+                "$oid": "621d276fec48fb03a4030654"
+            },
+            "resourceName": "enquiry",
+            "resourceSlug": "enquiry",
+            "isResourceShow": true,
+            "isMasterResource": false,
+            "rights": [
+                {
+                    "rightSlug": "create-enquiry",
+                    "rightName": "Add Enquiry",
+                    "isRightShow": true,
+                    "access": true,
+                    "isDeleted": false
+                },
+                {
+                    "rightSlug": "read-customerexistence",
+                    "rightName": "Check Customer Existence",
+                    "isRightShow": false,
+                    "access": true,
+                    "isDeleted": false
+                },
+                {
+                    "rightSlug": "read-dealer-enquirylimit",
+                    "rightName": "Check Customer Threshold",
+                    "isRightShow": false,
+                    "access": true,
+                    "isDeleted": false
+                },
+                {
+                    "rightSlug": "read-vehicleexistence",
+                    "rightName": "Check Vehicle Existence",
+                    "isRightShow": false,
+                    "access": true,
+                    "isDeleted": false
+                },
+                {
+                    "rightSlug": "read-enquiry",
+                    "rightName": "View Enquiry",
+                    "isRightShow": true,
+                    "access": true,
+                    "isDeleted": false
+                },
+                {
+                    "rightSlug": "delete-enquiry",
+                    "rightName": "Delete Enquiry",
+                    "isRightShow": false,
+                    "access": true,
+                    "isDeleted": false
+                },
+                {
+                    "rightSlug": "read-all-enquiry",
+                    "rightName": "View All Enquiry",
+                    "isRightShow": true,
+                    "access": true,
+                    "isDeleted": false
+                }
+            ]
+        }
+    ],
+    "createdAt": {
+        "$date": "2022-02-07T22:46:52.739Z"
+    },
+    "updatedAt": {
+        "$date": "2022-02-07T22:46:52.739Z"
+    },
+    "__v": 0
+}
