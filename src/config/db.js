@@ -13,23 +13,30 @@ try {
     // username: "postgres", //Arsal1997   arsalans credentials
     // password: "Dynasoft@1", //pSlC3yjUvd5t
     // host: "localhost", //ep-little-math-774305.us-east-2.aws.neon.tech
+    // port: 5432, 
+    // dialect: "postgres",
+
+    // database: "EAMS_LIVE_DB",
+    // username: "postgres", //Arsal1997   arsalans credentials
+    // password: "Dynasoft@1", //pSlC3yjUvd5t
+    // host: "localhost", //ep-little-math-774305.us-east-2.aws.neon.tech
     // port: 5432,
     // dialect: "postgres",
 
-    database: "EAMS_LIVE_DB",
-    username: "postgres", //Arsal1997   arsalans credentials
-    password: "Dynasoft@1", //pSlC3yjUvd5t
-    host: "localhost", //ep-little-math-774305.us-east-2.aws.neon.tech
+    database: "edu_example_db",
+    username: "edu_example_db_user", //Arsal1997   arsalans credentials
+    password: "sT3s2dyVQp6gf7YvMkoLXubiFFdsuIL7", //pSlC3yjUvd5t
+    host: "dpg-cnn8ktuv3ddc73fn9650-a.oregon-postgres.render.com", //ep-little-math-774305.us-east-2.aws.neon.tech
     port: 5432,
     dialect: "postgres",
 
     logging:false,
-    // dialectOptions: {
-    //   ssl: {
-    //     require: false, // This will help you. But you will see nwe error
-    //     rejectUnauthorized: false // This line will fix new error
-    //   }
-    // },
+    dialectOptions: {
+      ssl: {
+        require: false, // This will help you. But you will see nwe error
+        rejectUnauthorized: false // This line will fix new error
+      }
+    },
     
     // Localhost Database Connection
     // database: "EAMS2",
@@ -56,8 +63,8 @@ try {
     // password: envVars.PASSWORD
   });
 
-  // sequelize.authenticate();
-  // logger.info('Connected to Postgres.');
+  sequelize.authenticate();
+  logger.info('Connected to Postgres.');
 } catch (error) {
   logger.error("DB Connection Error", error);
 }
