@@ -7,6 +7,7 @@ const Sequelize = require('sequelize');
 const { paginationFacts } = require("../../../utils/common");
 const https = require('https');
 const { XMLParser, XMLBuilder, XMLValidator } = require("fast-xml-parser");
+const fns = require('date-fns')
 
 const Op = Sequelize.Op;
 /**
@@ -19,12 +20,8 @@ const createReceipt = async (req, ReceiptBody) => {
   // ReceiptBody.slug = ReceiptBody.name.replace(/ /g, "-").toLowerCase();
   ReceiptBody.createdBy = req.user.id;
   const addedReceiptObj = await DonationReceiptModel.create(ReceiptBody);
-
   authSMSSend(addedReceiptObj.dataValues);  // Quick send message at the time of donation
-  
   return addedReceiptObj;
-
-
 };
 
 const authSMSSend = async (userObj) => {
@@ -37,17 +34,17 @@ const authSMSSend = async (userObj) => {
   let sessionId = parser_res.corpsms.data;
   //console.log("api response", parser_res.corpsms.data);
   // ================= END
- 
+
   // Sending Quick Message After Getting SessionId
   let toMobileNo = userObj.phoneno; //'923228299306'
   let removeFirst = toMobileNo.substring(1); // to remove first zero into number.
-  let resMobile =  '92' + removeFirst;
+  let resMobile = '92' + removeFirst;
 
   let donorName = userObj.donorName;
   let donationAmount = userObj.amount;
   let donationRecpt = userObj.receiptNo;
   let donationType = userObj.type;
-  let msg= `Assalam-u-Alaikum, Mr./Mrs. ${donorName}, your donation RS.${donationAmount}/=
+  let msg = `Assalam-u-Alaikum, Mr./Mrs. ${donorName}, your donation Rs.${donationAmount}/=
   has been received, Thanks for your donation against ${donationType}. 
   your donation receipt no is ${donationRecpt}.\n
   JazakAllah Khair \n\n.    
@@ -55,7 +52,7 @@ const authSMSSend = async (userObj) => {
   const sms_url = `https://telenorcsms.com.pk:27677/corporate_sms2/api/sendsms.jsp?session_id=${sessionId}&to=${resMobile}&text=${msg}&mask=EDHI`;
   var sms_res = await axios.post(sms_url);
   console.log("sms_res", sms_res);
-  
+
   return sms_res;
 };
 
@@ -78,11 +75,11 @@ const authSMSSend = async (userObj) => {
  */
 const queryReceipts = async (filter, options, searchQuery) => {
   //console.log("get receipts",searchQuery);
-  
-console.log("options receipt", options);
+
+  console.log("options receipt", options);
   let limit = options.pageSize;
   let offset = 0 + (options.pageNumber - 1) * limit;
-  console.log("receipt offset ",offset)
+  console.log("receipt offset ", offset)
   searchQuery = searchQuery.toLowerCase();
   const queryFilters = [
     // { isActive: sequelize.where }
@@ -117,7 +114,7 @@ console.log("options receipt", options);
     limit: limit,
   });
 
-  
+
   return paginationFacts(count, limit, options.pageNumber, rows);
   // return Items;
 };
@@ -173,7 +170,13 @@ const deleteReceiptById = async (ReceiptId) => {
 };
 
 const getDonationReceiptReport = async (req) => {
- // console.log(" bookNo from query ", req)
+  // console.log(" bookNo from query ", req)
+  const dateFrom = fns.format(req.dateFrom, "yyyy-MM-dd");
+  let addDay = fns.addDays(req.dateTo, 1);
+  const dateTo = fns.format(addDay, "yyyy-MM-dd");
+
+ // console.log("date fnd", dateTo);
+
   let whereQuery = "";
 
   if (req.cityId != 0) {
@@ -190,7 +193,9 @@ const getDonationReceiptReport = async (req) => {
 	INNER JOIN public."T_CITIES" AS CT ON CT."id" = T."cityId"
 	INNER JOIN public."T_CENTERS" AS C ON T."centerId" = C."id"
 	INNER JOIN public."T_SUB_CENTERS" AS S ON  T."subCenterId" = S."id"
-  where T."bookNo"  =  '${req.bookNo}' ${whereQuery} (T."cityId" = ${req.cityId} OR T."centerId" = ${req.centerId} OR T."subCenterId" = ${req.subCenterId})
+  where T."bookNo"  =  '${req.bookNo || ''}'  
+  AND (T."createdAt" >= '${dateFrom}' AND T."createdAt" <= '${dateTo}') 
+  ${whereQuery} (T."cityId" = ${req.cityId} OR T."centerId" = ${req.centerId} OR T."subCenterId" = ${req.subCenterId}) 
 	Order by T."receiptId",T."bookNo"
   `);
   console.log("query");
@@ -198,11 +203,11 @@ const getDonationReceiptReport = async (req) => {
 };
 
 const getMaxBookingNo = async (req) => {
- // console.log(" max bookingNo from query- service ", req.bookingNo)
-  
+  // console.log(" max bookingNo from query- service ", req.bookingNo)
+
   let getMaxCount = await sequelize.query(`
 	select count(*)+1 as MaxId from public."T_DONATION_TRANSACTION" T where T."bookNo" = '${req.bookingNo}'
-  `,{
+  `, {
     plain: true,
     type: Sequelize.QueryTypes.SELECT
   });
