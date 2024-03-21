@@ -73,6 +73,8 @@ const getDonationReceiptByBookNo = {
         cityId: Joi.number().integer(),
         centerId: Joi.number().integer(),
         subCenterId: Joi.number().integer(),
+        dateFrom: Joi.string(),
+        dateTo: Joi.string(),
     }),
 };
 
