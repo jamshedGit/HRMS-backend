@@ -487,7 +487,7 @@ const getUserAccessForMiddleware = async (roleId, slugs) => {
 //     throw new ApiError(httpStatus.NOT_FOUND, 'Users not found');
 //   }
 //   return users;
-// };
+// };   
 
 // const createNewPassword = async (userId, user) => {
 //   const user_find = await getUserById(userId);
