@@ -13,7 +13,8 @@ try {
     dialect: "mysql",
     logging: false,
     define: {
-      freezeTableName: false,
+      freezeTableName: true,
+      modelName: 'singularName'
     },
 
     // database: "dsc_hrms_staging",
