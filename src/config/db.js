@@ -23,12 +23,12 @@ try {
     // port: 5432,
     // dialect: "postgres",
 
-    database: "edu_example_db",
-    username: "edu_example_db_user", //Arsal1997   arsalans credentials
-    password: "sT3s2dyVQp6gf7YvMkoLXubiFFdsuIL7", //pSlC3yjUvd5t
-    host: "dpg-cnn8ktuv3ddc73fn9650-a.oregon-postgres.render.com", //ep-little-math-774305.us-east-2.aws.neon.tech
-    port: 5432,
-    dialect: "postgres",
+    database: "sql10729008",
+    username: "sql10729008", //Arsal1997   arsalans credentials
+    password: "sMYzNnscZT", //pSlC3yjUvd5t
+    host: "sql10.freemysqlhosting.net", //ep-little-math-774305.us-east-2.aws.neon.tech
+    port: 3306,
+    dialect: "mysql",
 
     logging:false,
     dialectOptions: {
