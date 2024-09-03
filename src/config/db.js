@@ -32,10 +32,9 @@ try {
 
     logging:false,
     dialectOptions: {
-     // ssl: {
-      //   require: false, // This will help you. But you will see nwe error
-      //   rejectUnauthorized: false // This line will fix new error
-      // }
+      ssl: {
+    rejectUnauthorized: false, // Trust the self-signed certificate
+  }
     },
     
     // Localhost Database Connection
