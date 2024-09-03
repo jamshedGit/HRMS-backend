@@ -18,6 +18,37 @@ const getCountriesMasterData = {
   body: Joi.disallow(),
 };
 
+const getBanksMasterData = {
+  query: Joi.disallow(),
+  params: Joi.disallow(),
+  body: Joi.disallow(),
+};
+
+const getDeptMasterData = {
+  query: Joi.disallow(),
+  params: Joi.disallow(),
+  body: Joi.disallow(),
+};
+
+const getAllEmployees = {
+  query: Joi.disallow(),
+  params: Joi.disallow(),
+  body: Joi.disallow(),
+};
+
+const getFormMenuMasterData = {
+  query: Joi.disallow(),
+  params: Joi.disallow(),
+  body: Joi.object().keys({
+    Id: Joi.number().integer(),
+    tableName: Joi.string(),
+    prefix:Joi.string()
+  }),
+  
+};
+
+
+
 const getAlarmTimesMasterData = {
   query: Joi.disallow(),
   params: Joi.disallow(),
@@ -157,5 +188,9 @@ module.exports = {
   getStatusMasterData,
   getVehiclesDashboardMasterData,
   getHospitalsMasterData,
-  getPoliceStationsMasterData
+  getPoliceStationsMasterData,
+  getBanksMasterData,
+  getDeptMasterData,
+  getFormMenuMasterData,
+  getAllEmployees
 };

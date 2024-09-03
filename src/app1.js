@@ -74,8 +74,7 @@ app.use(
     multiples: true, // req.files to be arrays of files
   })
 );
-
-app.use("/uploads", express.static("uploads"));
+app.use(express.static('./uploadsPics'));
 
 // v1 api routes
 app.use("/apis", apiRoutes);

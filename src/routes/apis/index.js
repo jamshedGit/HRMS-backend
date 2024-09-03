@@ -23,6 +23,33 @@ const ibs = require('./operations/ibs/ibForm.route')
 const receipt = require('./operations/edrs/donation.route')
 const docsRoute = require("./docs.route");
 const config = require("../../config/config");
+const bank = require('./operations/banks/bank.route')
+const branch = require('./operations/branch/branch.route')
+const department = require('./operations/department/dept.route')
+const emptype = require('./operations/employeeType/employeeType.route')
+const religion = require('./operations/religion/religion.route')
+const region = require('./operations/region/region.route')
+const designation = require('./operations/designation/designation.route')
+const form = require('./operations/form/form.route')
+const formdetails = require('./operations/formdetails/formdetails.route')
+const emppolicy = require('./operations/emppolicy/emppolicy.route')
+const empprofile = require('./operations/emp_profile/profile.route')
+const contact = require('./operations/contact/contact.route')
+const academic = require('./operations/academic/academic.route')
+const experince = require('./operations/experience/experience.route')
+const skills = require('./operations/skills/skills.route')
+const incident = require('./operations/incident/incident.route')
+const earning = require('./operations/earning/earning.route')
+const deduction = require('./operations/deduction/deduction.route')
+const stoppage = require('./operations/stoppage_allowance/stoppage_allowance.route')
+const exchage_rate = require('./operations/exchange_rate/exchange_rate.route')
+const compensation_benefits = require('./operations/compensation_benefits/compensation_benefits.route')
+const earning_deduction_transaction = require('./operations/earning_transaction/earning_transaction.route')
+const employee_salary_earning = require('./operations/employee_salary_earning/employee_salary_earning.route')
+const employee_salary_setup = require('./operations/employee_salary_setup/employee_salary_setup.route')
+const salary_expatriate = require('./operations/employee_salary_expatriate/employee_salary_expatriate.route')
+const compensation_expatriate = require('./operations/compensation_expatriate_policy/compensation_expatriate_policy.route')
+const employee_transfer = require('./operations/employee_transfer/employee_transfer.route')
 
 const router = express.Router();
 
@@ -103,7 +130,123 @@ const defaultRoutes = [
     path: "/edrs",
     route: receipt
 
-  }
+  },
+  {
+    path: "/bank",
+    route: bank
+
+  },
+  {
+    path: "/branch",
+    route: branch
+
+  },
+  {
+    path: "/department",
+    route: department
+
+  },
+  {
+    path: "/emptype",
+    route: emptype
+
+  },
+  {
+    path: "/religion",
+    route: religion
+
+  },
+  {
+    path: "/region",
+    route: region
+  },
+  {
+    path: "/designation",
+    route: designation
+  },
+  {
+    path: "/form",
+    route: form
+  },
+  {
+    path: "/formdetails",
+    route: formdetails
+  },
+  {
+    path: "/policy",
+    route: emppolicy
+  },
+  {
+    path: "/profile",
+    route: empprofile
+  },
+  {
+    path: "/contact",
+    route: contact
+  },
+  {
+    path: "/academic",
+    route: academic
+  },
+  
+  {
+    path: "/experience",
+    route: experince
+  },
+  {
+    path: "/skills",
+    route: skills
+  },
+  {
+    path: "/incident",
+    route: incident
+  },
+  {
+    path: "/earning",
+    route: earning
+  },
+  {
+    path: "/deduction",
+    route: deduction
+  },
+  {
+    path: "/stoppage",
+    route: stoppage
+  },
+  {
+    path: "/exchange",
+    route: exchage_rate
+  },
+  {
+    path: "/compensation",
+    route: compensation_benefits
+  },
+  {
+    path: "/earning_transaction",
+    route: earning_deduction_transaction
+  },
+  {
+    path: "/employee_salary_earning",
+    route: employee_salary_earning
+  },
+  {
+    path: "/employee_salary",
+    route: employee_salary_setup
+  },
+  {
+    path: "/salary_expatriate",
+    route: salary_expatriate
+  },
+  {
+    path: "/compensation_expatriate",
+    route: compensation_expatriate
+  },
+  {
+    path: "/employee_transfer",
+    route: employee_transfer
+  },
+  
+
   // {
   //   path: "/roles",
   //   route: roleRoute,

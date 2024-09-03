@@ -23,14 +23,17 @@ const register = catchAsync(async (req, res) => {
 
 const login = catchAsync(async (req, res) => {
   const { email, password } = req.body;
+  
   const user = await authService.loginUserWithEmailAndPassword(email, password);
   // console.log(user.roleId);
   const userAccess = await userService.getUserCompleteRoleAccess(user.roleId);
+
   // console.log(userAccess);
   const _tokens = await tokenService.generateAuthTokens(user);
   const tokens = {access: _tokens.access.token, refresh: _tokens.refresh.token};
+  
   // res.send({ user, tokens, userAccess });
-  console.log('user login', user)
+  
   res.send({
     code: HttpStatusCodes.CREATED,
     message: HttpResponseMessages.CREATED,

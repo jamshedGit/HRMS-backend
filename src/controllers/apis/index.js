@@ -20,3 +20,4 @@ module.exports.incidentSeverityController = require('./operations/transactions/i
 module.exports.ibFormController = require('./operations/ibs/ibForm.controller')
 module.exports.mortuaryFormController = require('./operations/ibs/mortuaryForm.controller')
 module.exports.coffinFormController = require('./operations/ibs/coffinForm.controller')
+module.exports.employeeFormProfile = require('./operations/emp_profile/profile.controller')

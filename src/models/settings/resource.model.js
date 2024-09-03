@@ -7,7 +7,7 @@ const sequelize = require('../../config/db')
 // Define method takes two arguments
 // 1st - name of table
 // 2nd - columns inside the table
-const resource = sequelize.define('T_RESOURCES', {
+const resource = sequelize.define('t_resources', {
 	id:{
 		type:Sequelize.INTEGER,
 		autoIncrement:true,

@@ -36,6 +36,27 @@ const DDL_FIELD_NAMES = {
     labelField: 'userName',
     valueField: '_id',
   },
+  BankName:{
+    labelField: 'Name',
+    valueField: 'Id',
+  },
+  BranchName:{
+    labelField: 'Name',
+    valueField: 'Id',
+  },
+  DeptName:{
+    labelField: 'deptName',
+    valueField: 'deptId',
+  },
+  EmployeesKeys:{
+    labelField: 'firstName',
+    valueField: 'Id',
+  },
+
+  FormMenus:{
+    labelField: 'formName',
+    valueField: 'Id',
+  },
 };
 
 const HttpStatusCodes = {

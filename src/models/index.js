@@ -22,6 +22,10 @@ module.exports.SubCenterModel = require('./operations/entities/subcenters.model'
 module.exports.IncidentSeverityModel = require('./operations/transactions/incidentSeverity.model')
 module.exports.ItemModel = require('./operations/entities/items.model');
 
+
+
+
+
 //Dontation Receipt Model
 module.exports.DonationReceiptModel = require('./operations/edrs/donationReceipt.model');
 
@@ -53,6 +57,82 @@ module.exports.IbsImageModel = require('./operations/ibs/ibfImage.model');
 module.exports.MortuaryFormModel = require('./operations/ibs/morturayForm.model');
 module.exports.MortuaryImageModel = require('./operations/ibs/mortuaryImages.model');
 module.exports.CoffinFormModel = require('./operations/ibs/coffin.model');
+
+//Bank Model
+module.exports.BankModel = require('./operations/banks/bank.model');
+//Bank Model
+module.exports.BranchModel = require('./operations/branch/branch.model');
+//Department Model
+module.exports.DeptModel = require('./operations/department/dept.model');
+//Religion Model
+module.exports.ReligionModel = require('./operations/religion/religion.model');
+
+//Employee Type Model
+module.exports.EmployeeTypeModel = require('./operations/employeeType/employeeType.model');
+
+//Employee Type Model
+module.exports.RegionModel = require('./operations/region/region.model');
+
+//Desingation Type Model
+module.exports.DesignationModel = require('./operations/designation/designation.model');
+
+//Desingation Type Model
+module.exports.FormModel = require('./operations/form/form.model');
+
+//EmployeePolicyModel
+module.exports.EmployeePolicyModel = require('./operations/emppolicy/emppolicy.model');
+
+//EMployee Profile
+module.exports.EmployeeProfileModel = require('./operations/emp_profile/emp_profile.model');
+
+//Contact Information Profile
+module.exports.ContactInformationModel = require('./operations/emp_profile/emp_contact.model');
+
+//Contact Information Profile
+module.exports.AcademicModel = require('./operations/academic/academic.model');
+
+//Contact Information Profile
+module.exports.ExperienceModel = require('./operations/experience/experience.model');
+
+//Contact Information Profile
+module.exports.SkillsModel = require('./operations/skills/skills.model');
+
+//Contact Information Profile
+module.exports.IncidentModel = require('./operations/incident/incident.model');
+
+//EarningModel Information Profile
+module.exports.EarningModel = require('./operations/earning/earning.model');
+
+//deduction Information Profile
+module.exports.DeductionModel = require('./operations/deduction/deduction.model');
+
+//stoppage_allowance 
+module.exports.StoppageAllonceModel = require('./operations/stoppage_allowance/stoppage_allowance.model');
+
+//ExchangeRate Information Profile
+module.exports.ExchangeRateModel = require('./operations/exchange_rate/exchange_rate.model');
+
+//ExchangeRate Information Profile
+module.exports.CompensationBenefitsModel = require('./operations/compensatio_benefits/compensation_benefits.model');
+
+//EarningDeductionTranModel Information Profile
+module.exports.EarningDeductionTranModel = require('./operations/earning_transaction/earning_transaction.model');
+
+//EarningDeductionTranModel Information Profile
+module.exports.EmployeeSalaryEarningModel = require('./operations/employee_salary_earning/employee_salary_earning.model');
+
+//EarningDeductionTranModel Information Profile
+module.exports.EmployeeSalaryModel = require('./operations/employee_salary_setup/employee_salary_setup.model');
+
+//EmployeeSalaryExpatriateModel Information Profile
+module.exports.EmployeeSalaryExpatriateModel = require('./operations/employee_salary_expatriate/employee_salary_expatriate.model');
+
+
+//EarningDeductionTranModel Information Profile
+module.exports.CompensationExpatriateModel = require('./operations/compensation_expatriate_policy/compensation_expatriate_policy.model');
+
+//EmployeeTransferModel Information Profile
+module.exports.EmployeeTransferModel = require('./operations/employee_transfer/employee_transfer.model');
 
 // **********New way to Export Models******************
 

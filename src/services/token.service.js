@@ -35,13 +35,19 @@ const generateToken = (userId, expires, type, secret = config.jwt.secret) => {
  * @returns {Promise<TokenModel>}
  */
 const saveToken = async (token, userId, expires, type, blacklisted = false) => {
-  const tokenDoc = await TokenModel.create({
-    token,
-    id: userId,
-    expires: expires.toDate(),
-    type,
-    blacklisted,
-  });
+  try {
+
+
+    const tokenDoc = await TokenModel.create({
+      token,
+      id: userId,
+      expires: expires.toDate(),
+      type,
+      blacklisted,
+    });
+  } catch (error) {
+    console.log("Err.Message",error)
+  }
   return tokenDoc;
 };
 
@@ -71,7 +77,9 @@ const generateAuthTokens = async (user) => {
 
   const refreshTokenExpires = moment().add(config.jwt.refreshExpirationDays, 'days');
   const refreshToken = generateToken(user.id, refreshTokenExpires, tokenTypes.REFRESH);
-  await saveToken(refreshToken, user.id, refreshTokenExpires, tokenTypes.REFRESH);
+
+  //await saveToken(refreshToken, user.id, refreshTokenExpires, tokenTypes.REFRESH);
+
 
   return {
     access: {

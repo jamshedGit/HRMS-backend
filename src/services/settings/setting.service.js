@@ -1,4 +1,4 @@
-const { UserModel, RoleModel, ResourceModel, CountryModel, CityModel, CenterModel, SubCenterModel, VehicleDetailModel, VehicleCategoryModel, IncidentTypeModel, IncidentSeverityModel, StatusTypeModel, AlarmTimeModel, HospitalModel, PoliceStationModel } = require('../../models');
+const { UserModel, RoleModel, ResourceModel, CountryModel, CityModel, CenterModel, SubCenterModel, VehicleDetailModel, VehicleCategoryModel, IncidentTypeModel, IncidentSeverityModel, StatusTypeModel, AlarmTimeModel, HospitalModel, PoliceStationModel, BankModel, DeptModel, FormModel, EmployeeProfileModel, BranchModel } = require('../../models');
 const { getDdlItems, getAlarmTimesItems } = require('../../utils/common');
 const { DDL_FIELD_NAMES } = require('../../utils/constants');
 const { getRoleById } = require('./role.service');
@@ -33,8 +33,8 @@ const getStatusMasterData = async (check) => {
       attributes: ['id', 'name']
     }));
     return statusMasterData
-    
-  } 
+
+  }
 
   if (check.filter.ibf) {
 
@@ -43,18 +43,18 @@ const getStatusMasterData = async (check) => {
       attributes: ['id', 'name']
     }));
     return statusMasterData
-    
-  } 
+
+  }
 
   if (check.filter.mf) {
-    
+
     const statusMasterData = getDdlItems(DDL_FIELD_NAMES.default, await StatusTypeModel.findAll({
       where: { isActive: true, mf: check.filter.mf },
       attributes: ['id', 'name']
     }));
     return statusMasterData
 
-  } 
+  }
 
   if (check.filter.cf) {
 
@@ -63,8 +63,8 @@ const getStatusMasterData = async (check) => {
       attributes: ['id', 'name']
     }));
     return statusMasterData
-    
-  } 
+
+  }
 
 };
 
@@ -82,6 +82,63 @@ const getCountriesMasterData = async () => {
     attributes: ['id', 'name']
   }));
   return countriesMasterData
+};
+
+const getBanksMasterData = async () => {
+  const BanksMasterData = getDdlItems(DDL_FIELD_NAMES.BankName, await BankModel.findAll({
+    where: { isActive: true },
+    attributes: ['Id', 'Name']
+  }));
+  return BanksMasterData
+};
+
+
+
+const get_Bank_Branch_MasterData = async () => {
+  const Bank_Branch_MasterData = getDdlItems(DDL_FIELD_NAMES.BranchName, await BranchModel.findAll({
+    where: { isActive: true },
+    attributes: ['Id', 'Name']
+  }));
+  return Bank_Branch_MasterData
+};
+
+const getEmployeesMasterData = async () => {
+  const EmployeesMasterData = getDdlItems(DDL_FIELD_NAMES.EmployeesKeys, await EmployeeProfileModel.findAll({
+    where: { isActive: true },
+    attributes: ['Id', 'firstName']
+  }));
+  return EmployeesMasterData
+};
+
+
+const getDeptMasterData = async () => {
+  const DeptMasterData = getDdlItems(DDL_FIELD_NAMES.DeptName, await DeptModel.findAll({
+    where: { isActive: true, parentDept: null },
+    attributes: ['deptId', 'deptName']
+  }));
+  return DeptMasterData
+};
+
+const getChildMenusByParentId = async (parentMenuId) => {
+  const MenuChildsData = getDdlItems(DDL_FIELD_NAMES.FormMenus, await FormModel.findAll({
+    where: { isActive: true, parentDept: parentMenuId },
+    attributes: ['Id', 'formName']
+  }));
+  return MenuChildsData
+};
+
+
+const getFormMenusMasterData = async (req, res) => {
+  console.log("mm:", req.body.Id)
+  const FormMenusMasterData = getDdlItems(DDL_FIELD_NAMES.FormMenus, await FormModel.findAll({
+    where: { isActive: true, parentFormID: req.body.Id || null },
+    attributes: ['formName', 'Id']
+  }));
+  if (FormMenusMasterData.length > 0) {
+    FormMenusMasterData.unshift({ label: '--Select--', value: null })
+  }
+  console.log("Dropdown", FormMenusMasterData);
+  return FormMenusMasterData
 };
 
 const getAlarmTimesMasterData = async () => {
@@ -381,6 +438,21 @@ const getPoliceStationsMasterData = async (cityId) => {
   return policeStationsMasterData
 };
 
+
+const GetLastInserted_ID_ByTableName = async (tableName,prefix) => {
+  try {
+    console.log("tableName",tableName,prefix);
+    const results = await sequelize.query('CALL GetLastInsertedIdByTableName(:tableName,:prefix)', {
+      replacements: { tableName: tableName , prefix: prefix },
+      type: Sequelize.QueryTypes.RAW // Use RAW type for executing stored procedures
+    });
+
+    return results;
+  } catch (error) {
+    throw new ApiError(httpStatus.INTERNAL_SERVER_ERROR, error);
+  }
+};
+
 // const getVehicleMakes = async () => {
 //   const make = getDdlItems(DDL_FIELD_NAMES.make, await VehicleDetailsModel.find({ isDeleted: false }, { make: 1 }));
 //   return make;
@@ -595,5 +667,12 @@ module.exports = {
   getStatusMasterData,
   getVehiclesDashboardMasterData,
   getHospitalsMasterData,
-  getPoliceStationsMasterData
+  getPoliceStationsMasterData,
+  getBanksMasterData,
+  getDeptMasterData,
+  getFormMenusMasterData,
+  getChildMenusByParentId,
+  getEmployeesMasterData,
+  GetLastInserted_ID_ByTableName,
+  get_Bank_Branch_MasterData
 };

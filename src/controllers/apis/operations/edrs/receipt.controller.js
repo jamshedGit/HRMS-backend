@@ -6,7 +6,7 @@ const { donationReceiptFormService } = require("../../../../services");
 
 
 
-const {
+const { 
   HttpStatusCodes,
   HttpResponseMessages,
 } = require("../../../../utils/constants");
@@ -99,7 +99,7 @@ const getMaxbookingNoForReceipt = catchAsync(async (req, res) => {
   }
   res.send({
       code: HttpStatusCodes.OK,
-      message: HttpResponseMessages.OK,
+      message: HttpResponseMessages.OK,   
       data: edrsDonationReport,
   });
 });

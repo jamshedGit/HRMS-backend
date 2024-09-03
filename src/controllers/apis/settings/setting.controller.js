@@ -31,6 +31,60 @@ const getCountriesMasterData = catchAsync(async (req, res) => {
   });
 });
 
+const getBanksMasterData = catchAsync(async (req, res) => {
+  res.send({
+    code: HttpStatusCodes.OK,
+    message: HttpResponseMessages.OK,
+    data: await settingService.getBanksMasterData(),
+  });
+});
+
+const get_Bank_Branch_MasterData = catchAsync(async (req, res) => {
+  res.send({
+    code: HttpStatusCodes.OK,
+    message: HttpResponseMessages.OK,
+    data: await settingService.get_Bank_Branch_MasterData(),
+  });
+});
+
+
+const getEmployeesMasterData = catchAsync(async (req, res) => {
+  res.send({
+    code: HttpStatusCodes.OK,
+    message: HttpResponseMessages.OK,
+    data: await settingService.getEmployeesMasterData(),
+  });
+});
+
+
+const getDeptMasterData = catchAsync(async (req, res) => {
+  
+  res.send({
+    code: HttpStatusCodes.OK,
+    message: HttpResponseMessages.OK,
+    data: await settingService.getDeptMasterData(),
+  });
+});
+
+const getChildsMenusByParentId = catchAsync(async (req, res) => {
+  
+  res.send({
+    code: HttpStatusCodes.OK,
+    message: HttpResponseMessages.OK,
+    data: await settingService.getChildMenusByParentId(req.parentFormId),
+  });
+});
+
+const getFormMenusMasterData = catchAsync(async (req, res) => {
+  console.log("parentId main:", req.body);
+  res.send({  
+    code: HttpStatusCodes.OK,
+    message: HttpResponseMessages.OK,
+    data: await settingService.getFormMenusMasterData(req),
+  });
+});
+
+
 const getAlarmTimesMasterData = catchAsync(async (req, res) => {
   res.send({
     code: HttpStatusCodes.OK,
@@ -216,6 +270,21 @@ const getPoliceStationsMasterData = catchAsync(async (req, res) => {
   });
 });
 
+
+const GetLastInserted_ID_ByTableName = catchAsync(async (req, res) => {
+  console.log("GetLastInserted_ID_ByTableName")
+  console.log(req.body)
+  const Receipt = await settingService.GetLastInserted_ID_ByTableName(req.body.tableName,req.body.prefix);
+  if (!Receipt) {
+    throw new ApiError(httpStatus.NOT_FOUND, "Receipt not found");
+  }
+  res.send({
+    code: HttpStatusCodes.OK,
+    message: HttpResponseMessages.OK,
+    data: Receipt,
+  });
+});
+
 module.exports = {
   getRolesMasterData,
   getResourcesMasterData,
@@ -234,5 +303,12 @@ module.exports = {
   getNearByCenters,
   getVehiclesDashboardMasterData,
   getHospitalsMasterData,
-  getPoliceStationsMasterData
+  getPoliceStationsMasterData,
+  getBanksMasterData,
+  getDeptMasterData,
+  getFormMenusMasterData,
+  getChildsMenusByParentId,
+  getEmployeesMasterData,
+  GetLastInserted_ID_ByTableName,
+  get_Bank_Branch_MasterData
 };

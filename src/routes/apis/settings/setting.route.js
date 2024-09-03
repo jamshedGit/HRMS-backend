@@ -48,6 +48,12 @@ router.route('/find-near-by-centers').post(auth(), validate(settingValidation.ge
 router.route('/read-all-status-types-master-data').post(auth(), validate(settingValidation.getStatusMasterData), settingController.getStatusMasterData)
 router.route('/read-all-hospitals-master-data').post(auth(), validate(settingValidation.getHospitalsMasterData), settingController.getHospitalsMasterData);
 router.route('/read-all-police-stations-master-data').post(auth(), validate(settingValidation.getPoliceStationsMasterData), settingController.getPoliceStationsMasterData);
+router.route('/read-all-banks').get(auth(), validate(settingValidation.getBanksMasterData), settingController.getBanksMasterData);
+router.route('/read-all-branch').get(auth(), validate(settingValidation.getBanksMasterData), settingController.get_Bank_Branch_MasterData);
+router.route('/read-all-dept').get(auth(), validate(settingValidation.getDeptMasterData), settingController.getDeptMasterData);
+router.route('/read-all-form').post(auth(), validate(settingValidation.getFormMenuMasterData), settingController.getFormMenusMasterData);
+router.route('/read-all-child-forms').get(auth(), validate(settingValidation.getFormMenuMasterData), settingController.getChildsMenusByParentId);
+router.route('/read-all-profile').post(auth(), validate(settingValidation.getAllEmployees), settingController.getEmployeesMasterData);
 
 // Donation Receipt
 router.route('/get-max-booking-no').post(auth(), validate(getMaxNoFromReceipt),  getMaxbookingNoForReceipt);
@@ -55,6 +61,8 @@ router.route('/get-max-booking-no').post(auth(), validate(getMaxNoFromReceipt), 
 
 // Dashboard API's
 router.route('/read-all-vehicles-dashboard').post(auth(),validate(settingValidation.getVehiclesDashboardMasterData), settingController.getVehiclesDashboardMasterData)
+
+router.route('/get-max-tableId').post(validate(settingValidation.getFormMenuMasterData),  settingController.GetLastInserted_ID_ByTableName);
 
 module.exports = router;
 
