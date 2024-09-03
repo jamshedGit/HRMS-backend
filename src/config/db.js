@@ -32,10 +32,10 @@ try {
 
     logging:false,
     dialectOptions: {
-      ssl: {
-        require: false, // This will help you. But you will see nwe error
-        rejectUnauthorized: false // This line will fix new error
-      }
+     // ssl: {
+      //   require: false, // This will help you. But you will see nwe error
+      //   rejectUnauthorized: false // This line will fix new error
+      // }
     },
     
     // Localhost Database Connection
