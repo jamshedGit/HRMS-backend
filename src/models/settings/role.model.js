@@ -7,7 +7,7 @@ const sequelize = require('../../config/db')
 // Define method takes two arguments
 // 1st - name of table
 // 2nd - columns inside the table
-const role = sequelize.define('t_roles', {
+const role = sequelize.define('T_ROLES', {
 	id:{
 		type:Sequelize.INTEGER,
 		autoIncrement:true,

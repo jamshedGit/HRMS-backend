@@ -7,7 +7,7 @@ const { RoleModel, ResourceModel } = require('../index');
 // Define method takes two arguments
 // 1st - name of table
 // 2nd - columns inside the table
-const accessRight = sequelize.define('t_access_rights', {
+const accessRight = sequelize.define('T_ACCESS_RIGHTS', {
 	id:{
 		type:Sequelize.INTEGER,
 		autoIncrement:true,

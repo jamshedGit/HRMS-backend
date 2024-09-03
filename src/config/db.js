@@ -5,7 +5,6 @@ var sequelize;
 try {
   sequelize = new Sequelize({
 
-
     database: "sql10729008",
     username: "sql10729008",
     password: "sMYzNnscZT",
@@ -15,6 +14,7 @@ try {
     logging: false,
     define: {
       freezeTableName: true,
+      
     },
 
     // database: "dsc_hrms_staging",
@@ -49,15 +49,9 @@ try {
     //   },
     // },
     define: {
-      // timestamps: true,
       freezeTableName: true,
     },
-    // host: envVars.HOST,
-    // port: envVars.DB_PORT,
-    // database: envVars.DATABASE,
-    // dialect: envVars.DIALECT,
-    // username: envVars.USERNAME,
-    // password: envVars.PASSWORD
+  
   });
 
   sequelize.authenticate();
