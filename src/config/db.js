@@ -31,12 +31,7 @@ try {
     dialect: "mysql",
 
     logging:false,
-    dialectOptions: {
-         ssl: {
-         require: true, // This will help you. But you will see new error
-         rejectUnauthorized: false, // This line will fix new error
-       },
-    },
+    dialectOptions: {},
     
     // Localhost Database Connection
     // database: "EAMS2",
