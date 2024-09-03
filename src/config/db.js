@@ -14,7 +14,7 @@ try {
     logging: false,
     define: {
       freezeTableName: true,
-      modelName: 'singularName'
+      
     },
 
     // database: "dsc_hrms_staging",
