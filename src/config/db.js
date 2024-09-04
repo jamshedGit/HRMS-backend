@@ -13,8 +13,8 @@ try {
     dialect: "mysql",
     logging: false,
     define: {
-      freezeTableName: false,
-      
+        timestamps: true,
+    freezeTableName: true
     },
 
     // database: "dsc_hrms_staging",
