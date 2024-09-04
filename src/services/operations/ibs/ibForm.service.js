@@ -368,7 +368,7 @@ const getIbsReportByYear = async (year) => {
             COUNT(CASE WHEN DATE_PART('month', IB."createdAt") = 11 THEN 1 END) AS NOV,
             COUNT(CASE WHEN DATE_PART('month', IB."createdAt") = 12 THEN 1 END) AS DEC,
             COUNT(IB."incidentTypeId") AS TOTAL
-        FROM public."T_INCIDENT_TYPE" AS IT
+        FROM public."t_incident_type" AS IT
         LEFT JOIN public."T_IB_FORMS" AS IB ON IT."id" = IB."incidentTypeId" AND DATE_PART('year', IB."createdAt") = ${year} 
         AND IB."incidentTypeId" <> 2
         where IT."id" <> 2
@@ -390,7 +390,7 @@ const getIbsReportByYear = async (year) => {
             COUNT(CASE WHEN DATE_PART('month', INC."createdAt") = 11 THEN 1 END) AS NOV,
             COUNT(CASE WHEN DATE_PART('month', INC."createdAt") = 12 THEN 1 END) AS DEC,
             COUNT(INC."incidentTypeId") AS TOTAL
-        FROM public."T_INCIDENT_TYPE" AS IT
+        FROM public."t_incident_type" AS IT
         JOIN public."T_INCIDENT_DETAILS" AS INC ON IT."id" = INC."incidentTypeId" AND DATE_PART('year', INC."createdAt") = ${year}
         GROUP BY IT."id", IT."name") as report
         ORDER BY report."id", report."name"`);

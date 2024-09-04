@@ -36,9 +36,9 @@ const getAllAccessRightsByRoleId = async (filter, options) => {
     const formatedData = [];
     accessRights.forEach((element) => {
         formatedData.push({
-            name: element.T_RESOURCE.name,
-            parentName: element.T_RESOURCE.parentName,
-            slug: element.T_RESOURCE.slug,
+            name: element.t_resource.name,
+            parentName: element.t_resource.parentName,
+            slug: element.t_resource.slug,
             isAccess: element.isAccess,
             isActive: element.isActive,
             roleId: element.roleId,

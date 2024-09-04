@@ -3,7 +3,7 @@ const Sequelize = require('sequelize');
 const sequelize = require('../../../config/db');
 
 
-const incidentTypes = sequelize.define('T_INCIDENT_TYPE', {
+const incidentTypes = sequelize.define('t_incident_type', {
 	id:{
 		type:Sequelize.INTEGER,
 		autoIncrement:true,
