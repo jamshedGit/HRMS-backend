@@ -377,14 +377,14 @@ const getUserCompleteRoleAccess = async (roleId) => {
   const formatedData = [];
   roleAccessData.forEach((element) => {
     formatedData.push({
-      isResourceShow: element.T_RESOURCE.isResourceShow,
-      name: element.T_RESOURCE.name,
-      parentName: element.T_RESOURCE.parentName,
-      url: element.T_RESOURCE.parentSlug + '/' + element.T_RESOURCE.slug,
-      componentName: toPascalCase(element.T_RESOURCE.slug),
+      isResourceShow: element.t_resource.isResourceShow,
+      name: element.t_resource.name,
+      parentName: element.t_resource.parentName,
+      url: element.t_resource.parentSlug + '/' + element.t_resource.slug,
+      componentName: toPascalCase(element.t_resource.slug),
       isAccess: element.isAccess,
-      slug: element.T_RESOURCE.slug,
-      parentSlug: element.T_RESOURCE.parentSlug,
+      slug: element.t_resource.slug,
+      parentSlug: element.t_resource.parentSlug,
       resourceId: element.resourceId,
       // isActive: element.isActive,
       // roleId: element.roleId,
