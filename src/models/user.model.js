@@ -11,7 +11,7 @@ const { RoleModel, CenterModel, CityModel, CountryModel, SubCenterModel } = requ
 // Define method takes two arguments
 // 1st - name of table
 // 2nd - columns inside the table
-const user = sequelize.define('T_USERS', {
+const user = sequelize.define('t_users', {
 	id: {
 		type: Sequelize.INTEGER,
 		autoIncrement: true,
