@@ -4,7 +4,7 @@ const { ResourceModel } = require('../..');
 //import Database connection configurations.
 const sequelize = require('../../../config/db')
 
-const EmployeePolicyModel = sequelize.define('T_EmployeePolicy', {
+const EmployeePolicyModel = sequelize.define('t_employeepolicy', {
 	Id: {
 		type: Sequelize.INTEGER,
 		autoIncrement: true,

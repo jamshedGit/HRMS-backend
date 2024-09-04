@@ -2,7 +2,7 @@ const Sequelize = require('sequelize');
 const { ResourceModel } = require('../..');
 const sequelize = require('../../../config/db')
 
-const items = sequelize.define('T_ITEMS', {
+const items = sequelize.define('t_items', {
 	id:{
 		type:Sequelize.INTEGER,
 		autoIncrement:true,

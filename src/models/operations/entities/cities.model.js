@@ -2,7 +2,7 @@ const Sequelize = require("sequelize");
 const sequelize = require("../../../config/db");
 const { CountryModel } = require('../../../models/index');
 
-const cities = sequelize.define("T_CITIES", {
+const cities = sequelize.define("t_cities", {
     id: {
         type: Sequelize.INTEGER,
         autoIncrement: true,

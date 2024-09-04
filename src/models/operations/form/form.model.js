@@ -4,7 +4,7 @@ const { ResourceModel } = require('../..');
 //import Database connection configurations.
 const sequelize = require('../../../config/db')
 
-const FormModel = sequelize.define('T_FORM_MENU', {
+const FormModel = sequelize.define('t_form_menu', {
 	Id: {
 		type: Sequelize.INTEGER,
 		autoIncrement: true,

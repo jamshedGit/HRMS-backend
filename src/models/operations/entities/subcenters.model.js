@@ -2,7 +2,7 @@ const Sequelize = require("sequelize");
 const sequelize = require("../../../config/db");
 const { CountryModel, CityModel, CenterModel } = require('../../../models');
 
-const subCenters = sequelize.define("T_SUB_CENTERS", {
+const subCenters = sequelize.define("t_sub_centers", {
   id: {
     type: Sequelize.INTEGER,
     autoIncrement: true,

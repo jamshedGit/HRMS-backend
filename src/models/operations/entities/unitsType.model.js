@@ -2,7 +2,7 @@ const Sequelize = require('sequelize');
 const { ResourceModel } = require('../..');
 const sequelize = require('../../../config/db')
 
-const unitsTypes = sequelize.define('T_UNITS_TYPE', {
+const unitsTypes = sequelize.define('t_units_type', {
 	id:{
 		type:Sequelize.INTEGER,
 		autoIncrement:true,

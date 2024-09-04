@@ -4,7 +4,7 @@ const { ResourceModel } = require('../..');
 //import Database connection configurations.
 const sequelize = require('../../../config/db')
 
-const BankModel = sequelize.define('T_Employee_Academic_Info', {
+const BankModel = sequelize.define('t_employee_academic_info', {
 	Id: {
 		type: Sequelize.INTEGER,
 		autoIncrement: true,

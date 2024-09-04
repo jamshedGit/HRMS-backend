@@ -4,7 +4,7 @@ const { ResourceModel } = require('../..');
 //import Database connection configurations.
 const sequelize = require('../../../config/db')
 
-const DesigModel = sequelize.define('T_DESIGNATION', {
+const DesigModel = sequelize.define('t_designation', {
 	Id:{
 		type:Sequelize.INTEGER,
 		autoIncrement:true,

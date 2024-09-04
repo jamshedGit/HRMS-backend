@@ -4,7 +4,7 @@ const { ResourceModel } = require('../..');
 //import Database connection configurations.
 const sequelize = require('../../../config/db')
 
-const RegionModel = sequelize.define('T_REGION', {
+const RegionModel = sequelize.define('t_region', {
 	Id:{
 		type:Sequelize.INTEGER,
 		autoIncrement:true,

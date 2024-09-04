@@ -4,7 +4,7 @@ const { ResourceModel, BranchModel, BankModel } = require('../..');
 //import Database connection configurations.
 const sequelize = require('../../../config/db')
 
-const branch = sequelize.define('T_Bank_Branch', {
+const branch = sequelize.define('t_bank_branch', {
 	Id:{
 		type:Sequelize.INTEGER,
 		autoIncrement:true,

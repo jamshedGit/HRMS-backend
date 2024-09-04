@@ -1,7 +1,7 @@
 const Sequelize = require("sequelize");
 const sequelize = require("../../../config/db");
 
-const alarmTime = sequelize.define("T_ALARMTIME", {
+const alarmTime = sequelize.define("t_alarmtime", {
     id: {
         type: Sequelize.INTEGER,
         autoIncrement: true,

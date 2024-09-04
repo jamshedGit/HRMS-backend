@@ -4,7 +4,7 @@ const Sequelize = require('sequelize');
 //import Database connection configurations.
 const sequelize = require('../../../config/db');
 
-const employeeType = sequelize.define('T_EmployeeType', {
+const employeeType = sequelize.define('t_employeetype', {
     Id: {
         type: Sequelize.INTEGER,
         autoIncrement: true,

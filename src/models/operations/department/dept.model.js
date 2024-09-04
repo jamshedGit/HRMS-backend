@@ -5,7 +5,7 @@ const Sequelize = require('sequelize');
 const sequelize = require('../../../config/db');
 const { DeptModel } = require('../..');
 
-const department = sequelize.define('T_Department', {
+const department = sequelize.define('t_department', {
     deptId: {
         type: Sequelize.INTEGER,
         autoIncrement: true,

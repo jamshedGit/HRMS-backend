@@ -1,7 +1,7 @@
 const Sequelize = require('sequelize');
 const sequelize = require('../../../config/db')
 
-const statusTypes = sequelize.define('T_STATUS_TYPES', {
+const statusTypes = sequelize.define('t_status_types', {
 	id:{
 		type:Sequelize.INTEGER,
 		autoIncrement:true,
