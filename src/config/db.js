@@ -13,7 +13,7 @@ try {
     dialect: "mysql",
     logging: false,
     define: {
-        timestamps: true,
+        timestamps: false,
     freezeTableName: true
     },
 
