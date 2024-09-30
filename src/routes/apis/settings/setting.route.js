@@ -54,6 +54,7 @@ router.route('/read-all-dept').get(auth(), validate(settingValidation.getDeptMas
 router.route('/read-all-form').post(auth(), validate(settingValidation.getFormMenuMasterData), settingController.getFormMenusMasterData);
 router.route('/read-all-child-forms').get(auth(), validate(settingValidation.getFormMenuMasterData), settingController.getChildsMenusByParentId);
 router.route('/read-all-profile').post(auth(), validate(settingValidation.getAllEmployees), settingController.getEmployeesMasterData);
+router.route('/read-salary-revision-by-employeeId').post( validate(settingValidation.getEmpSalaryRevisionByEmpId), settingController.getRevisionHistoryByEmpId);
 
 // Donation Receipt
 router.route('/get-max-booking-no').post(auth(), validate(getMaxNoFromReceipt),  getMaxbookingNoForReceipt);

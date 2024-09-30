@@ -60,7 +60,23 @@ const usp_GetAllSalary_Earning_DeductionByEmpId = catchAsync(async (req, res) =>
   console.log("EmployeeSalary 123 EmpId")
   console.log(req.body)
   const response = await Employee_Salary_Earning_Deduction_formService.EmployeeSalaryEarningDeductionServicePage.usp_GetAllSalary_Earning_DeductionByEmpId(req.body.id,req.body.basicSalary);
-  console.log("doll",response);
+  
+  if (!response) {
+    throw new ApiError(httpStatus.NOT_FOUND, "response not found");
+  }
+  res.send({
+    code: HttpStatusCodes.OK,
+    message: HttpResponseMessages.OK,
+    data: response,
+  });
+});
+
+// For Use Employee Revision OnChange By GradeId and EmployeeTypeId
+const usp_GetAllCompensationByGradeAndEmployeeType = catchAsync(async (req, res) => {
+  
+  console.log("tell",req.body)
+  const response = await Employee_Salary_Earning_Deduction_formService.EmployeeSalaryEarningDeductionServicePage.usp_GetAllCompensationByGradeAndEmployeeType(req.body.gradeId,req.body.employeeTypeId);
+  
   if (!response) {
     throw new ApiError(httpStatus.NOT_FOUND, "response not found");
   }
@@ -129,5 +145,6 @@ module.exports = {
   deleteEmployeeSalary,
   usp_GetAllSalary_Earning_DeductionByEmpId,
   usp_UpdateSalaryEarningDeductionBulk,
-  SP_getAllEmployeeSalaryInfoForDDL
+  SP_getAllEmployeeSalaryInfoForDDL,
+  usp_GetAllCompensationByGradeAndEmployeeType
 };

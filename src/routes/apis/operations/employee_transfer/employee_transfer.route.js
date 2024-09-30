@@ -14,5 +14,7 @@ router.route("/create-employee-transfer").post(auth(), validate(employee_transfe
 router.route("/update-employee-transfer").put(auth(), employee_transfer_controller.updateEmployeeTransfer);
 router.route("/delete-employee-transfer").patch(auth(), employee_transfer_controller.deleteEmployeeTransfer);
 router.route("/create-employee-transfer-bulk").post( employee_transfer_controller.usp_InsertEmployeeTransferBulk);
+router.route("/get-all-employee-transfer-history-byId").post( employee_transfer_controller.SP_getAllEmployeeTransferInfoByEmpId);
+
 
 module.exports = router;

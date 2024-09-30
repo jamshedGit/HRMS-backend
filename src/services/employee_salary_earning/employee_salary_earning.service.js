@@ -110,7 +110,22 @@ const usp_GetAllSalary_Earning_DeductionByEmpId = async (empId, basicSalary) => 
       replacements: { id: empId || 'null', basicSalary: basicSalary || 0 },
       type: Sequelize.QueryTypes.RAW // Use RAW type for executing stored procedures
     });
-    console.log("gggg", results);
+   
+    return results;
+  } catch (error) {
+    throw new ApiError(httpStatus.INTERNAL_SERVER_ERROR, error);
+  }
+};
+
+
+const usp_GetAllCompensationByGradeAndEmployeeType = async (gradeId, employeeTypeId) => {
+  try {
+    console.log("revision empID", gradeId, employeeTypeId);
+    const results = await sequelize.query('CALL usp_GetAllCompensationByGradeAndEmployeeType(:gradeId,:employeeTypeId)', {
+      replacements: { gradeId: gradeId || 0, employeeTypeId: employeeTypeId || 0 },
+      type: Sequelize.QueryTypes.RAW // Use RAW type for executing stored procedures
+    });
+   
     return results;
   } catch (error) {
     throw new ApiError(httpStatus.INTERNAL_SERVER_ERROR, error);
@@ -224,5 +239,6 @@ module.exports = {
   SP_getAllEmployeeSalaryInfo,
   usp_GetAllSalary_Earning_DeductionByEmpId,
   usp_Update_Salary_Earning_Deduction_Bulk,
-  SP_getAllEmployeeSalaryInfoForDDL
+  SP_getAllEmployeeSalaryInfoForDDL,
+  usp_GetAllCompensationByGradeAndEmployeeType
 };

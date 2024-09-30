@@ -359,6 +359,7 @@ const deleteUserById = async (userId, deleteBody, updatedBy) => {
 const getUserCompleteRoleAccess = async (roleId) => {
   const roleAccessData = await AccessRightModel.findAll({
     where: { roleId: roleId, isAccess: true, isActive: true },
+    
     include: [
       {
         model: RoleModel,
@@ -366,9 +367,12 @@ const getUserCompleteRoleAccess = async (roleId) => {
       },
       {
         model: ResourceModel,
+        
         where: { isParentShow: true },
-        attributes: ['name', 'parentName', 'parentSlug', 'slug', 'isResourceShow']
-      }
+        
+        attributes: ['name', 'parentName', 'parentSlug', 'slug', 'isResourceShow','sortOrder']
+      },
+      
     ],
     attributes: ['isAccess', 'isActive', 'roleId', 'resourceId']
 
@@ -384,14 +388,15 @@ const getUserCompleteRoleAccess = async (roleId) => {
       componentName: toPascalCase(element.t_resource.slug),
       isAccess: element.isAccess,
       slug: element.t_resource.slug,
+      sortOrder: element.t_resource.sortOrder,
       parentSlug: element.t_resource.parentSlug,
       resourceId: element.resourceId,
       // isActive: element.isActive,
       // roleId: element.roleId,
     })
   });
-
-  // console.log("roleAccessData",roleAccessData);
+  
+   console.log("formatedData",formatedData);
   var groupedData = _.groupBy(formatedData, f => { return f.parentName });
   delete formatedData.parentName;
   return groupedData;

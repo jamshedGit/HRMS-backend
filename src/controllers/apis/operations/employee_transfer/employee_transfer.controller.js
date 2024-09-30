@@ -48,7 +48,7 @@ const getAllEmployeeTransfer = catchAsync(async (req, res) => {
 const SP_getAllEmployeeTransferInfoByEmpId = catchAsync(async (req, res) => {
   console.log("EmployeeTransfer Controller getEmployeeTransferId")
   console.log(req.body)
-  const obj = await EmployeeTransferServicePage.EmployeeTransferServicePage.SP_getAllEmployeeTransferInfoByEmpId(req.body.Id);
+  const obj = await EmployeeTransferServicePage.EmployeeTransferServicePage.SP_getAllEmployeeTransferInfoByEmpId(req.body.employeeId);
   if (!obj) {
     throw new ApiError(httpStatus.NOT_FOUND, "obj not found");
   }
@@ -79,7 +79,7 @@ const getEmployeeTransferById = catchAsync(async (req, res) => {
   console.log("EmployeeTransfer Controller getEmployeeTransferId")
   console.log(req.body)
   const obj = await EmployeeTransferServicePage.EmployeeTransferServicePage.getEmployeeTransferById(req.body.Id);
-  console.log("redeem",obj)
+  //console.log("redeem",obj)
   if (!obj) {
     throw new ApiError(httpStatus.NOT_FOUND, "obj not found");
   }

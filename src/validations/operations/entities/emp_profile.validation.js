@@ -25,6 +25,7 @@ const createEmp_profileValidation = {
         additional_summary: Joi.string(),
         status: Joi.string(),
         departmentId: Joi.number(),
+        designationId: Joi.number(),
         teamId: Joi.number(),
         payrollGroupId: Joi.number(),
         regionId: Joi.number(),

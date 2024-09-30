@@ -270,6 +270,13 @@ const getPoliceStationsMasterData = catchAsync(async (req, res) => {
   });
 });
 
+const getRevisionHistoryByEmpId = catchAsync(async (req, res) => {
+  res.send({
+    code: HttpStatusCodes.OK,
+    message: HttpResponseMessages.OK,
+    data: await settingService.getRevisionHistoryByEmpId(req.body.employeeId),
+  });
+});
 
 const GetLastInserted_ID_ByTableName = catchAsync(async (req, res) => {
   console.log("GetLastInserted_ID_ByTableName")
@@ -310,5 +317,6 @@ module.exports = {
   getChildsMenusByParentId,
   getEmployeesMasterData,
   GetLastInserted_ID_ByTableName,
-  get_Bank_Branch_MasterData
+  get_Bank_Branch_MasterData,
+  getRevisionHistoryByEmpId
 };

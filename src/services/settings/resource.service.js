@@ -39,7 +39,9 @@ const createResource = async (req, ResourceBody) => {
  * @param {number} [options.page] - Current page (default = 1)
  * @returns {Promise<QueryResult>}
  */
+
 const queryResources = async (filter, options) => {
+  console.log("do3");
   let limit = options.limit;
   let offset = 0 + (options.page - 1) * limit
   const Resources = await ResourceModel.findAll({
@@ -49,6 +51,7 @@ const queryResources = async (filter, options) => {
         //     ['date', 'ASC']
         // ]
     });
+    
   return Resources;
 
 //   const pipeline = [
@@ -125,6 +128,7 @@ const queryResources = async (filter, options) => {
  * @returns {Promise<ResourceModel>}
  */
 const getResourceById = async (id) => {
+  console.log("do2");
   return ResourceModel.findByPk(id);
 };
 

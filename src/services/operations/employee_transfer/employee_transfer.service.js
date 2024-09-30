@@ -131,8 +131,7 @@ const queryEmployeeTransfers = async (filter, options, searchQuery) => {
 const SP_getAllEmployeeTransferInfo = async (filter, options, searchQuery, empId) => {
   try {
 
-    const results = await sequelize.query('CALL usp_GetAllEmployeeTransferDetails(:employeeId)', {
-      replacements: { employeeId: empId },
+    const results = await sequelize.query('CALL usp_GetAllEmployeeTransferDetails()', {
       type: Sequelize.QueryTypes.RAW // Use RAW type for executing stored procedures
     });
     let limit = options.pageSize;
@@ -150,11 +149,11 @@ const SP_getAllEmployeeTransferInfo = async (filter, options, searchQuery, empId
 };
 
 
-const SP_getAllEmployeeTransferInfoByEmpId = async (empId, transactionType) => {
+const SP_getAllEmployeeTransferInfoByEmpId = async (employeeId) => {
   try {
-    console.log("EmployeeTransfer empID", empId);
-    const results = await sequelize.query('CALL usp_GetAllActiveEmployeeSalaries(:id,:transactionType)', {
-      replacements: { id: empId || 'null', transactionType: transactionType },
+    console.log("EmployeeTransfer empID", employeeId);
+    const results = await sequelize.query('CALL usp_GetAllEmployeeTransferHistoryByEmpId(:p_employeeId)', {
+      replacements: { p_employeeId: employeeId},
       type: Sequelize.QueryTypes.RAW // Use RAW type for executing stored procedures
     });
 

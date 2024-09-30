@@ -1,4 +1,4 @@
-const { UserModel, RoleModel, ResourceModel, CountryModel, CityModel, CenterModel, SubCenterModel, VehicleDetailModel, VehicleCategoryModel, IncidentTypeModel, IncidentSeverityModel, StatusTypeModel, AlarmTimeModel, HospitalModel, PoliceStationModel, BankModel, DeptModel, FormModel, EmployeeProfileModel, BranchModel } = require('../../models');
+const { UserModel, RoleModel, ResourceModel, CountryModel, CityModel, CenterModel, SubCenterModel, VehicleDetailModel, VehicleCategoryModel, IncidentTypeModel, IncidentSeverityModel, StatusTypeModel, AlarmTimeModel, HospitalModel, PoliceStationModel, BankModel, DeptModel, FormModel, EmployeeProfileModel, BranchModel, EmployeeSalaryRevisionModel } = require('../../models');
 const { getDdlItems, getAlarmTimesItems } = require('../../utils/common');
 const { DDL_FIELD_NAMES } = require('../../utils/constants');
 const { getRoleById } = require('./role.service');
@@ -126,6 +126,15 @@ const getChildMenusByParentId = async (parentMenuId) => {
   }));
   return MenuChildsData
 };
+
+const getRevisionHistoryByEmpId = async (employeeId) => {
+  const MenuChildsData = getDdlItems(DDL_FIELD_NAMES.SalaryRevisionKeys, await EmployeeSalaryRevisionModel.findAll({
+    where: { isActive: true,employeeId : employeeId },
+    attributes: ['Id', 'reviewDate']
+  }));
+  return MenuChildsData
+};
+
 
 
 const getFormMenusMasterData = async (req, res) => {
@@ -674,5 +683,6 @@ module.exports = {
   getChildMenusByParentId,
   getEmployeesMasterData,
   GetLastInserted_ID_ByTableName,
-  get_Bank_Branch_MasterData
+  get_Bank_Branch_MasterData,
+  getRevisionHistoryByEmpId
 };

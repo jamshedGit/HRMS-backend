@@ -92,7 +92,7 @@ const SP_getAllSkillsInfoByEmpId = async (empId) => {
   try {
     console.log("skill empId", empId);
     const results = await sequelize.query('CALL usp_GetAllEmployeeSkills(:employeeId)', {
-      replacements: { employeeId: empId || 'null' },
+      replacements: { employeeId: empId },
       type: Sequelize.QueryTypes.RAW // Use RAW type for executing stored procedures
     });
 

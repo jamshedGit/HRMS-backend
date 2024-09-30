@@ -5,32 +5,32 @@ var sequelize;
 try {
   sequelize = new Sequelize({
 
-    database: "sql10729008",
-    username: "sql10729008",
-    password: "sMYzNnscZT",
-    host: "sql10.freemysqlhosting.net",
-    port: 3306,
-    dialect: "mysql",
-    logging: false,
-    define: {
-        timestamps: false,
-    freezeTableName: true
-    },
-
-    // database: "dsc_hrms_staging",
-    // username: "root", //Arsal1997   arsalans credentials
-    // password: "", //pSlC3yjUvd5t
-    // host: "localhost", //ep-little-math-774305.us-east-2.aws.neon.tech
+    // database: "sql10729008",
+    // username: "sql10729008",
+    // password: "sMYzNnscZT",
+    // host: "sql10.freemysqlhosting.net",
     // port: 3306,
     // dialect: "mysql",
-    // logging: true,
-    // dialectOptions: {
-    //   // ssl: {
-    //   //   require: false, // This will help you. But you will see nwe error
-    //   //   rejectUnauthorized: false // This line will fix new error
-    //   // }
+    // logging: false,
+    // define: {
+    //     timestamps: false,
+    // freezeTableName: true
     // },
 
+    database: "dsc_hrms_staging",
+    username: "root", //Arsal1997   arsalans credentials
+    password: "", //pSlC3yjUvd5t
+    host: "localhost" ,// "119.153.103.211", //"localhost", //ep-little-math-774305.us-east-2.aws.neon.tech
+    port: 3306,
+    dialect: "mysql",
+    logging: true,
+    dialectOptions: {
+      // ssl: {
+      //   require: false, // This will help you. But you will see nwe error
+      //   rejectUnauthorized: false // This line will fix new error
+      // } 
+    },  
+  
 
 
 

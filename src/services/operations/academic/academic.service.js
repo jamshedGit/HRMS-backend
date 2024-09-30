@@ -92,7 +92,7 @@ const SP_getAllAcademicsInfoByEmpId = async (empId) => {
   try {
     console.log("jazz",empId);
     const results = await sequelize.query('CALL usp_GetAllAcademicInfo(:employeeId)', {
-      replacements: { employeeId: empId || 'null' },
+      replacements: { employeeId: empId },
       type: Sequelize.QueryTypes.RAW // Use RAW type for executing stored procedures
     });
    

@@ -109,7 +109,7 @@ const getContactInfoByEmployeeId = catchAsync(async (req, res) => {
 
 const updateEmp_profile = catchAsync(async (req, res) => {
  // req.body.profile_image = req.file.filename
-  console.log(req.body);
+  console.log("update emp",req.body);
   const Receipt = await Emp_profileformService.EmpProfileServicePage.updateEmp_profileById(req.body.Id, req.body, req.user.Id);
   res.send({
     code: HttpStatusCodes.OK,

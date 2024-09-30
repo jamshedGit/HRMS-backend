@@ -57,6 +57,11 @@ const DDL_FIELD_NAMES = {
     labelField: 'formName',
     valueField: 'Id',
   },
+
+  SalaryRevisionKeys:{
+    labelField: 'reviewDate',
+    valueField: 'Id',
+  },
 };
 
 const HttpStatusCodes = {

@@ -85,54 +85,71 @@ module.exports.EmployeePolicyModel = require('./operations/emppolicy/emppolicy.m
 //EMployee Profile
 module.exports.EmployeeProfileModel = require('./operations/emp_profile/emp_profile.model');
 
-//Contact Information Profile
+//Contact 
 module.exports.ContactInformationModel = require('./operations/emp_profile/emp_contact.model');
 
-//Contact Information Profile
+//Contact 
 module.exports.AcademicModel = require('./operations/academic/academic.model');
 
-//Contact Information Profile
+//Contact 
 module.exports.ExperienceModel = require('./operations/experience/experience.model');
 
-//Contact Information Profile
+//Contact 
 module.exports.SkillsModel = require('./operations/skills/skills.model');
 
-//Contact Information Profile
+//Contact 
 module.exports.IncidentModel = require('./operations/incident/incident.model');
 
-//EarningModel Information Profile
+//EarningModel 
 module.exports.EarningModel = require('./operations/earning/earning.model');
 
-//deduction Information Profile
+//deduction 
 module.exports.DeductionModel = require('./operations/deduction/deduction.model');
 
 //stoppage_allowance 
 module.exports.StoppageAllonceModel = require('./operations/stoppage_allowance/stoppage_allowance.model');
 
-//ExchangeRate Information Profile
+//ExchangeRate 
 module.exports.ExchangeRateModel = require('./operations/exchange_rate/exchange_rate.model');
 
-//ExchangeRate Information Profile
+//ExchangeRate 
 module.exports.CompensationBenefitsModel = require('./operations/compensatio_benefits/compensation_benefits.model');
 
-//EarningDeductionTranModel Information Profile
+//EarningDeductionTranModel 
 module.exports.EarningDeductionTranModel = require('./operations/earning_transaction/earning_transaction.model');
 
-//EarningDeductionTranModel Information Profile
+//EarningDeductionTranModel 
 module.exports.EmployeeSalaryEarningModel = require('./operations/employee_salary_earning/employee_salary_earning.model');
 
-//EarningDeductionTranModel Information Profile
+//EarningDeductionTranModel 
 module.exports.EmployeeSalaryModel = require('./operations/employee_salary_setup/employee_salary_setup.model');
 
-//EmployeeSalaryExpatriateModel Information Profile
+//EmployeeSalaryExpatriateModel 
 module.exports.EmployeeSalaryExpatriateModel = require('./operations/employee_salary_expatriate/employee_salary_expatriate.model');
 
-
-//EarningDeductionTranModel Information Profile
+//EarningDeductionTranModel 
 module.exports.CompensationExpatriateModel = require('./operations/compensation_expatriate_policy/compensation_expatriate_policy.model');
 
-//EmployeeTransferModel Information Profile
+//EmployeeTransferModel 
 module.exports.EmployeeTransferModel = require('./operations/employee_transfer/employee_transfer.model');
+
+//EmployeeSalaryRevisionModel 
+module.exports.EmployeeSalaryRevisionModel = require('./operations/employee_salary_revision/employee_salary_revision.model');
+
+//Tax Setup 
+module.exports.TaxSetupModel = require('./operations/tax_setup/tax_setup.model');
+
+//Fiscal Setup 
+module.exports.FiscalSetupModel = require('./operations/fiscal_setup/fiscal_setup.model');
+
+//PayrollMonthModel Setup 
+module.exports.PayrollMonthModel = require('./operations/payroll_month_setup/payroll_month_setup.model');
+
+
+
+
+
+
 
 // **********New way to Export Models******************
 

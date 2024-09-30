@@ -29,6 +29,7 @@ const getResources = catchAsync(async (req, res) => {
 });
 
 const getResource = catchAsync(async (req, res) => {
+ 
   const Resource = await resourceService.getResourceById(req.body.id);
   if (!Resource) {
     throw new ApiError(httpStatus.NOT_FOUND, 'Resource not found');

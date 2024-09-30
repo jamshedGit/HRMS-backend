@@ -169,6 +169,14 @@ const getPoliceStationsMasterData = {
   }),
 };
 
+const getEmpSalaryRevisionByEmpId = {
+  query: Joi.disallow(),
+  params: Joi.disallow(),
+  body: Joi.object().keys({
+    employeeId: Joi.number().integer().required()
+  }),
+};
+
 
 module.exports = {
   getRolesMasterData,
@@ -192,5 +200,6 @@ module.exports = {
   getBanksMasterData,
   getDeptMasterData,
   getFormMenuMasterData,
-  getAllEmployees
+  getAllEmployees,
+  getEmpSalaryRevisionByEmpId
 };

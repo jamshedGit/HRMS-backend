@@ -147,7 +147,7 @@ const getContactInfoByEmployeeId = async (id) => {
  * @returns {Promise<ReceiptModel>}
  */
 const updateEmp_profileById = async (Id, updateBody, updatedBy) => {
-  //console.log("item 12")
+  console.log("item 12",updateBody)
 
   const Item = await getEmp_profileById(Id);
   console.log("item", Item)

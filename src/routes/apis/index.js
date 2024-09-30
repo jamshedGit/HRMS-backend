@@ -50,6 +50,12 @@ const employee_salary_setup = require('./operations/employee_salary_setup/employ
 const salary_expatriate = require('./operations/employee_salary_expatriate/employee_salary_expatriate.route')
 const compensation_expatriate = require('./operations/compensation_expatriate_policy/compensation_expatriate_policy.route')
 const employee_transfer = require('./operations/employee_transfer/employee_transfer.route')
+const salary_revision = require('./operations/employee_salary_revision/employee_salary_revision.route')
+const tax_setup = require('./operations/tax_setup/tax_setup.route')
+const fiscal_setup = require('./operations/fiscal_setup/fiscal_setup.route')
+const payroll_month = require('./operations/payroll_month_setup/payroll_month_setup.route')
+
+
 
 const router = express.Router();
 
@@ -245,6 +251,27 @@ const defaultRoutes = [
     path: "/employee_transfer",
     route: employee_transfer
   },
+  {
+    path: "/salary_revision",
+    route: salary_revision
+  },
+  {
+    path: "/tax_setup",
+    route: tax_setup
+  },
+  {
+    path: "/fiscal_setup",
+    route: fiscal_setup
+  },
+  {
+    path: "/payroll_month",
+    route: payroll_month
+  },
+
+
+
+  
+
   
 
   // {

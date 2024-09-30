@@ -49,6 +49,11 @@ module.exports.EmployeeSalarySetupServicePage = require('./employee_salary_setup
 module.exports.EmployeeSalaryExpatriateServicePage = require('./employee_salary_expatriate/employee_salary_expatriate.service')
 module.exports.CompensationExpServicePage = require('./operations/compensation_expatriate_policy/compensation_expatriate_policy.service')
 module.exports.EmployeeTransferServicePage = require('./operations/employee_transfer/employee_transfer.service')
+module.exports.EmployeeSalaryRevisionServicePage = require('./operations/employee_salary_revision/employee_salary_revision.service')
+module.exports.TaxSetupServicePage = require('./operations/tax_setup/tax_setup.service')
+module.exports.FiscalSetupServicePage = require('./operations/fiscal_setup/fiscal_setup.service')
+module.exports.PayrollMonthServicePage = require('./operations/payroll_month_setup/payroll_month_setup.service')
+
 
 
 

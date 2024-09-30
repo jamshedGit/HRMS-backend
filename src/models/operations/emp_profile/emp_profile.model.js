@@ -12,6 +12,7 @@ const DesigModel = sequelize.define('t_employee_profile', {
 	},
 	subsidiaryId: { type: Sequelize.NUMBER, allowNull: true },
 	gradeId: { type: Sequelize.NUMBER, allowNull: true },
+	designationId: { type: Sequelize.NUMBER, allowNull: true },
 	title: { type: Sequelize.STRING, allowNull: true },
 	firstName: { type: Sequelize.STRING, allowNull: true },
 	middleName: { type: Sequelize.STRING, allowNull: true },

@@ -10,6 +10,7 @@ const createAccessRight = async (req, AccessRightBody) => {
 const getAllAccessRightsByRoleId = async (filter, options) => {
     // let limit = options.limit;
     // let offset = 0 + (options.page - 1) * limit
+    
     const accessRights = await AccessRightModel.findAll({
         // offset: offset,
         // limit: limit,

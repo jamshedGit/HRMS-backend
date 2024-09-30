@@ -95,7 +95,7 @@ const SP_getAllExperiencesInfoByEmpId = async (empId) => {
     console.log("SP_getAllExperiencesInfo", empId || 'null')
     //const test = empId || 'null'
     const results = await sequelize.query('CALL usp_GetAllEmployeeWorkExperience(:employeeId)', {
-      replacements: { employeeId: empId || 'null' },
+      replacements: { employeeId: empId },
       type: Sequelize.QueryTypes.RAW // Use RAW type for executing stored procedures
     });
 

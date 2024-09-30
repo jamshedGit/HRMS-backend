@@ -18,6 +18,7 @@ const resource = sequelize.define('t_resources', {
 	parentName: { type: Sequelize.STRING, allowNull:true },
 	parentSlug: { type: Sequelize.STRING, allowNull:true },
 	slug: { type: Sequelize.STRING, allowNull:true },
+	sortOrder: { type: Sequelize.INTEGER, allowNull:true },
 	isResourceShow: { type: Sequelize.BOOLEAN, allowNull:true, defaultValue: false },
 	isActive: { type: Sequelize.BOOLEAN, allowNull:true, defaultValue: true },
     createdBy:{

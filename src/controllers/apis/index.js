@@ -21,3 +21,6 @@ module.exports.ibFormController = require('./operations/ibs/ibForm.controller')
 module.exports.mortuaryFormController = require('./operations/ibs/mortuaryForm.controller')
 module.exports.coffinFormController = require('./operations/ibs/coffinForm.controller')
 module.exports.employeeFormProfile = require('./operations/emp_profile/profile.controller')
+module.exports.employeeSalaryRevision = require('./operations/employee_salary_revision/employee_salary_revision.controller')
+module.exports.payrollMonthSetup = require('./operations/payroll_month_setup/payroll_month_setup.controller')
+
