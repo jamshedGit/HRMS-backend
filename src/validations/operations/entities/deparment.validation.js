@@ -8,10 +8,10 @@ const createDept = {
     deptId: Joi.disallow(),
     deptName: Joi.string().required(),
     deptCode: Joi.string().required(),
-    parentDept: Joi.number().required(),
+    parentDept: Joi.any().optional(),
     budgetStrength:Joi.number().required(),
     subsidiary:Joi.number().required(),
-    chkParent:Joi.boolean().required()
+    chkParent:Joi.any().optional(),
     // location: Joi.string().required(),
     // slug: Joi.string().required(),
     // createdBy: Joi.string().required(),
