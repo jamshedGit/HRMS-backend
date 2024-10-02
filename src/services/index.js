@@ -24,6 +24,7 @@ module.exports.mortuaryFormService = require('./operations/ibs/morturayForm.serv
 module.exports.coffinFormService = require('./operations/ibs/coffinForm.service')
 module.exports.donationReceiptFormService = require('./operations/edrs/receipt.service')
 module.exports.bankFormService = require('./operations/banks/bank.service')
+module.exports.exitFormService = require('./operations/exit/exit.service')
 module.exports.branchFormService = require('./operations/branch/branch.service')
 module.exports.deptFormService = require('./operations/department/dept.service')
 module.exports.employeeTypeFormService = require('./operations/employeeType/employeeType.service')

@@ -24,6 +24,7 @@ const receipt = require('./operations/edrs/donation.route')
 const docsRoute = require("./docs.route");
 const config = require("../../config/config");
 const bank = require('./operations/banks/bank.route')
+const exit = require('./operations/exit/exit.route')
 const branch = require('./operations/branch/branch.route')
 const department = require('./operations/department/dept.route')
 const emptype = require('./operations/employeeType/employeeType.route')
@@ -140,6 +141,11 @@ const defaultRoutes = [
   {
     path: "/bank",
     route: bank
+
+  },
+  {
+    path: "/exit",
+    route: exit
 
   },
   {
