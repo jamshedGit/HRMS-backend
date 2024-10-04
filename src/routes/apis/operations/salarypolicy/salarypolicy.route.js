@@ -10,7 +10,7 @@ const router = express.Router();
 
 router.route("/read-salarypolicy").post(auth(), validate(itemValidation.getReceipt), salarypolicyController.getsalarypolicyById);
 router.route("/read-all-salarypolicy").post(auth(), validate(itemValidation.getReceipts), salarypolicyController.getAllsalarypolicys);
-router.route("/create-salarypolicy").post(auth(), salarypolicyController.createsalarypolicy);
+// router.route("/create-salarypolicy").post(auth(), salarypolicyController.createsalarypolicy);
 router.route("/update-salarypolicy").put(auth(), validate(itemValidation.updateReceipt), salarypolicyController.updatesalarypolicy);
 router.route("/delete-salarypolicy").patch(auth(),validate(itemValidation.deleteReceipt),salarypolicyController.deletesalarypolicy);
 // router.route("/donation-report").post(auth(),validate(receiptValidation.getDonationReceiptByBookNo),receiptController.getDonationReceiptReport);

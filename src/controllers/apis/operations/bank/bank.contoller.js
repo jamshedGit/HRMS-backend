@@ -14,7 +14,7 @@ const createBank = catchAsync(async (req, res) => {
   // console.log("reqested User", req.user.id);
   try {
 
-    console.log("insert bank")
+    console.log("insert bank req.body",req.body)
     console.log(req.body);
     const Bank = await bankformService.bankFormService.createBank(req, req.body);
 
