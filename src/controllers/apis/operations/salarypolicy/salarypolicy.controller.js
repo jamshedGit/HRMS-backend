@@ -14,9 +14,7 @@ const createsalarypolicy = catchAsync(async (req, res) => {
   // console.log("reqested User", req.user.id);
   try {
 
-    console.log("insert salarypolicy req.body",req.body)
-    console.log(req.body);
-    console.log("req.body");
+
     const salarypolicy = await salarypolicyformService.salarypolicyFormService.createsalarypolicy(req, req.body);
 
     res.status(httpStatus.CREATED).send({
