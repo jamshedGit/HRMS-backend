@@ -14,24 +14,10 @@ const arrearAttribute = [
   'type',
   'Id',
   'isActive',
-  [Sequelize.literal(`CASE WHEN multiplier < 1 THEN '-' ELSE multiplier END`), 'multiplier'],
-  [Sequelize.literal(`CASE WHEN divisor < 1 THEN '-' ELSE divisor END`), 'divisor'],
-  [Sequelize.literal(`CASE WHEN days < 1 THEN '-' ELSE days END`), 'days']
+  [Sequelize.literal(`CASE WHEN multiplier = '' THEN '-' ELSE multiplier END`), 'multiplier'],
+  [Sequelize.literal(`CASE WHEN divisor = '' THEN '-' ELSE multiplier END`), 'divisor'],
+  [Sequelize.literal(`CASE WHEN days = '' THEN '-' ELSE multiplier END`), 'days'],
 ]
-
-//Update Body values according to type (arrear type)
-const handleBodyvalues = (body)=> {
-  if(body.type == 1){
-    body.divisor = body.multiplier = body.days = 0
-  }
-  else if(body.type == 2){
-    body.days = 0
-  }
-  else if(body.type == 3){
-    body.multiplier = body.divisor = 0
-  }
-  return body;
-}
 
 /**
  * Create Arrear Policy
@@ -40,16 +26,15 @@ const handleBodyvalues = (body)=> {
  * @returns 
  */
 const createArrearPolicy = async (req) => {
-  const body = handleBodyvalues(req.body)
   const payload = {
-    ...body,
+    ...req.body,
     createdBy: req.user.id,
     companyId: 1,
     subsidiaryId: 1,
     type_name: Arrear_Policy_Type[req.body.type]
-  }
+  };
   const createdData = await ArrearPolicyModel.create(payload);
-  const data = await getArrearById(createdData.Id, arrearAttribute)
+  const data = await getArrearById(createdData.Id, arrearAttribute);
   return data;
 };
 
@@ -78,15 +63,7 @@ const getAllArrearPolicies = async (req) => {
       [Op.or]: queryFilters,
       // isActive: true
     },
-    attributes: [
-      'type_name',
-      'type',
-      'Id',
-      'isActive',
-      [Sequelize.literal(`CASE WHEN multiplier < 1 THEN '-' ELSE multiplier END`), 'multiplier'],
-      [Sequelize.literal(`CASE WHEN divisor < 1 THEN '-' ELSE divisor END`), 'divisor'],
-      [Sequelize.literal(`CASE WHEN days < 1 THEN '-' ELSE days END`), 'days'],
-    ],
+    attributes: arrearAttribute,
     offset: offset,
     limit: limit,
   });
@@ -101,7 +78,7 @@ const getAllArrearPolicies = async (req) => {
  * @param {Number} id 
  * @returns 
  */
-const getArrearById = async (id, options = null ) => {
+const getArrearById = async (id, options = null) => {
   return ArrearPolicyModel.findByPk(id, {
     attributes: options || ['divisor', 'multiplier', 'days', 'type_name', 'type', 'Id'],
   });
@@ -122,8 +99,7 @@ const updateArrearById = async (body, updatedBy) => {
   }
   body.updatedBy = updatedBy;
   body.type_name = Arrear_Policy_Type[body.type];
-  const obj = handleBodyvalues(body)
-  Object.assign(oldRecord, obj);
+  Object.assign(oldRecord, body);
   const updatedData = await oldRecord.save();
   const data = await getArrearById(updatedData.Id, arrearAttribute)
   return data;

@@ -7,10 +7,10 @@ const createItem = {
   query: Joi.disallow(),
   params: Joi.disallow(),
   body: Joi.object().keys({
-    type: Joi.number().required(),
-    divisor: Joi.number().optional(),
-    days: Joi.number().optional(),
-    multiplier: Joi.number().optional()
+    type: Joi.string().required(),
+    divisor: Joi.string().optional().allow(''),
+    days: Joi.string().optional().allow(''),
+    multiplier: Joi.string().optional().allow('')
   }),
 };
 
@@ -22,11 +22,11 @@ const updateitem = {
   params: Joi.disallow(),
   body: Joi.object().keys({
     Id: Joi.number().required(),
-    type: Joi.number().required(),
+    type: Joi.string().required(),
     type_name: Joi.string().optional(),
-    divisor: Joi.number().optional(),
-    days: Joi.number().optional(),
-    multiplier: Joi.number().optional()
+    divisor: Joi.string().optional().allow(''),
+    days: Joi.string().optional().allow(''),
+    multiplier: Joi.string().optional().allow('')
   }),
 };
 
