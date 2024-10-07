@@ -423,10 +423,7 @@ const getUserAccessForMiddleware = async (roleId, slugs) => {
 
     });
 
-
-
-    console.log("roleAccessData", roleAccessData[0].isAccess);
-    return roleAccessData[0].isAccess;
+    return roleAccessData?.[0]?.isAccess || false;
     // return roleAccessData;
   } catch (error) {
     console.log(error)

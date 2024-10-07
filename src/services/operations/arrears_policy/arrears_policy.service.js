@@ -20,7 +20,8 @@ const createArrearPolicy = async (req) => {
     createdBy: req.user.id,
     companyId: 1,
     subsidiaryId: 1,
-    type_name: Arrear_Policy_Type[req.body.type]
+    type_name: Arrear_Policy_Type[req.body.type],
+    isActive: true
   }
   const createdData = await ArrearPolicyModel.create(payload);
   return createdData;
@@ -89,7 +90,7 @@ const updateArrearById = async (body, updatedBy) => {
   body.type_name = Arrear_Policy_Type[body.type];
   Object.assign(oldRecord, body);
   const { type_name, type, Id } = await oldRecord.save();
-  return { type_name, type, Id, isActive: 1 };
+  return { type_name, type, Id, isActive: true };
 };
 
 
