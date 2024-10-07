@@ -396,7 +396,6 @@ const getUserCompleteRoleAccess = async (roleId) => {
     })
   });
   
-   console.log("formatedData",formatedData);
   var groupedData = _.groupBy(formatedData, f => { return f.parentName });
   delete formatedData.parentName;
   return groupedData;
