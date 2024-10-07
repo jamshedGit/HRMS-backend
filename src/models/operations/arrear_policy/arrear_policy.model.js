@@ -16,7 +16,7 @@ const ArrearPolicyModel = sequelize.define('t_arrear_policy', {
 	multiplier: { type: Sequelize.NUMBER, defaultValue: 0 },
 	days: { type: Sequelize.NUMBER, defaultValue: 0 },
 	type_name: { type: Sequelize.NUMBER, allowNull: true },
-	isActive: { type: Sequelize.STRING, allowNull: true, defaultValue: true },
+	isActive: { type: Sequelize.NUMBER, allowNull: true, defaultValue: 1 },
 	createdBy: {
 		type: Sequelize.INTEGER,
 		allowNull: true,

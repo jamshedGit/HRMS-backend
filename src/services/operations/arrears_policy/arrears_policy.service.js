@@ -20,10 +20,11 @@ const createArrearPolicy = async (req) => {
     createdBy: req.user.id,
     companyId: 1,
     subsidiaryId: 1,
-    type_name: Arrear_Policy_Type[req.body.type],
-    isActive: true
+    type_name: Arrear_Policy_Type[req.body.type]
   }
   const createdData = await ArrearPolicyModel.create(payload);
+  //Send Yes value for table view
+  createdData.dataValues.isActiveText = 'Yes'
   return createdData;
 };
 
@@ -52,7 +53,7 @@ const getAllArrearPolicies = async (req) => {
       [Op.or]: queryFilters,
       // isActive: true
     },
-    attributes: ['type_name', 'type', 'Id', 'isActive'],
+    attributes: ['type_name', 'type', 'Id', 'isActive', [Sequelize.literal(`IF(isActive = 1, 'Yes', 'No')`), 'isActiveText']],
     offset: offset,
     limit: limit,
   });
@@ -90,7 +91,8 @@ const updateArrearById = async (body, updatedBy) => {
   body.type_name = Arrear_Policy_Type[body.type];
   Object.assign(oldRecord, body);
   const { type_name, type, Id } = await oldRecord.save();
-  return { type_name, type, Id, isActive: true };
+  //Send specific fields only for table view
+  return { type_name, type, Id, isActive: 1, isActiveText: 'Yes' };
 };
 
 
