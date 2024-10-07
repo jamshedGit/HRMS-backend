@@ -8,6 +8,31 @@ const { Arrear_Policy_Type } = require("./enum/arrears_policy.enum");
 
 const Op = Sequelize.Op;
 
+//Attributes required for Arrear Table view
+const arrearAttribute = [
+  'type_name',
+  'type',
+  'Id',
+  'isActive',
+  [Sequelize.literal(`CASE WHEN multiplier < 1 THEN '-' ELSE multiplier END`), 'multiplier'],
+  [Sequelize.literal(`CASE WHEN divisor < 1 THEN '-' ELSE divisor END`), 'divisor'],
+  [Sequelize.literal(`CASE WHEN days < 1 THEN '-' ELSE days END`), 'days']
+]
+
+//Update Body values according to type (arrear type)
+const handleBodyvalues = (body)=> {
+  if(body.type == 1){
+    body.divisor = body.multiplier = body.days = 0
+  }
+  else if(body.type == 2){
+    body.days = 0
+  }
+  else if(body.type == 3){
+    body.multiplier = body.divisor = 0
+  }
+  return body;
+}
+
 /**
  * Create Arrear Policy
  * 
@@ -15,17 +40,17 @@ const Op = Sequelize.Op;
  * @returns 
  */
 const createArrearPolicy = async (req) => {
+  const body = handleBodyvalues(req.body)
   const payload = {
-    ...req.body,
+    ...body,
     createdBy: req.user.id,
     companyId: 1,
     subsidiaryId: 1,
     type_name: Arrear_Policy_Type[req.body.type]
   }
   const createdData = await ArrearPolicyModel.create(payload);
-  //Send Yes value for table view
-  createdData.dataValues.isActiveText = 'Yes'
-  return createdData;
+  const data = await getArrearById(createdData.Id, arrearAttribute)
+  return data;
 };
 
 
@@ -53,7 +78,15 @@ const getAllArrearPolicies = async (req) => {
       [Op.or]: queryFilters,
       // isActive: true
     },
-    attributes: ['type_name', 'type', 'Id', 'isActive', [Sequelize.literal(`IF(isActive = 1, 'Yes', 'No')`), 'isActiveText']],
+    attributes: [
+      'type_name',
+      'type',
+      'Id',
+      'isActive',
+      [Sequelize.literal(`CASE WHEN multiplier < 1 THEN '-' ELSE multiplier END`), 'multiplier'],
+      [Sequelize.literal(`CASE WHEN divisor < 1 THEN '-' ELSE divisor END`), 'divisor'],
+      [Sequelize.literal(`CASE WHEN days < 1 THEN '-' ELSE days END`), 'days'],
+    ],
     offset: offset,
     limit: limit,
   });
@@ -68,9 +101,9 @@ const getAllArrearPolicies = async (req) => {
  * @param {Number} id 
  * @returns 
  */
-const getArrearById = async (id) => {
+const getArrearById = async (id, options = null ) => {
   return ArrearPolicyModel.findByPk(id, {
-    attributes: ['divisor', 'multiplier', 'days', 'type_name', 'type', 'Id'],
+    attributes: options || ['divisor', 'multiplier', 'days', 'type_name', 'type', 'Id'],
   });
 };
 
@@ -89,10 +122,11 @@ const updateArrearById = async (body, updatedBy) => {
   }
   body.updatedBy = updatedBy;
   body.type_name = Arrear_Policy_Type[body.type];
-  Object.assign(oldRecord, body);
-  const { type_name, type, Id } = await oldRecord.save();
-  //Send specific fields only for table view
-  return { type_name, type, Id, isActive: 1, isActiveText: 'Yes' };
+  const obj = handleBodyvalues(body)
+  Object.assign(oldRecord, obj);
+  const updatedData = await oldRecord.save();
+  const data = await getArrearById(updatedData.Id, arrearAttribute)
+  return data;
 };
 
 
