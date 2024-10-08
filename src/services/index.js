@@ -54,6 +54,7 @@ module.exports.TaxSetupServicePage = require('./operations/tax_setup/tax_setup.s
 module.exports.FiscalSetupServicePage = require('./operations/fiscal_setup/fiscal_setup.service')
 module.exports.PayrollMonthServicePage = require('./operations/payroll_month_setup/payroll_month_setup.service')
 module.exports.ArrearPolicyServicePage = require('./operations/arrears_policy/arrears_policy.service')
+module.exports.SalaryRoundingPolicyServicePage = require('./operations/salary_rounding_policy/salary_rounding_policy.service')
 
 
 
