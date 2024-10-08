@@ -65,6 +65,10 @@ module.exports.exitModel = require('./operations/exit/exit.model');
 
 //Salarypolicy Model
 module.exports.salarypolicyModel = require('./operations/salarypolicy/salarypolicy.model');
+
+
+//Tax Slab Model
+module.exports.Tax_slabModel = require('./operations/tax_slab/tax_slab.model');
 //Bank Model
 module.exports.BranchModel = require('./operations/branch/branch.model');
 //Department Model

@@ -26,6 +26,7 @@ const config = require("../../config/config");
 const bank = require('./operations/banks/bank.route')
 const exit = require('./operations/exit/exit.route')
 const salarypolicy = require('./operations/salarypolicy/salarypolicy.route')
+const tax_slab = require('./operations/tax_slab/tax_slab.route')
 const branch = require('./operations/branch/branch.route')
 const department = require('./operations/department/dept.route')
 const emptype = require('./operations/employeeType/employeeType.route')
@@ -153,6 +154,11 @@ const defaultRoutes = [
   {
     path: "/salarypolicy",
     route: salarypolicy
+
+  },
+  {
+    path: "/tax_slab",
+    route: tax_slab
 
   },
   {

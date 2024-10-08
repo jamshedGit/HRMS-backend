@@ -26,6 +26,7 @@ module.exports.donationReceiptFormService = require('./operations/edrs/receipt.s
 module.exports.bankFormService = require('./operations/banks/bank.service')
 module.exports.exitFormService = require('./operations/exit/exit.service')
 module.exports.salarypolicyFormService = require('./operations/salarypolicy/salarypolicy.service')
+module.exports.tax_slabFormService = require('./operations/tax_slab/tax_slab.service')
 module.exports.branchFormService = require('./operations/branch/branch.service')
 module.exports.deptFormService = require('./operations/department/dept.service')
 module.exports.employeeTypeFormService = require('./operations/employeeType/employeeType.service')
