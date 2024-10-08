@@ -81,6 +81,10 @@ if (config.env === "production") {
 
 app.use("/uploads", express.static("uploads"));
 
+app.get('/', (req,res)=> {
+  res.send('Api working')
+})
+
 // v1 api routes
 app.use("/apis", apiRoutes);
 app.use(express.static(path.join(__dirname, "public")));

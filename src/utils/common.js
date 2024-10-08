@@ -1,11 +1,19 @@
 const moment = require('moment');
 
-const getRouteSlugs = (route) => {
+const getRouteSlugs = (req) => {
+  const route = req.originalUrl
+  const params = req.params;
   console.log(route);
   let arr = route.split('/');
   console.log(arr);
+  //If param is available then get the endpoints from the 2 parts before the params
+  //else take last two parts as endpoints from url
+  if (Object.keys(params).length) {
+    return { resourceSlug: arr[arr.length - 3], rightSlug: arr[arr.length - 2] }; // route.substring(route.lastIndexOf('/') + 1);
+  }
   return { resourceSlug: arr[arr.length - 2], rightSlug: arr[arr.length - 1] }; // route.substring(route.lastIndexOf('/') + 1);
 };
+
 const getDdlItems = (columns = { labelField: '', valueField: '' }, data = [], parentId = null) => {
   return data.map((i) => ({
     label: i[columns.labelField],
