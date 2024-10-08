@@ -82,6 +82,7 @@ module.exports.FormModel = require('./operations/form/form.model');
 //EmployeePolicyModel
 module.exports.EmployeePolicyModel = require('./operations/emppolicy/emppolicy.model');
 module.exports.ArrearPolicyModel = require('./operations/arrear_policy/arrear_policy.model');
+module.exports.RoundingPolicyModel = require('./operations/salary_rounding_policy/salary_rounding_policy.model');
 
 //EMployee Profile
 module.exports.EmployeeProfileModel = require('./operations/emp_profile/emp_profile.model');
