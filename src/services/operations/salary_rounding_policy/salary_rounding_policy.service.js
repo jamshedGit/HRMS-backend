@@ -10,6 +10,7 @@ const Op = Sequelize.Op;
 //Attributes required for Rounding Policy Table view
 const roundingAttribute = [
   'amount',
+  [Sequelize.literal("CONCAT(amount, ' Rupee')"), 'amountWithSuffix'],
   'Id',
   'isActive',
   'paymentMode'

@@ -22,7 +22,8 @@ const updateItem = {
     Id: Joi.number().required(),
     paymentMode: Joi.number().required(),
     amount: Joi.string().required(),
-    isActive: Joi.number().optional()
+    isActive: Joi.number().optional(),
+    amountWithSuffix: Joi.string().optional()
   }),
 };
 
