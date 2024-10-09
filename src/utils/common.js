@@ -87,20 +87,54 @@ const getPathStorageFromUrl = (url) => {
   return imagePath;
 }
 
-const updateDataValues = (data, sourceKey, targetKey) => {
-  if(Array.isArray(data)){
-    data.forEach((el)=> {
-      if(el[sourceKey]){
-        el.dataValues[targetKey] = el[sourceKey].dataValues?.[targetKey]
+/**
+ * 
+ * When we get data from DB where include option is included, It return data of the linked table under the key as name of the table. Example
+ * {
+ *  mainTableKey1: mainTableValue1,
+ *  mainTableKey2: mainTableValue2,
+ *  linkedTableName: {
+ *    linkedTableKey1: linkedTableValue1,
+ *    linkedTableKey2: linkedTableValue2,
+ *  }
+ * }
+ * 
+ * This function moves the nested Data keys to main object for easier handling. It doesn't delete the table key so the values will be copied to main object but table key is still there
+ * 
+ * {
+ *  mainTableKey1: mainTableValue1,
+ *  mainTableKey2: mainTableValue2,
+ *  linkedTableKey1: linkedTableValue1,
+ *  linkedTableKey2: linkedTableValue2
+ * }
+ * 
+ * @param {Object|Array} data 
+ * @returns 
+ */
+const handleNestedData = (data) => {
+  if (Array.isArray(data)) {
+    data.forEach((el) => {
+      Object.keys(el?.dataValues).forEach((keys) => {
+        if (el.dataValues[keys] && typeof el.dataValues[keys] == 'object') {
+          Object.entries(el.dataValues[keys]?.dataValues || {}).forEach((val) => {
+            el.dataValues[val[0]] = val[1];
+          })
+        }
+      })
+    })
+    return data;
+  }
+  else {
+    Object.keys(data.dataValues).forEach((keys) => {
+      if (data.dataValues[keys] && typeof data.dataValues[keys] == 'object') {
+        Object.entries(data.dataValues[keys].dataValues).forEach((val) => {
+          data.dataValues[val[0]] = val[1];
+        })
       }
     })
     return data;
   }
-  else{
-    if(data[sourceKey]){
-      data.dataValues[targetKey] = data[sourceKey].dataValues?.[targetKey]
-    }
-    return data;
-  }
 }
-module.exports = { updateDataValues, getRouteSlugs, getDdlItems, getAlarmTimesItems, customPaginate, paginationFacts, createDatetime, getPathStorageFromUrl };
+
+
+module.exports = { handleNestedData, getRouteSlugs, getDdlItems, getAlarmTimesItems, customPaginate, paginationFacts, createDatetime, getPathStorageFromUrl };

@@ -2,7 +2,7 @@ const httpStatus = require("http-status");
 const { RoundingPolicyModel, FormModel } = require("../../../models/index");
 const ApiError = require("../../../utils/ApiError");
 const Sequelize = require('sequelize');
-const { paginationFacts, updateDataValues } = require("../../../utils/common");
+const { paginationFacts, handleNestedData } = require("../../../utils/common");
 const pick = require("../../../utils/pick");
 
 const Op = Sequelize.Op;
@@ -33,8 +33,7 @@ const createRoundingPolicy = async (req) => {
     companyId: 1,
     subsidiaryId: 1,
   });
-  const data = await getRoundingPolicy({ id: createdData.Id }, roundingAttribute, [{ model: FormModel, attributes: ['formName'] }]);
-  return updateDataValues(data, 't_form_menu', 'formName');
+  return await getRoundingPolicy({ id: createdData.Id }, roundingAttribute, [{ model: FormModel, attributes: ['formName'] }]);
 };
 
 /**
@@ -56,15 +55,15 @@ const updateRoundingPolicyById = async (body, updatedBy) => {
   body.updatedBy = updatedBy;
   Object.assign(oldRecord, body);
   const updatedData = await oldRecord.save();
-  const data = await getRoundingPolicy({ id: updatedData.Id }, roundingAttribute, [{ model: FormModel, attributes: ['formName'] }])
-  return updateDataValues(data, 't_form_menu', 'formName')
+  return await getRoundingPolicy({ id: updatedData.Id }, roundingAttribute, [{ model: FormModel, attributes: ['formName'] }])
 };
 
 
 /**
- * Get Single Rounding By Id
  * 
- * @param {Number} id 
+ * @param {Object} filters filtering Options
+ * @param {Array} attributes Keys wanted in return (If null then will return all keys)
+ * @param {Array} include  Get data of different table with foreign key relation
  * @returns 
  */
 const getRoundingPolicy = async (filters, attributes = null, include = null) => {
@@ -77,6 +76,12 @@ const getRoundingPolicy = async (filters, attributes = null, include = null) => 
   }
   if (include) {
     options.include = include
+  }
+
+  //If Include is present then the returned data from the other table are under the key of table name. So we use updateDataValu
+  if (include) {
+    const data = await RoundingPolicyModel.findOne(options);
+    return handleNestedData(data)
   }
   return await RoundingPolicyModel.findOne(options);
 };
@@ -117,7 +122,7 @@ const getAllRoundingPolicies = async (req) => {
     limit: limit,
   });
 
-  const updatedRows = updateDataValues(rows, 't_form_menu', 'formName')
+  const updatedRows = handleNestedData(rows)
   return paginationFacts(count, limit, options.pageNumber, updatedRows);
 };
 
