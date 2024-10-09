@@ -59,7 +59,6 @@ const salary_rounding_policy = require('./operations/salary_rounding_policy/sala
 
 
 
-
 const router = express.Router();
 
 const defaultRoutes = [

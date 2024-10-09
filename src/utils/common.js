@@ -87,4 +87,20 @@ const getPathStorageFromUrl = (url) => {
   return imagePath;
 }
 
-module.exports = { getRouteSlugs, getDdlItems, getAlarmTimesItems, customPaginate, paginationFacts, createDatetime, getPathStorageFromUrl };
+const updateDataValues = (data, sourceKey, targetKey) => {
+  if(Array.isArray(data)){
+    data.forEach((el)=> {
+      if(el[sourceKey]){
+        el.dataValues[targetKey] = el[sourceKey].dataValues?.[targetKey]
+      }
+    })
+    return data;
+  }
+  else{
+    if(data[sourceKey]){
+      data.dataValues[targetKey] = data[sourceKey].dataValues?.[targetKey]
+    }
+    return data;
+  }
+}
+module.exports = { updateDataValues, getRouteSlugs, getDdlItems, getAlarmTimesItems, customPaginate, paginationFacts, createDatetime, getPathStorageFromUrl };

@@ -2,7 +2,7 @@ const httpStatus = require("http-status");
 const { RoundingPolicyModel, FormModel } = require("../../../models/index");
 const ApiError = require("../../../utils/ApiError");
 const Sequelize = require('sequelize');
-const { paginationFacts } = require("../../../utils/common");
+const { paginationFacts, updateDataValues } = require("../../../utils/common");
 const pick = require("../../../utils/pick");
 const { Salary_Rounding_Policy_Type } = require("./enum/salary_rounding_policy.enum");
 
@@ -10,7 +10,6 @@ const Op = Sequelize.Op;
 
 //Attributes required for Rounding Policy Table view
 const roundingAttribute = [
-  'paymentModeName',
   'amount',
   'Id',
   'isActive',
@@ -27,7 +26,7 @@ const createRoundingPolicy = async (req) => {
   const filter = { paymentMode: req.body.paymentMode }
   const oldRecord = await getRoundingPolicy(filter, roundingAttribute);
   if (oldRecord) {
-    throw new ApiError(httpStatus.CONFLICT, `Record for ${oldRecord.paymentModeName} already Present`);
+    throw new ApiError(httpStatus.CONFLICT, `Record for This mode already Present`);
   }
   const createdData = await RoundingPolicyModel.create({
     ...req.body,
@@ -36,8 +35,8 @@ const createRoundingPolicy = async (req) => {
     subsidiaryId: 1,
     paymentModeName: Salary_Rounding_Policy_Type[req.body.paymentMode]
   });
-  const data = await getRoundingPolicy({ id: createdData.Id }, roundingAttribute);
-  return data;
+  const data = await getRoundingPolicy({ id: createdData.Id }, roundingAttribute, [{ model: FormModel, attributes: ['formName'] }]);
+  return updateDataValues(data, 't_form_menu', 'formName');
 };
 
 /**
@@ -48,17 +47,20 @@ const createRoundingPolicy = async (req) => {
  * @returns 
  */
 const updateRoundingPolicyById = async (body, updatedBy) => {
-  const filter = { Id: body.Id }
-  const oldRecord = await getRoundingPolicy(filter);
-  if (oldRecord && oldRecord.paymentMode == body.paymentMode) {
-    throw new ApiError(httpStatus.CONFLICT, `Record for ${oldRecord.paymentModeName} already Present`);
+  const filter = { paymentMode: body.paymentMode }
+  let oldRecord = await getRoundingPolicy(filter);
+  if (oldRecord && oldRecord.Id != body.Id) {
+    throw new ApiError(httpStatus.CONFLICT, `Record for this mode already Present`);
+  }
+  else {
+    oldRecord = await getRoundingPolicy({ Id: body.Id })
   }
   body.updatedBy = updatedBy;
   body.paymentModeName = Salary_Rounding_Policy_Type[body.paymentMode];
   Object.assign(oldRecord, body);
   const updatedData = await oldRecord.save();
-  const data = await getRoundingPolicy({ id: updatedData.Id }, roundingAttribute)
-  return data;
+  const data = await getRoundingPolicy({ id: updatedData.Id }, roundingAttribute, [{ model: FormModel, attributes: ['formName'] }])
+  return updateDataValues(data, 't_form_menu', 'formName')
 };
 
 
@@ -68,13 +70,16 @@ const updateRoundingPolicyById = async (body, updatedBy) => {
  * @param {Number} id 
  * @returns 
  */
-const getRoundingPolicy = async (filters, attributes = null) => {
+const getRoundingPolicy = async (filters, attributes = null, include = null) => {
   const options = {};
   if (filters) {
     options.where = filters
   }
   if (attributes) {
     options.attributes = attributes
+  }
+  if (include) {
+    options.include = include
   }
   return await RoundingPolicyModel.findOne(options);
 };
@@ -96,23 +101,27 @@ const getAllRoundingPolicies = async (req) => {
   const limit = options.pageSize;
   const offset = 0 + (options.pageNumber - 1) * limit;
   const queryFilters = [
-    { Name: Sequelize.where(Sequelize.fn('LOWER', Sequelize.col('paymentModeName')), 'LIKE', '%' + searchQuery + '%') },
+    { Name: Sequelize.where(Sequelize.fn('LOWER', Sequelize.col('formName')), 'LIKE', '%' + searchQuery + '%') },
   ]
 
   const { count, rows } = await RoundingPolicyModel.findAndCountAll({
     order: [
       ['createdAt', 'DESC']
     ],
-    where: {
-      [Op.or]: queryFilters,
-      // isActive: true
-    },
     attributes: roundingAttribute,
+    include: [{
+      where: {
+        [Op.or]: queryFilters,
+      },
+      model: FormModel,
+      attributes: ['formName']  // Only fetch the 'name' field from table `b`
+    }],
     offset: offset,
     limit: limit,
   });
 
-  return paginationFacts(count, limit, options.pageNumber, rows);
+  const updatedRows = updateDataValues(rows, 't_form_menu', 'formName')
+  return paginationFacts(count, limit, options.pageNumber, updatedRows);
 };
 
 /**
