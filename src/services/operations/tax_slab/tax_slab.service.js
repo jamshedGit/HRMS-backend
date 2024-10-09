@@ -3,7 +3,11 @@ const  Tax_slabModel  = require("../../../models/index");
 const ApiError = require("../../../utils/ApiError");
 const Sequelize = require('sequelize');
 const { paginationFacts } = require("../../../utils/common");
-
+const { HttpStatusCodes } = require("../../../utils/constants");
+// const {
+//   HttpStatusCodes,
+//   HttpResponseMessages,
+// } = require("../../../../utils/constants");
 
 const Op = Sequelize.Op;
 /**
@@ -58,7 +62,12 @@ const createtax_slab = async (req, tax_slabBody) => {
 
     // Validate that from_amount is less than to_amount
     if (from_amount >= to_amount) {
-        return 'from_amount must be less than to_amount';
+     
+        let result={"message":'From Amount must be less than To Amount.',"status":"error"}
+        return result;
+        
+
+        
     }
 
     // Check for existing records that overlap with the new record
@@ -73,7 +82,11 @@ const createtax_slab = async (req, tax_slabBody) => {
     });
 
     if (existingSlab) {
-        return 'New tax slab overlaps with existing slabs. Cannot insert the record.';
+
+      let result={"message":'New tax slab overlaps with existing slabs. Cannot insert the record.',"status":"error"}
+      return result;
+        // return 'New tax slab overlaps with existing slabs. Cannot insert the record.';
+        // throw new ApiError(httpStatus.NOT_FOUND, "New tax slab overlaps with existing slabs. Cannot insert the record.");
     }
 
     const addedtax_slabObj = await Tax_slabModel.Tax_slabModel.create(tax_slabBody);
@@ -150,7 +163,9 @@ const updatetax_slabById = async (Id, updateBody, updatedBy) => {
     const { from_amount, to_amount } = updateBody;
 
     if (from_amount >= to_amount) {
-        return 'from_amount must be less than to_amount';
+
+      let result={"message":'From Amount must be less than To Amount',"status":"error"}
+        return result;
     }
 
 
@@ -167,8 +182,11 @@ const updatetax_slabById = async (Id, updateBody, updatedBy) => {
 
     if (overlappingSlab) {
         // throw new ApiError(httpStatus.CONFLICT, "New tax slab overlaps with existing slabs. Cannot update the record.");
+  
+    // return  "New tax slab overlaps with existing slabs. Cannot update the record."
     
-    return  "New tax slab overlaps with existing slabs. Cannot update the record."
+    let result={"message":'New tax slab overlaps with existing slabs. Cannot update the record.',"status":"error"}
+    return result;
     }
 
     updateBody.updatedBy = updatedBy;

@@ -17,6 +17,16 @@ const createtax_slab = catchAsync(async (req, res) => {
 
     const tax_slab = await tax_slabformService.tax_slabFormService.createtax_slab(req, req.body);
 
+    if(tax_slab.status=="error"){
+
+      res.status(HttpStatusCodes.INTERNAL_SERVER_ERROR).send({
+        code: HttpStatusCodes.INTERNAL_SERVER_ERROR,
+        message:tax_slab.message,
+        error: tax_slab.error || 'An unexpected error occurred',
+      });
+      
+  
+    }
     res.status(httpStatus.CREATED).send({
       code: HttpStatusCodes.CREATED,
       message: HttpResponseMessages.CREATED,
@@ -60,13 +70,33 @@ const gettax_slabById = catchAsync(async (req, res) => {
 });
 
 const updatetax_slab = catchAsync(async (req, res) => {
-  console.log(req.body);
+  console.log("tax_slab body",req.body);
   const Receipt = await tax_slabformService.tax_slabFormService.updatetax_slabById(req.body.Id, req.body, req.user.Id);
+  
+  console.log("recipt tax_slab",Receipt)
+
+  if(Receipt.status=="error"){
+
+    res.status(HttpStatusCodes.INTERNAL_SERVER_ERROR).send({
+      code: HttpStatusCodes.INTERNAL_SERVER_ERROR,
+      message:Receipt.message,
+      error: Receipt.error || 'An unexpected error occurred',
+    });
+    
+
+  }
+  else{
+      
   res.send({
     code: HttpStatusCodes.OK,
     message: HttpResponseMessages.OK,
-    data: Receipt,
+    data: Receipt.message,
   });
+
+  }
+
+
+  
 });
 
 const deletetax_slab = catchAsync(async (req, res) => {
