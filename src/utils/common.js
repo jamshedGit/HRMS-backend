@@ -90,16 +90,17 @@ const getPathStorageFromUrl = (url) => {
 /**
  * 
  * When we get data from DB where include option is included, It return data of the linked table under the key as name of the table. Example
- * {
+ * data = {
  *  mainTableKey1: mainTableValue1,
  *  mainTableKey2: mainTableValue2,
  *  linkedTableName: {
  *    linkedTableKey1: linkedTableValue1,
  *    linkedTableKey2: linkedTableValue2,
  *  }
- * }
+ * } 
  * 
- * This function moves the nested Data keys to main object for easier handling. It doesn't delete the table key so the values will be copied to main object but table key is still there
+ * This function moves the nested Data keys to main object for easier handling. It doesn't delete the table key so the values will be copied to main object but table key is still there.
+ * data can be array too so will handle that as well for every object of array
  * 
  * {
  *  mainTableKey1: mainTableValue1,
