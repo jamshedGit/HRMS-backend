@@ -4,7 +4,6 @@ const ApiError = require("../../../utils/ApiError");
 const Sequelize = require('sequelize');
 const { paginationFacts, updateDataValues } = require("../../../utils/common");
 const pick = require("../../../utils/pick");
-const { Salary_Rounding_Policy_Type } = require("./enum/salary_rounding_policy.enum");
 
 const Op = Sequelize.Op;
 
@@ -33,7 +32,6 @@ const createRoundingPolicy = async (req) => {
     createdBy: req.user.id,
     companyId: 1,
     subsidiaryId: 1,
-    paymentModeName: Salary_Rounding_Policy_Type[req.body.paymentMode]
   });
   const data = await getRoundingPolicy({ id: createdData.Id }, roundingAttribute, [{ model: FormModel, attributes: ['formName'] }]);
   return updateDataValues(data, 't_form_menu', 'formName');
@@ -56,7 +54,6 @@ const updateRoundingPolicyById = async (body, updatedBy) => {
     oldRecord = await getRoundingPolicy({ Id: body.Id })
   }
   body.updatedBy = updatedBy;
-  body.paymentModeName = Salary_Rounding_Policy_Type[body.paymentMode];
   Object.assign(oldRecord, body);
   const updatedData = await oldRecord.save();
   const data = await getRoundingPolicy({ id: updatedData.Id }, roundingAttribute, [{ model: FormModel, attributes: ['formName'] }])
