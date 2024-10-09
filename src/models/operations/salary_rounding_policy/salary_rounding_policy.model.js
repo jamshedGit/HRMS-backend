@@ -14,7 +14,6 @@ const RoundingPolicyModel = sequelize.define('t_salary_rounding_policy', {
 	companyId: { type: Sequelize.NUMBER, allowNull: true },
 	paymentMode: { type: Sequelize.NUMBER, allowNull: false },
 	amount: { type: Sequelize.STRING, allowNull: false  },
-	paymentModeName: { type: Sequelize.STRING, allowNull: true },
 	isActive: { type: Sequelize.NUMBER, allowNull: true, defaultValue: 1 },
 	createdBy: {
 		type: Sequelize.INTEGER,
