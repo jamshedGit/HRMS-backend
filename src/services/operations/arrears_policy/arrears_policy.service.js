@@ -48,7 +48,7 @@ const createArrearPolicy = async (req) => {
  */
 const getAllArrearPolicies = async (req) => {
   const options = pick(req.body, ['sortOrder', 'pageSize', 'pageNumber']);
-  const searchQuery = req?.body?.filter?.searchQuery?.toLowerCase() || '';
+  const searchQuery = req?.body?.filter?.searchQuery?.toLowerCase() || '';  //Get search field value for filtering
   const limit = options.pageSize;
   const offset = 0 + (options.pageNumber - 1) * limit;
   const queryFilters = [
@@ -68,6 +68,7 @@ const getAllArrearPolicies = async (req) => {
     limit: limit,
   });
 
+  //Send paginated data
   return paginationFacts(count, limit, options.pageNumber, rows);
 };
 

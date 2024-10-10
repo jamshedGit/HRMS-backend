@@ -10,7 +10,6 @@ const Op = Sequelize.Op;
 //Attributes required for Rounding Policy Table view
 const roundingAttribute = [
   'amount',
-  [Sequelize.literal("CONCAT(amount, ' Rupee')"), 'amountWithSuffix'],
   'Id',
   'isActive',
   'paymentMode'
@@ -26,7 +25,8 @@ const createRoundingPolicy = async (req) => {
   const filter = { paymentMode: req.body.paymentMode }
   const oldRecord = await getRoundingPolicy(filter, roundingAttribute);
   if (oldRecord) {
-    throw new ApiError(httpStatus.CONFLICT, `Record for This mode already Present`);
+    //If Old record is present with same payment mode then show error. There will be only one record for each mode.
+    throw new ApiError(httpStatus.CONFLICT, `Record for This mode already Present`);  
   }
   const createdData = await RoundingPolicyModel.create({
     ...req.body,
@@ -48,9 +48,11 @@ const updateRoundingPolicyById = async (body, updatedBy) => {
   const filter = { paymentMode: body.paymentMode }
   let oldRecord = await getRoundingPolicy(filter);
   if (oldRecord && oldRecord.Id != body.Id) {
+    //If Old record is present with same payment mode with different Id then show error. There will be only one record for each mode.
     throw new ApiError(httpStatus.CONFLICT, `Record for this mode already Present`);
   }
   else {
+    //else get the record by Id to update the record
     oldRecord = await getRoundingPolicy({ Id: body.Id })
   }
   body.updatedBy = updatedBy;
@@ -79,11 +81,12 @@ const getRoundingPolicy = async (filters, attributes = null, include = null) => 
     options.include = include
   }
 
-  //If Include is present then the returned data from the other table are under the key of table name. So we use updateDataValu
+  //If Include is present then the returned data from the other table are under the key of table name. So we use handleNestedData
   if (include) {
     const data = await RoundingPolicyModel.findOne(options);
     return handleNestedData(data)
   }
+  //otherwise just return the requested data as is
   return await RoundingPolicyModel.findOne(options);
 };
 
@@ -100,7 +103,7 @@ const getRoundingPolicyById = async (id) => {
  */
 const getAllRoundingPolicies = async (req) => {
   const options = pick(req.body, ['sortOrder', 'pageSize', 'pageNumber']);
-  const searchQuery = req?.body?.filter?.searchQuery?.toLowerCase() || '';
+  const searchQuery = req?.body?.filter?.searchQuery?.toLowerCase() || '';  //Get Search field value for filtering
   const limit = options.pageSize;
   const offset = 0 + (options.pageNumber - 1) * limit;
   const queryFilters = [
@@ -123,6 +126,7 @@ const getAllRoundingPolicies = async (req) => {
     limit: limit,
   });
 
+  //If Include is present in the query the returned data from the other table are under the key of table name. So we use handleNestedData
   const updatedRows = handleNestedData(rows)
   return paginationFacts(count, limit, options.pageNumber, updatedRows);
 };
@@ -143,6 +147,13 @@ const deleteRoundingPolicyById = async (id) => {
 };
 
 
+/**
+ * 
+ * Get Payment Mode Dropdown data
+ * 
+ * @param {String} id 
+ * @returns 
+ */
 const getPaymentModes = async (id) => {
   return await FormModel.findAll({
     where: { parentFormID: id }
