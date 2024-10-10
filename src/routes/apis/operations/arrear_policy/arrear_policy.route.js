@@ -7,6 +7,7 @@ const itemValidation = require("../../../../validations/operations/entities/arre
 const router = express.Router();
 
 router.route("/read-arrear-policy/:id").get(auth(), validate(itemValidation.getSingleItem), form_controller.getArrearById);
+router.route("/read-active-payroll-month").get(auth(), validate(itemValidation.getSingleItemWithoutId), form_controller.getActivePayrollMonth);
 router.route("/read-all-arrear-policy").post(auth(), validate(itemValidation.getAllItem), form_controller.getAllArrearPolicies);
 router.route("/create-arrear-policy").post(auth(), validate(itemValidation.createItem), form_controller.createArrearPolicy);
 router.route("/update-arrear-policy").put(auth(), validate(itemValidation.updateitem), form_controller.updateArrearPolicy);

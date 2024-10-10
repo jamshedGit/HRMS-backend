@@ -1,5 +1,5 @@
 const httpStatus = require("http-status");
-const { ArrearPolicyModel } = require("../../../models/index");
+const { ArrearPolicyModel, PayrollMonthModel } = require("../../../models/index");
 const ApiError = require("../../../utils/ApiError");
 const Sequelize = require('sequelize');
 const { paginationFacts } = require("../../../utils/common");
@@ -122,10 +122,25 @@ const deleteArrearById = async (id) => {
   return oldRecord;
 };
 
+/**
+ * 
+ * Get Active Payroll Month Data
+ * 
+ * @param {String} id 
+ * @returns 
+ */
+const getActivePayrollMonth = async () => {
+  return await PayrollMonthModel.findOne({
+    where: { isActive: 1 },
+    attributes: ['startDate', 'endDate']
+  })
+}
+
 module.exports = {
   getAllArrearPolicies,
   getArrearById,
   updateArrearById,
   deleteArrearById,
-  createArrearPolicy
+  createArrearPolicy,
+  getActivePayrollMonth
 };
