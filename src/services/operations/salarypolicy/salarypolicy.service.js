@@ -1,6 +1,7 @@
 const httpStatus = require("http-status");
 const axios = require("axios")
 const  salarypolicyModel  = require("../../../models/index");
+const  PayrollMonthModel  = require("../../../models/index");
 const ApiError = require("../../../utils/ApiError");
 const sequelize = require("../../../config/db");
 const Sequelize = require('sequelize');
@@ -112,6 +113,25 @@ const updatesalarypolicyById = async (Id, updateBody, updatedBy) => {
   return Item;
 };
 
+const getCurrentMonth = async () => {
+  console.log("getCurrentMonth service")
+  
+  const result= await PayrollMonthModel.PayrollMonthModel.findAndCountAll({
+    order: [
+      ['createdAt', 'DESC']
+    ],
+    where: {
+     
+      isActive: true
+    },
+   
+  });
+
+
+  return result;
+  
+};
+
 
 
 module.exports = {
@@ -119,5 +139,6 @@ module.exports = {
   querysalarypolicys,
   getsalarypolicyById,
   updatesalarypolicyById,
-  deletesalarypolicyById
+  deletesalarypolicyById,
+  getCurrentMonth
 };

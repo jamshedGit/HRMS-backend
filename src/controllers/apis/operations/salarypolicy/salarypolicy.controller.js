@@ -79,11 +79,27 @@ const deletesalarypolicy = catchAsync(async (req, res) => {
   });
 });
 
+const getCurrentMonth = catchAsync(async (req, res) => {
+  console.log("get current month");
+  // const obj = {};
+  // const filter = obj;
+  // const options = pick(req.body, ["sortBy", "limit", "page"]);
+  // const options = pick(req.body, ['sortOrder', 'pageSize', 'pageNumber']);
+  // const searchQuery = req.body.filter.searchQuery? req.body.filter.searchQuery : '';
+  const result = await salarypolicyformService.salarypolicyFormService.getCurrentMonth();
+  console.log("resp2",result);
+  res.send({
+    code: HttpStatusCodes.OK,
+    message: HttpResponseMessages.OK,
+    data: result,
+  });
+});
 
 module.exports = {
   createsalarypolicy,
   getAllsalarypolicys,
   getsalarypolicyById,
   updatesalarypolicy,
-  deletesalarypolicy
+  deletesalarypolicy,
+  getCurrentMonth
 };
