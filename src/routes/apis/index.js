@@ -25,7 +25,7 @@ const docsRoute = require("./docs.route");
 const config = require("../../config/config");
 const bank = require('./operations/banks/bank.route')
 const exit = require('./operations/exit/exit.route')
-const salarypolicy = require('./operations/salarypolicy/salarypolicy.route')
+
 const tax_slab = require('./operations/tax_slab/tax_slab.route')
 const branch = require('./operations/branch/branch.route')
 const department = require('./operations/department/dept.route')
@@ -57,7 +57,8 @@ const salary_revision = require('./operations/employee_salary_revision/employee_
 const tax_setup = require('./operations/tax_setup/tax_setup.route')
 const fiscal_setup = require('./operations/fiscal_setup/fiscal_setup.route')
 const payroll_month = require('./operations/payroll_month_setup/payroll_month_setup.route')
-
+const salarypolicy = require('./operations/salarypolicy/salarypolicy.route')
+const loan_management_configuration = require('./operations/loan_management_configuration/loan_management_configuration')
 
 
 const router = express.Router();
@@ -287,6 +288,10 @@ const defaultRoutes = [
     route: payroll_month
   },
 
+  {
+    path: "/loan_management_configuration",
+    route: loan_management_configuration
+  },
 
 
   

@@ -63,8 +63,6 @@ module.exports.BankModel = require('./operations/banks/bank.model');
 //Exit Model
 module.exports.exitModel = require('./operations/exit/exit.model');
 
-//Salarypolicy Model
-module.exports.salarypolicyModel = require('./operations/salarypolicy/salarypolicy.model');
 
 
 //Tax Slab Model
@@ -155,8 +153,12 @@ module.exports.FiscalSetupModel = require('./operations/fiscal_setup/fiscal_setu
 module.exports.PayrollMonthModel = require('./operations/payroll_month_setup/payroll_month_setup.model');
 
 
+//Salarypolicy Model
+module.exports.salarypolicyModel = require('./operations/salarypolicy/salarypolicy.model');
 
 
+//Loan Management Configuration Model
+module.exports.Loan_management_configurationModel = require('./operations/loan_management_configuration/loan_management_configuration.model');
 
 
 
