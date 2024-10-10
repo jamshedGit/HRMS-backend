@@ -132,7 +132,7 @@ const deleteArrearById = async (id) => {
 const getActivePayrollMonth = async () => {
   return await PayrollMonthModel.findOne({
     where: { isActive: 1 },
-    attributes: ['startDate', 'endDate']
+    attributes: ['startDate', 'endDate', 'month', 'year']
   })
 }
 
