@@ -15,8 +15,8 @@ const arrearAttribute = [
   'Id',
   'isActive',
   [Sequelize.literal(`CASE WHEN multiplier = '' THEN '-' ELSE multiplier END`), 'multiplier'],
-  [Sequelize.literal(`CASE WHEN divisor = '' THEN '-' ELSE multiplier END`), 'divisor'],
-  [Sequelize.literal(`CASE WHEN days = '' THEN '-' ELSE multiplier END`), 'days'],
+  [Sequelize.literal(`CASE WHEN divisor = '' THEN '-' ELSE divisor END`), 'divisor'],
+  [Sequelize.literal(`CASE WHEN days = '' THEN '-' ELSE days END`), 'days'],
 ]
 
 /**
