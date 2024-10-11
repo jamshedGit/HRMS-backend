@@ -39,7 +39,7 @@ const createtax_slab = catchAsync(async (req, res) => {
 });
 
 const getAlltax_slabs = catchAsync(async (req, res) => {
-  console.log("get tax_slabs");
+  console.log("get tax_slabs tax_slab body");
   const obj = {};
   const filter = obj;
   // const options = pick(req.body, ["sortBy", "limit", "page"]);
