@@ -57,6 +57,15 @@ const getAllItem = {
 };
 
 /**
+ * For Getting Leave Type Dropdown data
+ */
+const getItemWihoutId = {
+  query: Joi.disallow(),
+  params: Joi.disallow(),
+  body: Joi.disallow()
+};
+
+/**
  * For Deleting Single Leave Type Records By Id in Params
  */
 const deleteSingleItem = {
@@ -72,5 +81,6 @@ module.exports = {
   updateItem,
   getSingleItem,
   getAllItem,
-  deleteSingleItem
+  deleteSingleItem,
+  getItemWihoutId
 };

@@ -89,25 +89,17 @@ const deleteLeaveType = catchAsync(async (req, res) => {
   });
 });
 
-
-/**
- * Get Single Leave Type By Id
- * 
- * @param {Number} id 
- * @returns res
- */
-const getPaymentMode = catchAsync(async (req, res) => {
-  const paymentData = await LeaveTypeServicePage.getPaymentModes(req.params.id);
-  if (!paymentData) {
+const getLeaveTypeDropdownData = catchAsync(async (req, res) => {
+  const dropdownData = await LeaveTypeServicePage.getDropdownData();
+  if (!dropdownData) {
     throw new ApiError(httpStatus.NOT_FOUND, "No Data found");
   }
   res.send({
     code: HttpStatusCodes.OK,
     message: HttpResponseMessages.OK,
-    data: paymentData,
+    data: dropdownData,
   });
 });
-
 
 module.exports = {
   createLeaveType,
@@ -115,5 +107,5 @@ module.exports = {
   updateLeaveType,
   getAllLeaveType,
   deleteLeaveType,
-  getPaymentMode
+  getLeaveTypeDropdownData
 };

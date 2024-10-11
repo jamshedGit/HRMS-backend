@@ -163,10 +163,23 @@ const deleteLeaveTypeById = async (id) => {
   return oldRecord;
 };
 
+/**
+ * 
+ * Get Leave Type Dropdown Data
+ * 
+ * @returns 
+ */
+const getDropdownData = () => {
+  return Object.keys(LEAVE_TYPE).map((type)=> {
+    return {label: LEAVE_TYPE[type], value: Number(type)}
+  })
+}
+
 module.exports = {
   getAllLeaveType,
   getLeaveTypeById,
   updateLeaveTypeById,
   deleteLeaveTypeById,
-  createLeaveType
+  createLeaveType,
+  getDropdownData
 };
