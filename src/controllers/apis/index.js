@@ -23,4 +23,10 @@ module.exports.coffinFormController = require('./operations/ibs/coffinForm.contr
 module.exports.employeeFormProfile = require('./operations/emp_profile/profile.controller')
 module.exports.employeeSalaryRevision = require('./operations/employee_salary_revision/employee_salary_revision.controller')
 module.exports.payrollMonthSetup = require('./operations/payroll_month_setup/payroll_month_setup.controller')
+module.exports.finalSetllementPolicy = require('./operations/final_settlement_policy/final_settlement_policy.controller')
+module.exports.loanTypeSetup = require('./operations/loan_type/loan_type.controller')
+module.exports.payrollProcessPolicy = require('./operations/payroll_process_policy/payroll_process_policy.controller')
+
+
+
 

@@ -24,6 +24,8 @@ module.exports.mortuaryFormService = require('./operations/ibs/morturayForm.serv
 module.exports.coffinFormService = require('./operations/ibs/coffinForm.service')
 module.exports.donationReceiptFormService = require('./operations/edrs/receipt.service')
 module.exports.bankFormService = require('./operations/banks/bank.service')
+module.exports.exitFormService = require('./operations/exit/exit.service')
+module.exports.salarypolicyFormService = require('./operations/salarypolicy/salarypolicy.service')
 module.exports.branchFormService = require('./operations/branch/branch.service')
 module.exports.deptFormService = require('./operations/department/dept.service')
 module.exports.employeeTypeFormService = require('./operations/employeeType/employeeType.service')
@@ -54,6 +56,13 @@ module.exports.TaxSetupServicePage = require('./operations/tax_setup/tax_setup.s
 module.exports.FiscalSetupServicePage = require('./operations/fiscal_setup/fiscal_setup.service')
 module.exports.PayrollMonthServicePage = require('./operations/payroll_month_setup/payroll_month_setup.service')
 module.exports.ArrearPolicyServicePage = require('./operations/arrears_policy/arrears_policy.service')
+module.exports.FinalSettlementPolicy = require('./operations/final_settlement_policy/final_settlement_policy.service')
+module.exports.salarypolicyFormService = require('./operations/salarypolicy/salarypolicy.service')
+module.exports.OneTimeEarningService = require('./operations/onetime_allowance/onetime_allowance.service')
+module.exports.LoanTypeService = require('./operations/loan_type/loan_type.service')
+module.exports.PayrollProcessPolicy = require('./operations/payroll_process_policy/payroll_process_policy.service')
+  
+ 
 
 
 
