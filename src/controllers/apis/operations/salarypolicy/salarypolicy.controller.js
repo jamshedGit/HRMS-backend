@@ -2,7 +2,7 @@ const httpStatus = require("http-status");
 const pick = require("../../../../utils/pick");
 const ApiError = require("../../../../utils/ApiError");
 const catchAsync = require("../../../../utils/catchAsync");
-const bankformService = require("../../../../services/index");
+const salarypolicyformService = require("../../../../services/index");
 
 
 const {
@@ -10,18 +10,17 @@ const {
   HttpResponseMessages,
 } = require("../../../../utils/constants");
 
-const createBank = catchAsync(async (req, res) => {
+const createsalarypolicy = catchAsync(async (req, res) => {
   // console.log("reqested User", req.user.id);
   try {
 
-    console.log("insert bank req.body",req.body)
-    console.log(req.body);
-    const Bank = await bankformService.bankFormService.createBank(req, req.body);
+
+    const salarypolicy = await salarypolicyformService.salarypolicyFormService.createsalarypolicy(req, req.body);
 
     res.status(httpStatus.CREATED).send({
       code: HttpStatusCodes.CREATED,
       message: HttpResponseMessages.CREATED,
-      data: Bank
+      data: salarypolicy
     });
 
   } catch (error) {
@@ -29,14 +28,15 @@ const createBank = catchAsync(async (req, res) => {
   }
 });
 
-const getAllBanks = catchAsync(async (req, res) => {
-  console.log("get banks");
+const getAllsalarypolicys = catchAsync(async (req, res) => {
+  console.log("get salarypolicys");
   const obj = {};
   const filter = obj;
   // const options = pick(req.body, ["sortBy", "limit", "page"]);
   const options = pick(req.body, ['sortOrder', 'pageSize', 'pageNumber']);
   const searchQuery = req.body.filter.searchQuery? req.body.filter.searchQuery : '';
-  const result = await bankformService.bankFormService.queryBanks(filter, options,searchQuery);
+  console.log("searchQuery",searchQuery)
+  const result = await salarypolicyformService.salarypolicyFormService.querysalarypolicys(filter, options,searchQuery);
   console.log(result);
   res.send({
     code: HttpStatusCodes.OK,
@@ -45,10 +45,10 @@ const getAllBanks = catchAsync(async (req, res) => {
   });
 });
 
-const getBankById = catchAsync(async (req, res) => {
-  console.log("bank Controller getbankId")
+const getsalarypolicyById = catchAsync(async (req, res) => {
+  console.log("salarypolicy Controller getsalarypolicyId")
   console.log(req.body)
-  const Receipt = await bankformService.bankFormService.getBankById(req.body.Id);
+  const Receipt = await salarypolicyformService.salarypolicyFormService.getsalarypolicyById(req.body.Id);
   if (!Receipt) {
     throw new ApiError(httpStatus.NOT_FOUND, "Receipt not found");
   }
@@ -59,9 +59,9 @@ const getBankById = catchAsync(async (req, res) => {
   });
 });
 
-const updateBank = catchAsync(async (req, res) => {
+const updatesalarypolicy = catchAsync(async (req, res) => {
   console.log(req.body);
-  const Receipt = await bankformService.bankFormService.updateBankById(req.body.Id, req.body, req.user.Id);
+  const Receipt = await salarypolicyformService.salarypolicyFormService.updatesalarypolicyById(req.body.Id, req.body, req.user.Id);
   res.send({
     code: HttpStatusCodes.OK,
     message: HttpResponseMessages.OK,
@@ -69,9 +69,9 @@ const updateBank = catchAsync(async (req, res) => {
   });
 });
 
-const deleteBank = catchAsync(async (req, res) => {
+const deletesalarypolicy = catchAsync(async (req, res) => {
   console.log("req.body.Id " ,req.body.Id)
-  const Receipt = await bankformService.bankFormService.deleteBankById(req.body.Id);
+  const Receipt = await salarypolicyformService.salarypolicyFormService.deletesalarypolicyById(req.body.Id);
   res.send({
     code: HttpStatusCodes.OK,
     message: HttpResponseMessages.OK,
@@ -81,9 +81,9 @@ const deleteBank = catchAsync(async (req, res) => {
 
 
 module.exports = {
-  createBank,
-  getAllBanks,
-  getBankById,
-  updateBank,
-  deleteBank
+  createsalarypolicy,
+  getAllsalarypolicys,
+  getsalarypolicyById,
+  updatesalarypolicy,
+  deletesalarypolicy
 };

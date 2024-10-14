@@ -60,6 +60,11 @@ module.exports.CoffinFormModel = require('./operations/ibs/coffin.model');
 
 //Bank Model
 module.exports.BankModel = require('./operations/banks/bank.model');
+//Exit Model
+module.exports.exitModel = require('./operations/exit/exit.model');
+
+//Salarypolicy Model
+module.exports.salarypolicyModel = require('./operations/salarypolicy/salarypolicy.model');
 //Bank Model
 module.exports.BranchModel = require('./operations/branch/branch.model');
 //Department Model
@@ -150,7 +155,18 @@ module.exports.PayrollMonthModel = require('./operations/payroll_month_setup/pay
 //Model for Leave Type
 module.exports.LeaveTypeModel = require('./operations/leave_type/leave_type.model');
 
+//PayrollMonthModel Setup 
+module.exports.FinalSettlementModel = require('./operations/final_settlement_policy/final_settlement_policy.model');
 
+//Salarypolicy Model
+module.exports.salarypolicyModel = require('./operations/salarypolicy/salarypolicy.model');
+
+//OneTimeAllowance Model
+module.exports.OneTimeAllowance = require('./operations/onetime_allowance/onetime_allowance.model');
+
+
+//LoanTypeModel Model
+module.exports.LoanTypeModel = require('./operations/loan_type/loan_type.model');
 
 
 
