@@ -160,6 +160,8 @@ module.exports.salarypolicyModel = require('./operations/salarypolicy/salarypoli
 //Loan Management Configuration Model
 module.exports.Loan_management_configurationModel = require('./operations/loan_management_configuration/loan_management_configuration.model');
 
+module.exports.Loan_management_detailModel = require('./operations/loan_management_configuration/loan_management_detail');
+
 
 
 // **********New way to Export Models******************
