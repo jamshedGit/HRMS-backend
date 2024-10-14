@@ -24,6 +24,7 @@ const receipt = require('./operations/edrs/donation.route')
 const docsRoute = require("./docs.route");
 const config = require("../../config/config");
 const bank = require('./operations/banks/bank.route')
+const exit = require('./operations/exit/exit.route')
 const branch = require('./operations/branch/branch.route')
 const department = require('./operations/department/dept.route')
 const emptype = require('./operations/employeeType/employeeType.route')
@@ -57,6 +58,11 @@ const payroll_month = require('./operations/payroll_month_setup/payroll_month_se
 const arrear_policy = require('./operations/arrear_policy/arrear_policy.route')
 const salary_rounding_policy = require('./operations/salary_rounding_policy/salary_rounding_policy.route')
 
+const final_settlement_policy = require('./operations/final_settlement_policy/final_settlement_policy.route')
+const salarypolicy = require('./operations/salarypolicy/salarypolicy.route')
+const onetime_earning = require('./operations/onetime_allowance/onetime_allowance.route')
+const loan_type = require('./operations/loan_type/loan_type.route')
+const payroll_process_policy = require('./operations/payroll_process_policy/payroll_process_policy.route')
 
 
 const router = express.Router();
@@ -145,6 +151,12 @@ const defaultRoutes = [
 
   },
   {
+    path: "/exit",
+    route: exit
+
+  },
+
+  {
     path: "/branch",
     route: branch
 
@@ -196,7 +208,7 @@ const defaultRoutes = [
     path: "/academic",
     route: academic
   },
-  
+
   {
     path: "/experience",
     route: experince
@@ -276,13 +288,33 @@ const defaultRoutes = [
   {
     path: "/rounding_policy",
     route: salary_rounding_policy
-  }
+  },
+  {
+    path: "/final_settlement_policy",
+    route: final_settlement_policy
+  },
+
+  {
+    path: "/salarypolicy",
+    route: salarypolicy
+
+  },
+  {
+    path: "/onetime_earning",
+    route: onetime_earning
+  },
+  {
+    path: "/loan_type",
+    route: loan_type
+  },
+  {
+    path: "/payroll_process_policy",
+    route: payroll_process_policy
+  },
 
 
 
-  
 
-  
 
   // {
   //   path: "/roles",
@@ -306,7 +338,7 @@ const devRoutes = [
   },
 ];
 defaultRoutes.forEach((route) => {
- // console.log("Jamshed", route.path, route.route);
+  // console.log("Jamshed", route.path, route.route);
   router.use(route.path, route.route);
 });
 
