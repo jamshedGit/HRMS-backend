@@ -55,6 +55,13 @@ module.exports.EmployeeSalaryRevisionServicePage = require('./operations/employe
 module.exports.TaxSetupServicePage = require('./operations/tax_setup/tax_setup.service')
 module.exports.FiscalSetupServicePage = require('./operations/fiscal_setup/fiscal_setup.service')
 module.exports.PayrollMonthServicePage = require('./operations/payroll_month_setup/payroll_month_setup.service')
+module.exports.FinalSettlementPolicy = require('./operations/final_settlement_policy/final_settlement_policy.service')
+module.exports.salarypolicyFormService = require('./operations/salarypolicy/salarypolicy.service')
+module.exports.OneTimeEarningService = require('./operations/onetime_allowance/onetime_allowance.service')
+module.exports.LoanTypeService = require('./operations/loan_type/loan_type.service')
+module.exports.PayrollProcessPolicy = require('./operations/payroll_process_policy/payroll_process_policy.service')
+  
+ 
 
 
 
