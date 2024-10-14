@@ -89,10 +89,27 @@ const deleteArrear = catchAsync(async (req, res) => {
 });
 
 
+/**
+ * Get Active Payroll Month For View
+ * 
+ * @param {Number} id 
+ * @returns res
+ */
+const getActivePayrollMonth = catchAsync(async (req, res) => {
+  const payrollData = await ArrearPolicyServicePage.getActivePayrollMonth();
+  res.send({
+    code: HttpStatusCodes.OK,
+    message: HttpResponseMessages.OK,
+    data: payrollData || {},
+  });
+});
+
+
 module.exports = {
   getAllArrearPolicies,
   getArrearById,
   createArrearPolicy,
   updateArrearPolicy,
-  deleteArrear
+  deleteArrear,
+  getActivePayrollMonth
 };
