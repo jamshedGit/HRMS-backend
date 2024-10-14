@@ -60,6 +60,11 @@ module.exports.CoffinFormModel = require('./operations/ibs/coffin.model');
 
 //Bank Model
 module.exports.BankModel = require('./operations/banks/bank.model');
+//Exit Model
+module.exports.exitModel = require('./operations/exit/exit.model');
+
+//Salarypolicy Model
+module.exports.salarypolicyModel = require('./operations/salarypolicy/salarypolicy.model');
 //Bank Model
 module.exports.BranchModel = require('./operations/branch/branch.model');
 //Department Model
