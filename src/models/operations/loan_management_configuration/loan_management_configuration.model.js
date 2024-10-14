@@ -11,15 +11,16 @@ const Loan_management_configuration = sequelize.define('t_loan_management_config
 		primaryKey: true
 	},
 
-    subsidiary: { type: Sequelize.INTEGER,allowNull: false },
-	account: { type: Sequelize.INTEGER },
+    subsidiaryId: { type: Sequelize.INTEGER,allowNull: false },
+	accountId
+: { type: Sequelize.INTEGER },
 	human_resource_role: { type: Sequelize.INTEGER, allowNull: false },
     emp_loan_account: { type: Sequelize.INTEGER, allowNull: false },
     installment_deduction_percentage: { type: Sequelize.DECIMAL, allowNull: false },
-    installment_deduction_bases: { type: Sequelize.INTEGER, allowNull: false },
-	loan_type: { type: Sequelize.INTEGER, allowNull: false },
-    max_loan_amount: { type: Sequelize.INTEGER, allowNull: false },
-    salary_count: { type: Sequelize.INTEGER, allowNull: false },
+    installment_deduction_bases_type: { type: Sequelize.STRING, allowNull: false },
+	// loan_type: { type: Sequelize.INTEGER, allowNull: false },
+    // max_loan_amount: { type: Sequelize.INTEGER, allowNull: false },
+    // salary_count: { type: Sequelize.INTEGER, allowNull: false },
     
     isActive: { type: Sequelize.BOOLEAN, allowNull: true, defaultValue: true },
 	createdBy: {
