@@ -396,7 +396,6 @@ const getUserCompleteRoleAccess = async (roleId) => {
     })
   });
   
-   console.log("formatedData",formatedData);
   var groupedData = _.groupBy(formatedData, f => { return f.parentName });
   delete formatedData.parentName;
   return groupedData;
@@ -424,10 +423,7 @@ const getUserAccessForMiddleware = async (roleId, slugs) => {
 
     });
 
-
-
-    console.log("roleAccessData", roleAccessData[0].isAccess);
-    return roleAccessData[0].isAccess;
+    return roleAccessData?.[0]?.isAccess || false;
     // return roleAccessData;
   } catch (error) {
     console.log(error)
