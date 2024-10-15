@@ -129,8 +129,8 @@ const {
 // const ibForm = require('./models/operations/ibs/ibForm.model');
 
 
-Loan_management_configurationModel.sync({ alter: true });
-Loan_management_detailModel.sync({ alter: true });
+// Loan_management_configurationModel.sync({ force: true });
+// Loan_management_detailModel.sync({ force: true });
 // images.sync({ force: true });
 
 // const mortuaryImages = require('./models/operations/ibs/mortuaryImages.model');

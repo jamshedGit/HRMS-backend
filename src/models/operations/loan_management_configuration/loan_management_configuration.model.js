@@ -1,6 +1,6 @@
 const Sequelize = require('sequelize');
 const { ResourceModel } = require('../..');
-// const Loan_management_detailModel= require('../../index');
+const FormModel= require('../../index');
 //import Database connection configurations.
 const sequelize = require('../../../config/db')
 
@@ -35,10 +35,11 @@ const Loan_management_configuration = sequelize.define('t_loan_management_config
 });
 
 
-// Loan_management_configuration.hasMany(Loan_management_detailModel.Loan_management_detailModel, {
-// 	as: 'Details',foreignKey: 'loan_management_configurationId',
-
-// });
+// Loan_management_configuration.belongsTo(FormModel.FormModel, {
+// 	foreignKey: 'subsidiaryId',
+// 	targetKey: 'Id', // Optional alias
+//   });
+  
 
 
 
