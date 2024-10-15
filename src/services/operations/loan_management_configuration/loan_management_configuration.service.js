@@ -118,12 +118,53 @@ const queryloan_management_configuration = async (filter, options, searchQuery) 
     },
     offset: offset,
     limit: limit,
+    include: [
+      {
+          model:Loan_management_detailModel.Loan_management_detailModel, 
+          as: 'Details', 
+          // attributes:["I"]
+       
+      }
+  ]
   });
 
 
   return paginationFacts(count, limit, options.pageNumber, rows);
   
 };
+
+
+
+const getAllRoundingPolicies = async (req) => {
+  const options = pick(req.body, ['sortOrder', 'pageSize', 'pageNumber']);
+  const searchQuery = req?.body?.filter?.searchQuery?.toLowerCase() || '';  //Get Search field value for filtering
+  const limit = options.pageSize;
+  const offset = 0 + (options.pageNumber - 1) * limit;
+  const queryFilters = [
+    { Name: Sequelize.where(Sequelize.fn('LOWER', Sequelize.col('formName')), 'LIKE', '%' + searchQuery + '%') },
+  ]
+ 
+  const { count, rows } = await RoundingPolicyModel.findAndCountAll({
+    order: [
+      ['createdAt', 'DESC']
+    ],
+    attributes: roundingAttribute,
+    include: [{
+      where: {
+        [Op.or]: queryFilters,
+      },
+      model: FormModel,
+      attributes: ['formName']  // Only fetch the 'name' field from table `b`
+    }],
+    offset: offset,
+    limit: limit,
+  });
+ 
+  //If Include is present in the query the returned data from the other table are under the key of table name. So we use handleNestedData
+  const updatedRows = handleNestedData(rows)
+  return paginationFacts(count, limit, options.pageNumber, updatedRows);
+};
+
 
 /**
  * Get Item by id

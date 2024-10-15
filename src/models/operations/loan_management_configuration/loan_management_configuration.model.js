@@ -1,6 +1,6 @@
 const Sequelize = require('sequelize');
 const { ResourceModel } = require('../..');
-
+// const Loan_management_detailModel= require('../../index');
 //import Database connection configurations.
 const sequelize = require('../../../config/db')
 
@@ -18,9 +18,7 @@ const Loan_management_configuration = sequelize.define('t_loan_management_config
     emp_loan_account: { type: Sequelize.INTEGER, allowNull: false },
     installment_deduction_percentage: { type: Sequelize.DECIMAL, allowNull: false },
     installment_deduction_bases_type: { type: Sequelize.STRING, allowNull: false },
-	// loan_type: { type: Sequelize.INTEGER, allowNull: false },
-    // max_loan_amount: { type: Sequelize.INTEGER, allowNull: false },
-    // salary_count: { type: Sequelize.INTEGER, allowNull: false },
+
     
     isActive: { type: Sequelize.BOOLEAN, allowNull: true, defaultValue: true },
 	createdBy: {
@@ -36,4 +34,15 @@ const Loan_management_configuration = sequelize.define('t_loan_management_config
 
 });
 
-module.exports = Loan_management_configuration
+
+// Loan_management_configuration.hasMany(Loan_management_detailModel.Loan_management_detailModel, {
+// 	as: 'Details',foreignKey: 'loan_management_configurationId',
+
+// });
+
+
+
+
+
+
+module.exports = Loan_management_configuration;

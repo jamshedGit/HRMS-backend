@@ -122,13 +122,15 @@ const {
   AlarmTimeModel,
   IbFormModel,
   IbsImageModel,
-  CoffinFormModel
+  CoffinFormModel,Loan_management_configurationModel,Loan_management_detailModel
 } = require("./models");
 
 // const images = require('./models/operations/ibs/ibfImage.model');
 // const ibForm = require('./models/operations/ibs/ibForm.model');
 
-// ibForm.sync({ force: true });
+
+Loan_management_configurationModel.sync({ alter: true });
+Loan_management_detailModel.sync({ alter: true });
 // images.sync({ force: true });
 
 // const mortuaryImages = require('./models/operations/ibs/mortuaryImages.model');
