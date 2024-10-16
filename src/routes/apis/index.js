@@ -6,7 +6,6 @@ const settingRoute = require("./settings/setting.route");
 // const accessRightRoute = require("./settings/accessRight.route");
 const userRoute = require("./user.route");
 const ibs = require('./operations/ibs/ibForm.route')
-const receipt = require('./operations/edrs/donation.route')
 const docsRoute = require("./docs.route");
 const config = require("../../config/config");
 const bank = require('./operations/banks/bank.route')
@@ -70,11 +69,7 @@ const defaultRoutes = [
     path: "/ibs",
     route: ibs
   },
-  {
-    path: "/edrs",
-    route: receipt
-
-  },
+  
   {
     path: "/bank",
     route: bank
@@ -148,7 +143,7 @@ const defaultRoutes = [
     route: skills
   },
   {
-    path: "/incident",
+    path: "/incident", // hrms-employee-setup
     route: incident
   },
   {
@@ -175,6 +170,7 @@ const defaultRoutes = [
     path: "/earning_transaction",
     route: earning_deduction_transaction
   },
+  /// CleanUp By Jamshed
   {
     path: "/employee_salary_earning",
     route: employee_salary_earning
