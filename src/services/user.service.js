@@ -1,5 +1,5 @@
 const httpStatus = require('http-status');
-const { UserModel, RoleModel, ResourceModel, AccessRightModel, CenterModel, SubCenterModel, CountryModel, CityModel } = require('../models');
+const { UserModel, RoleModel, ResourceModel, AccessRightModel, CountryModel, CityModel } = require('../models');
 const ApiError = require('../utils/ApiError');
 const Pagination = require('../utils/common');
 const { types } = require('joi');
@@ -198,16 +198,6 @@ const queryUsers = async (filter, options, searchQuery, startDate, endDate) => {
         attributes: ['name'],
       },
       {
-        model: CenterModel,
-        as: 'center',
-        attributes: ['name']
-      },
-      {
-        model: SubCenterModel,
-        as: 'subcenter',
-        attributes: ['name']
-      },
-      {
         model: CountryModel,
         as: 'country',
         attributes: ['name']
@@ -239,16 +229,6 @@ const getUserById = async (id) => {
         model: RoleModel,
         as: 'role',
         attributes: ['id','name'],
-      },
-      {
-        model: CenterModel,
-        as: 'center',
-        attributes: ['id','name']
-      },
-      {
-        model: SubCenterModel,
-        as: 'subcenter',
-        attributes: ['id','name']
       }],
   });
 };
@@ -424,50 +404,13 @@ const getUserAccessForMiddleware = async (roleId, slugs) => {
     });
 
     return roleAccessData?.[0]?.isAccess || false;
+    // return 1
     // return roleAccessData;
   } catch (error) {
     console.log(error)
     return false;
   }
 };
-
-// const getUserRoleAccess = async (roleId, resourceSlug, rightSlug) => {
-//   // const  roleAccessData = await RoleaccessModel.find({ _id: '620ae3d7457b9e47ea85de78'}, {
-//   //   resources: {'$elemMatch': {slug: 'user'}}
-//   // });
-//   try {
-//     const roleAccessData = await RoleaccessModel.aggregate([
-//       {
-//         "$match": {
-//           "_id": mongoose.Types.ObjectId(roleId)
-//         }
-//       },
-//       { "$unwind": "$resources" },
-//       { "$unwind": "$resources.rights" },
-//       {
-//         "$match": {
-//           "resources.resourceSlug": resourceSlug
-//         }
-//       },
-//       {
-//         "$match": {
-//           "resources.rights.rightSlug": rightSlug
-//         }
-//       },
-//       {
-//         $project: {
-//           _id: 0,
-//           resource: '$resources.resourceSlug',
-//           accessname: "$resources.rights.rightSlug",
-//           access: "$resources.rights.access"
-//         }
-//       }
-//     ])
-//     return roleAccessData;
-//   } catch (error) {
-//     return error;
-//   }
-// };
 
 
 // const updatePasswordMobile = async (email) => {
