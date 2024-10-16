@@ -90,7 +90,40 @@ const createloan_management_configuration = async (
       }
     }
 
-    return addedloan_management_configurationObj;
+    // return addedloan_management_configurationObj;
+
+    const populatedConfiguration = await Loan_management_configurationModel.Loan_management_configurationModel.findOne({
+      where: { Id: addedloan_management_configurationObj.Id },
+      include: [
+        {
+          model: Loan_management_detailModel.Loan_management_detailModel,
+          as: "details",
+          include: [
+            {
+              model: FormModel.FormModel,
+              attributes: ["formName", "formCode"],
+              as: "Loan_Type",
+            },
+          ],
+        },
+        {
+          model: FormModel.FormModel,
+          attributes: ["formName", "formCode"],
+          as: "Subsidiary",
+        },
+        {
+          model: FormModel.FormModel,
+          attributes: ["formName", "formCode"],
+          as: "Account",
+        },
+        {
+          model: RoleModel.RoleModel,
+          attributes: ["name"],
+        },
+      ],
+    });
+
+    return populatedConfiguration;
   } catch (error) {
     console.error("Error creating loan management configuration:", error);
     throw error; // Rethrow or handle the error as needed
@@ -138,7 +171,7 @@ const queryloan_management_configuration = async (
         include: [
           {
             model: Loan_management_detailModel.Loan_management_detailModel,
-            as: "Details",
+            as: "details",
             include: [
               {
                 model: FormModel.FormModel,
@@ -174,41 +207,6 @@ const queryloan_management_configuration = async (
   return paginationFacts(count, limit, options.pageNumber, rows);
 };
 
-const getAllRoundingPolicies = async (req) => {
-  const options = pick(req.body, ["sortOrder", "pageSize", "pageNumber"]);
-  const searchQuery = req?.body?.filter?.searchQuery?.toLowerCase() || ""; //Get Search field value for filtering
-  const limit = options.pageSize;
-  const offset = 0 + (options.pageNumber - 1) * limit;
-  const queryFilters = [
-    {
-      Name: Sequelize.where(
-        Sequelize.fn("LOWER", Sequelize.col("formName")),
-        "LIKE",
-        "%" + searchQuery + "%"
-      ),
-    },
-  ];
-
-  const { count, rows } = await RoundingPolicyModel.findAndCountAll({
-    order: [["createdAt", "DESC"]],
-    attributes: roundingAttribute,
-    include: [
-      {
-        where: {
-          [Op.or]: queryFilters,
-        },
-        model: FormModel,
-        attributes: ["formName"], // Only fetch the 'name' field from table `b`
-      },
-    ],
-    offset: offset,
-    limit: limit,
-  });
-
-  //If Include is present in the query the returned data from the other table are under the key of table name. So we use handleNestedData
-  const updatedRows = handleNestedData(rows);
-  return paginationFacts(count, limit, options.pageNumber, updatedRows);
-};
 
 /**
  * Get Item by id
@@ -216,9 +214,43 @@ const getAllRoundingPolicies = async (req) => {
  * @returns {Promise<ReceiptModel>}
  */
 const getloan_management_configurationById = async (id) => {
-  return Loan_management_configurationModel.Loan_management_configurationModel.findByPk(
-    id
-  );
+  return Loan_management_configurationModel.Loan_management_configurationModel.findOne({
+    where: { Id:id },
+    include: [
+      {
+        model: Loan_management_detailModel.Loan_management_detailModel,
+        as: "details",
+        include: [
+          {
+            model: FormModel.FormModel,
+            attributes: ["formName", "formCode"],
+            as: "Loan_Type",
+          },
+        ],
+      },
+      {
+        model: FormModel.FormModel,
+        attributes: ["formName", "formCode"],
+        as: "Subsidiary",
+      },
+      {
+        model: FormModel.FormModel,
+        attributes: ["formName", "formCode"],
+        as: "Account",
+      },
+      {
+        model: RoleModel.RoleModel,
+        attributes: ["name"],
+      },
+    ],
+  });
+
+  // return populatedConfiguration;
+
+
+  // return Loan_management_configurationModel.Loan_management_configurationModel.findByPk(
+  //   id
+  // );
 };
 
 /**
@@ -227,6 +259,55 @@ const getloan_management_configurationById = async (id) => {
  * @param {Object} updateBody
  * @returns {Promise<ReceiptModel>}
  */
+
+
+
+// const updateloan_management_configurationById = async (
+//   Id,
+//   updateBody,
+//   updatedBy
+// ) => {
+//   const Item = await getloan_management_configurationById(Id, {
+//     include: [
+//       {
+//         model: Loan_management_detailModel.Loan_management_detailModel,
+//         as: "details",
+//       },
+//     ],
+//   });
+
+//   if (!Item) {
+//     throw new ApiError(httpStatus.NOT_FOUND, "Record not found");
+//   }
+
+//   // Update parent record
+//   updateBody.updatedBy = updatedBy;
+//   delete updateBody.id;
+//   Object.assign(Item, updateBody);
+//   await Item.save();
+
+//   // Update child records if details are provided in the updateBody
+//   if (updateBody.details && Array.isArray(updateBody.details)) {
+//     for (const detail of updateBody.details) {
+//       if (detail.id) {
+//         // Update existing detail
+//         const childDetail = Item.details.find(d => d.id === detail.id);
+//         if (childDetail) {
+//           Object.assign(childDetail, detail);
+//           await childDetail.save();
+//         }
+//       } else {
+//         // Create new detail if id is not present
+//         detail.loan_management_configurationId = Item.Id; // Associate with the configuration ID
+//         await Loan_management_detailModel.Loan_management_detailModel.create(detail);
+//       }
+//     }
+//   }
+
+//   return Item;
+// };
+
+
 
 const updateloan_management_configurationById = async (
   Id,
@@ -251,14 +332,42 @@ const updateloan_management_configurationById = async (
  * @param {ObjectId} Id
  * @returns {Promise<ReceiptModel>}
  */
+
+
 const deleteloan_management_configurationById = async (Id) => {
-  const Item = await getloan_management_configurationById(Id);
+  const Item = await getloan_management_configurationById(Id, {
+    include: [
+      {
+        model: Loan_management_detailModel.Loan_management_detailModel,
+        as: "details", // Make sure this matches the alias used in your associations
+      },
+    ],
+  });
+
   if (!Item) {
     throw new ApiError(httpStatus.NOT_FOUND, "Item not found");
   }
+
+  // Delete child records
+  if (Item.details && Array.isArray(Item.details)) {
+    for (const detail of Item.details) {
+      await detail.destroy(); // Remove each detail record
+    }
+  }
+
+  // Now delete the parent record
   await Item.destroy();
   return Item;
 };
+
+// const deleteloan_management_configurationById = async (Id) => {
+//   const Item = await getloan_management_configurationById(Id);
+//   if (!Item) {
+//     throw new ApiError(httpStatus.NOT_FOUND, "Item not found");
+//   }
+//   await Item.destroy();
+//   return Item;
+// };
 
 module.exports = {
   createloan_management_configuration,

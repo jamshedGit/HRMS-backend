@@ -46,7 +46,7 @@ Loan_management_detail.belongsTo(Loan_management_configurationModel.Loan_managem
 
 
 Loan_management_configurationModel.Loan_management_configurationModel.hasMany(Loan_management_detail, {
-  as: 'Details', foreignKey: 'loan_management_configurationId',
+  as: 'details', foreignKey: 'loan_management_configurationId',
 
 });
 
