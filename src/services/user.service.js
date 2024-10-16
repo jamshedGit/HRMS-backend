@@ -30,106 +30,6 @@ const createUser = async (userBody, createdBy) => {
   return getUserById(user.id)
 };
 
-// const createExample = async (exampleBody, createdBy) => {
-//   const jane = await ResourceModel.create({ name: "Add User", slug: "create-user", isActive: 1 });
-//   // Jane exists in the database now!
-//   console.log(jane instanceof ResourceModel); // true
-//   console.log(jane.name); // "Jane"
-//   // if (await UserModel.isEmailTaken(exampleBody.email)) {
-//   //   throw new ApiError(httpStatus.BAD_REQUEST, 'Email already taken');
-//   // }
-//   // userBody.userName = userBody.firstName + '_' + userBody.lastName;
-//   // delete userBody._id;
-//   // userBody.createdBy = createdBy;
-
-//   // return UserModel.create(userBody);
-// };
-
-// /**
-//  * Query for users
-//  * @param {Object} filter - Mongo filter
-//  * @param {Object} options - Query options
-//  * @param {string} [options.sortBy] - Sort option in the format: sortField:(desc|asc)
-//  * @param {number} [options.limit] - Maximum number of results per page (default = 10)
-//  * @param {number} [options.page] - Current page (default = 1)
-//  * @returns {Promise<QueryResult>}
-//  */
-// const queryUsers = async (filter, options) => {
-//   // const users = await UserModel.paginate(filter, options);
-//   // return users;
-
-//   const dealerId = filter.dealerId ? "YES" : "No";
-//   const page = options.page;
-//   const limit = options.limit;
-
-//   const pipeline = [
-//     // {
-//     //   $match: {
-//     //     isCompleted: false,
-//     //   },
-//     // },
-//     {
-//       $lookup: {
-//         from: 'roleaccesses',
-//         let: { id: '$role' },
-//         pipeline: [
-//           {
-//             $match: {
-//               $expr: { $eq: ['$_id', '$$id'] },
-//             },
-//           },
-//           {
-//             "$project": {
-//               "_id": true,
-//               "name": true,
-//             }
-//           }
-//         ],
-//         as: 'roleDetails',
-//       },
-//     },
-//     {
-//       $unwind: '$roleDetails',
-//     },
-//     {
-//       $lookup: {
-//         from: 'dealers',
-//         let: { id: '$dealerId' },
-//         pipeline: [
-//           {
-//             $match: {
-//               $expr: { $eq: ['$_id', '$$id'] },
-//             },
-//           },
-//           {
-//             "$project": {
-//               "_id": true,
-//               "name": true,
-//             }
-//           }
-//         ],
-//         as: 'dealerDetails',
-//       },
-//     },
-//     {
-//       // $unwind: '$dealerDetails',
-//       "$unwind": { path: "$dealerDetails", preserveNullAndEmptyArrays: true },
-//     }
-//   ];
-
-//   if (dealerId == "YES")
-//     pipeline.push({
-//       $match: {
-//         'dealerId': filter.dealerId,
-//       }
-//     });
-
-//   Pagination.customPaginate(page, limit, pipeline);
-//   const result = await UserModel.aggregate(pipeline).allowDiskUse(true);
-//   result[0].pagination.totalPages = Math.ceil(result[0].pagination.totalResults / limit);
-//   return { results: result[0].results, ...result[0].pagination };
-// };
-
 /**
  * Query for Roles
  * @param {Object} filter - Mongo filter
@@ -147,41 +47,23 @@ const queryUsers = async (filter, options, searchQuery, startDate, endDate) => {
   var endDate = Date.parse(endDate)
   searchQuery = searchQuery.toLowerCase();
   const queryFilters = [
-    // { isActive: sequelize.where }
     { firstName: Sequelize.where(Sequelize.fn('LOWER', Sequelize.col('firstName')), 'LIKE', '%' + searchQuery + '%') },
     { lastName: Sequelize.where(Sequelize.fn('LOWER', Sequelize.col('lastName')), 'LIKE', '%' + searchQuery + '%') },
     { email: Sequelize.where(Sequelize.fn('LOWER', Sequelize.col('email')), 'LIKE', '%' + searchQuery + '%') },
     { cnic: Sequelize.where(Sequelize.fn('LOWER', Sequelize.col('cnic')), 'LIKE', '%' + searchQuery + '%') },
     { phNo: Sequelize.where(Sequelize.fn('LOWER', Sequelize.col('phNo')), 'LIKE', '%' + searchQuery + '%') },
-    { 'center.name': Sequelize.where(Sequelize.fn('LOWER', Sequelize.col('center.name')), 'LIKE', '%' + searchQuery + '%') },
-    { 'subcenter.name': Sequelize.where(Sequelize.fn('LOWER', Sequelize.col('subcenter.name')), 'LIKE', '%' + searchQuery + '%') },
     { 'city.name': Sequelize.where(Sequelize.fn('LOWER', Sequelize.col('city.name')), 'LIKE', '%' + searchQuery + '%') },
     { 'country.name': Sequelize.where(Sequelize.fn('LOWER', Sequelize.col('country.name')), 'LIKE', '%' + searchQuery + '%') },
     { 'role.name': Sequelize.where(Sequelize.fn('LOWER', Sequelize.col('role.name')), 'LIKE', '%' + searchQuery + '%') }
-    // { firstName: { [Op.like]: '%' + searchQuery + '%' } },
-    // { lastName: { [Op.like]: '%' + searchQuery + '%' } },
-    // { email: { [Op.like]: '%' + searchQuery + '%' } },
-    // { cnic: { [Op.like]: '%' + searchQuery + '%' } },
-    // { phNo: { [Op.like]: '%' + searchQuery + '%' } }
   ]
-  // const Roles = await UserModel.findAll({
   if (startDate) {
     queryFilters.push({
       createdAt: {
         [Op.between]: [startDate, endDate] // ["2022-09-01T11:32:10.999Z"]
       }
     },
-      // {
-      //   updatedAt: {
-      //     [Op.between]: [startDate, endDate] // ["2022-09-01T11:32:10.999Z"]
-      //   }
-      // },
     )
   }
-
-
-  // console.log('search query type', date);
-
 
   const { count, rows } = await UserModel.findAndCountAll({
     order: [
@@ -412,52 +294,6 @@ const getUserAccessForMiddleware = async (roleId, slugs) => {
   }
 };
 
-
-// const updatePasswordMobile = async (email) => {
-//   const user = await UserModel.find({ isDeleted: false, email: email })
-//   if (!user[0]) {
-//     throw new ApiError(httpStatus.NOT_FOUND, 'User not found');
-//   }
-//   const userResetPass = await UserModel.findByIdAndUpdate(
-//     user[0]._id, { isResetPassword: 1 });
-//   Object.assign(userResetPass, { isResetPassword: 1 });
-//   await userResetPass.save();
-//   return userResetPass;
-// };
-
-// const allResetPassUsers = async (filter, options) => {
-//   const users = await UserModel.paginate(filter, options);
-//   if (!users) {
-//     throw new ApiError(httpStatus.NOT_FOUND, 'Users not found');
-//   }
-//   return users;
-// };   
-
-// const createNewPassword = async (userId, user) => {
-//   const user_find = await getUserById(userId);
-//   if (!user_find) {
-//     throw new ApiError(httpStatus.NOT_FOUND, 'User not found');
-//   }
-//   const userNewPass = await UserModel.findByIdAndUpdate(
-//     userId, user);
-//   Object.assign(userNewPass, user);
-//   await userNewPass.save();
-//   return userNewPass;
-// };
-
-// const adminResetPassword = async (userId, password, user) => {
-
-//   const user_find = await getUserById(userId);
-//   if (!user_find || !(await user_find.isPasswordMatch(password))) {
-//     throw new ApiError(httpStatus.UNAUTHORIZED, 'Old password is Incorrect');
-//   }
-//   const userResetPassword = await UserModel.findByIdAndUpdate(
-//     userId, user);
-//   Object.assign(userResetPassword, user);
-//   await userResetPassword.save();
-//   return userResetPassword;
-// };
-
 module.exports = {
   createUser,
   queryUsers,
@@ -468,10 +304,4 @@ module.exports = {
   deleteUserById,
   getUserAccessForMiddleware,
   getUserCompleteRoleAccess,
-  // getUserRoleAccess,
-  // updatePasswordMobile,
-  // allResetPassUsers,
-  // createNewPassword,
-  // adminResetPassword,
-  // createExample
 };
