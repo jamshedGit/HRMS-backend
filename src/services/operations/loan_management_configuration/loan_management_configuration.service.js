@@ -262,70 +262,77 @@ const getloan_management_configurationById = async (id) => {
 
 
 
-// const updateloan_management_configurationById = async (
-//   Id,
-//   updateBody,
-//   updatedBy
-// ) => {
-//   const Item = await getloan_management_configurationById(Id, {
-//     include: [
-//       {
-//         model: Loan_management_detailModel.Loan_management_detailModel,
-//         as: "details",
-//       },
-//     ],
-//   });
-
-//   if (!Item) {
-//     throw new ApiError(httpStatus.NOT_FOUND, "Record not found");
-//   }
-
-//   // Update parent record
-//   updateBody.updatedBy = updatedBy;
-//   delete updateBody.id;
-//   Object.assign(Item, updateBody);
-//   await Item.save();
-
-//   // Update child records if details are provided in the updateBody
-//   if (updateBody.details && Array.isArray(updateBody.details)) {
-//     for (const detail of updateBody.details) {
-//       if (detail.id) {
-//         // Update existing detail
-//         const childDetail = Item.details.find(d => d.id === detail.id);
-//         if (childDetail) {
-//           Object.assign(childDetail, detail);
-//           await childDetail.save();
-//         }
-//       } else {
-//         // Create new detail if id is not present
-//         detail.loan_management_configurationId = Item.Id; // Associate with the configuration ID
-//         await Loan_management_detailModel.Loan_management_detailModel.create(detail);
-//       }
-//     }
-//   }
-
-//   return Item;
-// };
-
-
-
 const updateloan_management_configurationById = async (
   Id,
   updateBody,
   updatedBy
 ) => {
-  const Item = await getloan_management_configurationById(Id);
+  const Item = await getloan_management_configurationById(Id, {
+    include: [
+      {
+        model: Loan_management_detailModel.Loan_management_detailModel,
+        as: "details",
+      },
+    ],
+  });
+
+  console.log("updateloan_management_configurationById Item",updateBody)
+
   if (!Item) {
-    throw new ApiError(httpStatus.NOT_FOUND, "record not found");
+    throw new ApiError(httpStatus.NOT_FOUND, "Record not found");
   }
-  //console.log("Update Receipt Id" , item);
-  // updateBody.slug = updateBody.name.replace(/ /g, "-").toLowerCase()
+
+  // Update parent record
   updateBody.updatedBy = updatedBy;
   delete updateBody.id;
   Object.assign(Item, updateBody);
   await Item.save();
-  return;
+
+  // // Update child records if details are provided in the updateBody
+  if (updateBody.details && Array.isArray(updateBody.details)) {
+   
+    for (const detail of updateBody.details) {
+      console.log("updateBody.details %&&",detail)
+      if (detail.Id) {
+        // Update existing detail
+        console.log("detail.id",detail.Id)
+        const childDetail = Item.details.find(d => d.Id === detail.Id);
+        if (childDetail) {
+          console.log("childDetail if id is  present",childDetail)
+          // Object.assign(childDetail, detail);
+          await childDetail.save();
+        }
+      } else {
+        // Create new detail if id is not present
+        console.log("reate new detail if id is not present",detail.Id)
+        detail.loan_management_configurationId = Item.Id; // Associate with the configuration ID
+        await Loan_management_detailModel.Loan_management_detailModel.create(detail);
+      }
+    }
+  }
+
+  return Item;
 };
+
+
+
+// const updateloan_management_configurationById = async (
+//   Id,
+//   updateBody,
+//   updatedBy
+// ) => {
+//   const Item = await getloan_management_configurationById(Id);
+//   if (!Item) {
+//     throw new ApiError(httpStatus.NOT_FOUND, "record not found");
+//   }
+//   //console.log("Update Receipt Id" , item);
+//   // updateBody.slug = updateBody.name.replace(/ /g, "-").toLowerCase()
+//   updateBody.updatedBy = updatedBy;
+//   delete updateBody.id;
+//   Object.assign(Item, updateBody);
+//   await Item.save();
+//   return;
+// };
 
 /**
  * Delete Item by id
