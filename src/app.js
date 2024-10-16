@@ -14,13 +14,10 @@ const morgan = require("./config/morgan");
 const { jwtStrategy } = require("./config/passport");
 const { authLimiter } = require("./middlewares/rateLimiter");
 const apiRoutes = require("./routes/apis");
-// const frontRoutes = require("./routes/front")
-// const webRoutes = require("./routes/web_routes");
 const { errorConverter, errorHandler } = require("./middlewares/error");
 const ApiError = require("./utils/ApiError");
 const ejs = require("ejs");
 const app = express();
-// const formidableMiddleware = require("express-formidable");
 
 if (config.env !== "test") {
   app.use(morgan.successHandler);

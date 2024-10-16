@@ -161,7 +161,6 @@ const defaultRoutes = [
     path: "/earning_transaction",
     route: earning_deduction_transaction
   },
-  /// CleanUp By Jamshed
   {
     path: "/employee_salary_earning",
     route: employee_salary_earning
@@ -223,24 +222,7 @@ const defaultRoutes = [
   {
     path: "/payroll_process_policy",
     route: payroll_process_policy
-  },
-
-
-
-
-
-  // {
-  //   path: "/roles",
-  //   route: roleRoute,
-  // },
-  // {
-  //   path: "/resources",
-  //   route: resourceRoute,
-  // },
-  // {
-  //   path: "/accessrights",
-  //   route: accessRightRoute,
-  // }
+  }
 ];
 
 const devRoutes = [
