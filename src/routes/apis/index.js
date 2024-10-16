@@ -1,11 +1,7 @@
 const express = require("express");
 const authRoute = require("./auth.route");
 const settingRoute = require("./settings/setting.route");
-// const roleRoute = require("./settings/role.route");
-// const resourceRoute = require("./settings/resource.route");
-// const accessRightRoute = require("./settings/accessRight.route");
 const userRoute = require("./user.route");
-const ibs = require('./operations/ibs/ibForm.route')
 const docsRoute = require("./docs.route");
 const config = require("../../config/config");
 const bank = require('./operations/banks/bank.route')
@@ -63,11 +59,6 @@ const defaultRoutes = [
   {
     path: "/settings",
     route: settingRoute,
-  },
-
-  {
-    path: "/ibs",
-    route: ibs
   },
   
   {

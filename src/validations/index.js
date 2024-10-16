@@ -4,6 +4,3 @@ module.exports.resourceValidation = require("./settings/resource.validation");
 module.exports.accessRightValidation = require("./settings/access.Right.validation");
 module.exports.settingValidation = require('./settings/setting.validation');
 module.exports.userValidation = require("./user.validation");
-module.exports.ibFormValidation = require('./operations/ibs/ibForm.validation')
-module.exports.mortuaryFormValidation = require('./operations/ibs/mortuary.validation')
-module.exports.coffinFormValidation = require('./operations/ibs/coffin.validation')
