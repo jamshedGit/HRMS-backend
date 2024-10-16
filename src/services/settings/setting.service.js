@@ -163,50 +163,6 @@ const getCitiesMasterData = async (countryId) => {
 
 
 
-const getDriversMasterData = async (subCenterId, available, notAvailable) => {
-
-  if ((available == true) && (notAvailable == true)) {
-    const driverRoleId = await RoleModel.findOne({
-      where: { isActive: true, slug: 'driver' },
-      attributes: ['id']
-    });
-    const driversMasterData = getDdlItems(DDL_FIELD_NAMES.driver, await UserModel.findAll({
-      where: { roleId: driverRoleId.id, subCenterId: subCenterId, isActive: true },
-      attributes: ['id', 'userName']
-    }));
-    return driversMasterData
-
-  } else if (notAvailable) {
-
-    const driverRoleId = await RoleModel.findOne({
-      where: { isActive: true, slug: 'driver' },
-      attributes: ['id']
-    });
-    const driversMasterData = getDdlItems(DDL_FIELD_NAMES.driver, await UserModel.findAll({
-      where: { roleId: driverRoleId.id, subCenterId: subCenterId, isActive: true, status: 'Not Available' },
-      attributes: ['id', 'userName']
-    }));
-    return driversMasterData
-
-  } else if (available) {
-    const driverRoleId = await RoleModel.findOne({
-      where: { isActive: true, slug: 'driver' },
-      attributes: ['id']
-    });
-    const driversMasterData = getDdlItems(DDL_FIELD_NAMES.driver, await UserModel.findAll({
-      where: { roleId: driverRoleId.id, subCenterId: subCenterId, isActive: true, status: 'Available' },
-      attributes: ['id', 'userName']
-    }));
-    return driversMasterData
-
-  } else {
-    return [];
-  }
-};
-
-
-
-
 
 
 const GetLastInserted_ID_ByTableName = async (tableName,prefix) => {
@@ -229,7 +185,6 @@ module.exports = {
   getResourcesMasterData,
   getCountriesMasterData,
   getCitiesMasterData,
-  getDriversMasterData,
   getStatusMasterData,
   getBanksMasterData,
   getDeptMasterData,

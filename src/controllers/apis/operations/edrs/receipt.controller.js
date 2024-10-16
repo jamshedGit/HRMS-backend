@@ -91,19 +91,6 @@ const getDonationReceiptReport = catchAsync(async (req, res) => {
   });
 });
 
-const getMaxbookingNoForReceipt = catchAsync(async (req, res) => {
-  console.log("get max booking no - controller " ,req);
-  const edrsDonationReport = await donationReceiptFormService.getMaxBookingNo(req.body);
-  if (!edrsDonationReport) {
-      throw new ApiError(httpStatus.NOT_FOUND, "Donation Report not found");
-  }
-  res.send({
-      code: HttpStatusCodes.OK,
-      message: HttpResponseMessages.OK,   
-      data: edrsDonationReport,
-  });
-});
-
 
 module.exports = {
   createReceipt,
@@ -112,5 +99,4 @@ module.exports = {
   updateReceipt,
   deleteReceipt,
   getDonationReceiptReport,
-  getMaxbookingNoForReceipt
 };

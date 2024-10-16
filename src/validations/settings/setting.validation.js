@@ -48,25 +48,12 @@ const getFormMenuMasterData = {
 };
 
 
-
-const getAlarmTimesMasterData = {
-  query: Joi.disallow(),
-  params: Joi.disallow(),
-  body: Joi.disallow(),
-};
-
 const getCitiesMasterData = {
   query: Joi.disallow(),
   params: Joi.disallow(),
   body: Joi.object().keys({
     countryId: Joi.number().integer().required()
   }),
-};
-
-const getCentersMasterData = {
-  query: Joi.disallow(),
-  params: Joi.disallow(),
-  body: Joi.disallow(),
 };
 
 const getSubCentersMasterData = {
@@ -182,9 +169,7 @@ module.exports = {
   getRolesMasterData,
   getResourcesMasterData,
   getCountriesMasterData,
-  getAlarmTimesMasterData,
   getCitiesMasterData,
-  getCentersMasterData,
   getSubCentersMasterData,
   getCentersMasterDataByCityId,
   getDriversMasterData,
