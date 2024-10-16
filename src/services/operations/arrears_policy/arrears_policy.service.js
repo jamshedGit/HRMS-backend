@@ -1,5 +1,5 @@
 const httpStatus = require("http-status");
-const { ArrearPolicyModel } = require("../../../models/index");
+const { ArrearPolicyModel, PayrollMonthModel } = require("../../../models/index");
 const ApiError = require("../../../utils/ApiError");
 const Sequelize = require('sequelize');
 const { paginationFacts } = require("../../../utils/common");
@@ -15,8 +15,8 @@ const arrearAttribute = [
   'Id',
   'isActive',
   [Sequelize.literal(`CASE WHEN multiplier = '' THEN '-' ELSE multiplier END`), 'multiplier'],
-  [Sequelize.literal(`CASE WHEN divisor = '' THEN '-' ELSE multiplier END`), 'divisor'],
-  [Sequelize.literal(`CASE WHEN days = '' THEN '-' ELSE multiplier END`), 'days'],
+  [Sequelize.literal(`CASE WHEN divisor = '' THEN '-' ELSE divisor END`), 'divisor'],
+  [Sequelize.literal(`CASE WHEN days = '' THEN '-' ELSE days END`), 'days'],
 ]
 
 /**
@@ -48,7 +48,7 @@ const createArrearPolicy = async (req) => {
  */
 const getAllArrearPolicies = async (req) => {
   const options = pick(req.body, ['sortOrder', 'pageSize', 'pageNumber']);
-  const searchQuery = req?.body?.filter?.searchQuery?.toLowerCase() || '';
+  const searchQuery = req?.body?.filter?.searchQuery?.toLowerCase() || '';  //Get search field value for filtering
   const limit = options.pageSize;
   const offset = 0 + (options.pageNumber - 1) * limit;
   const queryFilters = [
@@ -68,6 +68,7 @@ const getAllArrearPolicies = async (req) => {
     limit: limit,
   });
 
+  //Send paginated data
   return paginationFacts(count, limit, options.pageNumber, rows);
 };
 
@@ -121,10 +122,25 @@ const deleteArrearById = async (id) => {
   return oldRecord;
 };
 
+/**
+ * 
+ * Get Active Payroll Month Data
+ * 
+ * @param {String} id 
+ * @returns 
+ */
+const getActivePayrollMonth = async () => {
+  return await PayrollMonthModel.findOne({
+    where: { isActive: 1 },
+    attributes: ['startDate', 'endDate', 'month', 'year']
+  })
+}
+
 module.exports = {
   getAllArrearPolicies,
   getArrearById,
   updateArrearById,
   deleteArrearById,
-  createArrearPolicy
+  createArrearPolicy,
+  getActivePayrollMonth
 };

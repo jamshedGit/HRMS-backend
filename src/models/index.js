@@ -53,6 +53,7 @@ module.exports.FormModel = require('./operations/form/form.model');
 //EmployeePolicyModel
 module.exports.EmployeePolicyModel = require('./operations/emppolicy/emppolicy.model');
 module.exports.ArrearPolicyModel = require('./operations/arrear_policy/arrear_policy.model');
+module.exports.RoundingPolicyModel = require('./operations/salary_rounding_policy/salary_rounding_policy.model');
 
 //EMployee Profile
 module.exports.EmployeeProfileModel = require('./operations/emp_profile/emp_profile.model');
@@ -116,6 +117,9 @@ module.exports.FiscalSetupModel = require('./operations/fiscal_setup/fiscal_setu
 
 //PayrollMonthModel Setup 
 module.exports.PayrollMonthModel = require('./operations/payroll_month_setup/payroll_month_setup.model');
+
+//Model for Leave Type
+module.exports.LeaveTypeModel = require('./operations/leave_type/leave_type.model');
 
 //PayrollMonthModel Setup 
 module.exports.FinalSettlementModel = require('./operations/final_settlement_policy/final_settlement_policy.model');

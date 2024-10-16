@@ -37,6 +37,8 @@ const tax_setup = require('./operations/tax_setup/tax_setup.route')
 const fiscal_setup = require('./operations/fiscal_setup/fiscal_setup.route')
 const payroll_month = require('./operations/payroll_month_setup/payroll_month_setup.route')
 const arrear_policy = require('./operations/arrear_policy/arrear_policy.route')
+const salary_rounding_policy = require('./operations/salary_rounding_policy/salary_rounding_policy.route')
+const leave_type = require('./operations/leave_type/leave_type.route')
 
 const final_settlement_policy = require('./operations/final_settlement_policy/final_settlement_policy.route')
 const salarypolicy = require('./operations/salarypolicy/salarypolicy.route')
@@ -200,6 +202,14 @@ const defaultRoutes = [
   {
     path: "/arrear_policy",
     route: arrear_policy
+  },
+  {
+    path: "/rounding_policy",
+    route: salary_rounding_policy
+  },
+  {
+    path: "/leave_type",
+    route: leave_type
   },
   {
     path: "/final_settlement_policy",

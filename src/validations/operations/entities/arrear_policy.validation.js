@@ -58,6 +58,15 @@ const getSingleItem = {
 };
 
 /**
+ * For Getting Single Payroll Month
+ */
+const getSingleItemWithoutId = {
+  query: Joi.disallow(),
+  params: Joi.disallow(),
+  body: Joi.disallow()
+};
+
+/**
  * For Deleting Single Arrear Records By Id in Params
  */
 const deleteSingleItem = {
@@ -73,5 +82,6 @@ module.exports = {
   getAllItem,
   getSingleItem,
   updateitem,
-  deleteSingleItem
+  deleteSingleItem,
+  getSingleItemWithoutId
 };
