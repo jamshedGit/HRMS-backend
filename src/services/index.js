@@ -57,6 +57,7 @@ module.exports.FiscalSetupServicePage = require('./operations/fiscal_setup/fisca
 module.exports.PayrollMonthServicePage = require('./operations/payroll_month_setup/payroll_month_setup.service')
 module.exports.ArrearPolicyServicePage = require('./operations/arrears_policy/arrears_policy.service')
 module.exports.SalaryRoundingPolicyServicePage = require('./operations/salary_rounding_policy/salary_rounding_policy.service')
+module.exports.LeaveTypeServicePage = require('./operations/leave_type/leave_type.service')
 module.exports.FinalSettlementPolicy = require('./operations/final_settlement_policy/final_settlement_policy.service')
 module.exports.salarypolicyFormService = require('./operations/salarypolicy/salarypolicy.service')
 module.exports.OneTimeEarningService = require('./operations/onetime_allowance/onetime_allowance.service')
