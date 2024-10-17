@@ -18,42 +18,6 @@ const Op = Sequelize.Op;
 // const createtax_slab = async (req, tax_slabBody) => {
 
 
-//   tax_slabBody.createdBy = req.user.id;
-
-//   const addedtax_slabObj = await Tax_slabModel.Tax_slabModel.create(tax_slabBody);
-//   //authSMSSend(addedtax_slabObj.dataValues);  // Quick send message at the time of donation
-//   return addedtax_slabObj;
-// };
-
-
-
-// const createtax_slab = async (req, tax_slabBody) => {
-//     tax_slabBody.createdBy = req.user.id;
-  
-//     const { from_amount, to_amount } = tax_slabBody;
-  
-//     // Check for existing records that overlap with the new record
-//     const existingSlab = await Tax_slabModel.Tax_slabModel.findOne({
-//       where: {
-//         [Op.or]: [
-//           { from_amount: { [Op.between]: [from_amount, to_amount] } },
-//           { to_amount: { [Op.between]: [from_amount, to_amount] } },
-//           { from_amount: { [Op.lte]: from_amount }, to_amount: { [Op.gte]: to_amount } }
-//         ]
-//       }
-//     });
-  
-//     if (existingSlab) {
-//     //   throw new Error('New tax slab overlaps with existing slabs. Cannot insert the record.');
-//       return  'New tax slab overlaps with existing slabs. Cannot insert the record.';
-//     }
-//     tax_slabBody.createdBy = req.user.id;
-//     const addedtax_slabObj = await Tax_slabModel.Tax_slabModel.create(tax_slabBody);
-//     console.log("addedtax_slabObj",addedtax_slabObj)
-//     // authSMSSend(addedtax_slabObj.dataValues);  // Quick send message at the time of donation
-//     return addedtax_slabObj;
-//   };
-  
 
 const createtax_slab = async (req, tax_slabBody) => {
     tax_slabBody.createdBy = req.user.id;

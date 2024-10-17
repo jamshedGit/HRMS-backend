@@ -17,11 +17,26 @@ const createloan_management_configuration = catchAsync(async (req, res) => {
 
     const loan_management_configuration = await loan_management_configurationService.loan_management_configurationService.createloan_management_configuration(req, req.body);
 
-    res.status(httpStatus.CREATED).send({
+   
+
+    if(loan_management_configuration.status=="error"){
+
+      res.status(HttpStatusCodes.INTERNAL_SERVER_ERROR).send({
+        code: HttpStatusCodes.INTERNAL_SERVER_ERROR,
+        message:loan_management_configuration.message,
+        error: loan_management_configuration.error || 'An unexpected error occurred',
+      });
+      
+  
+    }
+    else{
+        
+     res.status(httpStatus.CREATED).send({
       code: HttpStatusCodes.CREATED,
       message: HttpResponseMessages.CREATED,
       data: loan_management_configuration
     });
+  }
 
   } catch (error) {
     console.log(error);        
