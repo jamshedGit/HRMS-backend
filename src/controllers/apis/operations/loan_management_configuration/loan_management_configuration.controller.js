@@ -110,12 +110,34 @@ const getloan_management_configurationById = catchAsync(async (req, res) => {
 
 const updateloan_management_configuration = catchAsync(async (req, res) => {
   console.log(req.body);
-  const Receipt = await loan_management_configurationService.loan_management_configurationService.updateloan_management_configurationById(req.body.Id, req.body, req.user.Id);
-  res.send({
-    code: HttpStatusCodes.OK,
-    message: HttpResponseMessages.OK,
-    data: Receipt,
+  const loan_management_configuration = await loan_management_configurationService.loan_management_configurationService.updateloan_management_configurationById(req.body.Id, req.body, req.user.Id);
+  
+  
+  if(loan_management_configuration.status=="error"){
+
+    res.status(HttpStatusCodes.INTERNAL_SERVER_ERROR).send({
+      code: HttpStatusCodes.INTERNAL_SERVER_ERROR,
+      message:loan_management_configuration.message,
+      error: loan_management_configuration.error || 'An unexpected error occurred',
+    });
+    
+
+  }
+  else{
+      
+   res.status(httpStatus.CREATED).send({
+    code: HttpStatusCodes.CREATED,
+    message: HttpResponseMessages.CREATED,
+    data: loan_management_configuration
   });
+}
+  
+  
+  // res.send({
+  //   code: HttpStatusCodes.OK,
+  //   message: HttpResponseMessages.OK,
+  //   data: loan_management_configuration,
+  // });
 });
 
 const deleteloan_management_configuration = catchAsync(async (req, res) => {

@@ -314,6 +314,24 @@ const updateloan_management_configurationById = async (
   updateBody,
   updatedBy
 ) => {
+
+  const { subsidiaryId} = updateBody;
+
+
+  const overlappingSubsidiary = await Loan_management_configurationModel.Loan_management_configurationModel.findOne({
+    where: {
+        Id: { [Op.ne]: Id },
+      [Op.or]: [
+        { subsidiaryId:subsidiaryId },
+       
+      ]
+    }
+  });
+  if (overlappingSubsidiary) {
+
+let result={"message":'New subsidiary overlaps with existing subsidiary.',"status":"error"}
+return result;
+}
   const Item = await Loan_management_configurationModel.Loan_management_configurationModel.findOne({
     where: { Id: Id },
     include: [
