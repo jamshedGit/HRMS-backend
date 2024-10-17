@@ -16,7 +16,8 @@ const includeData = [
     model: LeaveTypeSalaryDeductionPoliciesModel
   },
   {
-    model: EmployeeProfileModel
+    model: FormModel,
+    as: 'subsidiary'
   },
   {
     model: FormModel,
@@ -31,8 +32,9 @@ const includeData = [
 //Include options required for Leave Management Configuration Table view
 const LeaveManagementConfigurationInclude = [
   {
-    model: EmployeeProfileModel,
-    attributes: ['firstName']
+    model: FormModel,
+    attributes: [['formName', 'subsidiaryName']],
+    as: 'subsidiary',
   },
   {
     model: FormModel,
@@ -82,7 +84,7 @@ const getAllleaveManagementConfiguration = async (req) => {
   const limit = options.pageSize;
   const offset = 0 + (options.pageNumber - 1) * limit;
   const queryFilters = [
-    { Name: Sequelize.where(Sequelize.fn('LOWER', Sequelize.col('firstName')), 'LIKE', '%' + searchQuery + '%') },
+    { Name: Sequelize.where(Sequelize.fn('LOWER', Sequelize.col('formName')), 'LIKE', '%' + searchQuery + '%') },
   ]
 
   const { count, rows } = await LeaveManagementConfigurationModel.findAndCountAll({
@@ -91,8 +93,9 @@ const getAllleaveManagementConfiguration = async (req) => {
     ],
     include: [
       {
-        model: EmployeeProfileModel,
-        attributes: ['firstName'],
+        model: FormModel,
+        attributes: [['formName', 'subsidiaryName']],
+        as: 'subsidiary',
         where: {
           [Op.or]: queryFilters,
         }
@@ -100,7 +103,7 @@ const getAllleaveManagementConfiguration = async (req) => {
       {
         model: FormModel,
         as: 'employeeType',
-        attributes: [['formName', 'employeeName']]
+        attributes: [['formName', 'employeeTypeName']]
       },
       {
         model: FormModel,
@@ -154,7 +157,7 @@ const getleaveManagementConfigurationByForEdit = async (body) => {
  * @param {Array} include  Get data of different table with foreign key relation
  * @returns 
  */
-const getleaveManagementConfigurationData = async (filters, attributes = null, include = null, handleNestedData = false) => {
+const getleaveManagementConfigurationData = async (filters, attributes = null, include = null, handleNested = false) => {
   const options = {};
   if (filters) {
     options.where = filters
@@ -166,7 +169,7 @@ const getleaveManagementConfigurationData = async (filters, attributes = null, i
     options.include = include
   }
 
-  if (handleNestedData) {
+  if (handleNested) {
     const data = await LeaveManagementConfigurationModel.findOne(options);
     return handleNestedData(data)
   }
