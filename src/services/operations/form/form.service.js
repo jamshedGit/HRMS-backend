@@ -127,7 +127,7 @@ function filterByValue(array, string) {
     return array;
   }
   return array.filter(o => Object.keys(o).some(k => {
-    return o['formCode'].toLowerCase().includes(string.toLowerCase()) || o['formName'].toLowerCase().includes(string.toLowerCase()) || o['MenuName'].toLowerCase().includes(string.toLowerCase())
+    return o['formCode']?.toLowerCase().includes(string?.toLowerCase()) || o['formName']?.toLowerCase().includes(string?.toLowerCase()) || o['MenuName']?.toLowerCase().includes(string?.toLowerCase())
   }
   )
   );
@@ -137,7 +137,7 @@ const getAllParentChildForms = async (filter, options, searchQuery) => {
   try {
 
     const results = await sequelize.query('CALL sp_getAllParentChildeMenus()');
-    console.log(results, "res")
+    console.log(results, "res", searchQuery)
     let limit = options.pageSize;
     let offset = 0 + (options.pageNumber - 1) * limit;
     searchQuery = searchQuery.toLowerCase();
@@ -148,6 +148,8 @@ const getAllParentChildForms = async (filter, options, searchQuery) => {
 
     return paginationFacts(count, limit, options.pageNumber, rows); // 
   } catch (error) {
+    console.log('::::::error::::::',error);
+    
     throw new ApiError(httpStatus.INTERNAL_SERVER_ERROR, "Error calling stored procedure");
   }
 };

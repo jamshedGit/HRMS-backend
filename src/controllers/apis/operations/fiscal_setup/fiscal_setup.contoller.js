@@ -2,7 +2,7 @@ const httpStatus = require("http-status");
 const pick = require("../../../../utils/pick");
 const ApiError = require("../../../../utils/ApiError");
 const catchAsync = require("../../../../utils/catchAsync");
-const PayrollProcessPolicy = require("../../../../services/index");
+const FiscalSetupServicePage = require("../../../../services/index");
 
 
 const {
@@ -10,18 +10,18 @@ const {
   HttpResponseMessages,
 } = require("../../../../utils/constants");
 
-const create_Payroll_Process_Policy = catchAsync(async (req, res) => {
+const create_FiscalSetup = catchAsync(async (req, res) => {
   // console.log("reqested User", req.user.id);
   try {
 
-    console.log("insert _Payroll_Process_Policy")
+    console.log("insert _FiscalSetup")
     console.log(req.body);
-    const _Payroll_Process_Policy = await PayrollProcessPolicy.PayrollProcessPolicy.create_Payroll_Process_Policy(req, req.body);
+    const FiscalSetup = await FiscalSetupServicePage.FiscalSetupServicePage.createFiscalSetup(req, req.body);
 
     res.status(httpStatus.CREATED).send({
       code: HttpStatusCodes.CREATED,
       message: HttpResponseMessages.CREATED,
-      data: _Payroll_Process_Policy
+      data: FiscalSetup
     });
 
   } catch (error) {
@@ -29,14 +29,14 @@ const create_Payroll_Process_Policy = catchAsync(async (req, res) => {
   }
 });
 
-const getAll_Payroll_Process_Policy = catchAsync(async (req, res) => {
-  console.log("get _Payroll_Process_Policys");
+const getAll_FiscalSetup = catchAsync(async (req, res) => {
+  console.log("get _FiscalSetups");
   const obj = {};
   const filter = obj;
   // const options = pick(req.body, ["sortBy", "limit", "page"]);
   const options = pick(req.body, ['sortOrder', 'pageSize', 'pageNumber']);
   const searchQuery = req.body.filter.searchQuery? req.body.filter.searchQuery : '';
-  const result = await PayrollProcessPolicy.PayrollProcessPolicy.query_Payroll_Process_Policys(filter, options,searchQuery);
+  const result = await FiscalSetupServicePage.FiscalSetupServicePage.queryFiscalSetups(filter, options,searchQuery);
   console.log("resp2",result);
   res.send({
     code: HttpStatusCodes.OK,
@@ -45,10 +45,10 @@ const getAll_Payroll_Process_Policy = catchAsync(async (req, res) => {
   });
 });
 
-const get_Payroll_Process_PolicyById = catchAsync(async (req, res) => {
-  console.log("_Payroll_Process_Policy Controller get_Payroll_Process_PolicyId")
+const get_FiscalSetupById = catchAsync(async (req, res) => {
+  console.log("_FiscalSetup Controller get_FiscalSetupId")
   console.log(req.body)
-  const Receipt = await PayrollProcessPolicy.PayrollProcessPolicy.get_Payroll_Process_PolicyById(req.body.Id);
+  const Receipt = await FiscalSetupServicePage.FiscalSetupServicePage.getFiscalSetupById(req.body.Id);
   if (!Receipt) {
     throw new ApiError(httpStatus.NOT_FOUND, "Receipt not found");
   }
@@ -59,9 +59,9 @@ const get_Payroll_Process_PolicyById = catchAsync(async (req, res) => {
   });
 });
 
-const update_Payroll_Process_Policy = catchAsync(async (req, res) => {
+const update_FiscalSetup = catchAsync(async (req, res) => {
   console.log(req.body);
-  const Receipt = await PayrollProcessPolicy.PayrollProcessPolicy.update_Payroll_Process_PolicyById(req.body.Id, req.body, req.user.Id);
+  const Receipt = await FiscalSetupServicePage.FiscalSetupServicePage.updateFiscalSetupById(req.body.Id, req.body, req.user.Id);
   res.send({
     code: HttpStatusCodes.OK,
     message: HttpResponseMessages.OK,
@@ -69,9 +69,9 @@ const update_Payroll_Process_Policy = catchAsync(async (req, res) => {
   });
 });
 
-const delete_Payroll_Process_Policy = catchAsync(async (req, res) => {
+const delete_FiscalSetup = catchAsync(async (req, res) => {
   console.log("req.body.Id " ,req.body.Id)
-  const Receipt = await PayrollProcessPolicy.PayrollProcessPolicy.delete_Payroll_Process_PolicyById(req.body.Id);
+  const Receipt = await FiscalSetupServicePage.FiscalSetupServicePage.deleteFiscalSetupById(req.body.Id);
   res.send({
     code: HttpStatusCodes.OK,
     message: HttpResponseMessages.OK,
@@ -81,9 +81,9 @@ const delete_Payroll_Process_Policy = catchAsync(async (req, res) => {
 
 
 module.exports = {
-  create_Payroll_Process_Policy,
-  getAll_Payroll_Process_Policy,
-  get_Payroll_Process_PolicyById,
-  update_Payroll_Process_Policy,
-  delete_Payroll_Process_Policy
+  create_FiscalSetup,
+  getAll_FiscalSetup,
+  get_FiscalSetupById,
+  update_FiscalSetup,
+  delete_FiscalSetup
 };
