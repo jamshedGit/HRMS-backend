@@ -5,7 +5,7 @@ const tax_slabController = require("../../../../controllers/apis/operations/tax_
 const itemValidation = require("../../../../validations/operations/entities/item.validation");
 const tax_slabValidation = require("../../../../validations/operations/entities/tax_slab.validation");
 
-const receiptValidation = require("../../../../validations/operations/entities/receipt.validation");
+
 const router = express.Router();
 
 router.route("/read-tax-slab").post(auth(), validate(itemValidation.getReceipt), tax_slabController.gettax_slabById);

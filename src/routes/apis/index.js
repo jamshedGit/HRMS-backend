@@ -45,7 +45,6 @@ const salary_rounding_policy = require('./operations/salary_rounding_policy/sala
 const leave_type = require('./operations/leave_type/leave_type.route')
 
 const final_settlement_policy = require('./operations/final_settlement_policy/final_settlement_policy.route')
-const salarypolicy = require('./operations/salarypolicy/salarypolicy.route')
 const onetime_earning = require('./operations/onetime_allowance/onetime_allowance.route')
 const loan_type = require('./operations/loan_type/loan_type.route')
 const payroll_process_policy = require('./operations/payroll_process_policy/payroll_process_policy.route')
