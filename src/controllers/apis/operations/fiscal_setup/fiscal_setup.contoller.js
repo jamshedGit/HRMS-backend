@@ -10,11 +10,11 @@ const {
   HttpResponseMessages,
 } = require("../../../../utils/constants");
 
-const createFiscalSetup = catchAsync(async (req, res) => {
+const create_FiscalSetup = catchAsync(async (req, res) => {
   // console.log("reqested User", req.user.id);
   try {
 
-    console.log("insert FiscalSetup")
+    console.log("insert _FiscalSetup")
     console.log(req.body);
     const FiscalSetup = await FiscalSetupServicePage.FiscalSetupServicePage.createFiscalSetup(req, req.body);
 
@@ -29,8 +29,8 @@ const createFiscalSetup = catchAsync(async (req, res) => {
   }
 });
 
-const getAllFiscalSetup = catchAsync(async (req, res) => {
-  console.log("get FiscalSetups");
+const getAll_FiscalSetup = catchAsync(async (req, res) => {
+  console.log("get _FiscalSetups");
   const obj = {};
   const filter = obj;
   // const options = pick(req.body, ["sortBy", "limit", "page"]);
@@ -45,8 +45,8 @@ const getAllFiscalSetup = catchAsync(async (req, res) => {
   });
 });
 
-const getFiscalSetupById = catchAsync(async (req, res) => {
-  console.log("FiscalSetup Controller getFiscalSetupId")
+const get_FiscalSetupById = catchAsync(async (req, res) => {
+  console.log("_FiscalSetup Controller get_FiscalSetupId")
   console.log(req.body)
   const Receipt = await FiscalSetupServicePage.FiscalSetupServicePage.getFiscalSetupById(req.body.Id);
   if (!Receipt) {
@@ -59,7 +59,7 @@ const getFiscalSetupById = catchAsync(async (req, res) => {
   });
 });
 
-const updateFiscalSetup = catchAsync(async (req, res) => {
+const update_FiscalSetup = catchAsync(async (req, res) => {
   console.log(req.body);
   const Receipt = await FiscalSetupServicePage.FiscalSetupServicePage.updateFiscalSetupById(req.body.Id, req.body, req.user.Id);
   res.send({
@@ -69,7 +69,7 @@ const updateFiscalSetup = catchAsync(async (req, res) => {
   });
 });
 
-const deleteFiscalSetup = catchAsync(async (req, res) => {
+const delete_FiscalSetup = catchAsync(async (req, res) => {
   console.log("req.body.Id " ,req.body.Id)
   const Receipt = await FiscalSetupServicePage.FiscalSetupServicePage.deleteFiscalSetupById(req.body.Id);
   res.send({
@@ -81,9 +81,9 @@ const deleteFiscalSetup = catchAsync(async (req, res) => {
 
 
 module.exports = {
-  createFiscalSetup,
-  getAllFiscalSetup,
-  getFiscalSetupById,
-  updateFiscalSetup,
-  deleteFiscalSetup
+  create_FiscalSetup,
+  getAll_FiscalSetup,
+  get_FiscalSetupById,
+  update_FiscalSetup,
+  delete_FiscalSetup
 };

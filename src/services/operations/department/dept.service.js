@@ -18,15 +18,12 @@ const Op = Sequelize.Op;
 const createDept = async (req, DeptBody) => {
   console.log("Dept Body", DeptBody)
   // DeptBody.slug = DeptBody.name.replace(/ /g, "-").toLowerCase();
-  console.log(req.user.deptId);
+  
   DeptBody.createdBy = req.user.deptId;
   //DeptBody.parentDept = 1;
 
-  if (DeptBody.chkParent) {
-    console.log("parentDept 2",req.body.chkParent)
-    DeptBody.parentDept = null
-   }
-   
+   if(DeptBody.parentDept == '')
+      {DeptBody.parentDept = null}
   console.log(DeptBody, "body");
   const addedDeptObj = await DeptModel.DeptModel.create(DeptBody);
   //authSMSSend(addedDeptObj.dataValues);  // Quick send message at the time of donation

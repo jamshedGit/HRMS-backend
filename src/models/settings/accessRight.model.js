@@ -42,12 +42,6 @@ accessRight.belongsTo(RoleModel,{
     onUpdate:'CASCADE',
 });
 
-// accessRight.belongsTo(AccessModel,{
-//     foreignKey:'accessId',
-//     onDelete:'CASCADE',
-//     onUpdate:'CASCADE',
-// });
-
 // Exporting User, using this constant
 // we can perform CRUD operations on
 // 'user' table.

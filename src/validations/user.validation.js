@@ -13,8 +13,6 @@ const createUser = {
     lastName: Joi.string().required(),
     status: Joi.string().required(),
     roleId: Joi.number().integer().required(),
-    centerId: Joi.number().integer().required(),
-    subCenterId: Joi.number().integer().required(),
     countryId: Joi.number().integer().required(),
     cityId: Joi.number().integer().required(),
   }),
@@ -61,8 +59,6 @@ const updateUser = {
       lastName: Joi.string(),
       status: Joi.string().allow(),
       roleId: Joi.number().integer().allow(),
-      centerId: Joi.number().integer().allow(),
-      subCenterId: Joi.number().integer().allow(),
       countryId: Joi.number().integer().allow(),
       cityId: Joi.number().integer().allow(),
     })

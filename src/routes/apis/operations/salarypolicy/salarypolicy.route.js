@@ -5,7 +5,6 @@ const salarypolicyController = require("../../../../controllers/apis/operations/
 const itemValidation = require("../../../../validations/operations/entities/item.validation");
 const salarypolicyValidation = require("../../../../validations/operations/entities/salarypolicy.validation");
 
-const receiptValidation = require("../../../../validations/operations/entities/receipt.validation");
 const router = express.Router();
 
 router.route("/read-salarypolicy").post(auth(), validate(itemValidation.getReceipt), salarypolicyController.getsalarypolicyById);
