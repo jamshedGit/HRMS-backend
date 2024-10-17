@@ -1,19 +1,53 @@
 const httpStatus = require("http-status");
-const { LeaveManagementConfigurationModel, LeaveTypePoliciesModel } = require("../../../models/index");
+const { LeaveManagementConfigurationModel, LeaveTypePoliciesModel, LeaveTypeSalaryDeductionPoliciesModel, EmployeeProfileModel, FormModel } = require("../../../models/index");
 const ApiError = require("../../../utils/ApiError");
 const Sequelize = require('sequelize');
-const { paginationFacts } = require("../../../utils/common");
+const { paginationFacts, handleNestedData } = require("../../../utils/common");
 const pick = require("../../../utils/pick");
 const { leave_management_configuration, FORBIDDEN_CODES } = require("../../../models/operations/leave_management_configuration/enum/leave_management_configuration.enum");
 
 const Op = Sequelize.Op;
 
+const includeData = [
+  {
+    model: LeaveTypePoliciesModel
+  },
+  {
+    model: LeaveTypeSalaryDeductionPoliciesModel
+  },
+  {
+    model: EmployeeProfileModel
+  },
+  {
+    model: FormModel,
+    as: 'employeeType'
+  },
+  {
+    model: FormModel,
+    as: 'grade'
+  },
+
+]
+//Include options required for Leave Management Configuration Table view
+const LeaveManagementConfigurationInclude = [
+  {
+    model: EmployeeProfileModel,
+    attributes: ['firstName']
+  },
+  {
+    model: FormModel,
+    as: 'employeeType',
+    attributes: [['formName', 'employeeName']]
+  },
+  {
+    model: FormModel,
+    as: 'grade',
+    attributes: [['formName', 'gradeName']]
+  },
+]
+
 //Attributes required for Leave Management Configuration Table view
 const leaveManagementConfigurationAttributes = [
-  'typeName',
-  'type',
-  'code',
-  'name',
   'Id',
   'isActive',
 ]
@@ -27,10 +61,11 @@ const leaveManagementConfigurationAttributes = [
 const createleaveManagementConfiguration = async (req) => {
   const { leavetypePolicies, leaveTypeSalaryDeductionPolicies, ...payload } = req.body
   const createdData = await LeaveManagementConfigurationModel.create(payload);
-  if (createdData){
-    const createdPolicyData = await LeaveTypePoliciesModel.bulkCreate(leavetypePolicies.map((el)=> ({...el, leaveManagementConfigId: createdData.Id})))
-    return {createdPolicyData, createdData};
+  if (createdData) {
+    const createdPolicyData = await LeaveTypePoliciesModel.bulkCreate(leavetypePolicies.map((el) => ({ ...el, leaveManagementConfigId: createdData.Id })))
+    const createdSalaryDeductionData = await LeaveTypeSalaryDeductionPoliciesModel.bulkCreate(leaveTypeSalaryDeductionPolicies.map((el) => ({ ...el, leaveManagementConfigId: createdData.Id })))
   }
+  return await getleaveManagementConfigurationData({ Id: createdData.Id }, leaveManagementConfigurationAttributes, LeaveManagementConfigurationInclude, true)
 };
 
 
@@ -47,30 +82,39 @@ const getAllleaveManagementConfiguration = async (req) => {
   const limit = options.pageSize;
   const offset = 0 + (options.pageNumber - 1) * limit;
   const queryFilters = [
-    { Name: Sequelize.where(Sequelize.fn('LOWER', Sequelize.col('name')), 'LIKE', '%' + searchQuery + '%') },
+    { Name: Sequelize.where(Sequelize.fn('LOWER', Sequelize.col('firstName')), 'LIKE', '%' + searchQuery + '%') },
   ]
 
   const { count, rows } = await LeaveManagementConfigurationModel.findAndCountAll({
     order: [
       ['createdAt', 'DESC']
     ],
-    where: {
-      // [Op.or]: queryFilters,
-      // isActive: true
-    },
     include: [
       {
-        model: LeaveTypePoliciesModel
-      }
+        model: EmployeeProfileModel,
+        attributes: ['firstName'],
+        where: {
+          [Op.or]: queryFilters,
+        }
+      },
+      {
+        model: FormModel,
+        as: 'employeeType',
+        attributes: [['formName', 'employeeName']]
+      },
+      {
+        model: FormModel,
+        as: 'grade',
+        attributes: [['formName', 'gradeName']]
+      },
     ],
-    // attributes: leaveManagementConfigurationAttributes,
+    attributes: leaveManagementConfigurationAttributes,
     offset: offset,
     limit: limit,
   });
-
-  return rows
+  const updatedRows = handleNestedData(rows)
   //Send paginated data
-  return paginationFacts(count, limit, options.pageNumber, rows);
+  return paginationFacts(count, limit, options.pageNumber, updatedRows);
 };
 
 
@@ -81,16 +125,25 @@ const getAllleaveManagementConfiguration = async (req) => {
  * @returns 
  */
 const getleaveManagementConfigurationById = async (id, options = null) => {
-  return leaveManagementConfigurationModel.findByPk(id, {
-    attributes: options || [
-      'typeName',
-      'type',
-      'code',
-      'name',
-      'Id',
-      'isActive',
-    ],
-  });
+  return LeaveManagementConfigurationModel.findByPk(id);
+};
+
+
+const getleaveManagementConfigurationByForEdit = async (body) => {
+  if (body) {
+    return await getleaveManagementConfigurationData(
+      { ...body },
+      ['subsidiaryId', 'employeeTypeId', 'gradeId', 'weekend', 'isSandwich', 'Id'],
+      [{
+        model: LeaveTypePoliciesModel,
+        attributes: ['Id', 'leaveType', 'gender', 'minExp', 'maxAllowed', 'attachmentRequired', 'maritalStatus']
+      },
+      {
+        model: LeaveTypeSalaryDeductionPoliciesModel,
+        attributes: ['Id', 'leaveType', 'minLeave', 'maxLeave', 'deduction', 'leaveStatus']
+      }]
+    ) || {}
+  }
 };
 
 
@@ -101,7 +154,7 @@ const getleaveManagementConfigurationById = async (id, options = null) => {
  * @param {Array} include  Get data of different table with foreign key relation
  * @returns 
  */
-const getleaveManagementConfigurationData = async (filters, attributes = null, include = null) => {
+const getleaveManagementConfigurationData = async (filters, attributes = null, include = null, handleNestedData = false) => {
   const options = {};
   if (filters) {
     options.where = filters
@@ -113,7 +166,11 @@ const getleaveManagementConfigurationData = async (filters, attributes = null, i
     options.include = include
   }
 
-  return await leaveManagementConfigurationModel.findOne(options);
+  if (handleNestedData) {
+    const data = await LeaveManagementConfigurationModel.findOne(options);
+    return handleNestedData(data)
+  }
+  return await LeaveManagementConfigurationModel.findOne(options);
 };
 
 
@@ -125,23 +182,57 @@ const getleaveManagementConfigurationData = async (filters, attributes = null, i
  * @returns 
  */
 const updateleaveManagementConfigurationById = async (body, updatedBy) => {
-  if (FORBIDDEN_CODES.includes(body.code)) {
-    throw new ApiError(httpStatus.FORBIDDEN, `This code is forbidden ${body.code}. Please use another code`);
-  }
-  let oldRecord = await getleaveManagementConfigurationData({ code: body.code });
-  if (oldRecord && oldRecord.Id != body.Id) {
-    throw new ApiError(httpStatus.FORBIDDEN, `Code already in use ${body.code}. Please use another code`);
-  }
-  else {
-    oldRecord = await getleaveManagementConfigurationById(body.Id)
-  }
+  const { leavetypePolicies, leaveTypeSalaryDeductionPolicies, ...payload } = body
+  oldRecord = await getleaveManagementConfigurationById(payload.Id)
   body.updatedBy = updatedBy;
-  body.typeName = leave_management_configuration[body.type];
-  Object.assign(oldRecord, body);
+  Object.assign(oldRecord, payload);
   const updatedData = await oldRecord.save();
-  const data = await getleaveManagementConfigurationById(updatedData.Id, leaveManagementConfigurationAttributes)
-  return data;
+  if (updatedData) {
+    leavetypePolicies.forEach(element => {
+      element.updatedBy = updatedBy;
+      LeaveTypePoliciesModel.upsert({ ...element, leaveManagementConfigId: updatedData.Id })
+    });
+
+    leaveTypeSalaryDeductionPolicies.forEach(element => {
+      element.updatedBy = updatedBy;
+      LeaveTypeSalaryDeductionPoliciesModel.upsert({ ...element, leaveManagementConfigId: updatedData.Id })
+    });
+  }
+  return await getleaveManagementConfigurationData({ Id: updatedData.Id }, leaveManagementConfigurationAttributes, LeaveManagementConfigurationInclude, true);
 };
+
+
+/**
+ * Delete Single Leave type Policy Record By Id
+ * 
+ * @param {Number} id 
+ * @returns 
+ */
+const deleteLeaveTypePolicy = async (id) => {
+  const oldRecord = await LeaveTypePoliciesModel.findByPk(id);;
+  if (!oldRecord) {
+    throw new ApiError(httpStatus.NOT_FOUND, "Record not found");
+  }
+  await oldRecord.destroy();
+  return oldRecord;
+};
+
+
+/**
+ * Delete Single Leave type Policy Record By Id
+ * 
+ * @param {Number} id 
+ * @returns 
+ */
+const deleteLeaveTypeDeductionPolicy = async (id) => {
+  const oldRecord = await LeaveTypeSalaryDeductionPoliciesModel.findByPk(id);;
+  if (!oldRecord) {
+    throw new ApiError(httpStatus.NOT_FOUND, "Record not found");
+  }
+  await oldRecord.destroy();
+  return oldRecord;
+};
+
 
 /**
  * Delete Single Leave Management Configuration Record By Id
@@ -158,17 +249,7 @@ const deleteleaveManagementConfigurationById = async (id) => {
   return oldRecord;
 };
 
-/**
- * 
- * Get Leave Management Configuration Dropdown Data
- * 
- * @returns 
- */
-const getDropdownData = () => {
-  return Object.keys(leave_management_configuration).map((type) => {
-    return { label: leave_management_configuration[type], value: Number(type) }
-  })
-}
+
 
 module.exports = {
   getAllleaveManagementConfiguration,
@@ -176,5 +257,7 @@ module.exports = {
   updateleaveManagementConfigurationById,
   deleteleaveManagementConfigurationById,
   createleaveManagementConfiguration,
-  getDropdownData
+  deleteLeaveTypeDeductionPolicy,
+  deleteLeaveTypePolicy,
+  getleaveManagementConfigurationByForEdit
 };

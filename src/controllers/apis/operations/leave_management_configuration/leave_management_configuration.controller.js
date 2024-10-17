@@ -47,7 +47,7 @@ const updateleaveManagementConfiguration = catchAsync(async (req, res) => {
  * @returns res
  */
 const getleaveManagementConfigurationById = catchAsync(async (req, res) => {
-  const leaveManagementConfigurationData = await LeaveManagementConfigurationService.getleaveManagementConfigurationById(req.params.id);
+  const leaveManagementConfigurationData = await LeaveManagementConfigurationService.getleaveManagementConfigurationByForEdit(req.body);
   if (!leaveManagementConfigurationData) {
     throw new ApiError(httpStatus.NOT_FOUND, "No Data found");
   }
@@ -89,15 +89,33 @@ const deleteleaveManagementConfiguration = catchAsync(async (req, res) => {
   });
 });
 
-const getleaveManagementConfigurationDropdownData = catchAsync(async (req, res) => {
-  const dropdownData = await LeaveManagementConfigurationService.getDropdownData();
-  if (!dropdownData) {
-    throw new ApiError(httpStatus.NOT_FOUND, "No Data found");
-  }
+/**
+ * Delete Single Leave Management Configuration Record By Id
+ * 
+ * @param {Number} id 
+ * @returns res
+ */
+const deleteLeaveTypePolicy = catchAsync(async (req, res) => {
+  const leaveManagementConfigurationData = await LeaveManagementConfigurationService.deleteLeaveTypePolicy(req.params.id);
   res.send({
     code: HttpStatusCodes.OK,
     message: HttpResponseMessages.OK,
-    data: dropdownData,
+    data: leaveManagementConfigurationData,
+  });
+});
+
+/**
+ * Delete Single Leave Management Configuration Record By Id
+ * 
+ * @param {Number} id 
+ * @returns res
+ */
+const deleteLeaveTypeSalaryDeduction = catchAsync(async (req, res) => {
+  const leaveManagementConfigurationData = await LeaveManagementConfigurationService.deleteLeaveTypeDeductionPolicy(req.params.id);
+  res.send({
+    code: HttpStatusCodes.OK,
+    message: HttpResponseMessages.OK,
+    data: leaveManagementConfigurationData,
   });
 });
 
@@ -107,5 +125,6 @@ module.exports = {
   updateleaveManagementConfiguration,
   getAllleaveManagementConfiguration,
   deleteleaveManagementConfiguration,
-  getleaveManagementConfigurationDropdownData
+  deleteLeaveTypePolicy,
+  deleteLeaveTypeSalaryDeduction
 };

@@ -1,37 +1,9 @@
 const { Model, DataTypes } = require('sequelize');
 const sequelize = require('../../../config/db');
-const { LeaveTypeSalaryDeductionPoliciesModel, LeaveTypePoliciesModel, EmployeeProfileModel, FormModel } = require('../..');
+const { EmployeeProfileModel, FormModel } = require('../..');
 
 // Define the User model
 class LeaveManagementConfigurationModel extends Model {
-  // static associate(models) {
-  //   // define associations here
-  //   this.hasMany(LeaveTypePoliciesModel, {
-  //     foreignKey: 'Id'
-  //   })
-
-  //   this.hasMany(LeaveTypeSalaryDeductionPoliciesModel, {
-  //     foreignKey: 'Id'
-  //   })
-
-  //   // Association with EmployeeProfileModel model (subsidiaryId is a foreign key)
-  //   this.belongsTo(EmployeeProfileModel, {
-  //     foreignKey: 'subsidiaryId',
-  //     targetKey: 'Id',  // Assuming 'Id' is the primary key in LeaveType table
-  //   });
-
-  //   // Association with FormModel model (subsidiaryId is a foreign key)
-  //   this.belongsTo(FormModel, {
-  //     foreignKey: 'employeeTypeId',
-  //     targetKey: 'Id',  // Assuming 'Id' is the primary key in LeaveType table
-  //   });
-
-  //   // Association with FormModel model (subsidiaryId is a foreign key)
-  //   this.belongsTo(FormModel, {
-  //     foreignKey: 'gradeId',
-  //     targetKey: 'Id',  // Assuming 'Id' is the primary key in LeaveType table
-  //   });
-  // }
 }
 
 // Initialize the model
@@ -94,10 +66,6 @@ LeaveManagementConfigurationModel.init(
   }
 );
 
-
-
-
-
 // Association with EmployeeProfileModel model (subsidiaryId is a foreign key)
 LeaveManagementConfigurationModel.belongsTo(EmployeeProfileModel, {
   foreignKey: 'subsidiaryId',
@@ -108,12 +76,14 @@ LeaveManagementConfigurationModel.belongsTo(EmployeeProfileModel, {
 LeaveManagementConfigurationModel.belongsTo(FormModel, {
   foreignKey: 'employeeTypeId',
   targetKey: 'Id',  // Assuming 'Id' is the primary key in LeaveType table
+  as: 'employeeType'
 });
 
 // Association with FormModel model (subsidiaryId is a foreign key)
 LeaveManagementConfigurationModel.belongsTo(FormModel, {
   foreignKey: 'gradeId',
   targetKey: 'Id',  // Assuming 'Id' is the primary key in LeaveType table
+  as: 'grade'
 });
 
 

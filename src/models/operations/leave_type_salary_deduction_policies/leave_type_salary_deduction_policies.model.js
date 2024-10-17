@@ -4,26 +4,6 @@ const { LeaveTypeModel, FormModel, LeaveManagementConfigurationModel } = require
 
 // Define the User model
 class LeaveTypeSalaryDeductionPoliciesModel extends Model {
-  // static associate(models) {
-  //    // Association with LeaveTypeModel model (leaveType is a foreign key)
-  //    this.belongsTo(LeaveTypeModel, {
-  //     foreignKey: 'leaveType',
-  //     targetKey: 'Id',  // Assuming 'Id' is the primary key in LeaveTypeModel table
-  //   });
-
-  //   // Association with FormModel model (leaveStatus is a foreign key)
-  //   this.belongsTo(FormModel, {
-  //     foreignKey: 'leaveStatus',
-  //     targetKey: 'Id',  // Assuming 'Id' is the primary key in FormModel table
-  //   });
-
-  //   // Association with FormModel model (LeaveManagementConfigurationModel is a foreign key)
-  //   this.belongsTo(LeaveManagementConfigurationModel, {
-  //     foreignKey: 'leaveManagementConfigId',
-  //     targetKey: 'Id',  // Assuming 'Id' is the primary key in LeaveManagementConfigurationModel table
-  //   });
-
-  // }
 }
 
 // Initialize the model
@@ -98,6 +78,6 @@ LeaveTypeSalaryDeductionPoliciesModel.belongsTo(FormModel, {
 });
 
 LeaveManagementConfigurationModel.hasMany(LeaveTypeSalaryDeductionPoliciesModel, { foreignKey: 'leaveManagementConfigId' });
-LeaveTypeSalaryDeductionPoliciesModel.belongsTo(LeaveManagementConfigurationModel, { foreignKey: 'Id' });
+LeaveTypeSalaryDeductionPoliciesModel.belongsTo(LeaveManagementConfigurationModel, { foreignKey: 'leaveManagementConfigId' });
 
 module.exports = LeaveTypeSalaryDeductionPoliciesModel;

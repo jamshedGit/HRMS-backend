@@ -4,31 +4,6 @@ const { LeaveTypeModel, FormModel, LeaveManagementConfigurationModel } = require
 
 // Define the User model
 class LeaveTypePoliciesModel extends Model {
-  // static associate() {
-  //    // Association with LeaveTypeModel model (leaveType is a foreign key)
-  //    this.belongsTo(LeaveTypeModel, {
-  //     foreignKey: 'leaveType',
-  //     targetKey: 'Id',  // Assuming 'Id' is the primary key in LeaveType table
-  //   });
-
-  //   // Association with FormModel model (gender is a foreign key)
-  //   this.belongsTo(FormModel, {
-  //     foreignKey: 'gender',
-  //     targetKey: 'Id',  // Assuming 'Id' is the primary key in FormMenu table
-  //   });
-
-  //   // Association with FormModel model (maritalStatus is a foreign key)
-  //   this.belongsTo(FormModel, {
-  //     foreignKey: 'maritalStatus',
-  //     targetKey: 'Id',  // Assuming 'Id' is the primary key in FormMenu table
-  //   });
-
-  //   // Association with FormModel model (LeaveManagementConfigurationModel is a foreign key)
-  //   this.belongsTo(LeaveManagementConfigurationModel, {
-  //     foreignKey: 'leaveManagementConfigId',
-  //     targetKey: 'Id',  // Assuming 'Id' is the primary key in LeaveManagementConfigurationModel table
-  //   });
-  // }
 }
 
 // Initialize the model
@@ -105,17 +80,19 @@ LeaveTypePoliciesModel.belongsTo(LeaveTypeModel, {
 // Association with FormModel model (gender is a foreign key)
 LeaveTypePoliciesModel.belongsTo(FormModel, {
   foreignKey: 'gender',
-  targetKey: 'Id',  // Assuming 'Id' is the primary key in FormMenu table
+  targetKey: 'Id', // Assuming 'Id' is the primary key in FormMenu table
+  as: 'genderDetail'  
 });
 
 // Association with FormModel model (maritalStatus is a foreign key)
 LeaveTypePoliciesModel.belongsTo(FormModel, {
   foreignKey: 'maritalStatus',
   targetKey: 'Id',  // Assuming 'Id' is the primary key in FormMenu table
+  as: 'maritalDetail'
 });
 
 
 LeaveManagementConfigurationModel.hasMany(LeaveTypePoliciesModel, { foreignKey: 'leaveManagementConfigId' });
-LeaveTypePoliciesModel.belongsTo(LeaveManagementConfigurationModel, { foreignKey: 'Id' });
+LeaveTypePoliciesModel.belongsTo(LeaveManagementConfigurationModel, { foreignKey: 'leaveManagementConfigId' });
 
 module.exports = LeaveTypePoliciesModel;
