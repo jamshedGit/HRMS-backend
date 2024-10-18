@@ -378,14 +378,7 @@ const deleteloan_management_configurationById = async (Id) => {
   return Item;
 };
 
-// const deleteloan_management_configurationById = async (Id) => {
-//   const Item = await getloan_management_configurationById(Id);
-//   if (!Item) {
-//     throw new ApiError(httpStatus.NOT_FOUND, "Item not found");
-//   }
-//   await Item.destroy();
-//   return Item;
-// };
+
 
 module.exports = {
   createloan_management_configuration,
