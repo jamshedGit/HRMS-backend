@@ -14,10 +14,11 @@ const getRouteSlugs = (req) => {
   return { resourceSlug: arr[arr.length - 2], rightSlug: arr[arr.length - 1] }; // route.substring(route.lastIndexOf('/') + 1);
 };
 
-const getDdlItems = (columns = { labelField: '', valueField: '' }, data = [], parentId = null) => {
+const getDdlItems = (columns = { labelField: '', valueField: '',codeField:'' }, data = [], parentId = null) => {
   return data.map((i) => ({
     label: i[columns.labelField],
     value: i[columns.valueField],
+    code: i[columns.codeField],
   }));
 };
 
