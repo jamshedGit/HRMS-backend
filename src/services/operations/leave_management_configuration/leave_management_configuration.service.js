@@ -39,7 +39,7 @@ const LeaveManagementConfigurationInclude = [
   {
     model: FormModel,
     as: 'employeeType',
-    attributes: [['formName', 'employeeName']]
+    attributes: [['formName', 'employeeTypeName']]
   },
   {
     model: FormModel,
@@ -134,18 +134,29 @@ const getleaveManagementConfigurationById = async (id, options = null) => {
 
 const getleaveManagementConfigurationByForEdit = async (body) => {
   if (body) {
-    return await getleaveManagementConfigurationData(
+    const data = await getleaveManagementConfigurationData(
       { ...body },
       ['subsidiaryId', 'employeeTypeId', 'gradeId', 'weekend', 'isSandwich', 'Id'],
-      [{
-        model: LeaveTypePoliciesModel,
-        attributes: ['Id', 'leaveType', 'gender', 'minExp', 'maxAllowed', 'attachmentRequired', 'maritalStatus']
-      },
-      {
-        model: LeaveTypeSalaryDeductionPoliciesModel,
-        attributes: ['Id', 'leaveType', 'minLeave', 'maxLeave', 'deduction', 'leaveStatus']
-      }]
-    ) || {}
+      [
+        {
+          model: LeaveTypePoliciesModel,
+          attributes: ['Id', 'leaveType', 'gender', 'minExp', 'maxAllowed', 'attachmentRequired', 'maritalStatus']
+        },
+        {
+          model: LeaveTypeSalaryDeductionPoliciesModel,
+          attributes: ['Id', 'leaveType', 'minLeave', 'maxLeave', 'deduction', 'leaveStatus']
+        }
+      ]
+    )
+    if(!data){
+      return null;
+    }
+    const{t_leave_type_policies, t_leave_type_salary_deduction_policies, ...rest} = data.dataValues;
+    rest.leavetypePolicies = t_leave_type_policies || [];
+    rest.leaveTypeSalaryDeductionPolicies = t_leave_type_salary_deduction_policies || [];
+    rest.weekend = JSON.parse(rest.weekend || '[]')
+
+    return rest
   }
 };
 

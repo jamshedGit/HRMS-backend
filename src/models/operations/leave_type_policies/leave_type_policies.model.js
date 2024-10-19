@@ -27,7 +27,7 @@ LeaveTypePoliciesModel.init(
       allowNull: true
     },
     minExp: {
-      type: DataTypes.INTEGER,
+      type: DataTypes.FLOAT,
       allowNull: true
     },
     maxAllowed: {
@@ -75,24 +75,34 @@ LeaveTypePoliciesModel.init(
 LeaveTypePoliciesModel.belongsTo(LeaveTypeModel, {
   foreignKey: 'leaveType',
   targetKey: 'Id',  // Assuming 'Id' is the primary key in LeaveType table
+  onDelete: 'CASCADE',
+  onUpdate: 'CASCADE',
 });
 
 // Association with FormModel model (gender is a foreign key)
 LeaveTypePoliciesModel.belongsTo(FormModel, {
   foreignKey: 'gender',
   targetKey: 'Id', // Assuming 'Id' is the primary key in FormMenu table
-  as: 'genderDetail'  
+  as: 'genderDetail',
+  onDelete: 'CASCADE',
+  onUpdate: 'CASCADE',
 });
 
 // Association with FormModel model (maritalStatus is a foreign key)
 LeaveTypePoliciesModel.belongsTo(FormModel, {
   foreignKey: 'maritalStatus',
   targetKey: 'Id',  // Assuming 'Id' is the primary key in FormMenu table
-  as: 'maritalDetail'
+  as: 'maritalDetail',
+  onDelete: 'CASCADE',
+  onUpdate: 'CASCADE',
 });
 
 
 LeaveManagementConfigurationModel.hasMany(LeaveTypePoliciesModel, { foreignKey: 'leaveManagementConfigId' });
-LeaveTypePoliciesModel.belongsTo(LeaveManagementConfigurationModel, { foreignKey: 'leaveManagementConfigId' });
+LeaveTypePoliciesModel.belongsTo(LeaveManagementConfigurationModel, {
+  foreignKey: 'leaveManagementConfigId', 
+  onDelete: 'CASCADE',
+  onUpdate: 'CASCADE',
+});
 
 module.exports = LeaveTypePoliciesModel;

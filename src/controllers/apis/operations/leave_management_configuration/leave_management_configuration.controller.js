@@ -48,9 +48,6 @@ const updateleaveManagementConfiguration = catchAsync(async (req, res) => {
  */
 const getleaveManagementConfigurationById = catchAsync(async (req, res) => {
   const leaveManagementConfigurationData = await LeaveManagementConfigurationService.getleaveManagementConfigurationByForEdit(req.body);
-  if (!leaveManagementConfigurationData) {
-    throw new ApiError(httpStatus.NOT_FOUND, "No Data found");
-  }
   res.send({
     code: HttpStatusCodes.OK,
     message: HttpResponseMessages.OK,

@@ -70,21 +70,27 @@ LeaveManagementConfigurationModel.init(
 LeaveManagementConfigurationModel.belongsTo(FormModel, {
   foreignKey: 'subsidiaryId',
   targetKey: 'Id',  // Assuming 'Id' is the primary key in LeaveType table
-  as: 'subsidiary'
+  as: 'subsidiary',
+  onDelete: 'CASCADE',
+  onUpdate: 'CASCADE',
 });
 
 // Association with FormModel model (subsidiaryId is a foreign key)
 LeaveManagementConfigurationModel.belongsTo(FormModel, {
   foreignKey: 'employeeTypeId',
   targetKey: 'Id',  // Assuming 'Id' is the primary key in LeaveType table
-  as: 'employeeType'
+  as: 'employeeType',
+  onDelete: 'CASCADE',
+  onUpdate: 'CASCADE',
 });
 
 // Association with FormModel model (subsidiaryId is a foreign key)
 LeaveManagementConfigurationModel.belongsTo(FormModel, {
   foreignKey: 'gradeId',
   targetKey: 'Id',  // Assuming 'Id' is the primary key in LeaveType table
-  as: 'grade'
+  as: 'grade',
+  onDelete: 'CASCADE',
+  onUpdate: 'CASCADE',
 });
 
 

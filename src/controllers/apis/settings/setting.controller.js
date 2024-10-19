@@ -84,6 +84,14 @@ const getFormMenusMasterData = catchAsync(async (req, res) => {
   });
 });
 
+const getAllLeaveType = catchAsync(async (req, res) => {
+  res.send({  
+    code: HttpStatusCodes.OK,
+    message: HttpResponseMessages.OK,
+    data: await settingService.getLeaveTypesData(),
+  });
+});
+
 
 const getAlarmTimesMasterData = catchAsync(async (req, res) => {
   res.send({
@@ -318,5 +326,6 @@ module.exports = {
   getEmployeesMasterData,
   GetLastInserted_ID_ByTableName,
   get_Bank_Branch_MasterData,
-  getRevisionHistoryByEmpId
+  getRevisionHistoryByEmpId,
+  getAllLeaveType
 };

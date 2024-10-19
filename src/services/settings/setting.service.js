@@ -1,4 +1,4 @@
-const { UserModel, RoleModel, ResourceModel, CountryModel, CityModel, CenterModel, SubCenterModel, VehicleDetailModel, VehicleCategoryModel, IncidentTypeModel, IncidentSeverityModel, StatusTypeModel, AlarmTimeModel, HospitalModel, PoliceStationModel, BankModel, DeptModel, FormModel, EmployeeProfileModel, BranchModel, EmployeeSalaryRevisionModel } = require('../../models');
+const { UserModel, RoleModel, ResourceModel, CountryModel, CityModel, CenterModel, SubCenterModel, VehicleDetailModel, VehicleCategoryModel, IncidentTypeModel, IncidentSeverityModel, StatusTypeModel, AlarmTimeModel, HospitalModel, PoliceStationModel, BankModel, DeptModel, FormModel, EmployeeProfileModel, BranchModel, EmployeeSalaryRevisionModel, LeaveTypeModel } = require('../../models');
 const { getDdlItems, getAlarmTimesItems } = require('../../utils/common');
 const { DDL_FIELD_NAMES } = require('../../utils/constants');
 const { getRoleById } = require('./role.service');
@@ -144,10 +144,19 @@ const getFormMenusMasterData = async (req, res) => {
     attributes: ['formName', 'Id']
   }));
   if (FormMenusMasterData.length > 0) {
-    FormMenusMasterData.unshift({ label: '--Select--', value: null })
+    FormMenusMasterData.unshift({ label: req.body.text || '--Select--', value: null })
   }
-  console.log("Dropdown", FormMenusMasterData);
   return FormMenusMasterData
+};
+
+const getLeaveTypesData = async () => {
+  const LeaveTypeData = getDdlItems(DDL_FIELD_NAMES.LeaveType, await LeaveTypeModel.findAll({
+    attributes: ['name', 'Id']
+  }));
+  if (LeaveTypeData.length > 0) {
+    LeaveTypeData.unshift({ label: '--Select--', value: null })
+  }
+  return LeaveTypeData
 };
 
 const getAlarmTimesMasterData = async () => {
@@ -684,5 +693,6 @@ module.exports = {
   getEmployeesMasterData,
   GetLastInserted_ID_ByTableName,
   get_Bank_Branch_MasterData,
-  getRevisionHistoryByEmpId
+  getRevisionHistoryByEmpId,
+  getLeaveTypesData
 };

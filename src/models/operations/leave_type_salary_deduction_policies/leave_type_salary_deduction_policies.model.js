@@ -31,7 +31,7 @@ LeaveTypeSalaryDeductionPoliciesModel.init(
       allowNull: true
     },
     deduction: {
-      type: DataTypes.INTEGER,
+      type: DataTypes.FLOAT,
       allowNull: true
     },
     leaveStatus: {
@@ -69,15 +69,23 @@ LeaveTypeSalaryDeductionPoliciesModel.init(
 LeaveTypeSalaryDeductionPoliciesModel.belongsTo(LeaveTypeModel, {
   foreignKey: 'leaveType',
   targetKey: 'Id',  // Assuming 'Id' is the primary key in LeaveTypeModel table
+  onDelete: 'CASCADE',
+  onUpdate: 'CASCADE',
 });
 
 // Association with FormModel model (leaveStatus is a foreign key)
 LeaveTypeSalaryDeductionPoliciesModel.belongsTo(FormModel, {
   foreignKey: 'leaveStatus',
   targetKey: 'Id',  // Assuming 'Id' is the primary key in FormModel table
+  onDelete: 'CASCADE',
+  onUpdate: 'CASCADE',
 });
 
 LeaveManagementConfigurationModel.hasMany(LeaveTypeSalaryDeductionPoliciesModel, { foreignKey: 'leaveManagementConfigId' });
-LeaveTypeSalaryDeductionPoliciesModel.belongsTo(LeaveManagementConfigurationModel, { foreignKey: 'leaveManagementConfigId' });
+LeaveTypeSalaryDeductionPoliciesModel.belongsTo(LeaveManagementConfigurationModel, {
+  foreignKey: 'leaveManagementConfigId',
+  onDelete: 'CASCADE',
+  onUpdate: 'CASCADE',
+});
 
 module.exports = LeaveTypeSalaryDeductionPoliciesModel;
