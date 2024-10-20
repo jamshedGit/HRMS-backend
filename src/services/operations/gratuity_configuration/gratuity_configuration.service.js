@@ -1,109 +1,81 @@
 const httpStatus = require("http-status");
-const Loan_management_configurationModel = require("../../../models/index");
-const Loan_management_detailModel = require("../../../models/index");
-const FormModel = require("../../../models/index");
-const RoleModel = require("../../../models/index");
+const {Gratuity_configurationModel}= require("../../../models/index");
+const {FormModel} = require("../../../models/index");
+
 const ApiError = require("../../../utils/ApiError");
 const Sequelize = require("sequelize");
 const { paginationFacts } = require("../../../utils/common");
 const { HttpStatusCodes } = require("../../../utils/constants");
 
 const Op = Sequelize.Op;
-/**
- * Create a Item
- * @param {Object} loan_management_configurationBody
- * @returns {Promise<loan_management_configuration>}
- */
 
-
-
-const createloan_management_configuration = async (
+const creategratuity_configuration = async (
   req,
-  loan_management_configurationBody
+  gratuity_configurationBody
 ) => {
   try {
-    loan_management_configurationBody.createdBy = req.user.id;
-    console.log(loan_management_configurationBody, "body");
+    console.log("body gratuity_configurationBody",gratuity_configurationBody)
+    gratuity_configurationBody.createdBy = req.user.id;
+
 
     //check
-    const existingConfiguration = await Loan_management_configurationModel.Loan_management_configurationModel.findOne({
-      where: { subsidiaryId: loan_management_configurationBody.subsidiaryId },
+    const { max_year, min_year } = gratuity_configurationBody;
+
+    // Validate min is less than max
+    if (max_year < min_year) {
+        let result={"message":'Min year must be less than To Max.',"status":"error"}
+        return result;   
+    }
+
+    const existingConfiguration = await Gratuity_configurationModel.findOne({
+        where: {
+          subsidiaryId: gratuity_configurationBody.subsidiaryId,
+          contract_typeId: gratuity_configurationBody.contract_typeId,
+            [Op.or]: [
+                { min_year: { [Op.between]: [min_year, max_year] } },
+                { max_year: { [Op.between]: [min_year, max_year] } },
+                { min_year: { [Op.lte]: min_year }, max_year: { [Op.gte]: max_year } }
+            ]
+        }
     });
 
     if (existingConfiguration) {
    
-      let result={"message":'This subsidiary already exists. Save not allowed.',"status":"error"}
+      let result={"message":'This Already exists. Save not allowed.',"status":"error"}
         return result;
     }
+   
+    
 
-    // Create the loan management configuration
-    const addedloan_management_configurationObj =
-      await Loan_management_configurationModel.Loan_management_configurationModel.create(
-        loan_management_configurationBody
-      );
+    // Create the Gratuity configuration
+    const gratuity_configurationObj =
+      await Gratuity_configurationModel.create( gratuity_configurationBody);
 
-    console.log(
-      "addedloan_management_configurationObj Body",
-      loan_management_configurationBody
-    );
-    // Check for details and save them
-    if (
-      addedloan_management_configurationObj &&
-      addedloan_management_configurationObj.Id &&
-      loan_management_configurationBody.details &&
-      Array.isArray(loan_management_configurationBody.details)
-    ) {
-      const loanDetails = loan_management_configurationBody.details.map(
-        (detail) => ({
-          ...detail,
-          loan_management_configurationId:
-            addedloan_management_configurationObj.Id, // Associate with the configuration ID
-        })
-      );
-
-      for (const detail of loanDetails) {
-        await Loan_management_detailModel.Loan_management_detailModel.create(
-          detail
-        );
-      }
-    }
-
-    // return addedloan_management_configurationObj;
-
-    const populatedConfiguration = await Loan_management_configurationModel.Loan_management_configurationModel.findOne({
-      where: { Id: addedloan_management_configurationObj.Id },
-      include: [
-        {
-          model: Loan_management_detailModel.Loan_management_detailModel,
-          as: "details",
-          include: [
+      //return data
+      const result = await Gratuity_configurationModel.findByPk(gratuity_configurationObj.Id, {
+        include: [
             {
-              model: FormModel.FormModel,
-              attributes: ["formName", "formCode"],
-              as: "Loan_Type",
+                model: FormModel,
+                attributes: ["formName", "formCode"],
+                as: "Subsidiary",
             },
-          ],
-        },
-        {
-          model: FormModel.FormModel,
-          attributes: ["formName", "formCode"],
-          as: "Subsidiary",
-        },
-        {
-          model: FormModel.FormModel,
-          attributes: ["formName", "formCode"],
-          as: "Account",
-        },
-        {
-          model: RoleModel.RoleModel,
-          attributes: ["name"],
-        },
-      ],
+            {
+                model: FormModel,
+                attributes: ["formName", "formCode"],
+                as: "Contract_Type",
+            },
+            {
+                model: FormModel,
+                attributes: ["formName", "formCode"],
+                as: "Basis_Of_Gratuity",
+            }
+        ]
     });
+console.log("result",result)
+    return result;
 
-    return populatedConfiguration;
   } catch (error) {
-    console.error("Error creating loan management configuration:", error);
+    console.error("Error creating gratuity configuration:", error);
     throw error; // Rethrow or handle the error as needed
   }
 };
@@ -117,7 +89,7 @@ const createloan_management_configuration = async (
  * @param {number} [options.page] - Current page (default = 1)
  * @returns {Promise<QueryResult>}
  */
-const queryloan_management_configuration = async (
+const querygratuity_configuration = async (
   filter,
   options,
   searchQuery
@@ -128,8 +100,8 @@ const queryloan_management_configuration = async (
   searchQuery = searchQuery.toLowerCase();
   const queryFilters = [
     {
-      emp_loan_account: Sequelize.where(
-        Sequelize.fn("", Sequelize.col("emp_loan_account")),
+      min_year: Sequelize.where(
+        Sequelize.fn("", Sequelize.col("min_year")),
         "LIKE",
         "%" + searchQuery + "%"
       ),
@@ -137,7 +109,7 @@ const queryloan_management_configuration = async (
   ];
 
   const { count, rows } =
-    await Loan_management_configurationModel.Loan_management_configurationModel.findAndCountAll(
+    await Gratuity_configurationModel.findAndCountAll(
       {
         order: [["createdAt", "DESC"]],
         where: {
@@ -147,35 +119,24 @@ const queryloan_management_configuration = async (
         offset: offset,
         limit: limit,
         include: [
-          {
-            model: Loan_management_detailModel.Loan_management_detailModel,
-            as: "details",
-            include: [
-              {
-                model: FormModel.FormModel,
-                attributes: ["formName", "formCode"],
-                as: "Loan_Type",
-             
-              },
-            ]
-         
-          },
+      
   
           {
-            model: FormModel.FormModel,
+            model: FormModel,
             attributes: ["formName", "formCode"],
             as: "Subsidiary",
           },
           {
-            model: FormModel.FormModel,
+            model: FormModel,
             attributes: ["formName", "formCode"],
-            as: "Account",
+            as: "Contract_Type",
           },
        
 
           { 
-            model: RoleModel.RoleModel,
-            attributes: ["name"],
+            model: FormModel,
+            attributes: ["formName", "formCode"],
+            as:"Basis_Of_Gratuity"
           
           },
         ],
@@ -191,7 +152,7 @@ const queryloan_management_configuration = async (
  * @param {ObjectId} id
  * @returns {Promise<ReceiptModel>}
  */
-const getloan_management_configurationById = async (id) => {
+const getgratuity_configurationById = async (id) => {
   return Loan_management_configurationModel.Loan_management_configurationModel.findOne({
     where: { Id:id },
     include: [
@@ -223,7 +184,12 @@ const getloan_management_configurationById = async (id) => {
     ],
   });
 
+  // return populatedConfiguration;
 
+
+  // return Loan_management_configurationModel.Loan_management_configurationModel.findByPk(
+  //   id
+  // );
 };
 
 /**
@@ -239,7 +205,7 @@ const getloan_management_configurationById = async (id) => {
 
 
 
-const updateloan_management_configurationById = async (
+const updategratuity_configurationById = async (
   Id,
   updateBody,
   updatedBy
@@ -277,7 +243,11 @@ return result;
     throw new ApiError(httpStatus.NOT_FOUND, "Record not found");
   }
 
-
+  // Update parent record
+  // updateBody.updatedBy = updatedBy;
+  // delete updateBody.id;
+  // Object.assign(Item, updateBody);
+  // await Item.save();
 
   const existingDetailIds = Item.details.map(d => d.Id);
   console.log("existingDetailIds,Item.details.map(d => d.Id)",existingDetailIds)
@@ -343,7 +313,7 @@ return result;
  */
 
 
-const deleteloan_management_configurationById = async (Id) => {
+const deletegratuity_configurationById = async (Id) => {
   const Item = await getloan_management_configurationById(Id, {
     include: [
       {
@@ -372,9 +342,9 @@ const deleteloan_management_configurationById = async (Id) => {
 
 
 module.exports = {
-  createloan_management_configuration,
-  queryloan_management_configuration,
-  getloan_management_configurationById,
-  updateloan_management_configurationById,
-  deleteloan_management_configurationById,
-};
+    creategratuity_configuration,
+    getgratuity_configurationById,
+    updategratuity_configurationById,
+    deletegratuity_configurationById,
+    querygratuity_configuration
+}

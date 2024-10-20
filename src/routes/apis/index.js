@@ -48,6 +48,7 @@ const final_settlement_policy = require('./operations/final_settlement_policy/fi
 const onetime_earning = require('./operations/onetime_allowance/onetime_allowance.route')
 const loan_type = require('./operations/loan_type/loan_type.route')
 const payroll_process_policy = require('./operations/payroll_process_policy/payroll_process_policy.route')
+const gratuity_configuration = require('./operations/gratuity_configuration/gratuity_configuration.route')
 
 
 const router = express.Router();
@@ -249,7 +250,11 @@ const defaultRoutes = [
   {
     path: "/payroll_process_policy",
     route: payroll_process_policy
-  }
+  },
+  {
+    path: "/gratuity_configuration",
+    route: gratuity_configuration
+  },
 ];
 
 const devRoutes = [

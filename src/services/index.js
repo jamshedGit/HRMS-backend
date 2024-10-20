@@ -47,3 +47,4 @@ module.exports.salarypolicyFormService = require('./operations/salarypolicy/sala
 module.exports.OneTimeEarningService = require('./operations/onetime_allowance/onetime_allowance.service')
 module.exports.LoanTypeService = require('./operations/loan_type/loan_type.service')
 module.exports.PayrollProcessPolicy = require('./operations/payroll_process_policy/payroll_process_policy.service')
+module.exports.Gratuity_configurationService = require('./operations/gratuity_configuration/gratuity_configuration.service')

@@ -4,10 +4,7 @@ const ApiError = require("../../../utils/ApiError");
 const Sequelize = require('sequelize');
 const { paginationFacts } = require("../../../utils/common");
 const { HttpStatusCodes } = require("../../../utils/constants");
-// const {
-//   HttpStatusCodes,
-//   HttpResponseMessages,
-// } = require("../../../../utils/constants");
+
 
 const Op = Sequelize.Op;
 /**
@@ -54,8 +51,7 @@ const createtax_slab = async (req, tax_slabBody) => {
     }
 
     const addedtax_slabObj = await Tax_slabModel.Tax_slabModel.create(tax_slabBody);
-    console.log("addedtax_slabObj", addedtax_slabObj);
-    // authSMSSend(addedtax_slabObj.dataValues);  // Quick send message at the time of donation
+   
     return addedtax_slabObj;
 };
 
@@ -145,10 +141,7 @@ const updatetax_slabById = async (Id, updateBody, updatedBy) => {
       });
 
     if (overlappingSlab) {
-        // throw new ApiError(httpStatus.CONFLICT, "New tax slab overlaps with existing slabs. Cannot update the record.");
-  
-    // return  "New tax slab overlaps with existing slabs. Cannot update the record."
-    
+
     let result={"message":'New tax slab overlaps with existing slabs. Cannot update the record.',"status":"error"}
     return result;
     }
