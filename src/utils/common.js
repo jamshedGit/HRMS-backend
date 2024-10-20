@@ -1,4 +1,9 @@
 const moment = require('moment');
+const Sequelize = require("sequelize");
+const Op = Sequelize.Op;
+
+const modelMapping= require("../models/index");
+
 
 const getRouteSlugs = (req) => {
   const route = req.originalUrl
@@ -138,5 +143,53 @@ const handleNestedData = (data) => {
   }
 }
 
+// Utility function to check for existing ranges with conditional fields
 
-module.exports = { handleNestedData, getRouteSlugs, getDdlItems, getAlarmTimesItems, customPaginate, paginationFacts, createDatetime, getPathStorageFromUrl };
+
+const check_range_exist = async (body, table, minField, maxField,fieldMappings = []) => {
+  // Validate that max is greater than min
+
+  if (body[maxField] < body[minField]) {
+      return { message: 'Min value must be less than Max value.', status: 'error' };
+  }
+
+  // Start building the where condition
+  const whereCondition = {
+      [Op.or]: [
+          { [minField]: { [Op.between]: [ body[minField], body[maxField]] } },
+          { [maxField]: { [Op.between]: [ body[minField],body[maxField]] } },
+          { [minField]: { [Op.lte]:  body[minField] }, [maxField]: { [Op.gte]: body[maxField] } },
+      ],
+  };
+
+  // Add required fields from fieldMappings
+  Object.keys(fieldMappings).forEach(field => {
+   
+      if (fieldMappings[field] !== undefined) {
+      
+          whereCondition[fieldMappings[field] ] = body[fieldMappings[field] ];
+      }
+  });
+
+  // Check if fieldMappings is defined and is an array
+if (Array.isArray(fieldMappings) && fieldMappings.length > 0) {
+  Object.keys(fieldMappings).forEach(field => {
+    if (fieldMappings[field] !== undefined) {
+        whereCondition[fieldMappings[field] ] = body[fieldMappings[field] ];
+    }
+});
+}
+
+  const model = modelMapping[table];
+  if (!model) {
+      throw new Error(`Model ${table} not found`);
+  }
+  // Query to check for existing configuration
+  const existingConfiguration = await model.findOne({
+      where: whereCondition,
+  });
+  return existingConfiguration ?  { message: 'Already exist.', status: 'error' } : null;
+};
+
+
+module.exports = { handleNestedData, getRouteSlugs, getDdlItems, getAlarmTimesItems, customPaginate, paginationFacts, createDatetime, getPathStorageFromUrl,check_range_exist };

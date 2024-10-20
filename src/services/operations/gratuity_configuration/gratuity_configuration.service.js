@@ -4,7 +4,7 @@ const {FormModel} = require("../../../models/index");
 
 const ApiError = require("../../../utils/ApiError");
 const Sequelize = require("sequelize");
-const { paginationFacts } = require("../../../utils/common");
+const { paginationFacts ,check_range_exist} = require("../../../utils/common");
 const { HttpStatusCodes } = require("../../../utils/constants");
 
 const Op = Sequelize.Op;
@@ -17,32 +17,38 @@ const creategratuity_configuration = async (
     console.log("body gratuity_configurationBody",gratuity_configurationBody)
     gratuity_configurationBody.createdBy = req.user.id;
 
-
+ 
     //check
     const { max_year, min_year } = gratuity_configurationBody;
 
-    // Validate min is less than max
-    if (max_year < min_year) {
-        let result={"message":'Min year must be less than To Max.',"status":"error"}
-        return result;   
-    }
+// fieldMappings=["subsidiaryId","contract_typeId"]
+    const existingConfiguration=await check_range_exist (gratuity_configurationBody, "Gratuity_configurationModel","min_year", "max_year", fieldMappings=["subsidiaryId","contract_typeId"]) 
 
-    const existingConfiguration = await Gratuity_configurationModel.findOne({
-        where: {
-          subsidiaryId: gratuity_configurationBody.subsidiaryId,
-          contract_typeId: gratuity_configurationBody.contract_typeId,
-            [Op.or]: [
-                { min_year: { [Op.between]: [min_year, max_year] } },
-                { max_year: { [Op.between]: [min_year, max_year] } },
-                { min_year: { [Op.lte]: min_year }, max_year: { [Op.gte]: max_year } }
-            ]
-        }
-    });
+    // Validate min is less than max
+    // if (max_year < min_year) {
+    //     let result={"message":'Min year must be less than To Max.',"status":"error"}
+    //     return result;   
+    // }
+
+    // const existingConfiguration = await Gratuity_configurationModel.findOne({
+    //     where: {
+    //       subsidiaryId: gratuity_configurationBody.subsidiaryId,
+    //       contract_typeId: gratuity_configurationBody.contract_typeId,
+    //         [Op.or]: [
+    //             { min_year: { [Op.between]: [min_year, max_year] } },
+    //             { max_year: { [Op.between]: [min_year, max_year] } },
+    //             { min_year: { [Op.lte]: min_year }, max_year: { [Op.gte]: max_year } }
+    //         ]
+    //     }
+    // });
+
+
 
     if (existingConfiguration) {
+      console.log("existingConfiguration",existingConfiguration)
    
-      let result={"message":'This Already exists. Save not allowed.',"status":"error"}
-        return result;
+      // let result={"message":'This Already exists. Save not allowed.',"status":"error"}
+        return existingConfiguration;
     }
    
     
