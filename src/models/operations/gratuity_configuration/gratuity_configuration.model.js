@@ -13,7 +13,7 @@ const Gratuity_configuration = sequelize.define('t_gratuity_configuration', {
 	contract_typeId: { type: Sequelize.INTEGER,allowNull: false },
 	basis_of_gratuityId: { type: Sequelize.INTEGER, allowNull: false },
    num_of_days: { type: Sequelize.INTEGER, allowNull: false },
-   gratuity_fraction: { type: Sequelize.DECIMAL, allowNull: false },
+   gratuity_fraction: { type: Sequelize.INTEGER, allowNull: false },
     min_year: { type: Sequelize.INTEGER, allowNull: false },
     max_year: { type: Sequelize.INTEGER, allowNull: false },
 
@@ -44,15 +44,6 @@ Gratuity_configuration.belongsTo(FormModel.FormModel, {
 	foreignKey: 'contract_typeId',
 	targetKey: 'Id',
 	as:"Contract_Type"
-  });
-
-
-
-
-  Gratuity_configuration.belongsTo(FormModel.FormModel, {
-	foreignKey: 'basis_of_gratuityId',
-	targetKey: 'Id', // Optional alias
-    as:"Basis_Of_Gratuity"
   });
 
 

@@ -50,7 +50,7 @@ const loan_type = require('./operations/loan_type/loan_type.route')
 const payroll_process_policy = require('./operations/payroll_process_policy/payroll_process_policy.route')
 const gratuity_configuration = require('./operations/gratuity_configuration/gratuity_configuration.route')
 
-
+const accrue_gratuity_configuration= require('./operations/accrue_gratuity_configuration/accrue_gratuity_configuration.route')
 const router = express.Router();
 
 const defaultRoutes = [
@@ -254,6 +254,10 @@ const defaultRoutes = [
   {
     path: "/gratuity_configuration",
     route: gratuity_configuration
+  },
+  {
+    path: "/accrue_gratuity_configuration",
+    route: accrue_gratuity_configuration
   },
 ];
 

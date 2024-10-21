@@ -61,7 +61,6 @@ const getAllgratuity_configuration= catchAsync(async (req, res) => {
 });
 
 const getgratuity_configurationById = catchAsync(async (req, res) => {
-  console.log("loan_management_configuration Controller getloan_management_configurationId")
   console.log(req.body)
   const Receipt = await Gratuity_configurationService.getgratuity_configurationById(req.body.Id);
   if (!Receipt) {
@@ -76,7 +75,7 @@ const getgratuity_configurationById = catchAsync(async (req, res) => {
 
 const updategratuity_configuration = catchAsync(async (req, res) => {
   console.log(req.body);
-  const loan_management_configuration = await loan_management_configurationService.loan_management_configurationService.updateloan_management_configurationById(req.body.Id, req.body, req.user.Id);
+  const loan_management_configuration = await Gratuity_configurationService.updategratuity_configurationById(req.body.Id, req.body, req.user.Id);
   
   
   if(loan_management_configuration.status=="error"){
@@ -108,7 +107,7 @@ const updategratuity_configuration = catchAsync(async (req, res) => {
 
 const deletegratuity_configuration = catchAsync(async (req, res) => {
   console.log("req.body.Id " ,req.body.Id)
-  const Receipt = await loan_management_configurationService.loan_management_configurationService.deleteloan_management_configurationById(req.body.Id);
+  const Receipt = await Gratuity_configurationService.deletegratuity_configurationById(req.body.Id);
   res.send({
     code: HttpStatusCodes.OK,
     message: HttpResponseMessages.OK,

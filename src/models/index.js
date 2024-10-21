@@ -96,4 +96,6 @@ module.exports.Loan_management_detailModel = require('./operations/loan_manageme
 
 //Gratuity_configuration Model
 module.exports.Gratuity_configurationModel = require('./operations/gratuity_configuration/gratuity_configuration.model');
+module.exports.accrue_gratuity_configurationModel = require('./operations/accrue_gratuity_configuration/accrue_gratuity_configuration');
+
 
