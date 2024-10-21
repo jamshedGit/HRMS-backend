@@ -1,13 +1,17 @@
 const httpStatus = require("http-status");
-const { LeaveManagementConfigurationModel, LeaveTypePoliciesModel, LeaveTypeSalaryDeductionPoliciesModel, EmployeeProfileModel, FormModel } = require("../../../models/index");
+const { LeaveManagementConfigurationModel, LeaveTypePoliciesModel, LeaveTypeSalaryDeductionPoliciesModel, FormModel } = require("../../../models/index");
 const ApiError = require("../../../utils/ApiError");
 const Sequelize = require('sequelize');
 const { paginationFacts, handleNestedData } = require("../../../utils/common");
 const pick = require("../../../utils/pick");
-const { leave_management_configuration, FORBIDDEN_CODES } = require("../../../models/operations/leave_management_configuration/enum/leave_management_configuration.enum");
 
 const Op = Sequelize.Op;
 
+/**
+ * Example of how Include data are sent to Leave Configuration Models
+ * Not being used. Just for example
+ * 
+ */
 const includeData = [
   {
     model: LeaveTypePoliciesModel
@@ -27,8 +31,8 @@ const includeData = [
     model: FormModel,
     as: 'grade'
   },
-
 ]
+
 //Include options required for Leave Management Configuration Table view
 const LeaveManagementConfigurationInclude = [
   {
