@@ -208,7 +208,7 @@ const updateaccrue_gratuity_configurationById = async (
  */
 
 const deleteaccrue_gratuity_configurationById = async (Id) => {
-  const Item = await getgratuity_configurationById(Id, {});
+  const Item = await getaccrue_gratuity_configurationById(Id, {});
 
   if (!Item) {
     throw new ApiError(httpStatus.NOT_FOUND, "Item not found");
