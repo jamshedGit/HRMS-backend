@@ -87,8 +87,7 @@ const sequelize = require('./config/db')
 	
 // Import the user model we have defined
 // const RoleModel = require('./models/setups/role.model')
-// const AccessModel = require('./models/setups/access.model')
-const { ResourceModel, RoleModel, AccessModel, AccessRightModel, UserModel, TokenModel } = require('./models');
+const { ResourceModel, RoleModel, AccessRightModel, UserModel, TokenModel } = require('./models');
 
 	
 // Create all the table defined using

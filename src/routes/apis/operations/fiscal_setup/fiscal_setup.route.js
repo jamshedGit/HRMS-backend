@@ -6,10 +6,10 @@ const itemValidation = require("../../../../validations/operations/entities/fisc
 
 const router = express.Router();
 
-router.route("/read-fiscal-setup").post(auth(), validate(itemValidation.createItem), form_controller.get_Payroll_Process_PolicyById);
-router.route("/read-all-fiscal-setup").post(auth(), validate(itemValidation.createItem), form_controller.getAll_Payroll_Process_Policy);
-router.route("/create-fiscal-setup").post(auth(), validate(itemValidation.createItem), form_controller.create_Payroll_Process_Policy);
-router.route("/update-fiscal-setup").put(auth(), form_controller.update_Payroll_Process_Policy);
-router.route("/delete-fiscal-setup").patch(auth(),form_controller.delete_Payroll_Process_Policy);
+router.route("/read-fiscal-setup").post(auth(), validate(itemValidation.createItem), form_controller.get_FiscalSetupById);
+router.route("/read-all-fiscal-setup").post(auth(), form_controller.getAll_FiscalSetup);
+router.route("/create-fiscal-setup").post(auth(), validate(itemValidation.createItem), form_controller.create_FiscalSetup);
+router.route("/update-fiscal-setup").put(auth(), form_controller.update_FiscalSetup);
+router.route("/delete-fiscal-setup").patch(auth(),form_controller.delete_FiscalSetup);
  
 module.exports = router;
