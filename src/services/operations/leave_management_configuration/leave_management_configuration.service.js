@@ -61,12 +61,13 @@ const leaveManagementConfigurationAttributes = [
  * @returns 
  */
 const createleaveManagementConfiguration = async (req) => {
-  const { leavetypePolicies, leaveTypeSalaryDeductionPolicies, ...payload } = req.body
-  const createdData = await LeaveManagementConfigurationModel.create(payload);
-  if (createdData) {
+  const { leavetypePolicies, leaveTypeSalaryDeductionPolicies, ...payload } = req.body //Seperate Policies data from Leave Configuration data
+  const createdData = await LeaveManagementConfigurationModel.create(payload);  //Create Leave Configuration Data
+  if (createdData) {  //If Leave Configuration is created then create the tables data
     const createdPolicyData = await LeaveTypePoliciesModel.bulkCreate(leavetypePolicies.map((el) => ({ ...el, leaveManagementConfigId: createdData.Id })))
     const createdSalaryDeductionData = await LeaveTypeSalaryDeductionPoliciesModel.bulkCreate(leaveTypeSalaryDeductionPolicies.map((el) => ({ ...el, leaveManagementConfigId: createdData.Id })))
   }
+  //Get data in Table view format to update table in UI
   return await getleaveManagementConfigurationData({ Id: createdData.Id }, leaveManagementConfigurationAttributes, LeaveManagementConfigurationInclude, true)
 };
 
@@ -84,14 +85,15 @@ const getAllleaveManagementConfiguration = async (req) => {
   const limit = options.pageSize;
   const offset = 0 + (options.pageNumber - 1) * limit;
   const queryFilters = [
-    { Name: Sequelize.where(Sequelize.fn('LOWER', Sequelize.col('formName')), 'LIKE', '%' + searchQuery + '%') },
+    { Name: Sequelize.where(Sequelize.fn('LOWER', Sequelize.col('formName')), 'LIKE', '%' + searchQuery + '%') }, //Filter data By subsidiary name
   ]
 
+  //Get all Leave Configuration data from DB with count for pagination
   const { count, rows } = await LeaveManagementConfigurationModel.findAndCountAll({
     order: [
       ['createdAt', 'DESC']
     ],
-    include: [
+    include: [  //Include Subsidiary, Employee Type, Grade from Their Tables
       {
         model: FormModel,
         attributes: [['formName', 'subsidiaryName']],
@@ -115,7 +117,7 @@ const getAllleaveManagementConfiguration = async (req) => {
     offset: offset,
     limit: limit,
   });
-  const updatedRows = handleNestedData(rows)
+  const updatedRows = handleNestedData(rows)  //Info of this function present in function declaration
   //Send paginated data
   return paginationFacts(count, limit, options.pageNumber, updatedRows);
 };
@@ -132,6 +134,14 @@ const getleaveManagementConfigurationById = async (id, options = null) => {
 };
 
 
+/**
+ * 
+ * Get Leave Configuration data For edit by filters provided in body.
+ * Filters can be either Id or by subsidiaryId, gradeId, employeeTypeId (all three should be present)
+ * 
+ * @param {Object} body 
+ * @returns 
+ */
 const getleaveManagementConfigurationByForEdit = async (body) => {
   if (body) {
     const data = await getleaveManagementConfigurationData(
@@ -149,23 +159,26 @@ const getleaveManagementConfigurationByForEdit = async (body) => {
       ]
     )
     if(!data){
-      return null;
+      return null;  //If we don't get any data then return null
     }
-    const{t_leave_type_policies, t_leave_type_salary_deduction_policies, ...rest} = data.dataValues;
+    const{t_leave_type_policies, t_leave_type_salary_deduction_policies, ...rest} = data.dataValues;  //Seperate Table values from the returned data and change their keys for frontend handling
     rest.leavetypePolicies = t_leave_type_policies || [];
     rest.leaveTypeSalaryDeductionPolicies = t_leave_type_salary_deduction_policies || [];
-    rest.weekend = JSON.parse(rest.weekend || '[]')
-
-    return rest
+    rest.weekend = JSON.parse(rest.weekend || '[]');  //We get weekend data stringified from Db so we parse it before sending it to Frontend
+    
+    return rest;  //return processed data
   }
 };
 
 
 /**
  * 
+ * Common function to Get Data from Configuration Table will provided filters, attributes, and include tables
+ * 
  * @param {Object} filters filtering Options
  * @param {Array} attributes Keys wanted in return (If null then will return all keys)
  * @param {Array} include  Get data of different table with foreign key relation
+ * @param {Boolean} handleNested If present true then return data from DB will be sent to handleNestedData function (function details present function declaration)
  * @returns 
  */
 const getleaveManagementConfigurationData = async (filters, attributes = null, include = null, handleNested = false) => {
@@ -196,11 +209,13 @@ const getleaveManagementConfigurationData = async (filters, attributes = null, i
  * @returns 
  */
 const updateleaveManagementConfigurationById = async (body, updatedBy) => {
-  const { leavetypePolicies, leaveTypeSalaryDeductionPolicies, ...payload } = body
-  oldRecord = await getleaveManagementConfigurationById(payload.Id)
+  const { leavetypePolicies, leaveTypeSalaryDeductionPolicies, ...payload } = body  //Seperate Policies data from Leave Configuration data
+  oldRecord = await getleaveManagementConfigurationById(payload.Id) // Get Old Data By Id
   body.updatedBy = updatedBy;
-  Object.assign(oldRecord, payload);
+  Object.assign(oldRecord, payload);  //Update Old Data with New Data
   const updatedData = await oldRecord.save();
+
+  //If Configuration data is updated then upsert Table data into Leave Type Policies and Leave Type Salary Deductions policies table
   if (updatedData) {
     leavetypePolicies.forEach(element => {
       element.updatedBy = updatedBy;
@@ -212,6 +227,7 @@ const updateleaveManagementConfigurationById = async (body, updatedBy) => {
       LeaveTypeSalaryDeductionPoliciesModel.upsert({ ...element, leaveManagementConfigId: updatedData.Id })
     });
   }
+  //Get data in Table view format to update table in UI
   return await getleaveManagementConfigurationData({ Id: updatedData.Id }, leaveManagementConfigurationAttributes, LeaveManagementConfigurationInclude, true);
 };
 
