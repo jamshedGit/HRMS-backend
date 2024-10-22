@@ -2,7 +2,7 @@ const Sequelize = require('sequelize');
 
 //import Database connection configurations.
 const sequelize = require('../../../config/db');
-const { EmployeeProfileModel, LeaveTypeModel } = require('../..');
+const { EmployeeProfileModel, LeaveTypeModel, CompanyModel, SubsidiaryModel } = require('../..');
 
 const leaveApplicationModel = sequelize.define('t_leave_application', {
 	Id: {
@@ -19,6 +19,7 @@ const leaveApplicationModel = sequelize.define('t_leave_application', {
 		type: Sequelize.INTEGER,
 		allowNull: false
 	},
+	days: { type: Sequelize.INTEGER, allowNull: false },
 	remarks: { type: Sequelize.STRING, allowNull: true },
 	file: { type: Sequelize.STRING, allowNull: true },
 	isActive: { type: Sequelize.BOOLEAN, allowNull: true, defaultValue: 1 },
@@ -51,5 +52,24 @@ leaveApplicationModel.belongsTo(LeaveTypeModel, {
 	onDelete: 'CASCADE',
 	onUpdate: 'CASCADE',
 });
+
+// Association with SubsidiaryModel model (subsidiaryId is a foreign key)
+SubsidiaryModel.hasMany(leaveApplicationModel, { foreignKey: 'subsidiaryId' });
+leaveApplicationModel.belongsTo(SubsidiaryModel, {
+	foreignKey: 'subsidiaryId',
+	targetKey: 'Id',  // Assuming 'Id' is the primary key in SubsidiaryModel table
+	onDelete: 'CASCADE',
+	onUpdate: 'CASCADE',
+});
+
+// Association with CompanyModel model (companyId is a foreign key)
+CompanyModel.hasMany(leaveApplicationModel, { foreignKey: 'subsidiaryId' });
+leaveApplicationModel.belongsTo(CompanyModel, {
+	foreignKey: 'companyId',
+	targetKey: 'Id',  // Assuming 'Id' is the primary key in CompanyModel table
+	onDelete: 'CASCADE',
+	onUpdate: 'CASCADE',
+});
+
 
 module.exports = leaveApplicationModel;

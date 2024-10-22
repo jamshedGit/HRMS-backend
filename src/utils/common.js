@@ -1,5 +1,5 @@
 const moment = require('moment');
-const {format} = require('date-fns');
+const { format, differenceInDays, addDays } = require('date-fns');
 
 const getRouteSlugs = (req) => {
   const route = req.originalUrl
@@ -114,33 +114,71 @@ const getPathStorageFromUrl = (url) => {
  * @returns 
  */
 const handleNestedData = (data) => {
-  if (Array.isArray(data)) {
-    data.forEach((el) => {
-      Object.keys(el?.dataValues).forEach((keys) => {
-        if (el.dataValues[keys] && typeof el.dataValues[keys] == 'object') {
-          Object.entries(el.dataValues[keys]?.dataValues || {}).forEach((val) => {
-            el.dataValues[val[0]] = val[1];
+  const sortedData = JSON.parse(JSON.stringify(data))
+  if (Array.isArray(sortedData)) {
+    sortedData.forEach((el) => {
+      Object.keys(el).forEach((keys) => {
+        if (el[keys] && typeof el[keys] == 'object') {
+          Object.entries(el[keys] || {}).forEach((val) => {
+            el[val[0]] = val[1];
           })
         }
       })
     })
-    return data;
+    return sortedData;
   }
   else {
-    Object.keys(data.dataValues).forEach((keys) => {
-      if (data.dataValues[keys] && typeof data.dataValues[keys] == 'object') {
-        Object.entries(data.dataValues[keys].dataValues).forEach((val) => {
-          data.dataValues[val[0]] = val[1];
+    Object.keys(sortedData).forEach((keys) => {
+      console.log('::::::data[keys]::::', keys, typeof sortedData[keys]);
+      if (sortedData[keys] && typeof sortedData[keys] == 'object') {
+
+        Object.entries(sortedData[keys] || {}).forEach((val) => {
+          sortedData[val[0]] = val[1];
         })
       }
     })
-    return data;
+    return sortedData;
   }
 }
 
+/**
+ * 
+ * function to return formatted date
+ * 
+ * @param {Date|String} date 
+ * @param {String} dateFormat 
+ * @returns 
+ */
 const formatDates = (date, dateFormat = null) => {
-    return format(new Date(date), dateFormat || 'MM/dd/yyyy')
+  return format(new Date(date), dateFormat || 'MM/dd/yyyy')
+}
+
+/**
+ * 
+ * Get Diff in days between two provided dates
+ * 
+ * @param {Date|String} startDate 
+ * @param {Date|String} endDate 
+ * @returns 
+ */
+const getDateDiffInDays = (startDate, endDate) => {
+  if (startDate && endDate) {
+    return differenceInDays(new Date(endDate), new Date(startDate)) + 1;
+  }
+  return 0;
+}
+
+/**
+ * 
+ * Add provided number of days in provided date
+ * 
+ * @param {Date|string} startDate 
+ * @param {Number} days 
+ * @returns 
+ */
+const addDaysInDate = (startDate, days = 0) => {
+  return new Date(addDays(new Date(startDate), days))
 }
 
 
-module.exports = { handleNestedData, getRouteSlugs, getDdlItems, getAlarmTimesItems, customPaginate, paginationFacts, createDatetime, getPathStorageFromUrl, formatDates };
+module.exports = { handleNestedData, getRouteSlugs, getDdlItems, getAlarmTimesItems, customPaginate, paginationFacts, createDatetime, getPathStorageFromUrl, formatDates, getDateDiffInDays, addDaysInDate };

@@ -23,7 +23,13 @@ const updateItem = {
   query: Joi.disallow(),
   params: Joi.disallow(),
   body: Joi.object().keys({
-    Id: Joi.number().required()
+    Id: Joi.number().required(),
+    employeeId: Joi.number().optional(),
+    from: Joi.date().optional(),
+    to: Joi.date().optional(),
+    leaveType: Joi.number().optional(),
+    remarks: Joi.string().optional(),
+    file: Joi.number().optional(),
   }),
 };
 
@@ -45,6 +51,7 @@ const getAllItem = {
   query: Joi.disallow(),
   params: Joi.disallow(),
   body: Joi.object().keys({
+    employeeId: Joi.number().required(),
     sortOrder: Joi.string().required(),
     pageSize: Joi.number().required(),
     pageNumber: Joi.number().required(),
