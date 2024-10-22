@@ -4,6 +4,8 @@ module.exports.AccessRightModel = require('./settings/accessRight.model');
 module.exports.CountryModel = require('./operations/entities/countries.model');
 module.exports.CityModel = require('./operations/entities/cities.model');
 module.exports.StatusTypeModel = require('./operations/entities/status.model');
+module.exports.CompanyModel = require('./operations/company/company.model');
+module.exports.SubsidiaryModel = require('./operations/subsidiary/subsidiary.model');
 // Setups
 module.exports.UserModel = require('./user.model');
 module.exports.TokenModel = require('./token.model');
