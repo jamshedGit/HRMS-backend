@@ -46,3 +46,4 @@ module.exports.OneTimeEarningService = require('./operations/onetime_allowance/o
 module.exports.LoanTypeService = require('./operations/loan_type/loan_type.service')
 module.exports.PayrollProcessPolicy = require('./operations/payroll_process_policy/payroll_process_policy.service')
 module.exports.LeaveManagementConfigurationService = require('./operations/leave_management_configuration/leave_management_configuration.service')
+module.exports.LeaveApplicationServicePage = require('./operations/leave_application/leave_application.service')

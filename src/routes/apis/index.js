@@ -46,6 +46,7 @@ const onetime_earning = require('./operations/onetime_allowance/onetime_allowanc
 const loan_type = require('./operations/loan_type/loan_type.route')
 const payroll_process_policy = require('./operations/payroll_process_policy/payroll_process_policy.route')
 const leave_management_configuration = require('./operations/leave_management_configuration/leave_management_configuration.route')
+const leave_application = require('./operations/leave_application/leave_application.route')
 
 
 const router = express.Router();
@@ -237,6 +238,10 @@ const defaultRoutes = [
   {
     path: "/leave_management_configuration",
     route: leave_management_configuration
+  },
+  {
+    path: "/leave_application",
+    route: leave_application
   }
 ];
 
