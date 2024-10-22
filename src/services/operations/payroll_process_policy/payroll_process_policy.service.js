@@ -1,6 +1,6 @@
 const httpStatus = require("http-status");
 const axios = require("axios")
-const  FiscalSetupModel  = require("../../../models/index");
+const { PayrollPolicyModel, PayrollEmailRecipentModel, PayrollEOBIAllowancesModel, PayrollBankInfoPolicy } = require("../../../models/index");
 const ApiError = require("../../../utils/ApiError");
 const sequelize = require("../../../config/db");
 const Sequelize = require('sequelize');
@@ -12,20 +12,47 @@ const fns = require('date-fns')
 const Op = Sequelize.Op;
 /**
  * Create a Item
- * @param {Object} FiscalSetupBody
- * @returns {Promise<FiscalSetup>}
+ * @param {Object} payollBodyObj
+ * @returns {Promise<PayrollPolicy>}
  */
-const createFiscalSetup = async (req, FiscalSetupBody) => {
-    console.log("FiscalSetup Body", FiscalSetupBody)
-  // FiscalSetupBody.slug = FiscalSetupBody.name.replace(/ /g, "-").toLowerCase();
-  console.log(req.user.id);
-  FiscalSetupBody.createdBy = req.user.id;
-  console.log(FiscalSetupBody,"body");
-  const resp = await sequelize.query(' update t_Fiscal_setup set isActive = 0');
+const createPayrollPolicy = async (req, payollBodyObj) => {
+console.log("::gg::",payollBodyObj)
+  payollBodyObj.createdBy = req.user.id;
 
-  const addedFiscalSetupObj = await FiscalSetupModel.FiscalSetupModel.create(FiscalSetupBody);
-  //authSMSSend(addedFiscalSetupObj.dataValues);  // Quick send message at the time of donation
-  return addedFiscalSetupObj;
+  const addedPayrollPolicyObj = await PayrollPolicyModel.create(payollBodyObj.body);
+
+  const emailRecipentObj = []
+  const listEOBIAllowancesObj = []
+
+  /// For Insert Employee sending email ID's
+  payollBodyObj.emailRecipentList.forEach(element => {
+
+    emailRecipentObj.push({
+      subsidiaryId: payollBodyObj.body.subsidiaryId,
+      companyId: payollBodyObj.body.companyId || 1,
+      payrollConfigurationId: addedPayrollPolicyObj.Id,
+      employeeId: element,
+      email_sender_Id: addedPayrollPolicyObj.sender_emailId
+    })
+
+  });
+
+  const emailRecipentResponse = await PayrollEmailRecipentModel.bulkCreate(emailRecipentObj);
+  // --- END
+  // this method used for bulk inserting employee eobi Allowances
+  payollBodyObj.eobiAllowancesList.forEach(element => {
+    listEOBIAllowancesObj.push({
+      subsidiaryId: payollBodyObj.body.subsidiaryId,
+      companyId: payollBodyObj.body.companyId || 1,
+      payrollConfigurationId: addedPayrollPolicyObj.Id,
+      earningId: element,
+    })
+  });
+
+  const eobiAllowanceResp = await PayrollEOBIAllowancesModel.bulkCreate(listEOBIAllowancesObj);
+  const payroll_bankInfoPolicy = await PayrollBankInfoPolicy.bulkCreate(payollBodyObj.bankInfoList);
+
+  return addedPayrollPolicyObj;
 };
 
 
@@ -39,18 +66,18 @@ const createFiscalSetup = async (req, FiscalSetupBody) => {
  * @param {number} [options.page] - Current page (default = 1)
  * @returns {Promise<QueryResult>}
  */
-const queryFiscalSetups = async (filter, options, searchQuery) => {
-  
+const queryPayrollPolicy = async (filter, options, searchQuery) => {
+
   let limit = options.pageSize;
   let offset = 0 + (options.pageNumber - 1) * limit;
-  
+
   searchQuery = searchQuery.toLowerCase();
   const queryFilters = [
-    { Name: Sequelize.where(Sequelize.fn('LOWER', Sequelize.col('startDate')), 'LIKE', '%' + searchQuery + '%') },
+    { Name: Sequelize.where(Sequelize.fn('LOWER', Sequelize.col('subsidiaryId')), 'LIKE', '%' + searchQuery + '%') },
   ]
 
 
-  const { count, rows } = await FiscalSetupModel.FiscalSetupModel.findAndCountAll({
+  const { count, rows } = await PayrollPolicyModel.findAndCountAll({
     order: [
       ['createdAt', 'DESC']
     ],
@@ -64,7 +91,7 @@ const queryFiscalSetups = async (filter, options, searchQuery) => {
 
 
   return paginationFacts(count, limit, options.pageNumber, rows);
-  
+
 };
 
 /**
@@ -72,8 +99,8 @@ const queryFiscalSetups = async (filter, options, searchQuery) => {
  * @param {ObjectId} id
  * @returns {Promise<ReceiptModel>}
  */
-const getFiscalSetupById = async (id) => {
-  return FiscalSetupModel.FiscalSetupModel.findByPk(id);
+const getPayrollPolicyById = async (id) => {
+  return PayrollPolicyModel.findByPk(id);
 };
 
 
@@ -84,9 +111,9 @@ const getFiscalSetupById = async (id) => {
  * @param {Object} updateBody
  * @returns {Promise<ReceiptModel>}
  */
-const updateFiscalSetupById = async (Id, updateBody, updatedBy) => {
-  console.log("tool",Id, updateBody, updatedBy)
-  const Item = await getFiscalSetupById(Id);
+const updatePayrollPolicyById = async (Id, updateBody, updatedBy) => {
+  console.log("tool", Id, updateBody, updatedBy)
+  const Item = await getPayrollPolicyById(Id);
   if (!Item) {
     throw new ApiError(httpStatus.NOT_FOUND, "record not found");
   }
@@ -96,7 +123,7 @@ const updateFiscalSetupById = async (Id, updateBody, updatedBy) => {
   delete updateBody.id;
   Object.assign(Item, updateBody);
   await Item.save();
-  return  ;
+  return;
 };
 
 /**
@@ -104,9 +131,9 @@ const updateFiscalSetupById = async (Id, updateBody, updatedBy) => {
  * @param {ObjectId} Id
  * @returns {Promise<ReceiptModel>}
  */
-  const deleteFiscalSetupById = async (Id) => {
+const deletePayrollPolicyById = async (Id) => {
 
-  const Item = await getFiscalSetupById(Id);
+  const Item = await getPayrollPolicyById(Id);
   if (!Item) {
     throw new ApiError(httpStatus.NOT_FOUND, "Item not found");
   }
@@ -117,9 +144,9 @@ const updateFiscalSetupById = async (Id, updateBody, updatedBy) => {
 
 
 module.exports = {
-  createFiscalSetup,
-  queryFiscalSetups,
-  getFiscalSetupById,
-  updateFiscalSetupById,
-  deleteFiscalSetupById
+  createPayrollPolicy,
+  queryPayrollPolicy,
+  getPayrollPolicyById,
+  updatePayrollPolicyById,
+  deletePayrollPolicyById
 };

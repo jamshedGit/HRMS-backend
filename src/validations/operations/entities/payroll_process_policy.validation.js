@@ -48,7 +48,10 @@ const createItem = {
     isIncludeBasic : Joi.disallow(),
     eobi_employeer_value_in_percent : Joi.disallow(),
     eobi_employee_value_in_percent : Joi.disallow(),
-
+    emailRecipentList : Joi.disallow(),
+    eobiAllowancesList: Joi.disallow(),
+    body: Joi.object().disallow(),
+    bankInfoList: Joi.disallow(),
   }),
 };
 
