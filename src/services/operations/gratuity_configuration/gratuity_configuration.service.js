@@ -171,7 +171,7 @@ const updategratuity_configurationById = async (Id, updateBody, updatedBy) => {
 
   if (min_year >= max_year) {
     let result = {
-      message: "From Amount must be less than To Amount",
+      message: "Min year must be less than To Max year",
       status: "error",
     };
     return result;
