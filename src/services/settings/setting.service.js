@@ -145,7 +145,7 @@ const getFormMenusMasterData = async (req, res) => {
   }));
   console.log("getFormMenusMasterData ",FormMenusMasterData)
   if (FormMenusMasterData.length > 0) {
-    FormMenusMasterData.unshift({ label: '--Select--', value: null,code:null})
+    FormMenusMasterData.unshift({ label: '--Select--', value: null,code:null,mergeLabel:"--Select--"})
   }
   console.log("Dropdown", FormMenusMasterData);
   return FormMenusMasterData
