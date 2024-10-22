@@ -66,7 +66,7 @@ LeaveManagementConfigurationModel.init(
   }
 );
 
-// Association with EmployeeProfileModel model (subsidiaryId is a foreign key)
+// Association with FormModel model (subsidiaryId is a foreign key)
 LeaveManagementConfigurationModel.belongsTo(FormModel, {
   foreignKey: 'subsidiaryId',
   targetKey: 'Id',  // Assuming 'Id' is the primary key in LeaveType table

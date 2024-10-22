@@ -92,3 +92,9 @@ module.exports.LeaveTypePoliciesModel = require('./operations/leave_type_policie
 
 //Leave Type Salary Deduction Policies Model
 module.exports.LeaveTypeSalaryDeductionPoliciesModel = require('./operations/leave_type_salary_deduction_policies/leave_type_salary_deduction_policies.model');
+
+//Leave Application Model
+module.exports.LeaveApplicationModel = require('./operations/leave_application/leave_application.model');
+
+//Leave Application Detail Model
+module.exports.LeaveApplicationDetailModel = require('./operations/leave_application_detail/leave_application_detail.model');

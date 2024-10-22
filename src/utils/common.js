@@ -1,4 +1,5 @@
 const moment = require('moment');
+const {format} = require('date-fns');
 
 const getRouteSlugs = (req) => {
   const route = req.originalUrl
@@ -137,5 +138,9 @@ const handleNestedData = (data) => {
   }
 }
 
+const formatDates = (date, dateFormat = null) => {
+    return format(new Date(date), dateFormat || 'MM/dd/yyyy')
+}
 
-module.exports = { handleNestedData, getRouteSlugs, getDdlItems, getAlarmTimesItems, customPaginate, paginationFacts, createDatetime, getPathStorageFromUrl };
+
+module.exports = { handleNestedData, getRouteSlugs, getDdlItems, getAlarmTimesItems, customPaginate, paginationFacts, createDatetime, getPathStorageFromUrl, formatDates };
