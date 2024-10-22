@@ -51,6 +51,9 @@ const payroll_process_policy = require('./operations/payroll_process_policy/payr
 const gratuity_configuration = require('./operations/gratuity_configuration/gratuity_configuration.route')
 
 const accrue_gratuity_configuration= require('./operations/accrue_gratuity_configuration/accrue_gratuity_configuration.route')
+const reimbursement_configuration=require('./operations/reimbursement_configuration/reimbursement_configuration.route')
+
+
 const router = express.Router();
 
 const defaultRoutes = [
@@ -259,6 +262,12 @@ const defaultRoutes = [
     path: "/accrue_gratuity_configuration",
     route: accrue_gratuity_configuration
   },
+  {
+    path: "/reimbursement_configuration",
+    route: reimbursement_configuration
+  },
+
+
 ];
 
 const devRoutes = [

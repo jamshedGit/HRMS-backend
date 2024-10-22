@@ -87,8 +87,9 @@ const sequelize = require('./config/db')
 	
 // Import the user model we have defined
 // const RoleModel = require('./models/setups/role.model')
-const { ResourceModel, RoleModel, AccessRightModel, UserModel, TokenModel,Loan_management_configurationModel,Loan_management_detailModel,Gratuity_configurationModel,accrue_gratuity_configurationModel } = require('./models');
+const { ResourceModel, RoleModel, AccessRightModel, UserModel, TokenModel,Loan_management_configurationModel,Loan_management_detailModel,Gratuity_configurationModel,accrue_gratuity_configurationModel,Reimbursement_configurationModel} = require('./models');
 
+Reimbursement_configurationModel.sync({ force: true });
 // accrue_gratuity_configurationModel.sync({ force: true });
 // Gratuity_configurationModel.sync({ force: true });
 // Loan_management_configurationModel.sync({ force: true });
@@ -101,7 +102,7 @@ const { ResourceModel, RoleModel, AccessRightModel, UserModel, TokenModel,Loan_m
 	
 // Sync all models that are not
 // already in the database
-sequelize.sync()
+// sequelize.sync()
 	
 // Force sync all models
 // It will drop the table first

@@ -49,3 +49,4 @@ module.exports.LoanTypeService = require('./operations/loan_type/loan_type.servi
 module.exports.PayrollProcessPolicy = require('./operations/payroll_process_policy/payroll_process_policy.service')
 module.exports.Gratuity_configurationService = require('./operations/gratuity_configuration/gratuity_configuration.service')
 module.exports.accrue_gratuity_configurationService = require('./operations/accure_gratuity_configuration/accure_gratuity_configuration.service')
+module.exports.reimbursement_configurationService=require("./operations/reimbursement_configuration/reimbursement_configuration.service")
