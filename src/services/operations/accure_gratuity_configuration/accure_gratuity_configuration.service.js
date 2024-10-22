@@ -197,7 +197,7 @@ const updateaccrue_gratuity_configurationById = async (
     delete updateBody.id;
     Object.assign(Item, updateBody);
     await Item.save();
-    return;
+    return Item;
   }
 };
 

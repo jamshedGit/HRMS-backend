@@ -77,7 +77,7 @@ const updateaccrue_gratuity_configuration = catchAsync(async (req, res) => {
     console.log(req.body);
     const accrue_gratuity_configuration = await accrue_gratuity_configurationService.updateaccrue_gratuity_configurationById(req.body.Id, req.body, req.user.Id);
 
-
+console.log("updated status",accrue_gratuity_configuration)
     if (accrue_gratuity_configuration.status == "error") {
 
         res.status(HttpStatusCodes.INTERNAL_SERVER_ERROR).send({
