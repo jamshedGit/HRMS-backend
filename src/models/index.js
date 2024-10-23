@@ -101,3 +101,5 @@ module.exports.Gratuity_configurationModel = require('./operations/gratuity_conf
 module.exports.accrue_gratuity_configurationModel = require('./operations/accrue_gratuity_configuration/accrue_gratuity_configuration');
 
 module.exports.Reimbursement_configurationModel=require("./operations/reimbursement_configuration/reimbursement_configuration.model")
+module.exports.Reimbursement_policies_detailModel=require("./operations/reimbursement_configuration/reimbursement_policies_detail.model")
+module.exports.Policies_grade_detailModel=require("./operations/reimbursement_configuration/policies_grade_detail.model")

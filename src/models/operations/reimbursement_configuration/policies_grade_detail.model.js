@@ -1,6 +1,5 @@
 const Sequelize = require("sequelize");
-const { ResourceModel } = require("../..");
-const { Reimbursement_policies_detail } = require("../../index");
+const { Reimbursement_policies_detailModel } = require("../../index");
 const { FormModel } = require("../../index");
 //import Database connection configurations.
 const sequelize = require("../../../config/db");
@@ -35,12 +34,12 @@ const Policies_grade_detail = sequelize.define(
   }
 );
 
-Policies_grade_detail.belongsTo(Reimbursement_policies_detail, {
+Policies_grade_detail.belongsTo(Reimbursement_policies_detailModel, {
   foreignKey: "reimbursement_policies_detailId",
   targetKey: "Id", // Optional alias
 });
 
-Reimbursement_policies_detail.hasMany(Policies_grade_detail, {
+Reimbursement_policies_detailModel.hasMany(Policies_grade_detail, {
   as: "policies",
   foreignKey: "reimbursement_configurationId",
 });

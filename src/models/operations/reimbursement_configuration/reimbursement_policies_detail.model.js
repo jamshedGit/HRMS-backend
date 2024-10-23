@@ -1,5 +1,4 @@
 const Sequelize = require("sequelize");
-const { ResourceModel } = require("../..");
 const { Reimbursement_configurationModel } = require("../../index");
 const { FormModel } = require("../../index");
 //import Database connection configurations.
@@ -41,7 +40,7 @@ const Reimbursement_policies_detail = sequelize.define(
 
 Reimbursement_policies_detail.belongsTo(Reimbursement_configurationModel, {
   foreignKey: "reimbursement_configurationId",
-  targetKey: "Id", // Optional alias
+ 
 });
 
 Reimbursement_configurationModel.hasMany(Reimbursement_policies_detail, {
@@ -49,11 +48,6 @@ Reimbursement_configurationModel.hasMany(Reimbursement_policies_detail, {
   foreignKey: "reimbursement_configurationId",
 });
 
-Reimbursement_policies_detail.belongsTo(FormModel, {
-  foreignKey: "reimbursement_typeId",
-  targetKey: "Id",
-  as: "reimbursement_type",
-});
 
 Reimbursement_policies_detail.belongsTo(FormModel, {
   foreignKey: "reimbursement_typeId",

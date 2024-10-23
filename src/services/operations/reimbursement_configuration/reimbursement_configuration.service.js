@@ -1,5 +1,5 @@
 const httpStatus = require("http-status");
-const { Reimbursement_configurationModel } = require("../../../models/index");
+const { Reimbursement_configurationModel,Reimbursement_policies_detailModel } = require("../../../models/index");
 const { FormModel } = require("../../../models/index");
 
 const ApiError = require("../../../utils/ApiError");
@@ -9,14 +9,90 @@ const { HttpStatusCodes } = require("../../../utils/constants");
 
 const Op = Sequelize.Op;
 
-const createreimbursement_configuration = async (
-  req,
-  reimbursement_configurationBody
-) => {
+
+
+
+// const createreimbursement_configuration = async (
+//   req,
+//   reimbursement_configurationBody
+// ) => {
+//   try {
+//     console.log("createreimbursement_configuration 1");
+//     const subsidiaryExists = await Reimbursement_configurationModel.findOne({
+//       where: { subsidiaryId: reimbursement_configurationBody.subsidiaryId,payroll_groupId:reimbursement_configurationBody.payroll_groupId },
+//     });
+
+//     if (subsidiaryExists) {
+//       return {
+//         message: "Already Exist",
+//         status: "error",
+//       };
+//     }
+
+//     reimbursement_configurationBody.createdBy = req.user.id;
+//     const addedreimbursement_configurationObj =
+//       await Reimbursement_configurationModel.create(
+//         reimbursement_configurationBody
+//       );
+
+
+//       if (
+//         addedreimbursement_configurationObj &&
+//         addedreimbursement_configurationObj.Id &&
+//         addedreimbursement_configurationObj.policies &&
+//         Array.isArray(addedreimbursement_configurationObj.policies)
+//       ) {
+//         const reimbursementDetails = addedreimbursement_configurationObj.details.map(
+//           (detail) => ({
+//             ...detail,
+//             reimbursement_configuratioId:
+//             addedreimbursement_configurationObj.Id, // Associate with the configuration ID
+//           })
+//         );
+  
+//         for (const detail of reimbursementDetails) {
+//           await Reimbursement_configurationModel.create(
+//             detail
+//           );
+//         }
+//       }
+
+//     const result = await Reimbursement_configurationModel.findByPk(
+//       addedreimbursement_configurationObj.Id,
+//       {
+//         include: [
+//           {
+//             model: FormModel,
+//             attributes: ["formName", "formCode"],
+//             as: "Subsidiary",
+//           },
+//           {
+//             model: FormModel,
+//             attributes: ["formName", "formCode"],
+//             as: "PayrollGroup",
+//           },
+       
+//         ],
+//       }
+//     );
+
+//     return result;
+//   } catch (error) {
+//     console.error("Error creating gratuity configuration:", error);
+//     throw error; // Rethrow or handle the error as needed
+//   }
+// };
+
+const createreimbursement_configuration = async (req, reimbursement_configurationBody) => {
   try {
-    console.log("createreimbursement_configuration 1");
+    console.log("Creating reimbursement configuration...");
+
+    // Check if the parent configuration already exists
     const subsidiaryExists = await Reimbursement_configurationModel.findOne({
-      where: { subsidiaryId: reimbursement_configurationBody.subsidiaryId,payroll_groupId:reimbursement_configurationBody.payroll_groupId },
+      where: {
+        subsidiaryId: reimbursement_configurationBody.subsidiaryId,
+        payroll_groupId: reimbursement_configurationBody.payroll_groupId,
+      },
     });
 
     if (subsidiaryExists) {
@@ -26,14 +102,35 @@ const createreimbursement_configuration = async (
       };
     }
 
+    // Set createdBy field
     reimbursement_configurationBody.createdBy = req.user.id;
-    const addedreimbursement_configurationObj =
-      await Reimbursement_configurationModel.create(
-        reimbursement_configurationBody
-      );
 
+    // Create the parent reimbursement configuration
+    const addedReimbursementConfiguration = await Reimbursement_configurationModel.create(
+      reimbursement_configurationBody
+    );
+
+    // Check if there are details to add
+    if (reimbursement_configurationBody.policies && Array.isArray(reimbursement_configurationBody.policies)) {
+      for (const policy of reimbursement_configurationBody.policies) {
+        policy.reimbursement_configurationId = addedReimbursementConfiguration.Id; // Associate with the parent ID
+
+        // Create child records
+        const addedPolicy = await Reimbursement_policies_detailModel.create(policy);
+
+        // Check for grandchild records
+        if (policy.gradeDetails && Array.isArray(policy.gradeDetails)) {
+          for (const gradeDetail of policy.gradeDetails) {
+            gradeDetail.reimbursement_policies_detailId = addedPolicy.Id; // Associate with the child ID
+            await Policies_grade_detailModel.create(gradeDetail);
+          }
+        }
+      }
+    }
+
+    // Fetch and return the created configuration with associated models
     const result = await Reimbursement_configurationModel.findByPk(
-      addedreimbursement_configurationObj.Id,
+      addedReimbursementConfiguration.Id,
       {
         include: [
           {
@@ -46,17 +143,38 @@ const createreimbursement_configuration = async (
             attributes: ["formName", "formCode"],
             as: "PayrollGroup",
           },
-       
+          {
+            model: Reimbursement_policies_detailModel,
+            as: "policies",
+            include: [
+              {
+                model: Policies_grade_detailModel,
+                as: "gradeDetails",
+                include: [
+                  {
+                    model: FormModel,
+                    as: "salary_grade",
+                    attributes: ["formName", "formCode"],
+                  },
+                ],
+              },
+            ],
+          },
         ],
       }
     );
 
     return result;
   } catch (error) {
-    console.error("Error creating gratuity configuration:", error);
+    console.error("Error creating reimbursement configuration:", error);
     throw error; // Rethrow or handle the error as needed
   }
 };
+
+
+
+
+
 
 /**
  * Query for Items
