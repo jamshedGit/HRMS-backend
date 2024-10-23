@@ -13,8 +13,10 @@ module.exports.TokenModel = require('./token.model');
 module.exports.BankModel = require('./operations/banks/bank.model');
 //Exit Model
 module.exports.exitModel = require('./operations/exit/exit.model');
-//Salarypolicy Model
-module.exports.salarypolicyModel = require('./operations/salarypolicy/salarypolicy.model');
+
+
+
+
 //Bank Model
 module.exports.BranchModel = require('./operations/branch/branch.model');
 //Department Model
@@ -79,9 +81,23 @@ module.exports.PayrollMonthModel = require('./operations/payroll_month_setup/pay
 module.exports.LeaveTypeModel = require('./operations/leave_type/leave_type.model');
 //PayrollMonthModel Setup 
 module.exports.FinalSettlementModel = require('./operations/final_settlement_policy/final_settlement_policy.model');
-//Salarypolicy Model
-module.exports.salarypolicyModel = require('./operations/salarypolicy/salarypolicy.model');
+
 //OneTimeAllowance Model
 module.exports.OneTimeAllowance = require('./operations/onetime_allowance/onetime_allowance.model');
 //LoanTypeModel Model
 module.exports.LoanTypeModel = require('./operations/loan_type/loan_type.model');
+//Loan Management Configuration Model
+
+//Tax Slab Model
+module.exports.Tax_slabModel = require('./operations/tax_slab/tax_slab.model');
+//Salarypolicy Model
+module.exports.salarypolicyModel = require('./operations/salarypolicy/salarypolicy.model');
+//Loan_management_configuration Model
+module.exports.Loan_management_configurationModel = require('./operations/loan_management_configuration/loan_management_configuration.model');
+module.exports.Loan_management_detailModel = require('./operations/loan_management_configuration/loan_management_detail');
+
+//Gratuity_configuration Model
+module.exports.Gratuity_configurationModel = require('./operations/gratuity_configuration/gratuity_configuration.model');
+module.exports.accrue_gratuity_configurationModel = require('./operations/accrue_gratuity_configuration/accrue_gratuity_configuration');
+
+

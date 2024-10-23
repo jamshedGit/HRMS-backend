@@ -6,6 +6,8 @@ const docsRoute = require("./docs.route");
 const config = require("../../config/config");
 const bank = require('./operations/banks/bank.route')
 const exit = require('./operations/exit/exit.route')
+
+const tax_slab = require('./operations/tax_slab/tax_slab.route')
 const branch = require('./operations/branch/branch.route')
 const department = require('./operations/department/dept.route')
 const emptype = require('./operations/employeeType/employeeType.route')
@@ -36,17 +38,19 @@ const salary_revision = require('./operations/employee_salary_revision/employee_
 const tax_setup = require('./operations/tax_setup/tax_setup.route')
 const fiscal_setup = require('./operations/fiscal_setup/fiscal_setup.route')
 const payroll_month = require('./operations/payroll_month_setup/payroll_month_setup.route')
+const salarypolicy = require('./operations/salarypolicy/salarypolicy.route')
+const loan_management_configuration = require('./operations/loan_management_configuration/loan_management_configuration')
 const arrear_policy = require('./operations/arrear_policy/arrear_policy.route')
 const salary_rounding_policy = require('./operations/salary_rounding_policy/salary_rounding_policy.route')
 const leave_type = require('./operations/leave_type/leave_type.route')
 
 const final_settlement_policy = require('./operations/final_settlement_policy/final_settlement_policy.route')
-const salarypolicy = require('./operations/salarypolicy/salarypolicy.route')
 const onetime_earning = require('./operations/onetime_allowance/onetime_allowance.route')
 const loan_type = require('./operations/loan_type/loan_type.route')
 const payroll_process_policy = require('./operations/payroll_process_policy/payroll_process_policy.route')
+const gratuity_configuration = require('./operations/gratuity_configuration/gratuity_configuration.route')
 
-
+const accrue_gratuity_configuration= require('./operations/accrue_gratuity_configuration/accrue_gratuity_configuration.route')
 const router = express.Router();
 
 const defaultRoutes = [
@@ -74,6 +78,16 @@ const defaultRoutes = [
 
   },
 
+  {
+    path: "/salarypolicy",
+    route: salarypolicy
+
+  },
+  {
+    path: "/tax_slab",
+    route: tax_slab
+
+  },
   {
     path: "/branch",
     route: branch
@@ -217,6 +231,10 @@ const defaultRoutes = [
   },
 
   {
+    path: "/loan_management_configuration",
+    route: loan_management_configuration
+  },
+  {
     path: "/salarypolicy",
     route: salarypolicy
 
@@ -232,7 +250,15 @@ const defaultRoutes = [
   {
     path: "/payroll_process_policy",
     route: payroll_process_policy
-  }
+  },
+  {
+    path: "/gratuity_configuration",
+    route: gratuity_configuration
+  },
+  {
+    path: "/accrue_gratuity_configuration",
+    route: accrue_gratuity_configuration
+  },
 ];
 
 const devRoutes = [
