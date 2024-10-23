@@ -1,6 +1,7 @@
 const httpStatus = require("http-status");
 const axios = require("axios")
 const  salarypolicyModel  = require("../../../models/index");
+const  PayrollMonthModel  = require("../../../models/index");
 const ApiError = require("../../../utils/ApiError");
 const sequelize = require("../../../config/db");
 const Sequelize = require('sequelize');
@@ -16,11 +17,10 @@ const Op = Sequelize.Op;
  * @returns {Promise<salarypolicy>}
  */
 const createsalarypolicy = async (req, salarypolicyBody) => {
-    console.log("salarypolicy Body", salarypolicyBody)
-  // salarypolicyBody.slug = salarypolicyBody.name.replace(/ /g, "-").toLowerCase();
-  console.log(req.user.id);
+
+
   salarypolicyBody.createdBy = req.user.id;
-  console.log(salarypolicyBody,"body");
+
   const addedsalarypolicyObj = await salarypolicyModel.salarypolicyModel.create(salarypolicyBody);
   //authSMSSend(addedsalarypolicyObj.dataValues);  // Quick send message at the time of donation
   return addedsalarypolicyObj;
@@ -88,8 +88,7 @@ const updatesalarypolicyById = async (Id, updateBody, updatedBy) => {
   if (!Item) {
     throw new ApiError(httpStatus.NOT_FOUND, "record not found");
   }
-  //console.log("Update Receipt Id" , item);
-  // updateBody.slug = updateBody.name.replace(/ /g, "-").toLowerCase()
+  
   updateBody.updatedBy = updatedBy;
   delete updateBody.id;
   Object.assign(Item, updateBody);
@@ -112,6 +111,25 @@ const updatesalarypolicyById = async (Id, updateBody, updatedBy) => {
   return Item;
 };
 
+const getCurrentMonth = async () => {
+
+  
+  const result= await PayrollMonthModel.PayrollMonthModel.findAndCountAll({
+    order: [
+      ['createdAt', 'DESC']
+    ],
+    where: {
+     
+      isActive: true
+    },
+   
+  });
+
+
+  return result;
+  
+};
+
 
 
 module.exports = {
@@ -119,5 +137,6 @@ module.exports = {
   querysalarypolicys,
   getsalarypolicyById,
   updatesalarypolicyById,
-  deletesalarypolicyById
+  deletesalarypolicyById,
+  getCurrentMonth
 };
