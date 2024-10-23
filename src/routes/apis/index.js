@@ -48,6 +48,7 @@ const final_settlement_policy = require('./operations/final_settlement_policy/fi
 const onetime_earning = require('./operations/onetime_allowance/onetime_allowance.route')
 const loan_type = require('./operations/loan_type/loan_type.route')
 const payroll_process_policy = require('./operations/payroll_process_policy/payroll_process_policy.route')
+const leave_management_configuration = require('./operations/leave_management_configuration/leave_management_configuration.route')
 const gratuity_configuration = require('./operations/gratuity_configuration/gratuity_configuration.route')
 
 const accrue_gratuity_configuration= require('./operations/accrue_gratuity_configuration/accrue_gratuity_configuration.route')
@@ -250,6 +251,10 @@ const defaultRoutes = [
   {
     path: "/payroll_process_policy",
     route: payroll_process_policy
+  },
+  {
+    path: "/leave_management_configuration",
+    route: leave_management_configuration
   },
   {
     path: "/gratuity_configuration",
