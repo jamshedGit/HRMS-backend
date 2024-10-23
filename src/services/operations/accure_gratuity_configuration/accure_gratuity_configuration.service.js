@@ -14,7 +14,7 @@ const createaccrue_gratuity_configuration = async (
   accrue_gratuity_configurationBody
 ) => {
   try {
-    console.log("createaccrue_gratuity_configuration 1");
+ 
     const subsidiaryExists = await accrue_gratuity_configurationModel.findOne({
       where: { subsidiaryId: accrue_gratuity_configurationBody.subsidiaryId },
     });

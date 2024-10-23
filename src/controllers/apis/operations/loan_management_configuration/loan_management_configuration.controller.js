@@ -11,7 +11,7 @@ const {
 } = require("../../../../utils/constants");
 
 const createloan_management_configuration = catchAsync(async (req, res) => {
-  // console.log("reqested User", req.user.id);
+
   try {
 
 
@@ -66,7 +66,7 @@ const createloan_management_configuration = catchAsync(async (req, res) => {
 //       data: loan_management_configuration
 //     });
 //   } catch (error) {
-//     console.log(error);
+//    
 //     res.status(httpStatus.INTERNAL_SERVER_ERROR).send({
 //       code: HttpStatusCodes.INTERNAL_SERVER_ERROR,
 //       message: HttpResponseMessages.INTERNAL_SERVER_ERROR,
@@ -78,15 +78,15 @@ const createloan_management_configuration = catchAsync(async (req, res) => {
 
 
 const getAllloan_management_configuration= catchAsync(async (req, res) => {
-  console.log("get loan_management_configurations");
+
   const obj = {};
   const filter = obj;
   // const options = pick(req.body, ["sortBy", "limit", "page"]);
   const options = pick(req.body, ['sortOrder', 'pageSize', 'pageNumber']);
   const searchQuery = req.body.filter.searchQuery? req.body.filter.searchQuery : '';
-  console.log("searchQuery",searchQuery)
+ 
   const result = await loan_management_configurationService.loan_management_configurationService.queryloan_management_configuration(filter, options,searchQuery);
-  console.log(result);
+
   res.send({
     code: HttpStatusCodes.OK,
     message: HttpResponseMessages.OK,
@@ -95,8 +95,8 @@ const getAllloan_management_configuration= catchAsync(async (req, res) => {
 });
 
 const getloan_management_configurationById = catchAsync(async (req, res) => {
-  console.log("loan_management_configuration Controller getloan_management_configurationId")
-  console.log(req.body)
+
+
   const Receipt = await loan_management_configurationService.loan_management_configurationService.getloan_management_configurationById(req.body.Id);
   if (!Receipt) {
     throw new ApiError(httpStatus.NOT_FOUND, "Receipt not found");
@@ -109,7 +109,7 @@ const getloan_management_configurationById = catchAsync(async (req, res) => {
 });
 
 const updateloan_management_configuration = catchAsync(async (req, res) => {
-  console.log(req.body);
+
   const loan_management_configuration = await loan_management_configurationService.loan_management_configurationService.updateloan_management_configurationById(req.body.Id, req.body, req.user.Id);
   
   
@@ -141,7 +141,7 @@ const updateloan_management_configuration = catchAsync(async (req, res) => {
 });
 
 const deleteloan_management_configuration = catchAsync(async (req, res) => {
-  console.log("req.body.Id " ,req.body.Id)
+
   const Receipt = await loan_management_configurationService.loan_management_configurationService.deleteloan_management_configurationById(req.body.Id);
   res.send({
     code: HttpStatusCodes.OK,

@@ -23,7 +23,7 @@ const createloan_management_configuration = async (
 ) => {
   try {
     loan_management_configurationBody.createdBy = req.user.id;
-    console.log(loan_management_configurationBody, "body");
+
 
     //check
     const existingConfiguration = await Loan_management_configurationModel.Loan_management_configurationModel.findOne({
@@ -42,10 +42,7 @@ const createloan_management_configuration = async (
         loan_management_configurationBody
       );
 
-    console.log(
-      "addedloan_management_configurationObj Body",
-      loan_management_configurationBody
-    );
+  
     // Check for details and save them
     if (
       addedloan_management_configurationObj &&
@@ -271,7 +268,7 @@ return result;
       },
     ],
   });
-  console.log("Item for update updateBody",updateBody)
+
 
   if (!Item) {
     throw new ApiError(httpStatus.NOT_FOUND, "Record not found");
@@ -280,22 +277,22 @@ return result;
 
 
   const existingDetailIds = Item.details.map(d => d.Id);
-  console.log("existingDetailIds,Item.details.map(d => d.Id)",existingDetailIds)
+
   // Update or create child records
   if (updateBody.details && Array.isArray(updateBody.details)) {
     const newDetailIds = [];
 
     for (const detail of updateBody.details) {
-      console.log("updateBody.details:", detail);
+  
       if (detail.Id) {
         // Update existing detail
-        console.log("detail.Id:", detail.Id);
+   
         const childDetail = await Loan_management_detailModel.Loan_management_detailModel.findOne({
           where: { Id: detail.Id }
         });
 
         if (childDetail) {
-          console.log("Updating childDetail:", childDetail);
+
           Object.assign(childDetail, detail); // Apply updates
           try {
             await childDetail.save();
@@ -308,7 +305,7 @@ return result;
         newDetailIds.push(detail.Id);
       } else {
         // Create new detail if Id is not present
-        console.log("Creating new detail, no Id present:", detail);
+      
         detail.loan_management_configurationId = Item.Id; // Associate with the configuration ID
         await Loan_management_detailModel.Loan_management_detailModel.create(detail);
         newDetailIds.push(detail.Id); // Add the new detail's Id
@@ -317,9 +314,9 @@ return result;
 
     // Delete child records that are not present in the incoming details
     for (const existingId of existingDetailIds) {
-      console.log("existingDetailIds,existingId",existingDetailIds,existingId)
+
       if (!newDetailIds.includes(existingId)) {
-        console.log("Deleting child detail with Id:", existingId);
+ 
         await Loan_management_detailModel.Loan_management_detailModel.destroy({
           where: { Id: existingId }
         });

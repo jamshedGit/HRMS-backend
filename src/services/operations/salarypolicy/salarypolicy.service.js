@@ -112,7 +112,7 @@ const updatesalarypolicyById = async (Id, updateBody, updatedBy) => {
 };
 
 const getCurrentMonth = async () => {
-  console.log("getCurrentMonth service")
+
   
   const result= await PayrollMonthModel.PayrollMonthModel.findAndCountAll({
     order: [

@@ -18,7 +18,7 @@ const creategratuity_configuration = async (
   gratuity_configurationBody
 ) => {
   try {
-    console.log("body gratuity_configurationBody", gratuity_configurationBody);
+ 
     gratuity_configurationBody.createdBy = req.user.id;
 
     //check
@@ -34,7 +34,7 @@ const creategratuity_configuration = async (
     );
 
     if (existingConfiguration) {
-      console.log("existingConfiguration", existingConfiguration);
+    
 
       // let result={"message":'This Already exists. Save not allowed.',"status":"error"}
       return existingConfiguration;
@@ -63,7 +63,7 @@ const creategratuity_configuration = async (
         ],
       }
     );
-    console.log("result", result);
+
     return result;
   } catch (error) {
     console.error("Error creating gratuity configuration:", error);
