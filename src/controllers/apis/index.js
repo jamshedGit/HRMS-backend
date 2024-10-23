@@ -10,6 +10,7 @@ module.exports.payrollMonthSetup = require('./operations/payroll_month_setup/pay
 module.exports.finalSetllementPolicy = require('./operations/final_settlement_policy/final_settlement_policy.controller')
 module.exports.loanTypeSetup = require('./operations/loan_type/loan_type.controller')
 module.exports.payrollProcessPolicy = require('./operations/payroll_process_policy/payroll_process_policy.controller')
+module.exports.leaveManagementConfiguration = require('./operations/leave_management_configuration/leave_management_configuration.controller')
 
 
 

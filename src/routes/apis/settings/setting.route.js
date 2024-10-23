@@ -41,6 +41,7 @@ router.route('/read-all-form').post(auth(), validate(settingValidation.getFormMe
 router.route('/read-all-child-forms').get(auth(), validate(settingValidation.getFormMenuMasterData), settingController.getChildsMenusByParentId);
 router.route('/read-all-profile').post(auth(), validate(settingValidation.getAllEmployees), settingController.getEmployeesMasterData);
 router.route('/read-salary-revision-by-employeeId').post( validate(settingValidation.getEmpSalaryRevisionByEmpId), settingController.getRevisionHistoryByEmpId);
+router.route('/read-all-leave-types').get(auth(), validate(settingValidation.getAllLeaveType), settingController.getAllLeaveType);
 
 router.route('/get-max-tableId').post(validate(settingValidation.getFormMenuMasterData),  settingController.GetLastInserted_ID_ByTableName);
 

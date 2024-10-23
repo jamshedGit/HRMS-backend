@@ -86,7 +86,15 @@ module.exports.FinalSettlementModel = require('./operations/final_settlement_pol
 module.exports.OneTimeAllowance = require('./operations/onetime_allowance/onetime_allowance.model');
 //LoanTypeModel Model
 module.exports.LoanTypeModel = require('./operations/loan_type/loan_type.model');
-//Loan Management Configuration Model
+
+//Leave Management Configuration Model
+module.exports.LeaveManagementConfigurationModel = require('./operations/leave_management_configuration/leave_management_configuration.model');
+
+//Leave Type Policies Model
+module.exports.LeaveTypePoliciesModel = require('./operations/leave_type_policies/leave_type_policies.model');
+
+//Leave Type Salary Deduction Policies Model
+module.exports.LeaveTypeSalaryDeductionPoliciesModel = require('./operations/leave_type_salary_deduction_policies/leave_type_salary_deduction_policies.model');
 
 //Tax Slab Model
 module.exports.Tax_slabModel = require('./operations/tax_slab/tax_slab.model');

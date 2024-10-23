@@ -42,11 +42,17 @@ const getFormMenuMasterData = {
   body: Joi.object().keys({
     Id: Joi.number().integer(),
     tableName: Joi.string(),
-    prefix:Joi.string()
+    prefix:Joi.string(),
+    text: Joi.optional()
   }),
   
 };
 
+const getAllLeaveType = {
+  query: Joi.disallow(),
+  params: Joi.disallow(),
+  body: Joi.disallow(),
+}
 
 const getCitiesMasterData = {
   query: Joi.disallow(),
@@ -186,5 +192,6 @@ module.exports = {
   getDeptMasterData,
   getFormMenuMasterData,
   getAllEmployees,
-  getEmpSalaryRevisionByEmpId
+  getEmpSalaryRevisionByEmpId,
+  getAllLeaveType
 };
