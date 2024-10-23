@@ -1,6 +1,6 @@
 const httpStatus = require("http-status");
 const axios = require("axios")
-const { PayrollPolicyModel, PayrollEmailRecipentModel, PayrollEOBIAllowancesModel, PayrollBankInfoPolicy } = require("../../../models/index");
+const { PayrollPolicyModel, PayrollEmailRecipentModel, PayrollEOBIAllowancesModel, PayrollBankInfoPolicy, FormModel, PayrollSessiAllowanceModel } = require("../../../models/index");
 const ApiError = require("../../../utils/ApiError");
 const sequelize = require("../../../config/db");
 const Sequelize = require('sequelize');
@@ -16,14 +16,15 @@ const Op = Sequelize.Op;
  * @returns {Promise<PayrollPolicy>}
  */
 const createPayrollPolicy = async (req, payollBodyObj) => {
-console.log("::gg::",payollBodyObj)
+  console.log("::gg::", payollBodyObj)
   payollBodyObj.createdBy = req.user.id;
 
   const addedPayrollPolicyObj = await PayrollPolicyModel.create(payollBodyObj.body);
 
   const emailRecipentObj = []
   const listEOBIAllowancesObj = []
-
+  const listSESSIAllowancesObj = []
+  const listBankInfoPayroll = []
   /// For Insert Employee sending email ID's
   payollBodyObj.emailRecipentList.forEach(element => {
 
@@ -39,7 +40,8 @@ console.log("::gg::",payollBodyObj)
 
   const emailRecipentResponse = await PayrollEmailRecipentModel.bulkCreate(emailRecipentObj);
   // --- END
-  // this method used for bulk inserting employee eobi Allowances
+
+  // this method used for bulk inserting employee EOBI Allowances
   payollBodyObj.eobiAllowancesList.forEach(element => {
     listEOBIAllowancesObj.push({
       subsidiaryId: payollBodyObj.body.subsidiaryId,
@@ -50,7 +52,34 @@ console.log("::gg::",payollBodyObj)
   });
 
   const eobiAllowanceResp = await PayrollEOBIAllowancesModel.bulkCreate(listEOBIAllowancesObj);
-  const payroll_bankInfoPolicy = await PayrollBankInfoPolicy.bulkCreate(payollBodyObj.bankInfoList);
+
+  // SESSI Allowance
+
+  payollBodyObj.sessiAllowanceList.forEach(element => {
+    listSESSIAllowancesObj.push({
+      subsidiaryId: payollBodyObj.body.subsidiaryId,
+      companyId: payollBodyObj.body.companyId || 1,
+      payrollConfigurationId: addedPayrollPolicyObj.Id,
+      earningId: element,
+    })
+  });
+
+  const sessiAllowanceResp = await PayrollSessiAllowanceModel.bulkCreate(listSESSIAllowancesObj);
+  //  END
+
+  // Insert Into BankInfo 
+  payollBodyObj.bankInfoList.forEach(element => {
+    listBankInfoPayroll.push({
+      subsidiaryId: payollBodyObj.body.subsidiaryId,
+      companyId: payollBodyObj.body.companyId || 1,
+      payrollConfigurationId: addedPayrollPolicyObj.Id,
+      journalBankAccountId: element.journalBankAccountId,
+      bankCode: element.bankCode,
+      bankAccountNo: element.bankAccountNo,
+      bankName: element.bankName
+    })
+  });
+  const payroll_bankInfoPolicy = await PayrollBankInfoPolicy.bulkCreate(listBankInfoPayroll);
 
   return addedPayrollPolicyObj;
 };
@@ -100,7 +129,29 @@ const queryPayrollPolicy = async (filter, options, searchQuery) => {
  * @returns {Promise<ReceiptModel>}
  */
 const getPayrollPolicyById = async (id) => {
-  return PayrollPolicyModel.findByPk(id);
+  return PayrollPolicyModel.findByPk(id, {
+    include: [
+      {
+        model: PayrollEmailRecipentModel,
+        attributes: ["employeeId"],
+
+      },
+      {
+        model: PayrollEOBIAllowancesModel,
+        attributes: ["earningId"],
+
+      },
+      {
+        model: PayrollBankInfoPolicy,
+        attributes: ["payrollConfigurationId", "journalBankAccountId", "bankCode", "bankName", "bankAccountNo", "isDefault"],
+
+      },
+      {
+        model: PayrollSessiAllowanceModel,
+        attributes: ["earningId"]
+      }
+    ]
+  });
 };
 
 

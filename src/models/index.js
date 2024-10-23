@@ -97,3 +97,6 @@ module.exports.PayrollEOBIAllowancesModel = require('./operations/payroll_eobi_a
 
 //PayrollBankInfoPolicy Model
 module.exports.PayrollBankInfoPolicy = require('./operations/payroll_bankInfo_policy/payroll_bankInfo_policy.model');
+
+//PayrollBankInfoPolicy Model
+module.exports.PayrollSessiAllowanceModel = require('./operations/payroll_sessi_allowances/payroll_sessi_allowances.model');

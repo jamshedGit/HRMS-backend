@@ -3,8 +3,9 @@ const { ResourceModel } = require('../../..');
 
 //import Database connection configurations.
 const sequelize = require('../../../config/db')
+const parentModel = require('../payroll_policy/payroll_policy.model');
 
-const Model = sequelize.define('tran_payroll_policy_bank_info', {
+const payroll_bank_accountModel = sequelize.define('tran_payroll_policy_bank_info', {
 	Id: {
 		type: Sequelize.INTEGER,
 		autoIncrement: true,
@@ -23,4 +24,13 @@ const Model = sequelize.define('tran_payroll_policy_bank_info', {
 	updatedAt: { type: Sequelize.DATE, allowNull: true },
 });
 
-module.exports = Model;
+parentModel.hasMany(payroll_bank_accountModel, { foreignKey: 'payrollConfigurationId' });
+ 
+payroll_bank_accountModel.belongsTo(parentModel, {
+	foreignKey: 'payrollConfigurationId',
+	targetKey: 'Id',
+	as: "payroll_policy"
+  });
+
+module.exports = payroll_bank_accountModel;
+

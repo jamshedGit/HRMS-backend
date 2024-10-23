@@ -5,7 +5,7 @@ const { ResourceModel } = require('../../..');
 const sequelize = require('../../../config/db')
 const parentModel = require('../payroll_policy/payroll_policy.model');
 
-const eobi_allowances = sequelize.define('tran_payroll_policy_eobiAllowances', {
+const sessi_allowances = sequelize.define('tran_payroll_policy_sessiAllowance', {
 	Id: {
 		type: Sequelize.INTEGER,
 		autoIncrement: true,
@@ -21,13 +21,13 @@ const eobi_allowances = sequelize.define('tran_payroll_policy_eobiAllowances', {
 
 });
 
-parentModel.hasMany(eobi_allowances, { foreignKey: 'payrollConfigurationId' });
+parentModel.hasMany(sessi_allowances, { foreignKey: 'payrollConfigurationId' });
 
-eobi_allowances.belongsTo(parentModel, {
+sessi_allowances.belongsTo(parentModel, {
 	foreignKey: 'payrollConfigurationId',
-	targetKey: 'Id',
+	targetKey: 'Id'
 	
 });
 
 
-module.exports = eobi_allowances;
+module.exports = sessi_allowances;

@@ -3,8 +3,9 @@ const { ResourceModel } = require('../../..');
 
 //import Database connection configurations.
 const sequelize = require('../../../config/db')
+const parentModel = require('../payroll_policy/payroll_policy.model');
 
-const Model = sequelize.define('tran_email_recipents_setup', {
+const email_recipent_setup = sequelize.define('tran_email_recipents_setup', {
 	Id: {
 		type: Sequelize.INTEGER,
 		autoIncrement: true,
@@ -20,5 +21,12 @@ const Model = sequelize.define('tran_email_recipents_setup', {
 	updatedAt: { type: Sequelize.DATE, allowNull: true },
 
 });
+parentModel.hasMany(email_recipent_setup, { foreignKey: 'payrollConfigurationId' });
+ 
+email_recipent_setup.belongsTo(parentModel, {
+	foreignKey: 'payrollConfigurationId',
+	targetKey: 'Id',
+	as: "payroll_policy"
+  });
 
-module.exports = Model;
+module.exports = email_recipent_setup;

@@ -48,10 +48,20 @@ const createItem = {
     isIncludeBasic : Joi.disallow(),
     eobi_employeer_value_in_percent : Joi.disallow(),
     eobi_employee_value_in_percent : Joi.disallow(),
+
+    // SESSI Configuration
+    isEnableSESSI : Joi.disallow(),
+    sessi_deductionId : Joi.disallow(),
+    sessi_earningId : Joi.disallow(),
+    isIncludeBasic : Joi.disallow(),
+    sessi_employeer_value_in_percent : Joi.disallow(),
+    sessi_employee_value_in_percent : Joi.disallow(),
+
     emailRecipentList : Joi.disallow(),
     eobiAllowancesList: Joi.disallow(),
     body: Joi.object().disallow(),
     bankInfoList: Joi.disallow(),
+    sessiAllowanceList: Joi.disallow()
   }),
 };
 
