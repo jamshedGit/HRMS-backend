@@ -106,6 +106,11 @@ const queryreimbursement_configuration = async (
           attributes: ["formName", "formCode"],
           as: "PayrollGroup",
         },
+        {
+          model: FormModel,
+          attributes: ["formName", "formCode"],
+          as: "CycleType",
+        },
   
       ],
     });

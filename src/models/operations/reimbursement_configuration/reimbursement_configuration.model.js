@@ -41,6 +41,12 @@ Reimbursement_configuration.belongsTo(FormModel.FormModel, {
 	targetKey: 'Id',
 	as:"PayrollGroup"
   });
+  
+  Reimbursement_configuration.belongsTo(FormModel.FormModel, {
+	foreignKey: 'cycle_typeId',
+	targetKey: 'Id',
+	as:"CycleType"
+  });
 
 
 
