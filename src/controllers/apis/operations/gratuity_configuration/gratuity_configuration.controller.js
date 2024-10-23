@@ -28,7 +28,7 @@ const creategratuity_configuration = catchAsync(async (req, res) => {
   
     }
     else{
-      console.log("created")
+  
         
      res.status(httpStatus.CREATED).send({
       code: HttpStatusCodes.CREATED,
@@ -50,9 +50,9 @@ const getAllgratuity_configuration= catchAsync(async (req, res) => {
   // const options = pick(req.body, ["sortBy", "limit", "page"]);
   const options = pick(req.body, ['sortOrder', 'pageSize', 'pageNumber']);
   const searchQuery = req.body.filter.searchQuery? req.body.filter.searchQuery : '';
-  console.log("searchQuery",searchQuery)
+
   const result = await Gratuity_configurationService.querygratuity_configuration(filter, options,searchQuery);
-  console.log(result);
+
   res.send({
     code: HttpStatusCodes.OK,
     message: HttpResponseMessages.OK,
@@ -61,7 +61,7 @@ const getAllgratuity_configuration= catchAsync(async (req, res) => {
 });
 
 const getgratuity_configurationById = catchAsync(async (req, res) => {
-  console.log(req.body)
+
   const Receipt = await Gratuity_configurationService.getgratuity_configurationById(req.body.Id);
   if (!Receipt) {
     throw new ApiError(httpStatus.NOT_FOUND, "Receipt not found");
@@ -74,7 +74,7 @@ const getgratuity_configurationById = catchAsync(async (req, res) => {
 });
 
 const updategratuity_configuration = catchAsync(async (req, res) => {
-  console.log(req.body);
+
   const loan_management_configuration = await Gratuity_configurationService.updategratuity_configurationById(req.body.Id, req.body, req.user.Id);
   
   
@@ -106,7 +106,7 @@ const updategratuity_configuration = catchAsync(async (req, res) => {
 });
 
 const deletegratuity_configuration = catchAsync(async (req, res) => {
-  console.log("req.body.Id " ,req.body.Id)
+
   const Receipt = await Gratuity_configurationService.deletegratuity_configurationById(req.body.Id);
   res.send({
     code: HttpStatusCodes.OK,

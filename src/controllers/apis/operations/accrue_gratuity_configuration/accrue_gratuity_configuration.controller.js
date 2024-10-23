@@ -28,7 +28,7 @@ const createaccrue_gratuity_configuration = catchAsync(async (req, res) => {
 
         }
         else {
-            console.log("created")
+  
 
             res.status(httpStatus.CREATED).send({
                 code: HttpStatusCodes.CREATED,
@@ -52,7 +52,7 @@ const getAllaccrue_gratuity_configuration = catchAsync(async (req, res) => {
     const searchQuery = req.body.filter.searchQuery ? req.body.filter.searchQuery : '';
 
     const result = await accrue_gratuity_configurationService.queryaccrue_gratuity_configuration(filter, options, searchQuery);
-    console.log(result);
+
     res.send({
         code: HttpStatusCodes.OK,
         message: HttpResponseMessages.OK,
@@ -61,7 +61,7 @@ const getAllaccrue_gratuity_configuration = catchAsync(async (req, res) => {
 });
 
 const getaccrue_gratuity_configurationById = catchAsync(async (req, res) => {
-    console.log(req.body)
+  
     const Receipt = await accrue_gratuity_configurationService.getaccrue_gratuity_configurationById(req.body.Id);
     if (!Receipt) {
         throw new ApiError(httpStatus.NOT_FOUND, "Receipt not found");
@@ -74,10 +74,10 @@ const getaccrue_gratuity_configurationById = catchAsync(async (req, res) => {
 });
 
 const updateaccrue_gratuity_configuration = catchAsync(async (req, res) => {
-    console.log(req.body);
+
     const accrue_gratuity_configuration = await accrue_gratuity_configurationService.updateaccrue_gratuity_configurationById(req.body.Id, req.body, req.user.Id);
 
-console.log("updated status",accrue_gratuity_configuration)
+
     if (accrue_gratuity_configuration.status == "error") {
 
         res.status(HttpStatusCodes.INTERNAL_SERVER_ERROR).send({
@@ -100,7 +100,7 @@ console.log("updated status",accrue_gratuity_configuration)
 });
 
 const deleteaccrue_gratuity_configuration = catchAsync(async (req, res) => {
-    console.log("req.body.Id ", req.body.Id)
+
     const Receipt = await accrue_gratuity_configurationService.deleteaccrue_gratuity_configurationById(req.body.Id);
     res.send({
         code: HttpStatusCodes.OK,

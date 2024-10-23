@@ -11,7 +11,7 @@ const {
 } = require("../../../../utils/constants");
 
 const createtax_slab = catchAsync(async (req, res) => {
-  // console.log("reqested User", req.user.id);
+
   try {
 
 
@@ -39,15 +39,15 @@ const createtax_slab = catchAsync(async (req, res) => {
 });
 
 const getAlltax_slabs = catchAsync(async (req, res) => {
-  console.log("get tax_slabs tax_slab body");
+
   const obj = {};
   const filter = obj;
   // const options = pick(req.body, ["sortBy", "limit", "page"]);
   const options = pick(req.body, ['sortOrder', 'pageSize', 'pageNumber']);
   const searchQuery = req.body.filter.searchQuery? req.body.filter.searchQuery : '';
-  console.log("searchQuery",searchQuery)
+
   const result = await tax_slabformService.tax_slabFormService.querytax_slab(filter, options,searchQuery);
-  console.log(result);
+
   res.send({
     code: HttpStatusCodes.OK,
     message: HttpResponseMessages.OK,
@@ -56,8 +56,8 @@ const getAlltax_slabs = catchAsync(async (req, res) => {
 });
 
 const gettax_slabById = catchAsync(async (req, res) => {
-  console.log("tax_slab Controller gettax_slabId")
-  console.log(req.body)
+
+
   const Receipt = await tax_slabformService.tax_slabFormService.gettax_slabById(req.body.Id);
   if (!Receipt) {
     throw new ApiError(httpStatus.NOT_FOUND, "Receipt not found");
@@ -70,10 +70,9 @@ const gettax_slabById = catchAsync(async (req, res) => {
 });
 
 const updatetax_slab = catchAsync(async (req, res) => {
-  console.log("tax_slab body",req.body);
+
   const Receipt = await tax_slabformService.tax_slabFormService.updatetax_slabById(req.body.Id, req.body, req.user.Id);
-  
-  console.log("recipt tax_slab",Receipt)
+ 
 
   if(Receipt.status=="error"){
 
@@ -100,7 +99,7 @@ const updatetax_slab = catchAsync(async (req, res) => {
 });
 
 const deletetax_slab = catchAsync(async (req, res) => {
-  console.log("req.body.Id " ,req.body.Id)
+
   const Receipt = await tax_slabformService.tax_slabFormService.deletetax_slabById(req.body.Id);
   res.send({
     code: HttpStatusCodes.OK,
