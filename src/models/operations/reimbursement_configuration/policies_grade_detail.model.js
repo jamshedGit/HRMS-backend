@@ -40,8 +40,8 @@ Policies_grade_detail.belongsTo(Reimbursement_policies_detailModel, {
 });
 
 Reimbursement_policies_detailModel.hasMany(Policies_grade_detail, {
-  as: "policies",
-  foreignKey: "reimbursement_configurationId",
+  as: "grades",
+  foreignKey: "reimbursement_policies_detailId",
 });
 
 Policies_grade_detail.belongsTo(FormModel, {
