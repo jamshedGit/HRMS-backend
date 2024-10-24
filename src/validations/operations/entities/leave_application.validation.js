@@ -12,7 +12,9 @@ const createItem = {
     to: Joi.date().required(),
     leaveType: Joi.number().required(),
     remarks: Joi.string().optional(),
-    file: Joi.number().optional(),
+    file: Joi.string().allow(null).optional(),
+    fileDetail: Joi.object().optional(),
+    days: Joi.number().optional()
   }),
 };
 
@@ -29,7 +31,10 @@ const updateItem = {
     to: Joi.date().optional(),
     leaveType: Joi.number().optional(),
     remarks: Joi.string().optional(),
-    file: Joi.number().optional(),
+    file: Joi.string().allow(null).optional(),
+    fileDetail: Joi.object().optional(),
+    days: Joi.number().optional(),
+    isActive: Joi.boolean().optional()
   }),
 };
 

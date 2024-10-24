@@ -13,6 +13,7 @@ const leaveApplicationAttributes = [
   'from',
   'to',
   'remarks',
+  'leaveType',
   'file',
   'days',
   'Id',

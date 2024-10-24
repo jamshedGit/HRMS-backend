@@ -3,6 +3,7 @@ const Sequelize = require('sequelize');
 //import Database connection configurations.
 const sequelize = require('../../../config/db');
 const { EmployeeProfileModel, LeaveTypeModel, CompanyModel, SubsidiaryModel } = require('../..');
+const { formatDates } = require('../../../utils/common');
 
 const leaveApplicationModel = sequelize.define('t_leave_application', {
 	Id: {
@@ -13,8 +14,22 @@ const leaveApplicationModel = sequelize.define('t_leave_application', {
 	subsidiaryId: { type: Sequelize.INTEGER, allowNull: true },
 	companyId: { type: Sequelize.INTEGER, allowNull: true },
 	employeeId: { type: Sequelize.INTEGER, allowNull: false },
-	from: { type: Sequelize.DATE, allowNull: false },
-	to: { type: Sequelize.DATE, allowNull: false },
+	from: {
+		type: Sequelize.DATE,
+		allowNull: false,
+		get() {
+			const rawValue = this.getDataValue('from');
+			return rawValue ? formatDates(rawValue) : null;
+		}
+	},
+	to: {
+		type: Sequelize.DATE,
+		allowNull: false,
+		get() {
+			const rawValue = this.getDataValue('to');
+			return rawValue ? formatDates(rawValue) : null;
+		}
+	},
 	leaveType: {
 		type: Sequelize.INTEGER,
 		allowNull: false

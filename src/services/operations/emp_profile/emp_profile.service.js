@@ -118,8 +118,8 @@ const getContactInfoByEmployeeId = async (id) => {
   const queryFilters = [
     // { isActive: sequelize.where }
     // { Id: Sequelize.where(Sequelize.fn('LOWER', Sequelize.col('Id')), 'LIKE', '%' + searchQuery + '%') },
-    { employeeId: id},
-    
+    { employeeId: id },
+
 
   ]
 
@@ -130,7 +130,7 @@ const getContactInfoByEmployeeId = async (id) => {
     ],
     where: {
       [Op.or]: queryFilters,
-       isActive: true
+      isActive: true
     },
     offset: 0,
     limit: 10,
@@ -147,7 +147,7 @@ const getContactInfoByEmployeeId = async (id) => {
  * @returns {Promise<ReceiptModel>}
  */
 const updateEmp_profileById = async (Id, updateBody, updatedBy) => {
-  console.log("item 12",updateBody)
+  console.log("item 12", updateBody)
 
   const Item = await getEmp_profileById(Id);
   console.log("item", Item)
@@ -211,6 +211,21 @@ const deleteEmp_profileById = async (Id) => {
   return Item;
 };
 
+
+
+const getProfileView = async (id) => {
+  const [result] = await sequelize.query(`
+    SELECT *
+    FROM v_employee_profile
+    WHERE Id = :id
+  `, {
+    replacements: { id },
+    type: Sequelize.QueryTypes.SELECT
+  });
+
+  return result || {};
+}
+
 module.exports = {
   createEmp_profile,
   queryEmp_profile,
@@ -220,5 +235,6 @@ module.exports = {
   queryContactInfo,
   getContactInfoByEmployeeId,
   updateContactById,
-  usp_GetAllEmployeeProfileDetails
+  usp_GetAllEmployeeProfileDetails,
+  getProfileView
 };

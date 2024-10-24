@@ -53,6 +53,8 @@ router.route("/read-all-contact").post(auth(), emp_profile_Controller.getAllCont
 router.route("/read-contact").post(auth(), emp_profile_Controller.getContactInfoByEmployeeId);
 router.route("/update-contact").put(auth(),validate(empValidation.createEmp_profileValidation), emp_profile_Controller.updateContactById);
 router.route("/read-all-employee-profile").post( emp_profile_Controller.usp_GetAllEmployeeProfileDetails);
+router.route("/read-profile-view/:id").get( emp_profile_Controller.getProfileView);
+
 
 
 // router.post('/uploadImage',upload.single('image'),(req,res)=>{

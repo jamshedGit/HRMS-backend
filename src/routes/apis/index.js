@@ -46,7 +46,10 @@ const onetime_earning = require('./operations/onetime_allowance/onetime_allowanc
 const loan_type = require('./operations/loan_type/loan_type.route')
 const payroll_process_policy = require('./operations/payroll_process_policy/payroll_process_policy.route')
 const leave_management_configuration = require('./operations/leave_management_configuration/leave_management_configuration.route')
-const leave_application = require('./operations/leave_application/leave_application.route')
+const leave_application = require('./operations/leave_application/leave_application.route');
+const uploadImage = require("../../middlewares/fileUpload.middleware");
+const ApiError = require("../../utils/ApiError");
+const httpStatus = require("http-status");
 
 
 const router = express.Router();
@@ -256,6 +259,13 @@ defaultRoutes.forEach((route) => {
   // console.log("Jamshed", route.path, route.route);
   router.use(route.path, route.route);
 });
+
+router.post('/file-upload', uploadImage('file'), (req, res) => {
+  if (!req.file) {
+    throw new ApiError(httpStatus.NOT_ACCEPTABLE, "File Not Uploaded");
+  }
+  res.send(req.file)
+})
 
 /* istanbul ignore next */
 if (config.env === "development") {
