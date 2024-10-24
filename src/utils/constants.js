@@ -59,7 +59,10 @@ const DDL_FIELD_NAMES = {
     codeField: 'formCode',
   },
 
-
+  LeaveType:{
+    labelField: 'name',
+    valueField: 'Id',
+  },
 
   SalaryRevisionKeys:{
     labelField: 'reviewDate',
