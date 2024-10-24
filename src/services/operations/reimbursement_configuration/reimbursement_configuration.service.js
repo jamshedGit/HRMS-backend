@@ -10,70 +10,24 @@ const { HttpStatusCodes } = require("../../../utils/constants");
 const Op = Sequelize.Op;
 
 
-
-
-// const createreimbursement_configuration = async (req, reimbursement_configurationBody) => {
-//   try {
-//     console.log("Creating reimbursement configuration...");
-
-//     // Check if the parent configuration already exists
-//     const subsidiaryExists = await Reimbursement_configurationModel.findOne({
-//       where: {
-//         subsidiaryId: reimbursement_configurationBody.subsidiaryId,
-//         payroll_groupId: reimbursement_configurationBody.payroll_groupId,
-//       },
-//     });
-
-//     if (subsidiaryExists) {
-//       return {
-//         message: "Already Exist",
-//         status: "error",
-//       };
-//     }
-
-//     // Set createdBy field
-//     reimbursement_configurationBody.createdBy = req.user.id;
-
-//     // Create the parent reimbursement configuration
-//     const addedReimbursementConfiguration = await Reimbursement_configurationModel.create(
-//       reimbursement_configurationBody
-//     );
-
-
-//     if (addedReimbursementConfiguration && reimbursement_configurationBody.policies && Array.isArray(reimbursement_configurationBody.policies)) { 
-//       const createdPolicyData = await Reimbursement_policies_detailModel.bulkCreate(reimbursement_configurationBody.policies.map((el) => ({ ...el, reimbursement_configurationId: addedReimbursementConfiguration.Id })))
-    
-//     }
-    
-//     return await getreimbursement_configurationById({ Id: addedReimbursementConfiguration.Id })
-
-
-//   } catch (error) {
-//     console.error("Error creating reimbursement configuration:", error);
-//     throw error; // Rethrow or handle the error as needed
-//   }
-// };
-
-
-
 const createreimbursement_configuration = async (req, reimbursement_configurationBody) => {
   try {
-    console.log("Creating reimbursement configuration...");
+    console.log("Creating reimbursement configuration...",reimbursement_configurationBody);
 
     // Check if the parent configuration already exists
-    // const subsidiaryExists = await Reimbursement_configurationModel.findOne({
-    //   where: {
-    //     subsidiaryId: reimbursement_configurationBody.subsidiaryId,
-    //     payroll_groupId: reimbursement_configurationBody.payroll_groupId,
-    //   },
-    // });
+    const subsidiaryExists = await Reimbursement_configurationModel.findOne({
+      where: {
+        subsidiaryId: reimbursement_configurationBody.subsidiaryId,
+        payroll_groupId: reimbursement_configurationBody.payroll_groupId,
+      },
+    });
 
-    // if (subsidiaryExists) {
-    //   return {
-    //     message: "Already Exist",
-    //     status: "error",
-    //   };
-    // }
+    if (subsidiaryExists) {
+      return {
+        message: "Already Exist",
+        status: "error",
+      };
+    }
 
     // Set createdBy field
     reimbursement_configurationBody.createdBy = req.user.id;
@@ -91,23 +45,41 @@ const createreimbursement_configuration = async (req, reimbursement_configuratio
         }))
       );
 
-      // Handle the grade details for each created policy
+ 
+
+
       for (const policy of reimbursement_configurationBody.policies) {
         const createdPolicy = createdPolicies.find(p => p.reimbursement_typeId === policy.reimbursement_typeId);
-        
-        if (createdPolicy && Array.isArray(policy.gradeDetails)) {
-          // Create grade details
+    
+        if (createdPolicy && Array.isArray(policy.grades)) {
+          console.log("policy.grades", policy.grades);
+          
+          // Create grade details, dynamically adding `salary_gradeId` if only IDs are sent
           await Policies_grade_detailModel.bulkCreate(
-            policy.gradeDetails.map(gradeDetail => ({
-              ...gradeDetail,
-              reimbursement_policies_detailId: createdPolicy.Id,
-            }))
+            policy.grades.map(gradeDetail => {
+              // Check if gradeDetail is just an ID (number) and dynamically add the `salary_gradeId`
+              if (typeof gradeDetail === 'number') {
+                return {
+                  salary_gradeId: gradeDetail, // Add `salary_gradeId` when it's missing
+                  reimbursement_policies_detailId: createdPolicy.Id,
+                };
+              }
+    
+            
+              return {
+                ...gradeDetail,
+                reimbursement_policies_detailId: createdPolicy.Id,
+              };
+            })
           );
         }
       }
+
+
+
     }
 
-    return await getreimbursement_configurationById({ Id: addedReimbursementConfiguration.Id });
+    return await getreimbursement_configurationById(addedReimbursementConfiguration.Id );
     // return "Done"
 
   } catch (error) {
@@ -115,6 +87,7 @@ const createreimbursement_configuration = async (req, reimbursement_configuratio
     throw error; // Rethrow or handle the error as needed
   }
 };
+
 
 
 /**
@@ -226,23 +199,76 @@ const queryreimbursement_configuration = async (
  * @param {ObjectId} id
  * @returns {Promise<ReceiptModel>}
  */
+
+
 const getreimbursement_configurationById = async (id) => {
-  return Reimbursement_configurationModel.findOne({
-    where: { Id: id },
-    include: [
-      {
-        model: FormModel,
-        attributes: ["formName", "formCode"],
-        as: "Subsidiary",
-      },
-      {
-        model: FormModel,
-        attributes: ["formName", "formCode"],
-        as: "PayrollGroup",
-      },
-      
-    ],
-  });
+  console.log("final id",id)
+  // let a= await Reimbursement_configurationModel.findOne({
+  //   where: { Id:id },
+  //   include: [
+  //     {
+  //       model:Reimbursement_policies_detailModel,
+  //       as: "policies",
+  //       include: [
+  //         {
+  //           model: Policies_grade_detailModel,
+  //           as: "grades",
+  //         },
+  //       ],
+  //     },
+  //     {
+  //       model:FormModel,
+  //       attributes: ["formName", "formCode"],
+  //       as: "Subsidiary",
+  //     },
+
+
+  //   ],
+  // });
+
+ 
+return await Reimbursement_configurationModel.findOne({
+
+  where: { Id:id },
+
+  include: [
+    {
+      model: Reimbursement_policies_detailModel,
+      as: "policies",
+      include: [
+        {
+          model: Policies_grade_detailModel,
+          as: "grades", // Ensure this matches the alias in the child model
+          include: [
+            {
+              model: FormModel, // Include the salary grade model
+              attributes: ["formName", "formCode"],
+              as: "salary_grade", // Ensure this matches the alias in the grandchild model
+            },
+          ],
+        },
+      ],
+    },
+    {
+      model: FormModel,
+      attributes: ["formName", "formCode"],
+      as: "Subsidiary",
+    },
+    {
+      model: FormModel,
+      attributes: ["formName", "formCode"],
+      as: "PayrollGroup",
+    },
+    {
+      model: FormModel,
+      attributes: ["formName", "formCode"],
+      as: "CycleType",
+    },
+  ],
+});
+
+
+
 };
 
 /**
@@ -288,14 +314,52 @@ const updatereimbursement_configurationById = async (
  * @returns {Promise<ReceiptModel>}
  */
 
-const deletereimbursement_configurationById = async (Id) => {
-  const Item = await getreimbursement_configurationById(Id, {});
+// const deletereimbursement_configurationById = async (Id) => {
+//   const Item = await getreimbursement_configurationById(Id, {});
 
+//   if (!Item) {
+//     throw new ApiError(httpStatus.NOT_FOUND, "Item not found");
+//   }
+
+//   await Item.destroy();
+//   return Item;
+// };
+
+
+const deletereimbursement_configurationById = async (Id) => {
+  // Fetch the parent model (reimbursement configuration)
+  const Item = await getreimbursement_configurationById(Id, {
+    include: [
+      {
+        model: Reimbursement_policies_detailModel, // Replace with actual child model name
+        as: 'policies',    // Assuming 'children' is the alias
+        include: [
+          {
+            model: Policies_grade_detailModel, // Replace with actual grandchild model name
+            as: 'grades',    // Assuming 'grandchildren' is the alias
+          },
+        ],
+      },
+    ],
+  });
+
+  // If the item doesn't exist, throw an error
   if (!Item) {
     throw new ApiError(httpStatus.NOT_FOUND, "Item not found");
   }
 
+  // Loop through and delete all grandchildren first
+  for (const policy of Item.policies) {
+    for (const grade of policy.grades) {
+      await grade.destroy(); // Destroy grandchild first
+    }
+
+    await policy.destroy(); // Destroy child after all grandchildren are deleted
+  }
+
+  // Finally, destroy the parent item
   await Item.destroy();
+
   return Item;
 };
 
