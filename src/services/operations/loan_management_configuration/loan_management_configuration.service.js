@@ -168,6 +168,12 @@ const queryloan_management_configuration = async (
             attributes: ["formName", "formCode"],
             as: "Account",
           },
+
+          {
+            model: FormModel.FormModel,
+            attributes: ["formName", "formCode"],
+            as: "EmpLoanAccount",
+          },
        
 
           { 

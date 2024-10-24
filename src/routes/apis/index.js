@@ -38,7 +38,7 @@ const salary_revision = require('./operations/employee_salary_revision/employee_
 const tax_setup = require('./operations/tax_setup/tax_setup.route')
 const fiscal_setup = require('./operations/fiscal_setup/fiscal_setup.route')
 const payroll_month = require('./operations/payroll_month_setup/payroll_month_setup.route')
-const salarypolicy = require('./operations/salarypolicy/salarypolicy.route')
+const salary_policy = require('./operations/salarypolicy/salarypolicy.route')
 const loan_management_configuration = require('./operations/loan_management_configuration/loan_management_configuration')
 const arrear_policy = require('./operations/arrear_policy/arrear_policy.route')
 const salary_rounding_policy = require('./operations/salary_rounding_policy/salary_rounding_policy.route')
@@ -79,11 +79,7 @@ const defaultRoutes = [
 
   },
 
-  {
-    path: "/salarypolicy",
-    route: salarypolicy
 
-  },
   {
     path: "/tax_slab",
     route: tax_slab
@@ -236,8 +232,8 @@ const defaultRoutes = [
     route: loan_management_configuration
   },
   {
-    path: "/salarypolicy",
-    route: salarypolicy
+    path: "/salary_policy",
+    route: salary_policy
 
   },
   {

@@ -79,7 +79,7 @@ const querytax_slab = async (filter, options, searchQuery) => {
 
   const { count, rows } = await Tax_slabModel.Tax_slabModel.findAndCountAll({
     order: [
-      ['createdAt', 'DESC']
+      ['from_amount', 'ASC']
     ],
     where: {
       [Op.or]: queryFilters,
