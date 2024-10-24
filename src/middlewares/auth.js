@@ -16,7 +16,7 @@ const verifyCallback = (req, resolve, reject) => async (err, user, info) => {
   req.user = user;
 
   // console.log("UserRoleId",user.roleId);
-  const hasAccess = await userService.getUserAccessForMiddleware(user.roleId, getRouteSlugs(req.originalUrl))
+  const hasAccess = await userService.getUserAccessForMiddleware(user.roleId, getRouteSlugs(req))
   
   if(!hasAccess){
     return reject(new ApiError(httpStatus.FORBIDDEN, 'Restricted Access'));

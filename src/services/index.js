@@ -5,27 +5,9 @@ module.exports.accessRightService = require("./settings/accessRight.service");
 module.exports.settingService = require("./settings/setting.service");
 module.exports.tokenService = require("./token.service");
 module.exports.userService = require("./user.service");
-module.exports.vehicleDetailService = require('./operations/vehicles/vehicleDetail.service')
-module.exports.centerService = require("./operations/entities/center.service");
-module.exports.subCenterService = require("./operations/entities/subcenter.service");
-module.exports.itemService = require("./operations/entities/item.service");
-module.exports.unitTypeService = require('./operations/entities/unitType.service')
-module.exports.incidentDetailService = require('./operations/transactions/incidentDetail.service')
-module.exports.driverRouterService = require('./operations/transactions/driverRoute.service')
-module.exports.driverTriplogService = require('./operations/transactions/driverTriplog.service')
-module.exports.vehicleCategoryService = require('./operations/vehicles/vehicleCategory.service')
-module.exports.expenseCategoryService = require('./accounts/incomeExpenses/expenseCategory.service')
-module.exports.transactionMasterService = require('./accounts/transactions/transactionMaster.service')
-module.exports.transactionDetailService = require('./accounts/transactions/transactionDetail.service')
-module.exports.incidentTypeService = require('./operations/transactions/incidentType.service')
-module.exports.incidentSeverityService = require('./operations/transactions/incidentSeverity.service')
-module.exports.ibFormService = require('./operations/ibs/ibForm.service')
-module.exports.mortuaryFormService = require('./operations/ibs/morturayForm.service')
-module.exports.coffinFormService = require('./operations/ibs/coffinForm.service')
-module.exports.donationReceiptFormService = require('./operations/edrs/receipt.service')
 module.exports.bankFormService = require('./operations/banks/bank.service')
 module.exports.exitFormService = require('./operations/exit/exit.service')
-module.exports.salarypolicyFormService = require('./operations/salarypolicy/salarypolicy.service')
+
 module.exports.branchFormService = require('./operations/branch/branch.service')
 module.exports.deptFormService = require('./operations/department/dept.service')
 module.exports.employeeTypeFormService = require('./operations/employeeType/employeeType.service')
@@ -55,9 +37,16 @@ module.exports.EmployeeSalaryRevisionServicePage = require('./operations/employe
 module.exports.TaxSetupServicePage = require('./operations/tax_setup/tax_setup.service')
 module.exports.FiscalSetupServicePage = require('./operations/fiscal_setup/fiscal_setup.service')
 module.exports.PayrollMonthServicePage = require('./operations/payroll_month_setup/payroll_month_setup.service')
-
-
-
-
-
-
+module.exports.tax_slabFormService = require('./operations/tax_slab/tax_slab.service')
+module.exports.loan_management_configurationService = require('./operations/loan_management_configuration/loan_management_configuration.service')
+module.exports.ArrearPolicyServicePage = require('./operations/arrears_policy/arrears_policy.service')
+module.exports.SalaryRoundingPolicyServicePage = require('./operations/salary_rounding_policy/salary_rounding_policy.service')
+module.exports.LeaveTypeServicePage = require('./operations/leave_type/leave_type.service')
+module.exports.FinalSettlementPolicy = require('./operations/final_settlement_policy/final_settlement_policy.service')
+module.exports.salarypolicyFormService = require('./operations/salarypolicy/salarypolicy.service')
+module.exports.OneTimeEarningService = require('./operations/onetime_allowance/onetime_allowance.service')
+module.exports.LoanTypeService = require('./operations/loan_type/loan_type.service')
+module.exports.PayrollProcessPolicy = require('./operations/payroll_process_policy/payroll_process_policy.service')
+module.exports.LeaveManagementConfigurationService = require('./operations/leave_management_configuration/leave_management_configuration.service')
+module.exports.Gratuity_configurationService = require('./operations/gratuity_configuration/gratuity_configuration.service')
+module.exports.accrue_gratuity_configurationService = require('./operations/accure_gratuity_configuration/accure_gratuity_configuration.service')

@@ -1,31 +1,13 @@
 const express = require("express");
 const authRoute = require("./auth.route");
 const settingRoute = require("./settings/setting.route");
-// const roleRoute = require("./settings/role.route");
-// const resourceRoute = require("./settings/resource.route");
-// const accessRightRoute = require("./settings/accessRight.route");
 const userRoute = require("./user.route");
-const centerRoute = require("./operations/entities/centers.route");
-// const subCenterRoute = require("./operations/entities/subcenters.route");
-const itemRoute = require("./operations/entities/items.route");
-const unitTypeRoute = require('./operations/entities/unitType.route')
-const incidentDetailRoute = require('./operations/transactions/incidentDetail.route')
-const driverRoute = require('./operations/transactions/driverRoute.route')
-const driverTriplogRoute = require('./operations/transactions/driverTriplog.route')
-const vehicleCategorieRoute = require('./operations/vehicles/vehicleCategory.route')
-const vehicleDetailRoute = require('./operations/vehicles/vehicleDetail.route')
-const expenseCategoriesRoute = require('./accounts/incomeExpenses/expensesCategories.route')
-const transactionMaster = require('./accounts/transactions/transactionMaster.route')
-const transactionDetail = require('./accounts/transactions/transactionDetail.route')
-const incidentType = require('./operations/transactions/incidentType.route')
-const incidentSeverity = require('./operations/transactions/incidentSeverity.route')
-const ibs = require('./operations/ibs/ibForm.route')
-const receipt = require('./operations/edrs/donation.route')
 const docsRoute = require("./docs.route");
 const config = require("../../config/config");
 const bank = require('./operations/banks/bank.route')
 const exit = require('./operations/exit/exit.route')
-const salarypolicy = require('./operations/salarypolicy/salarypolicy.route')
+
+const tax_slab = require('./operations/tax_slab/tax_slab.route')
 const branch = require('./operations/branch/branch.route')
 const department = require('./operations/department/dept.route')
 const emptype = require('./operations/employeeType/employeeType.route')
@@ -56,9 +38,20 @@ const salary_revision = require('./operations/employee_salary_revision/employee_
 const tax_setup = require('./operations/tax_setup/tax_setup.route')
 const fiscal_setup = require('./operations/fiscal_setup/fiscal_setup.route')
 const payroll_month = require('./operations/payroll_month_setup/payroll_month_setup.route')
+const salary_policy = require('./operations/salarypolicy/salarypolicy.route')
+const loan_management_configuration = require('./operations/loan_management_configuration/loan_management_configuration')
+const arrear_policy = require('./operations/arrear_policy/arrear_policy.route')
+const salary_rounding_policy = require('./operations/salary_rounding_policy/salary_rounding_policy.route')
+const leave_type = require('./operations/leave_type/leave_type.route')
 
+const final_settlement_policy = require('./operations/final_settlement_policy/final_settlement_policy.route')
+const onetime_earning = require('./operations/onetime_allowance/onetime_allowance.route')
+const loan_type = require('./operations/loan_type/loan_type.route')
+const payroll_process_policy = require('./operations/payroll_process_policy/payroll_process_policy.route')
+const leave_management_configuration = require('./operations/leave_management_configuration/leave_management_configuration.route')
+const gratuity_configuration = require('./operations/gratuity_configuration/gratuity_configuration.route')
 
-
+const accrue_gratuity_configuration= require('./operations/accrue_gratuity_configuration/accrue_gratuity_configuration.route')
 const router = express.Router();
 
 const defaultRoutes = [
@@ -74,71 +67,7 @@ const defaultRoutes = [
     path: "/settings",
     route: settingRoute,
   },
-  {
-    path: "/centers",
-    route: centerRoute,
-  },
-  // {
-  //   path: "/subcenters",
-  //   route: subCenterRoute,
-  // },
-  {
-    path: "/items",
-    route: itemRoute,
-  },
-  {
-    path: '/unittypes',
-    route: unitTypeRoute
-  },
-  {
-    path: '/incidentdetails',
-    route: incidentDetailRoute
-  },
-  {
-    path: '/driverroute',
-    route: driverRoute
-  },
-  {
-    path: '/drivertriplog',
-    route: driverTriplogRoute
-  },
-  {
-    path: '/vehiclecategories',
-    route: vehicleCategorieRoute
-  },
-  {
-    path: "/vehicles",
-    route: vehicleDetailRoute
-  },
-  {
-    path: "/expensecategories",
-    route: expenseCategoriesRoute
-  },
-  {
-    path: "/transactionmasters",
-    route: transactionMaster
-  },
-  {
-    path: "/transactiondetails",
-    route: transactionDetail
-  },
-  {
-    path: '/incidenttype',
-    route: incidentType
-  },
-  {
-    path: "/incidentseverity",
-    route: incidentSeverity
-  },
-  {
-    path: "/ibs",
-    route: ibs
-  },
-  {
-    path: "/edrs",
-    route: receipt
-
-  },
+  
   {
     path: "/bank",
     route: bank
@@ -150,9 +79,10 @@ const defaultRoutes = [
 
   },
 
+
   {
-    path: "/salarypolicy",
-    route: salarypolicy
+    path: "/tax_slab",
+    route: tax_slab
 
   },
   {
@@ -207,7 +137,7 @@ const defaultRoutes = [
     path: "/academic",
     route: academic
   },
-  
+
   {
     path: "/experience",
     route: experince
@@ -217,7 +147,7 @@ const defaultRoutes = [
     route: skills
   },
   {
-    path: "/incident",
+    path: "/incident", // hrms-employee-setup
     route: incident
   },
   {
@@ -280,25 +210,56 @@ const defaultRoutes = [
     path: "/payroll_month",
     route: payroll_month
   },
+  {
+    path: "/arrear_policy",
+    route: arrear_policy
+  },
+  {
+    path: "/rounding_policy",
+    route: salary_rounding_policy
+  },
+  {
+    path: "/leave_type",
+    route: leave_type
+  },
+  {
+    path: "/final_settlement_policy",
+    route: final_settlement_policy
+  },
 
+  {
+    path: "/loan_management_configuration",
+    route: loan_management_configuration
+  },
+  {
+    path: "/salary_policy",
+    route: salary_policy
 
-
-  
-
-  
-
-  // {
-  //   path: "/roles",
-  //   route: roleRoute,
-  // },
-  // {
-  //   path: "/resources",
-  //   route: resourceRoute,
-  // },
-  // {
-  //   path: "/accessrights",
-  //   route: accessRightRoute,
-  // }
+  },
+  {
+    path: "/onetime_earning",
+    route: onetime_earning
+  },
+  {
+    path: "/loan_type",
+    route: loan_type
+  },
+  {
+    path: "/payroll_process_policy",
+    route: payroll_process_policy
+  },
+  {
+    path: "/leave_management_configuration",
+    route: leave_management_configuration
+  },
+  {
+    path: "/gratuity_configuration",
+    route: gratuity_configuration
+  },
+  {
+    path: "/accrue_gratuity_configuration",
+    route: accrue_gratuity_configuration
+  },
 ];
 
 const devRoutes = [
@@ -309,7 +270,7 @@ const devRoutes = [
   },
 ];
 defaultRoutes.forEach((route) => {
- // console.log("Jamshed", route.path, route.route);
+  // console.log("Jamshed", route.path, route.route);
   router.use(route.path, route.route);
 });
 

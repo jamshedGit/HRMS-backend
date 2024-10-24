@@ -42,18 +42,17 @@ const getFormMenuMasterData = {
   body: Joi.object().keys({
     Id: Joi.number().integer(),
     tableName: Joi.string(),
-    prefix:Joi.string()
+    prefix:Joi.string(),
+    text: Joi.optional()
   }),
   
 };
 
-
-
-const getAlarmTimesMasterData = {
+const getAllLeaveType = {
   query: Joi.disallow(),
   params: Joi.disallow(),
   body: Joi.disallow(),
-};
+}
 
 const getCitiesMasterData = {
   query: Joi.disallow(),
@@ -61,12 +60,6 @@ const getCitiesMasterData = {
   body: Joi.object().keys({
     countryId: Joi.number().integer().required()
   }),
-};
-
-const getCentersMasterData = {
-  query: Joi.disallow(),
-  params: Joi.disallow(),
-  body: Joi.disallow(),
 };
 
 const getSubCentersMasterData = {
@@ -182,9 +175,7 @@ module.exports = {
   getRolesMasterData,
   getResourcesMasterData,
   getCountriesMasterData,
-  getAlarmTimesMasterData,
   getCitiesMasterData,
-  getCentersMasterData,
   getSubCentersMasterData,
   getCentersMasterDataByCityId,
   getDriversMasterData,
@@ -201,5 +192,6 @@ module.exports = {
   getDeptMasterData,
   getFormMenuMasterData,
   getAllEmployees,
-  getEmpSalaryRevisionByEmpId
+  getEmpSalaryRevisionByEmpId,
+  getAllLeaveType
 };
