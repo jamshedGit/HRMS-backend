@@ -1,5 +1,5 @@
 const httpStatus = require("http-status");
-const { LeaveApplicationModel, LeaveApplicationDetailModel, EmployeeProfileModel, LeaveTypeModel } = require("../../../models/index");
+const { LeaveApplicationModel, LeaveApplicationDetailModel, EmployeeProfileModel, LeaveTypeModel, LeaveTypePoliciesModel, LeaveManagementConfigurationModel } = require("../../../models/index");
 const ApiError = require("../../../utils/ApiError");
 const Sequelize = require('sequelize');
 const { paginationFacts, formatDates, addDaysInDate, getDateDiffInDays, handleNestedData } = require("../../../utils/common");
@@ -28,7 +28,7 @@ const leaveApplicationAttributes = [
  */
 const createleaveApplication = async (req) => {
   const body = req.body;
-  const employeeData = await EmployeeProfileModel.findByPk(body.employeeId, { attributes: ['subsidiaryId', 'Id'] })
+  const employeeData = await EmployeeProfileModel.findByPk(body.employeeId)
   if (!employeeData) {
     throw new ApiError(httpStatus.NOT_FOUND, `No User Found`);
   }
@@ -52,6 +52,12 @@ const createleaveApplication = async (req) => {
   )
   if (oldRecord) {
     throw new ApiError(httpStatus.CONFLICT, `Already have leave present for following dates ${formatDates(oldRecord.from)} - ${formatDates(oldRecord.to)}`);
+  }
+  if (!body.file) {
+    const isFileRequired = await checkAttachmentRequired(employeeData, body)
+    if (isFileRequired) {
+      throw new ApiError(httpStatus.BAD_REQUEST, `File is required for this Leave type`);
+    }
   }
   const payload = {
     ...body,
@@ -185,6 +191,45 @@ const deleteleaveApplicationById = async (id) => {
   })
   return oldRecord;
 };
+
+const checkAttachmentRequired = async (employeeData, body) => {
+  const configurationWithPolicy = await LeaveManagementConfigurationModel.findOne({
+    where: {
+      employeeTypeId: employeeData.employeeTypeId,
+      subsidiaryId: employeeData.subsidiaryId,
+      gradeId: employeeData.gradeId,
+    },
+    include: [
+      {
+        model: LeaveTypePoliciesModel,
+        where: {
+          leaveType: body.leaveType,
+          [Op.and]: [
+            {
+              [Op.or]: [
+                { gender: employeeData.gender },
+                { gender: null }
+              ]
+            },
+            {
+              [Op.or]: [
+                { maritalStatus: employeeData.maritalStatus },
+                { maritalStatus: null }
+              ]
+            }
+          ]
+        },
+        attributes: ['attachmentRequired'],
+        required: false,
+      },
+    ],
+  });
+
+  if (configurationWithPolicy?.t_leave_type_policies?.[0]?.attachmentRequired != null) {
+    return configurationWithPolicy?.t_leave_type_policies?.[0]?.attachmentRequired;
+  }
+  return false;
+}
 
 module.exports = {
   getAllleaveApplication,
