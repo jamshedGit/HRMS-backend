@@ -4,8 +4,8 @@ const { FormModel } = require("../../index");
 //import Database connection configurations.
 const sequelize = require("../../../config/db");
 
-const Reimbursement_policies_detail = sequelize.define(
-  "t_reimbursement_policies_detail",
+const Reimbursement_accounts_detail = sequelize.define(
+  "t_reimbursement_account_detail",
   {
     Id: {
       type: Sequelize.INTEGER,
@@ -18,11 +18,8 @@ const Reimbursement_policies_detail = sequelize.define(
       allowNull: false,
     },
     reimbursement_typeId: { type: Sequelize.INTEGER, allowNull: false },
-    max_amount: { type: Sequelize.INTEGER, allowNull: false },
-    attachment_required: {
-      type: Sequelize.BOOLEAN,
-      allowNull: false,
-    },
+    expense_accountId: { type: Sequelize.INTEGER },
+    bank_accountId: { type: Sequelize.INTEGER },
 
     isActive: { type: Sequelize.BOOLEAN, allowNull: true, defaultValue: true },
     createdBy: {
@@ -38,23 +35,37 @@ const Reimbursement_policies_detail = sequelize.define(
   }
 );
 
-Reimbursement_policies_detail.belongsTo(Reimbursement_configurationModel, {
+Reimbursement_accounts_detail.belongsTo(Reimbursement_configurationModel, {
   foreignKey: "reimbursement_configurationId",
      onDelete: 'CASCADE'
  
 });
 
-Reimbursement_configurationModel.hasMany(Reimbursement_policies_detail, {
-  as: "policies",
+Reimbursement_configurationModel.hasMany(Reimbursement_accounts_detail, {
+  as: "accounts",
   foreignKey: "reimbursement_configurationId",
-
 });
 
 
-Reimbursement_policies_detail.belongsTo(FormModel, {
+Reimbursement_accounts_detail.belongsTo(FormModel, {
   foreignKey: "reimbursement_typeId",
   targetKey: "Id",
-  as: "reimbursement_type",
+  as: "Reimbursement_type",
 });
 
-module.exports = Reimbursement_policies_detail;
+
+
+Reimbursement_accounts_detail.belongsTo(FormModel, {
+    foreignKey: "expense_accountId",
+    targetKey: "Id",
+    as: "Expense_account",
+  });
+
+
+  
+  Reimbursement_accounts_detail.belongsTo(FormModel, {
+    foreignKey: "bank_accountId",
+    targetKey: "Id",
+    as: "Bank_account",
+  });
+module.exports = Reimbursement_accounts_detail;
