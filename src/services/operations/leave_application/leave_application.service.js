@@ -80,7 +80,7 @@ const createleaveApplication = async (req) => {
 
     await LeaveApplicationDetailModel.bulkCreate(detailData)
   }
-  return await getleaveApplicationData({ Id: createdData.Id }, leaveApplicationAttributes, [{ model: LeaveTypeModel, attributes: ['name'] }], true);;
+  return await getleaveApplicationData({ Id: createdData.Id }, leaveApplicationAttributes, [{ model: LeaveTypeModel, attributes: ['name'] }], true);
 };
 
 
@@ -167,8 +167,7 @@ const updateleaveApplicationById = async (body, updatedBy) => {
   body.updatedBy = updatedBy;
   Object.assign(oldRecord, body);
   const updatedData = await oldRecord.save({ fields: ['remarks', 'file'] });
-  const data = await getleaveApplicationById(updatedData.Id, leaveApplicationAttributes)
-  return data;
+  return getleaveApplicationData({ Id: updatedData.Id }, leaveApplicationAttributes, [{ model: LeaveTypeModel, attributes: ['name'] }], true);;
 };
 
 /**
