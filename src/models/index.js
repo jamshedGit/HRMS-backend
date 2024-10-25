@@ -87,6 +87,21 @@ module.exports.OneTimeAllowance = require('./operations/onetime_allowance/onetim
 //LoanTypeModel Model
 module.exports.LoanTypeModel = require('./operations/loan_type/loan_type.model');
 
+//PayrollPolicyModel Model
+module.exports.PayrollPolicyModel = require('./operations/payroll_policy/payroll_policy.model');
+
+//PayrollPolicyModel Model
+module.exports.PayrollEmailRecipentModel = require('./operations/payroll_email_recipents/payroll_email_recipents.model');
+
+//PayrollEOBIAllowancesModel Model
+module.exports.PayrollEOBIAllowancesModel = require('./operations/payroll_eobi_allowances/payroll_eobi_allowances.model');
+
+//PayrollBankInfoPolicy Model
+module.exports.PayrollBankInfoPolicy = require('./operations/payroll_bankInfo_policy/payroll_bankInfo_policy.model');
+
+//PayrollBankInfoPolicy Model
+module.exports.PayrollSessiAllowanceModel = require('./operations/payroll_sessi_allowances/payroll_sessi_allowances.model');
+//Loan Management Configuration Model
 //Leave Management Configuration Model
 module.exports.LeaveManagementConfigurationModel = require('./operations/leave_management_configuration/leave_management_configuration.model');
 
