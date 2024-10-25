@@ -177,6 +177,19 @@ const usp_GetAllEmployeeProfileDetails = async (employeeCode) => {
 };
 
 
+const SP_getContactDetailByEmployeeId = async (employeeId) => {
+  try {
+    const results = await sequelize.query('CALL SP_getContactDetailByEmployeeId(:employeeId)', {
+      replacements: { employeeId: employeeId || 'null' },
+      type: Sequelize.QueryTypes.RAW // Use RAW type for executing stored procedures
+    });
+
+    return results
+  } catch (error) {
+    throw new ApiError(httpStatus.INTERNAL_SERVER_ERROR, error);
+  }
+};
+
 
 
 const updateContactById = async (Id, updateBody, updatedBy) => {
@@ -220,5 +233,6 @@ module.exports = {
   queryContactInfo,
   getContactInfoByEmployeeId,
   updateContactById,
-  usp_GetAllEmployeeProfileDetails
+  usp_GetAllEmployeeProfileDetails,
+  SP_getContactDetailByEmployeeId
 };
