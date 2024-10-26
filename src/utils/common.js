@@ -150,7 +150,10 @@ const handleNestedData = (data) => {
  * @returns 
  */
 const formatDates = (date, dateFormat = null) => {
-  return format(new Date(date), dateFormat || 'MM/dd/yyyy')
+  if(!date)
+    return null;
+
+  return format(new Date(date), dateFormat || 'dd/MMM/yyyy')
 }
 
 /**
