@@ -24,7 +24,7 @@ const createreimbursement_configuration = async (req, reimbursement_configuratio
 
     if (subsidiaryExists) {
       return {
-        message: "Already Exist",
+        message: "Subsidiary & payroll group already exist",
         status: "error",
       };
     }
@@ -133,33 +133,6 @@ const queryreimbursement_configuration = async (
     },
   ];
 
-  // const { count, rows } =
-    
-  //   await Reimbursement_configurationModel.findAndCountAll({
-  //     order: [["createdAt", "DESC"]],
-  //     where: {
-  //       [Op.or]: queryFilters,
-  //       // isActive: true
-  //     },
-  //     offset: offset,
-  //     limit: limit,
-  //     include: [
-  //       {
-  //         model: Reimbursement_policies_detailModel,
-      
-  //         as: "policies",
-  //         include: [
-  //           {
-  //             model: Policies_grade_detailModel, 
-  //             attributes: ["formName", "formCode"],
-  //             as: "salary_grade", 
-  //           },
-  //         ],
-  //       },
-     
-    
-  //     ],
-  //   });
 
 
   const { count, rows } = await Reimbursement_configurationModel.findAndCountAll({
@@ -236,80 +209,6 @@ const queryreimbursement_configuration = async (
  * @param {ObjectId} id
  * @returns {Promise<ReceiptModel>}
  */
-
-
-// const getreimbursement_configurationById = async (id) => {
-//   console.log("final id",id)
- 
-// return await Reimbursement_configurationModel.findOne({
-
-//   where: { Id:id },
-
-//   include: [
-//     {
-//       model: Reimbursement_policies_detailModel,
-//       as: "policies",
-//       include: [
-//         {
-//           model: Policies_grade_detailModel,
-//           as: "grades", // Ensure this matches the alias in the child model
-//           include: [
-//             {
-//               model: FormModel, // Include the salary grade model
-//               attributes: ["formName", "formCode"],
-//               as: "salary_grade", // Ensure this matches the alias in the grandchild model
-//             },
-//           ],
-//         },
-//       ],
-//     },
-
-//     {
-//       model: Reimbursement_accounts_detailModel,
-//       as: "accounts",
-//       include: [
-//         {
-//           model: FormModel,
-//           attributes: ["formName", "formCode"],
-//           as: "Reimbursement_type",
-//         },
-//         {
-//           model: FormModel,
-//           attributes: ["formName", "formCode"],
-//           as: "Expense_account",
-//         },
-//         {
-//           model: FormModel,
-//           attributes: ["formName", "formCode"],
-//           as: "Bank_account",
-//         },
-//       ],
-//     },
-
-
-//     {
-//       model: FormModel,
-//       attributes: ["formName", "formCode"],
-//       as: "Subsidiary",
-//     },
-//     {
-//       model: FormModel,
-//       attributes: ["formName", "formCode"],
-//       as: "PayrollGroup",
-//     },
-//     {
-//       model: FormModel,
-//       attributes: ["formName", "formCode"],
-//       as: "CycleType",
-//     },
-//   ],
-// });
-
-
-
-
-
-// };
 
 
 
@@ -402,141 +301,6 @@ const getreimbursement_configurationById = async (id) => {
  * @returns {Promise<ReceiptModel>}
  */
 
-// const updatereimbursement_configurationById = async (
-//   Id,
-//   updateBody,
-//   updatedBy
-// ) => {
-//   const Item = await getreimbursement_configurationById(Id);
-//   if (!Item) {
-//     throw new ApiError(httpStatus.NOT_FOUND, "record not found");
-//   }
-//   const { subsidiaryId,payroll_groupId} = updateBody;
-//   const exist = await Reimbursement_configurationModel.findOne({
-//     where: {
-//       Id: { [Op.ne]: Id },
-//     [Op.or]: [
-//       { subsidiaryId:subsidiaryId },
-//       {payroll_groupId:payroll_groupId}
-      
-     
-//     ]
-//   }
-//   });
-//   if (exist) {
-//     return {
-//       message: "Already Exist.",
-//       status: "error",
-//     };
-//   } else {
-//     updateBody.updatedBy = updatedBy;
-//     delete updateBody.id;
-//     Object.assign(Item, updateBody);
-//     await Item.save();
-//     return Item;
-//   }
-// };
-
-
-
-// const updatereimbursement_configurationById = async (
-//   Id,
-//   updateBody,
-//   updatedBy
-// ) => {
-
-//   const { subsidiaryId,payroll_groupId} = updateBody;
-
-
-//   const overlappingSubsidiary = await Reimbursement_configurationModel.findOne({
-//     where: {
-//         Id: { [Op.ne]: Id },
-//       [Op.or]: [
-//         { subsidiaryId},
-//         { payroll_groupId },
-        
-       
-//       ]
-//     }
-//   });
-//   if (overlappingSubsidiary) {
-
-// let result={"message":'New data overlaps with existing.',"status":"error"}
-// return result;
-// }
-//   const Item = await Reimbursement_configurationModel.findOne({
-//     where: { Id: Id },
-//     include: [
-//       {
-//         model: Reimbursement_policies_detailModel,
-//         as: "policies",
-//       },
-//     ],
-//   });
-
-
-//   if (!Item) {
-//     throw new ApiError(httpStatus.NOT_FOUND, "Record not found");
-//   }
-
-
-
-//   const existingPolicyDetailIds = Item.policies.map(d => d.Id);
-
-//   // Update or create child records
-//   if (updateBody.policies && Array.isArray(updateBody.policies)) {
-//     const newPolicyIds = [];
-
-//     for (const policy of updateBody.policies) {
-  
-//       if (policy.Id) {
-//         // Update existingPolicyDetailIds detail
-   
-//         const policyDetail = await Reimbursement_policies_detailModel.findOne({
-//           where: { Id: policy.Id }
-//         });
-
-//         if (policyDetail) {
-
-//           Object.assign(policyDetail, detail); // Apply updates
-//           try {
-//             await policyDetail.save();
-//           } catch (error) {
-//             console.error("Error saving policy detail:", error);
-//           }
-//         } else {
-//           console.error("policy detail not found for Id:", policy.Id);
-//         }
-//         newPolicyIds.push(policy.Id);
-//       } else {
-//         // Create new detail if Id is not present
-      
-//         policy.reimbursement_configurationId = Item.Id; // Associate with the configuration ID
-//         await Reimbursement_policies_detailModel.create(policy);
-//         newDetailIds.push(detail.Id); // Add the new detail's Id
-//       }
-//     }
-
-//     // Delete child records that are not present in the incoming details
-//     for (const existingId of existingPolicyDetailIds) {
-
-//       if (!newDetailIds.includes(existingId)) {
- 
-//         await Loan_management_detailModel.Loan_management_detailModel.destroy({
-//           where: { Id: existingId }
-//         });
-//       }
-//     }
-//   }
-//     // Update parent record
-//   updateBody.updatedBy = updatedBy;
-//   delete updateBody.id;
-//   Object.assign(Item, updateBody);
-//   await Item.save();
-
-//   return Item;
-// };
-
 
 const updatereimbursement_configurationById = async (
   Id,
@@ -547,19 +311,25 @@ const updatereimbursement_configurationById = async (
 console.log(" subsidiaryId, payroll_groupId updateBody",updateBody)
 
 const overlappingSubsidiary = await Reimbursement_configurationModel.findOne({
+  // where: {
+  //   Id: { [Op.ne]: Id }, // Exclude the current record
+  //   [Op.or]: 
+  //   [
+  //     { subsidiaryId: subsidiaryId }, // Wrap in an object
+  //     { payroll_groupId: payroll_groupId } // Wrap in an object
+  //   ]
+  // }
+
   where: {
-    Id: { [Op.ne]: Id }, // Exclude the current record
-    [Op.or]: [
-      { subsidiaryId: subsidiaryId }, // Wrap in an object
-      { payroll_groupId: payroll_groupId } // Wrap in an object
-    ]
+    Id: { [Op.ne]: Id }, // Exclude the current record by ID
+    subsidiaryId: subsidiaryId,
+    payroll_groupId: payroll_groupId,
   }
 });
 
-
   console.log(" subsidiaryId, payroll_groupId overlappingSubsidiary", overlappingSubsidiary)
   if (overlappingSubsidiary) {
-    return { message: 'New data overlaps with existing.', status: "error" };
+    return { message: 'Subsidiary & payroll group already exist.', status: "error" };
   }
 
   const Item = await Reimbursement_configurationModel.findOne({
