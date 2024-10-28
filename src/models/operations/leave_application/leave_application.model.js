@@ -78,7 +78,7 @@ leaveApplicationModel.belongsTo(SubsidiaryModel, {
 });
 
 // Association with CompanyModel model (companyId is a foreign key)
-CompanyModel.hasMany(leaveApplicationModel, { foreignKey: 'subsidiaryId' });
+CompanyModel.hasMany(leaveApplicationModel, { foreignKey: 'companyId' });
 leaveApplicationModel.belongsTo(CompanyModel, {
 	foreignKey: 'companyId',
 	targetKey: 'Id',  // Assuming 'Id' is the primary key in CompanyModel table
