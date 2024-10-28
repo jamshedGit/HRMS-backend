@@ -256,6 +256,7 @@ const updateloan_management_configurationById = async (
         Id: { [Op.ne]: Id },
       [Op.or]: [
         { subsidiaryId:subsidiaryId },
+        
        
       ]
     }

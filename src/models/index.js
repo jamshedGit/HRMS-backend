@@ -128,4 +128,7 @@ module.exports.Loan_management_detailModel = require('./operations/loan_manageme
 module.exports.Gratuity_configurationModel = require('./operations/gratuity_configuration/gratuity_configuration.model');
 module.exports.accrue_gratuity_configurationModel = require('./operations/accrue_gratuity_configuration/accrue_gratuity_configuration');
 
-
+module.exports.Reimbursement_configurationModel=require("./operations/reimbursement_configuration/reimbursement_configuration.model")
+module.exports.Reimbursement_policies_detailModel=require("./operations/reimbursement_configuration/reimbursement_policies_detail.model")
+module.exports.Policies_grade_detailModel=require("./operations/reimbursement_configuration/policies_grade_detail.model")
+module.exports.Reimbursement_accounts_detailModel=require("./operations/reimbursement_configuration/reimbursement_accounts_detail.model")
