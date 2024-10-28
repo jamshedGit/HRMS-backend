@@ -118,6 +118,18 @@ const updateEmp_profile = catchAsync(async (req, res) => {
   });
 });
 
+const SP_getContactDetailByEmployeeId = catchAsync(async (req, res) => {
+  // req.body.profile_image = req.file.filename
+   console.log("contact emp",req.body);
+   const Receipt = await Emp_profileformService.EmpProfileServicePage.SP_getContactDetailByEmployeeId(req.body.Id);
+   res.send({
+     code: HttpStatusCodes.OK,
+     message: HttpResponseMessages.OK,
+     data: Receipt,
+   });
+ });
+ 
+
 
 const updateContactById = catchAsync(async (req, res) => {
   // req.body.profile_image = req.file.filename
@@ -174,5 +186,6 @@ module.exports = {
   getContactInfoByEmployeeId,
   updateContactById,
   usp_GetAllEmployeeProfileDetails,
-  getProfileView
+  getProfileView,
+  SP_getContactDetailByEmployeeId
 };

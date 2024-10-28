@@ -50,7 +50,7 @@ router.route("/delete-profile").patch(auth(), validate(itemValidation.deleteRece
 // =============== COntact Info
 
 router.route("/read-all-contact").post(auth(), emp_profile_Controller.getAllContactInfo);
-router.route("/read-contact").post(auth(), emp_profile_Controller.getContactInfoByEmployeeId);
+router.route("/read-contact").post(auth(), emp_profile_Controller.SP_getContactDetailByEmployeeId);
 router.route("/update-contact").put(auth(),validate(empValidation.createEmp_profileValidation), emp_profile_Controller.updateContactById);
 router.route("/read-all-employee-profile").post( emp_profile_Controller.usp_GetAllEmployeeProfileDetails);
 router.route("/read-profile-view/:id").get( emp_profile_Controller.getProfileView);

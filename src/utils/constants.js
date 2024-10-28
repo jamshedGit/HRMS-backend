@@ -56,6 +56,7 @@ const DDL_FIELD_NAMES = {
   FormMenus:{
     labelField: 'formName',
     valueField: 'Id',
+    codeField: 'formCode',
   },
 
   LeaveType:{
