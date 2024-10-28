@@ -50,3 +50,4 @@ module.exports.PayrollProcessPolicy = require('./operations/payroll_process_poli
 module.exports.LeaveManagementConfigurationService = require('./operations/leave_management_configuration/leave_management_configuration.service')
 module.exports.Gratuity_configurationService = require('./operations/gratuity_configuration/gratuity_configuration.service')
 module.exports.accrue_gratuity_configurationService = require('./operations/accure_gratuity_configuration/accure_gratuity_configuration.service')
+module.exports.reimbursement_configurationService=require("./operations/reimbursement_configuration/reimbursement_configuration.service")
