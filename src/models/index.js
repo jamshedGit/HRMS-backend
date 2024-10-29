@@ -110,13 +110,15 @@ module.exports.LeaveTypePoliciesModel = require('./operations/leave_type_policie
 
 //Leave Type Salary Deduction Policies Model
 module.exports.LeaveTypeSalaryDeductionPoliciesModel = require('./operations/leave_type_salary_deduction_policies/leave_type_salary_deduction_policies.model');
-
 //Tax Slab Model
+
 module.exports.Tax_slabModel = require('./operations/tax_slab/tax_slab.model');
 //Salarypolicy Model
+
 module.exports.salarypolicyModel = require('./operations/salarypolicy/salarypolicy.model');
 //Loan_management_configuration Model
 module.exports.Loan_management_configurationModel = require('./operations/loan_management_configuration/loan_management_configuration.model');
+
 module.exports.Loan_management_detailModel = require('./operations/loan_management_configuration/loan_management_detail');
 
 //Gratuity_configuration Model

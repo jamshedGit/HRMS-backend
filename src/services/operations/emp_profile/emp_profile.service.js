@@ -17,15 +17,8 @@ const Op = Sequelize.Op;
  * @returns {Promise<Bank>}
  */
 const createEmp_profile = async (req, Emp_profileBody) => {
-  console.log("Emp_profile Body", Emp_profileBody)
-  // Emp_profileBody.slug = Emp_profileBody.name.replace(/ /g, "-").toLowerCase();
-  console.log(req.user.id);
   Emp_profileBody.createdBy = req.user.id;
-  Emp_profileBody.subsidiaryId = 1; // 
-  // Emp_profileBody.bankName = Emp_profileBody.Name;
-  console.log(Emp_profileBody, "body");
   const addedEmp_profileObj = await Emp_profileModel.EmployeeProfileModel.create(Emp_profileBody);
-  //authSMSSend(addedBankObj.dataValues);  // Quick send message at the time of donation
   return addedEmp_profileObj;
 };
 
