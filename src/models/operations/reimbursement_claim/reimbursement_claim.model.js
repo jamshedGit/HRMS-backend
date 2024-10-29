@@ -16,7 +16,7 @@ const Reimbursement_claim = sequelize.define('t_reimbursement_claim', {
     amount: { type: Sequelize.INTEGER,allowNull: false },
     pay_in_payroll_forId: { type: Sequelize.INTEGER, allowNull: false ,defaultValue:1},
     pay_slip_refId: { type: Sequelize.INTEGER, allowNull: false,defaultValue:1 },
-    reimbursement_configurationId: { type: Sequelize.INTEGER, allowNull: false },
+    reimbursement_configurationId: { type: Sequelize.INTEGER, allowNull: true },
     isActive: { type: Sequelize.BOOLEAN, allowNull: true, defaultValue: true },
 	createdBy: {
 		type: Sequelize.INTEGER,
