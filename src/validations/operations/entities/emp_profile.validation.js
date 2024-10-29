@@ -13,10 +13,10 @@ const createEmp_profileValidation = {
         profile_image: Joi.string(),
         nic_no: Joi.string(),
         passportNo: Joi.any().optional(),
-        maritalStatus: Joi.string(),
+        maritalStatus: Joi.any().optional(),
         gender: Joi.string(),
         nationality: Joi.string(),
-        email_official: Joi.string(),
+        email_official: Joi.any().optional(),
         email_personal: Joi.string(),
         email: Joi.any().optional(),
         phone_home: Joi.any().optional(),
@@ -45,7 +45,8 @@ const createEmp_profileValidation = {
         dateOfBirth: Joi.date(),
         dateOfRetirement: Joi.date(),
         gradeId: Joi.number(),
-        reportTo: Joi.number()
+        reportTo: Joi.number(),
+        email:Joi.any().optional(),
     }),
 };
 
