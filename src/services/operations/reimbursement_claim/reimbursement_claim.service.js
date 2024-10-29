@@ -13,19 +13,19 @@ const createreimbursement_claim = async (req, reimbursement_claimBody) => {
   try {
     console.log("Creating reimbursement configuration...", reimbursement_claimBody);
 
-    // Check if the parent configuration already exists
-    const subsidiaryExists = await Reimbursement_claimModel.findOne({
-      where: {
-        employeeId: reimbursement_claimBody.employeeId,
-      },
-    });
+    // // Check if the parent configuration already exists
+    // const subsidiaryExists = await Reimbursement_claimModel.findOne({
+    //   where: {
+    //     employeeId: reimbursement_claimBody.employeeId,
+    //   },
+    // });
 
-    if (subsidiaryExists) {
-      return {
-        message: "Subsidiary & payroll group already exist",
-        status: "error",
-      };
-    }
+    // if (subsidiaryExists) {
+    //   return {
+    //     message: "Subsidiary & payroll group already exist",
+    //     status: "error",
+    //   };
+    // }
 
     // Set createdBy field
     reimbursement_claimBody.createdBy = req.user.id;
@@ -64,29 +64,19 @@ const createreimbursement_claim = async (req, reimbursement_claimBody) => {
 const queryreimbursement_claim = async (
   filter,
   options,
-  searchQuery
+  searchQuery,
+  employeeId
 ) => {
   let limit = options.pageSize;
   let offset = 0 + (options.pageNumber - 1) * limit;
 
-  searchQuery = searchQuery.toLowerCase();
-  const queryFilters = [
-    {
-      min_year: Sequelize.where(
-        Sequelize.fn("", Sequelize.col("employeeId")),
-        "LIKE",
-        "%" + searchQuery + "%"
-      ),
-    },
-  ];
-
-
+console.log("reimbursement_claim employeeId claim_body",employeeId
+)
 
   const { count, rows } = await Reimbursement_claimModel.findAndCountAll({
     order: [["createdAt", "DESC"]],
     where: {
-      [Op.or]: queryFilters,
-      // isActive: true
+     employeeId
     },
     offset: offset,
     limit: limit,
@@ -113,8 +103,19 @@ const queryreimbursement_claim = async (
     ],
    
   });
-    
-  return paginationFacts(count, limit, options.pageNumber, rows);
+
+  if(count && rows)
+  {
+    return paginationFacts(count, limit, options.pageNumber, rows);
+  }    
+  else {
+      // return {
+      //   message: "Data not present",
+      //   status: "error",
+      // };
+      return  paginationFacts(count, limit, options.pageNumber, rows=[]);
+    }
+  
 };
 
 /**

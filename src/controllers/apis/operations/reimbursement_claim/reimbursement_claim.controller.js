@@ -44,20 +44,41 @@ const createreimbursement_claim = catchAsync(async (req, res) => {
 
 
 const getAllreimbursement_claim = catchAsync(async (req, res) => {
-
+console.log("req.body",req.body)
     const obj = {};
     const filter = obj;
     // const options = pick(req.body, ["sortBy", "limit", "page"]);
-    const options = pick(req.body, ['sortOrder', 'pageSize', 'pageNumber']);
-    const searchQuery = req.body.filter.searchQuery ? req.body.filter.searchQuery : '';
+    // const options = pick(req.body, req.body.queryParams['sortOrder', 'pageSize', 'pageNumber']);
+    const options = pick(req.body.queryParams, ['sortOrder', 'pageSize', 'pageNumber']);
 
-    const result = await reimbursement_claimService.queryreimbursement_claim(filter, options, searchQuery);
+    const searchQuery = req.body.queryParams.filter.searchQuery ? req.body.queryParams.filter.searchQuery : '';
+
+    const result = await reimbursement_claimService.queryreimbursement_claim(filter, options, searchQuery,req.body.employeeId);
     console.log(result);
-    res.send({
-        code: HttpStatusCodes.OK,
-        message: HttpResponseMessages.OK,
-        data: result,
-    });
+    // res.send({
+    //     code: HttpStatusCodes.OK,
+    //     message: HttpResponseMessages.OK,
+    //     data: result,
+    // });
+
+    if (result.status == "error") {
+
+        res.status(HttpStatusCodes.INTERNAL_SERVER_ERROR).send({
+            code: HttpStatusCodes.INTERNAL_SERVER_ERROR,
+            message: result.message,
+            error: result.error || 'An unexpected error occurred',
+        });
+
+
+    }
+    else {
+
+        res.status(httpStatus.CREATED).send({
+            code: HttpStatusCodes.CREATED,
+            message: HttpResponseMessages.CREATED,
+            data: result
+        });
+    }
 });
 
 const getreimbursement_claimById = catchAsync(async (req, res) => {
@@ -71,6 +92,9 @@ const getreimbursement_claimById = catchAsync(async (req, res) => {
         message: HttpResponseMessages.OK,
         data: Receipt,
     });
+
+
+
 });
 
 const updatereimbursement_claim = catchAsync(async (req, res) => {
