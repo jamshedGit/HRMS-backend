@@ -43,14 +43,16 @@ const loan_management_configuration = require('./operations/loan_management_conf
 const arrear_policy = require('./operations/arrear_policy/arrear_policy.route')
 const salary_rounding_policy = require('./operations/salary_rounding_policy/salary_rounding_policy.route')
 const leave_type = require('./operations/leave_type/leave_type.route')
-
 const final_settlement_policy = require('./operations/final_settlement_policy/final_settlement_policy.route')
 const onetime_earning = require('./operations/onetime_allowance/onetime_allowance.route')
 const loan_type = require('./operations/loan_type/loan_type.route')
 const payroll_process_policy = require('./operations/payroll_process_policy/payroll_process_policy.route')
 const leave_management_configuration = require('./operations/leave_management_configuration/leave_management_configuration.route')
+const leave_application = require('./operations/leave_application/leave_application.route');
+const uploadImage = require("../../middlewares/fileUpload.middleware");
+const ApiError = require("../../utils/ApiError");
+const httpStatus = require("http-status");
 const gratuity_configuration = require('./operations/gratuity_configuration/gratuity_configuration.route')
-
 const accrue_gratuity_configuration= require('./operations/accrue_gratuity_configuration/accrue_gratuity_configuration.route')
 const reimbursement_configuration=require('./operations/reimbursement_configuration/reimbursement_configuration.route')
 const reimbursement_claim=require('./operations/reimbursement_claim/reimbursement_claim.route')
@@ -257,6 +259,10 @@ const defaultRoutes = [
     route: leave_management_configuration
   },
   {
+    path: "/leave_application",
+    route: leave_application
+  },
+  {
     path: "/gratuity_configuration",
     route: gratuity_configuration
   },
@@ -287,6 +293,13 @@ defaultRoutes.forEach((route) => {
   // console.log("Jamshed", route.path, route.route);
   router.use(route.path, route.route);
 });
+
+router.post('/file-upload', uploadImage('file'), (req, res) => {
+  if (!req.file) {
+    throw new ApiError(httpStatus.NOT_ACCEPTABLE, "File Not Uploaded");
+  }
+  res.send(req.file)
+})
 
 /* istanbul ignore next */
 if (config.env === "development") {
