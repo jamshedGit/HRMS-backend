@@ -125,86 +125,24 @@ const queryreimbursement_claim = async (
 
 
 
-const getreimbursement_claimById = async (id) => {
-  console.log("final id", id);
 
-  // Fetch the reimbursement configuration
-  const result = await Reimbursement_claimModel.findOne({
+
+
+
+const getreimbursement_claimById = async (id) => {
+  return Reimbursement_claimModel.findOne({
     where: { Id: id },
     include: [
       {
-        model: Reimbursement_policies_detailModel,
-        as: "policies",
-        include: [
-          {
-            model: Policies_grade_detailModel,
-            as: "grades", // Ensure this matches the alias in the child model
-            include: [
-              {
-                model: FormModel, // Include the salary grade model
-                attributes: ["formName", "formCode"],
-                as: "salary_grade", // Ensure this matches the alias in the grandchild model
-              },
-            ],
-          },
-        ],
-      },
-      {
-        model: Reimbursement_accounts_detailModel,
-        as: "accounts",
-        include: [
-          {
-            model: FormModel,
-            attributes: ["formName", "formCode"],
-            as: "Reimbursement_type",
-          },
-          {
-            model: FormModel,
-            attributes: ["formName", "formCode"],
-            as: "Expense_account",
-          },
-          {
-            model: FormModel,
-            attributes: ["formName", "formCode"],
-            as: "Bank_account",
-          },
-        ],
-      },
-      {
         model: FormModel,
         attributes: ["formName", "formCode"],
-        as: "Subsidiary",
+        as: "ReimbursementType",
       },
-      {
-        model: FormModel,
-        attributes: ["formName", "formCode"],
-        as: "PayrollGroup",
-      },
-      {
-        model: FormModel,
-        attributes: ["formName", "formCode"],
-        as: "CycleType",
-      },
+  
     ],
   });
 
-  // Transform the result to adjust the grades format
-  if (result) {
-    const transformedResult = JSON.parse(JSON.stringify(result)); // Convert Sequelize instance to plain object
 
-    // Map the grades to only include their IDs
-    if (transformedResult.policies) {
-      transformedResult.policies.forEach(policy => {
-        if (policy.grades) {
-          policy.grades = policy.grades.map(grade => grade.salary_gradeId);
-        }
-      });
-    }
-    console.log("transformedResult", id);
-    return transformedResult;
-  }
-
-  return null; // or handle the case where no result is found
 };
 
 /**
