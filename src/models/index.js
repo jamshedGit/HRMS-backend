@@ -110,6 +110,12 @@ module.exports.LeaveTypePoliciesModel = require('./operations/leave_type_policie
 
 //Leave Type Salary Deduction Policies Model
 module.exports.LeaveTypeSalaryDeductionPoliciesModel = require('./operations/leave_type_salary_deduction_policies/leave_type_salary_deduction_policies.model');
+
+//Leave Application Model
+module.exports.LeaveApplicationModel = require('./operations/leave_application/leave_application.model');
+
+//Leave Application Detail Model
+module.exports.LeaveApplicationDetailModel = require('./operations/leave_application_detail/leave_application_detail.model');
 //Tax Slab Model
 
 module.exports.Tax_slabModel = require('./operations/tax_slab/tax_slab.model');
@@ -125,4 +131,7 @@ module.exports.Loan_management_detailModel = require('./operations/loan_manageme
 module.exports.Gratuity_configurationModel = require('./operations/gratuity_configuration/gratuity_configuration.model');
 module.exports.accrue_gratuity_configurationModel = require('./operations/accrue_gratuity_configuration/accrue_gratuity_configuration');
 
-
+module.exports.Reimbursement_configurationModel=require("./operations/reimbursement_configuration/reimbursement_configuration.model")
+module.exports.Reimbursement_policies_detailModel=require("./operations/reimbursement_configuration/reimbursement_policies_detail.model")
+module.exports.Policies_grade_detailModel=require("./operations/reimbursement_configuration/policies_grade_detail.model")
+module.exports.Reimbursement_accounts_detailModel=require("./operations/reimbursement_configuration/reimbursement_accounts_detail.model")

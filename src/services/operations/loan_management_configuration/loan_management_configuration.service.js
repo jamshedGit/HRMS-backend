@@ -168,6 +168,12 @@ const queryloan_management_configuration = async (
             attributes: ["formName", "formCode"],
             as: "Account",
           },
+
+          {
+            model: FormModel.FormModel,
+            attributes: ["formName", "formCode"],
+            as: "EmpLoanAccount",
+          },
        
 
           { 
@@ -250,6 +256,7 @@ const updateloan_management_configurationById = async (
         Id: { [Op.ne]: Id },
       [Op.or]: [
         { subsidiaryId:subsidiaryId },
+        
        
       ]
     }

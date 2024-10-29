@@ -34,12 +34,9 @@ const createEmp_profile = async (req, Emp_profileBody) => {
  * @returns {Promise<QueryResult>}
  */
 const queryEmp_profile = async (filter, options, searchQuery) => {
-  console.log("get search query", searchQuery);
 
-  console.log("options Emp_profile", options);
   let limit = options.pageSize;
   let offset = 0 + (options.pageNumber - 1) * limit;
-  console.log("Emp_profileCode offset ", offset)
   searchQuery = searchQuery.toLowerCase();
   const queryFilters = [
     // { isActive: sequelize.where }
@@ -101,18 +98,15 @@ const queryContactInfo = async () => {
  * @returns {Promise<ReceiptModel>}
  */
 const getEmp_profileById = async (id) => {
-  //console.log("read receipt by id " + id)
   return Emp_profileModel.EmployeeProfileModel.findByPk(id);
 };
 
 const getContactInfoByEmployeeId = async (id) => {
-  console.log("employee id " + id)
-
   const queryFilters = [
     // { isActive: sequelize.where }
     // { Id: Sequelize.where(Sequelize.fn('LOWER', Sequelize.col('Id')), 'LIKE', '%' + searchQuery + '%') },
-    { employeeId: id},
-    
+    { employeeId: id },
+
 
   ]
 
@@ -123,7 +117,7 @@ const getContactInfoByEmployeeId = async (id) => {
     ],
     where: {
       [Op.or]: queryFilters,
-       isActive: true
+      isActive: true
     },
     offset: 0,
     limit: 10,
@@ -140,14 +134,10 @@ const getContactInfoByEmployeeId = async (id) => {
  * @returns {Promise<ReceiptModel>}
  */
 const updateEmp_profileById = async (Id, updateBody, updatedBy) => {
-  console.log("item 12",updateBody)
-
   const Item = await getEmp_profileById(Id);
-  console.log("item", Item)
   if (!Item) {
     throw new ApiError(httpStatus.NOT_FOUND, "record not found");
   }
-  //console.log("Update Receipt Id" , item);
   // updateBody.slug = updateBody.name.replace(/ /g, "-").toLowerCase()
   updateBody.updatedBy = updatedBy;
   delete updateBody.id;
@@ -186,14 +176,10 @@ const SP_getContactDetailByEmployeeId = async (employeeId) => {
 
 
 const updateContactById = async (Id, updateBody, updatedBy) => {
-  //console.log("item 12")
-
   const Item = await getContactById(Id);
-  console.log("item", Item)
   if (!Item) {
     throw new ApiError(httpStatus.NOT_FOUND, "record not found");
   }
-  //console.log("Update Receipt Id" , item);
   // updateBody.slug = updateBody.name.replace(/ /g, "-").toLowerCase()
   updateBody.updatedBy = updatedBy;
   delete updateBody.id;
@@ -217,6 +203,21 @@ const deleteEmp_profileById = async (Id) => {
   return Item;
 };
 
+
+
+const getProfileView = async (id) => {
+  const [result] = await sequelize.query(`
+    SELECT *
+    FROM v_employee_profile
+    WHERE Id = :id
+  `, {
+    replacements: { id },
+    type: Sequelize.QueryTypes.SELECT
+  });
+
+  return result || {};
+}
+
 module.exports = {
   createEmp_profile,
   queryEmp_profile,
@@ -227,5 +228,6 @@ module.exports = {
   getContactInfoByEmployeeId,
   updateContactById,
   usp_GetAllEmployeeProfileDetails,
+  getProfileView,
   SP_getContactDetailByEmployeeId
 };

@@ -164,6 +164,16 @@ const deleteEmp_profile = catchAsync(async (req, res) => {
   });
 });
 
+const getProfileView = catchAsync(async (req, res) => {
+  const Receipt = await Emp_profileformService.EmpProfileServicePage.getProfileView(req.params.id);
+  res.send({
+    code: HttpStatusCodes.OK,
+    message: HttpResponseMessages.OK,
+    data: Receipt,
+  });
+});
+
+
 
 module.exports = {
   createEmp_profile,
@@ -176,5 +186,6 @@ module.exports = {
   getContactInfoByEmployeeId,
   updateContactById,
   usp_GetAllEmployeeProfileDetails,
+  getProfileView,
   SP_getContactDetailByEmployeeId
 };
