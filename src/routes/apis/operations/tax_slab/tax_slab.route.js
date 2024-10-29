@@ -4,8 +4,6 @@ const validate = require("../../../../middlewares/validate");
 const tax_slabController = require("../../../../controllers/apis/operations/tax_slab/tax_slab.controller");
 
 const tax_slabValidation = require("../../../../validations/operations/entities/tax_slab.validation");
-
-
 const router = express.Router();
 
 router.route("/read-tax-slab").post(auth(), tax_slabController.gettax_slabById);
