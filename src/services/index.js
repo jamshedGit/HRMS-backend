@@ -52,3 +52,4 @@ module.exports.LeaveApplicationServicePage = require('./operations/leave_applica
 module.exports.Gratuity_configurationService = require('./operations/gratuity_configuration/gratuity_configuration.service')
 module.exports.accrue_gratuity_configurationService = require('./operations/accure_gratuity_configuration/accure_gratuity_configuration.service')
 module.exports.reimbursement_configurationService=require("./operations/reimbursement_configuration/reimbursement_configuration.service")
+module.exports.allocateLeavesServicePage=require("./operations/allocate_leaves/allocate_leaves.service")

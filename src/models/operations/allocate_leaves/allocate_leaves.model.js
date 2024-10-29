@@ -59,15 +59,6 @@ allocateLeavesModel.belongsTo(LeaveTypeModel, {
 	onUpdate: 'RESTRICT',
 });
 
-// Association with FormModel model (allocationType is a foreign key)
-allocateLeavesModel.belongsTo(FormModel, {
-	foreignKey: 'policyType',
-	targetKey: 'Id',  // Assuming 'Id' is the primary key in LeaveType table
-	as: 'policy',
-	onDelete: 'RESTRICT',
-	onUpdate: 'RESTRICT',
-});
-
 // Association with FormModel model (cycleTypeId is a foreign key)
 allocateLeavesModel.belongsTo(FormModel, {
 	foreignKey: 'cycleTypeId',
