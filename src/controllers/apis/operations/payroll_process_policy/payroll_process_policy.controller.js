@@ -59,8 +59,8 @@ const get_Payroll_Process_PolicyById = catchAsync(async (req, res) => {
 });
 
 const update_Payroll_Process_Policy = catchAsync(async (req, res) => {
-  console.log(req.body);
-  const Receipt = await PayrollProcessPolicy.PayrollProcessPolicy.updatePayrollPolicyById(req.body.Id, req.body, req.user.Id);
+  console.log("update_policy::",req.body);
+  const Receipt = await PayrollProcessPolicy.PayrollProcessPolicy.updatePayrollPolicyById(req.body.body.Id, req.body.body, req.user.Id,req.body);
   res.send({
     code: HttpStatusCodes.OK,
     message: HttpResponseMessages.OK,

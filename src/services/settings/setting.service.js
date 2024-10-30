@@ -187,9 +187,15 @@ const getAllFiscalYearData = async () => {
 
 
 const getCitiesMasterData = async (countryId) => {
-  const citiesMasterData = getDdlItems(DDL_FIELD_NAMES.default, await CityModel.findAll({
-    where: { isActive: true, countryId: countryId },
-    attributes: ['id', 'name']
+  const filter = { isActive: true }
+  if (countryId) {
+
+    filter.countryId = countryId
+
+  }
+  const citiesMasterData = getDdlItems(DDL_FIELD_NAMES.city, await CityModel.findAll({
+    where: filter,
+    attributes: ['id', 'name','countryId']
   }));
   return citiesMasterData
 };
