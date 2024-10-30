@@ -46,6 +46,11 @@ const createEmp_profileValidation = {
         gradeId: Joi.number(),
         reportTo: Joi.number(),
         email:Joi.any().optional(),
+        contactList: Joi.disallow(),
+        workExperienceList: Joi.disallow(),
+        academicList: Joi.disallow(),
+        skillsList: Joi.disallow(),
+        incidentList: Joi.disallow(),
     }),
 };
 

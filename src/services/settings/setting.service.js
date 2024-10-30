@@ -129,7 +129,7 @@ const getChildMenusByParentId = async (parentMenuId) => {
 
 const getRevisionHistoryByEmpId = async (employeeId) => {
   const MenuChildsData = getDdlItems(DDL_FIELD_NAMES.SalaryRevisionKeys, await EmployeeSalaryRevisionModel.findAll({
-    where: { isActive: true,employeeId : employeeId },
+    where: { isActive: true, employeeId: employeeId },
     attributes: ['Id', 'reviewDate']
   }));
   return MenuChildsData
@@ -141,11 +141,11 @@ const getFormMenusMasterData = async (req, res) => {
   console.log("mm:", req.body.Id)
   const FormMenusMasterData = getDdlItems(DDL_FIELD_NAMES.FormMenus, await FormModel.findAll({
     where: { isActive: true, parentFormID: req.body.Id || null },
-    attributes: ['formName', 'Id','formCode']
+    attributes: ['formName', 'Id', 'formCode']
   }));
-  console.log("getFormMenusMasterData ",FormMenusMasterData)
+  console.log("getFormMenusMasterData ", FormMenusMasterData)
   if (FormMenusMasterData.length > 0) {
-    FormMenusMasterData.unshift({ label: req.body.text || '--Select--', value: null,code:null,mergeLabel:"--Select--"})
+    FormMenusMasterData.unshift({ label: req.body.text || '--Select--', value: null, code: null, mergeLabel: "--Select--" })
   }
   return FormMenusMasterData
 };
@@ -161,9 +161,15 @@ const getLeaveTypesData = async () => {
 };
 
 const getCitiesMasterData = async (countryId) => {
-  const citiesMasterData = getDdlItems(DDL_FIELD_NAMES.default, await CityModel.findAll({
-    where: { isActive: true, countryId: countryId },
-    attributes: ['id', 'name']
+  const filter = { isActive: true }
+  if (countryId) {
+
+    filter.countryId = countryId
+
+  }
+  const citiesMasterData = getDdlItems(DDL_FIELD_NAMES.city, await CityModel.findAll({
+    where: filter,
+    attributes: ['id', 'name','countryId']
   }));
   return citiesMasterData
 };
@@ -174,11 +180,11 @@ const getCitiesMasterData = async (countryId) => {
 
 
 
-const GetLastInserted_ID_ByTableName = async (tableName,prefix) => {
+const GetLastInserted_ID_ByTableName = async (tableName, prefix) => {
   try {
-    console.log("tableName",tableName,prefix);
+    console.log("tableName", tableName, prefix);
     const results = await sequelize.query('CALL GetLastInsertedIdByTableName(:tableName,:prefix)', {
-      replacements: { tableName: tableName , prefix: prefix },
+      replacements: { tableName: tableName, prefix: prefix },
       type: Sequelize.QueryTypes.RAW // Use RAW type for executing stored procedures
     });
 
