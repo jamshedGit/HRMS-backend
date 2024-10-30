@@ -9,47 +9,73 @@ const { HttpStatusCodes } = require("../../../utils/constants");
 
 const Op = Sequelize.Op;
 
+// const createreimbursement_claim = async (req, reimbursement_claimBody) => {
+//   try {
+//     console.log("Creating reimbursement configuration...", reimbursement_claimBody);
+//     let  dataExists;
+//     if(reimbursement_claimBody.Id){
+//        dataExists = await Reimbursement_claimModel.findOne({
+//       where: {
+//         Id: reimbursement_claimBody.Id,
+//       },
+//     });
+//     }
+
+
+//     if (dataExists) {
+  
+//     }
+
+//     // Set createdBy field
+//     reimbursement_claimBody.createdBy = req.user.id;
+
+
+
+//     // Create the parent reimbursement configuration
+//     const addedReimbursementClaim = await Reimbursement_claimModel.create(reimbursement_claimBody);
+
+//     return await getreimbursement_claimById(addedReimbursementClaim.Id);
+//   } catch (error) {
+//     console.error("Error creating reimbursement configuration:", error);
+//     throw error; // Rethrow or handle the error as needed
+//   }
+// };
+
 const createreimbursement_claim = async (req, reimbursement_claimBody) => {
   try {
-    console.log("Creating reimbursement configuration...", reimbursement_claimBody.data);
+    console.log("Processing reimbursement claim...", reimbursement_claimBody);
 
-    // // Check if the parent configuration already exists
-    // const subsidiaryExists = await Reimbursement_claimModel.findOne({
-    //   where: {
-    //     employeeId: reimbursement_claimBody.employeeId,
-    //   },
-    // });
+    let dataExists;
 
-    // if (subsidiaryExists) {
-    //   return {
-    //     message: "Subsidiary & payroll group already exist",
-    //     status: "error",
-    //   };
-    // }
+    if (reimbursement_claimBody.Id) {
+      // Check if a record with this ID already exists
+      dataExists = await Reimbursement_claimModel.findOne({
+        where: { Id: reimbursement_claimBody.Id },
+      });
+    }
 
-    // Set createdBy field
-    reimbursement_claimBody.createdBy = req.user.id;
+    // Set createdBy or updatedBy field
+    const userId = req.user.id;
+    if (dataExists) {
+      // Update existing record
+      reimbursement_claimBody.updatedBy = userId;
+      await dataExists.update(reimbursement_claimBody);
 
-    // If a file was uploaded, add its location to reimbursement_claimBody
-    // if (req.file) {
-    //   reimbursement_claimBody.attachment = req.file.path; // Assuming req.file.path contains the file path
-    // } else {
-    //   return {
-    //     message: "File upload is required",
-    //     status: "error",
-    //   };
-    // }
+      // Return the updated record
+      return await getreimbursement_claimById(reimbursement_claimBody.Id);
+    } else {
+      // Create new record
+      reimbursement_claimBody.createdBy = userId;
+      const addedReimbursementClaim = await Reimbursement_claimModel.create(reimbursement_claimBody);
 
-    // Create the parent reimbursement configuration
-    const addedReimbursementConfiguration = await Reimbursement_claimModel.create(reimbursement_claimBody);
-
-    return await getreimbursement_claimById(addedReimbursementConfiguration.Id);
+      // Return the new record
+      return await getreimbursement_claimById(addedReimbursementClaim.Id);
+    }
   } catch (error) {
-    console.error("Error creating reimbursement configuration:", error);
-    throw error; // Rethrow or handle the error as needed
+    console.error("Error processing reimbursement claim:", error);
+    throw error;
   }
 };
-
 
 
 /**
@@ -106,6 +132,7 @@ console.log("reimbursement_claim employeeId claim_body",employeeId
 
   if(count && rows)
   {
+    console.log("count && rows")
     return paginationFacts(count, limit, options.pageNumber, rows);
   }    
   else {
