@@ -18,10 +18,73 @@ const Op = Sequelize.Op;
  */
 const createEmp_profile = async (req, Emp_profileBody) => {
   Emp_profileBody.createdBy = req.user.id;
+  console.log("create_body", Emp_profileBody)
   const addedEmp_profileObj = await Emp_profileModel.EmployeeProfileModel.create(Emp_profileBody);
+
+// For Adding EmployeeId During Creation Record
+  for (let i = 0; i < Emp_profileBody.contactList.length; i++) {
+    Emp_profileBody.contactList[i].employeeId = addedEmp_profileObj.dataValues.Id;
+  }
+
+
+// For Adding EmployeeId During Creation Record
+  for (let i = 0; i < Emp_profileBody.workExperienceList.length; i++) {
+    Emp_profileBody.workExperienceList[i].employeeId = addedEmp_profileObj.dataValues.Id;
+  }
+
+// For Adding EmployeeId During Creation Record
+  for (let i = 0; i < Emp_profileBody.academicList.length; i++) {
+    Emp_profileBody.academicList[i].employeeId = addedEmp_profileObj.dataValues.Id;
+  }
+
+
+  // For Adding EmployeeId During Creation Record
+  for (let i = 0; i < Emp_profileBody.skillsList.length; i++) {
+    Emp_profileBody.skillsList[i].employeeId = addedEmp_profileObj.dataValues.Id;
+  }
+
+   // For Adding EmployeeId During Creation Record
+   for (let i = 0; i < Emp_profileBody.incidentList.length; i++) {
+    Emp_profileBody.incidentList[i].employeeId = addedEmp_profileObj.dataValues.Id;
+  }
+
+
+ 
+  await BUlkInsertEmployeeDetails(Emp_profileBody, addedEmp_profileObj.dataValues.Id);
+
   return addedEmp_profileObj;
 };
 
+const BUlkInsertEmployeeDetails = async (updateBody, employeeId) => {
+
+  if (updateBody.contactList.length) {
+    console.log("create_contact_list_from_create", updateBody)
+    const deleteContact = await sequelize.query(' delete from t_contact_information where employeeId = ' + employeeId);
+    const objContactList = await Emp_profileModel.ContactInformationModel.bulkCreate(updateBody.contactList);
+  }
+
+  if (updateBody.workExperienceList.length) {
+    const workObj = await sequelize.query(' delete from t_employee_work_experience where employeeId = ' + employeeId);
+    const objExperienceList = await Emp_profileModel.ExperienceModel.bulkCreate(updateBody.workExperienceList);
+  }
+
+  if (updateBody.academicList.length) {
+    const objAcad = await sequelize.query(' delete from t_employee_academic_info where employeeId = ' + employeeId);
+    const objAcadList = await Emp_profileModel.AcademicModel.bulkCreate(updateBody.academicList);
+  }
+
+  if (updateBody.skillsList.length) {
+    console.log("skills insert")
+    const objSkill = await sequelize.query(' delete from t_employee_skills where employeeId = ' + employeeId);
+    const objSkillList = await Emp_profileModel.SkillsModel.bulkCreate(updateBody.skillsList);
+  }
+
+  if (updateBody.incidentList.length) {
+    console.log("t_employee_incident insert")
+    const objIncident = await sequelize.query(' delete from t_employee_incident where employeeId = ' + employeeId);
+    const objIncidentList = await Emp_profileModel.IncidentModel.bulkCreate(updateBody.incidentList);
+  }
+}
 
 
 /**
@@ -107,9 +170,7 @@ const getContactInfoByEmployeeId = async (id) => {
     // { Id: Sequelize.where(Sequelize.fn('LOWER', Sequelize.col('Id')), 'LIKE', '%' + searchQuery + '%') },
     { employeeId: id },
 
-
   ]
-
 
   return Emp_profileModel.ContactInformationModel.findAndCountAll({
     order: [
@@ -138,7 +199,10 @@ const updateEmp_profileById = async (Id, updateBody, updatedBy) => {
   if (!Item) {
     throw new ApiError(httpStatus.NOT_FOUND, "record not found");
   }
-  // updateBody.slug = updateBody.name.replace(/ /g, "-").toLowerCase()
+  console.log("updateBody", updateBody)
+
+  BUlkInsertEmployeeDetails(updateBody, updateBody.Id);
+
   updateBody.updatedBy = updatedBy;
   delete updateBody.id;
   Object.assign(Item, updateBody);
@@ -180,11 +244,16 @@ const updateContactById = async (Id, updateBody, updatedBy) => {
   if (!Item) {
     throw new ApiError(httpStatus.NOT_FOUND, "record not found");
   }
+
   // updateBody.slug = updateBody.name.replace(/ /g, "-").toLowerCase()
   updateBody.updatedBy = updatedBy;
   delete updateBody.id;
   Object.assign(Item, updateBody);
   await Item.save();
+
+
+
+
   return;
 };
 

@@ -58,7 +58,7 @@ const getCitiesMasterData = {
   query: Joi.disallow(),
   params: Joi.disallow(),
   body: Joi.object().keys({
-    countryId: Joi.number().integer().required()
+    countryId: Joi.number().integer().optional()
   }),
 };
 
