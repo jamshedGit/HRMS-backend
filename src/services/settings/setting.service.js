@@ -1,5 +1,5 @@
-const { RoleModel, ResourceModel, CountryModel, CityModel, StatusTypeModel, BankModel, DeptModel, FormModel, EmployeeProfileModel, BranchModel, EmployeeSalaryRevisionModel, LeaveTypeModel } = require('../../models');
-const { getDdlItems, getAlarmTimesItems } = require('../../utils/common');
+const { RoleModel, ResourceModel, CountryModel, CityModel, StatusTypeModel, BankModel, DeptModel, FormModel, EmployeeProfileModel, BranchModel, EmployeeSalaryRevisionModel, LeaveTypeModel, FiscalSetupModel, SubsidiaryModel } = require('../../models');
+const { getDdlItems, getAlarmTimesItems, formatDates } = require('../../utils/common');
 const { DDL_FIELD_NAMES } = require('../../utils/constants');
 const { getRoleById } = require('./role.service');
 const Sequelize = require('sequelize');
@@ -129,7 +129,7 @@ const getChildMenusByParentId = async (parentMenuId) => {
 
 const getRevisionHistoryByEmpId = async (employeeId) => {
   const MenuChildsData = getDdlItems(DDL_FIELD_NAMES.SalaryRevisionKeys, await EmployeeSalaryRevisionModel.findAll({
-    where: { isActive: true,employeeId : employeeId },
+    where: { isActive: true, employeeId: employeeId },
     attributes: ['Id', 'reviewDate']
   }));
   return MenuChildsData
@@ -138,14 +138,12 @@ const getRevisionHistoryByEmpId = async (employeeId) => {
 
 
 const getFormMenusMasterData = async (req, res) => {
-  console.log("mm:", req.body.Id)
   const FormMenusMasterData = getDdlItems(DDL_FIELD_NAMES.FormMenus, await FormModel.findAll({
     where: { isActive: true, parentFormID: req.body.Id || null },
-    attributes: ['formName', 'Id','formCode']
+    attributes: ['formName', 'Id', 'formCode']
   }));
-  console.log("getFormMenusMasterData ",FormMenusMasterData)
   if (FormMenusMasterData.length > 0) {
-    FormMenusMasterData.unshift({ label: req.body.text || '--Select--', value: null,code:null,mergeLabel:"--Select--"})
+    FormMenusMasterData.unshift({ label: req.body.text || '--Select--', value: null, code: null, mergeLabel: "--Select--" })
   }
   return FormMenusMasterData
 };
@@ -159,6 +157,34 @@ const getLeaveTypesData = async () => {
   }
   return LeaveTypeData
 };
+
+
+const getAllSubsidiaryData = async () => {
+  const subsidiaryData = getDdlItems(DDL_FIELD_NAMES.Subsidiary, await SubsidiaryModel.findAll({
+    where: { isActive: true },
+    attributes: ['name', 'Id']
+  }));
+  return subsidiaryData
+};
+
+const getAllFiscalYearData = async () => {
+  const result = []
+  const yearData = await FiscalSetupModel.findAll({
+    attributes: ['startDate', 'endDate', 'Id']
+  });
+  if (yearData.length) {
+    yearData.forEach(element => {
+      if (element.startDate && element.endDate) {
+        result.push({
+          label: `Year - ${new Date(element.endDate).getFullYear()} (${formatDates(new Date(element.startDate), 'dd-MMM-yyyy')} to ${formatDates(new Date(element.endDate), 'dd-MMM-yyyy')})`,
+          value: element.Id,
+        })
+      }
+    });
+  }
+  return result;
+};
+
 
 const getCitiesMasterData = async (countryId) => {
   const citiesMasterData = getDdlItems(DDL_FIELD_NAMES.default, await CityModel.findAll({
@@ -174,11 +200,10 @@ const getCitiesMasterData = async (countryId) => {
 
 
 
-const GetLastInserted_ID_ByTableName = async (tableName,prefix) => {
+const GetLastInserted_ID_ByTableName = async (tableName, prefix) => {
   try {
-    console.log("tableName",tableName,prefix);
     const results = await sequelize.query('CALL GetLastInsertedIdByTableName(:tableName,:prefix)', {
-      replacements: { tableName: tableName , prefix: prefix },
+      replacements: { tableName: tableName, prefix: prefix },
       type: Sequelize.QueryTypes.RAW // Use RAW type for executing stored procedures
     });
 
@@ -203,5 +228,7 @@ module.exports = {
   GetLastInserted_ID_ByTableName,
   get_Bank_Branch_MasterData,
   getRevisionHistoryByEmpId,
-  getLeaveTypesData
+  getLeaveTypesData,
+  getAllSubsidiaryData,
+  getAllFiscalYearData
 };

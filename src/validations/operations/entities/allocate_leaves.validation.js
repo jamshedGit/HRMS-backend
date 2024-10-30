@@ -12,6 +12,7 @@ const createItem = {
     yearId: Joi.number().optional(),
     list: Joi.array().items(
       Joi.object().keys({
+        Id: Joi.number().optional(),
         leaveType: Joi.number().required(),
         leaveCount: Joi.number().required(),
         policyType: Joi.number().required(),

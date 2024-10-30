@@ -24,68 +24,18 @@ const createallocateLeaves = catchAsync(async (req, res) => {
 });
 
 /**
- * Update Single Allocate Leaves By Id
- * 
- * @param {Object} body 
- * @param {Number} updatedBy 
- * @returns res
- */
-const updateallocateLeaves = catchAsync(async (req, res) => {
-  const data = await allocateLeavesServicePage.updateallocateLeavesById(req.body, req.user.Id);
-  res.send({
-    code: HttpStatusCodes.OK,
-    message: HttpResponseMessages.OK,
-    data: data,
-  });
-});
-
-
-/**
- * Get Single Allocate Leaves By Id
- * 
- * @param {Number} id 
- * @returns res
- */
-const getallocateLeavesById = catchAsync(async (req, res) => {
-  const data = await allocateLeavesServicePage.getallocateLeavesById(req.params.id);
-  if (!data) {
-    throw new ApiError(httpStatus.NOT_FOUND, "No Data found");
-  }
-  res.send({
-    code: HttpStatusCodes.OK,
-    message: HttpResponseMessages.OK,
-    data: data,
-  });
-});
-
-/**
  * 
  * Get All Allocate Leaves with Pagination
  * 
  * @param {Object} req 
  * @returns res
  */
-const getAllallocateLeaves = catchAsync(async (req, res) => {
+const getAllAllocateLeaves = catchAsync(async (req, res) => {
   const data = await allocateLeavesServicePage.getAllAllocateLeaves(req);
   res.send({
     code: HttpStatusCodes.OK,
     message: HttpResponseMessages.OK,
     data: data
-  });
-});
-
-/**
- * Delete Single Allocate Leaves Record By Id
- * 
- * @param {Number} id 
- * @returns res
- */
-const deleteallocateLeaves = catchAsync(async (req, res) => {
-  const data = await allocateLeavesServicePage.deleteallocateLeavesById(req.params.id);
-  res.send({
-    code: HttpStatusCodes.OK,
-    message: HttpResponseMessages.OK,
-    data: data,
   });
 });
 
@@ -107,9 +57,6 @@ const getPolicyTypeDropdown = catchAsync(async (req, res) => {
 
 module.exports = {
   createallocateLeaves,
-  getallocateLeavesById,
-  updateallocateLeaves,
-  getAllallocateLeaves,
-  deleteallocateLeaves,
+  getAllAllocateLeaves,
   getPolicyTypeDropdown
 };

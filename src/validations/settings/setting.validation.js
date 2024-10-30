@@ -54,6 +54,12 @@ const getAllLeaveType = {
   body: Joi.disallow(),
 }
 
+const getAllSubsidiaries = {
+  query: Joi.disallow(),
+  params: Joi.disallow(),
+  body: Joi.disallow(),
+}
+
 const getCitiesMasterData = {
   query: Joi.disallow(),
   params: Joi.disallow(),
@@ -193,5 +199,6 @@ module.exports = {
   getFormMenuMasterData,
   getAllEmployees,
   getEmpSalaryRevisionByEmpId,
-  getAllLeaveType
+  getAllLeaveType,
+  getAllSubsidiaries
 };

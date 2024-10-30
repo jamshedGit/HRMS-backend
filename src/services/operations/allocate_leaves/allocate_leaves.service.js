@@ -15,7 +15,6 @@ const allocateLeavesAttributes = [
   'policyType',
   'maxCount',
   'Id',
-  'isActive',
 ]
 
 /**
@@ -39,7 +38,7 @@ const createallocateLeaves = async (req) => {
 
   }
   const data = await getallocateLeavesData({ ...rest }, allocateLeavesAttributes);
-  return { list: data };
+  return { ...rest, list: data };
 };
 
 /**
@@ -49,23 +48,11 @@ const createallocateLeaves = async (req) => {
  * @param {Object} req 
  * @returns 
  */
-const getAllAllocateLeaves = async (req)=> {
+const getAllAllocateLeaves = async (req) => {
   const body = req.body;
   const data = await getallocateLeavesData({ ...body }, allocateLeavesAttributes);
-  return data;
+  return { ...body, list: data };
 }
-
-/**
- * Get Single Allocate Leaves By Id
- * 
- * @param {Number} id 
- * @returns 
- */
-const getallocateLeavesById = async (id, options = null) => {
-  return AllocateLeavesModel.findByPk(id, {
-    attributes: options || allocateLeavesAttributes,
-  });
-};
 
 
 /**
@@ -90,47 +77,6 @@ const getallocateLeavesData = async (filters, attributes = null, include = null)
   return await AllocateLeavesModel.findAll(options);
 };
 
-
-/**
- * Update Single Allocate Leaves By Id
- * 
- * @param {Object} body 
- * @param {Number} updatedBy 
- * @returns 
- */
-const updateallocateLeavesById = async (body, updatedBy) => {
-  if (FORBIDDEN_CODES.includes(body.code)) {
-    throw new ApiError(httpStatus.FORBIDDEN, `This code is forbidden ${body.code}. Please use another code`);
-  }
-  let oldRecord = await getallocateLeavesData({ code: body.code });
-  if (oldRecord && oldRecord.Id != body.Id) {
-    throw new ApiError(httpStatus.FORBIDDEN, `Code already in use ${body.code}. Please use another code`);
-  }
-  else {
-    oldRecord = await getallocateLeavesById(body.Id)
-  }
-  body.updatedBy = updatedBy;
-  Object.assign(oldRecord, body);
-  const updatedData = await oldRecord.save();
-  const data = await getallocateLeavesById(updatedData.Id, allocateLeavesAttributes)
-  return data;
-};
-
-/**
- * Delete Single Allocate Leaves Record By Id
- * 
- * @param {Number} id 
- * @returns 
- */
-const deleteallocateLeavesById = async (id) => {
-  const oldRecord = await getallocateLeavesById(id);
-  if (!oldRecord) {
-    throw new ApiError(httpStatus.NOT_FOUND, "Record not found");
-  }
-  await oldRecord.destroy();
-  return oldRecord;
-};
-
 /**
  * 
  * Get Policy Type Dropdown Data
@@ -138,15 +84,12 @@ const deleteallocateLeavesById = async (id) => {
  * @returns 
  */
 const getDropdownData = () => {
-  return Object.keys(POLICY_TYPE).map((type)=> {
-    return {label: POLICY_TYPE[type], value: Number(type)}
+  return Object.keys(POLICY_TYPE).map((type) => {
+    return { label: POLICY_TYPE[type], value: Number(type) }
   })
 }
 
 module.exports = {
-  getallocateLeavesById,
-  updateallocateLeavesById,
-  deleteallocateLeavesById,
   createallocateLeaves,
   getAllAllocateLeaves,
   getDropdownData
