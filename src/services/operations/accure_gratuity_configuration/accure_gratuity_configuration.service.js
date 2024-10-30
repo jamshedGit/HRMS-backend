@@ -189,7 +189,7 @@ const updateaccrue_gratuity_configurationById = async (
   });
   if (exist) {
     return {
-      message: "Already Exist.",
+      message: "Record already exists.",
       status: "error",
     };
   } else {
