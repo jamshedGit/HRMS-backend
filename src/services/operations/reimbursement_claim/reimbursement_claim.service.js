@@ -11,7 +11,7 @@ const Op = Sequelize.Op;
 
 const createreimbursement_claim = async (req, reimbursement_claimBody) => {
   try {
-    console.log("Creating reimbursement configuration...", reimbursement_claimBody);
+    console.log("Creating reimbursement configuration...", reimbursement_claimBody.data);
 
     // // Check if the parent configuration already exists
     // const subsidiaryExists = await Reimbursement_claimModel.findOne({
@@ -73,7 +73,7 @@ const queryreimbursement_claim = async (
 console.log("reimbursement_claim employeeId claim_body",employeeId
 )
 
-  const { count, rows } = await Reimbursement_claimModel.findAndCountAll({
+ let { count, rows } = await Reimbursement_claimModel.findAndCountAll({
     order: [["createdAt", "DESC"]],
     where: {
      employeeId

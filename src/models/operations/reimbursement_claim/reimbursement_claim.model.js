@@ -11,7 +11,7 @@ const Reimbursement_claim = sequelize.define('t_reimbursement_claim', {
     reimbursement_typeId: { type: Sequelize.INTEGER, allowNull: false },
     employeeId: { type: Sequelize.INTEGER, allowNull: false },
 	details: { type: Sequelize.STRING, },
-	attachment: { type: Sequelize.STRING },
+	file: { type: Sequelize.STRING },
 	date: { type: Sequelize.DATE },
     amount: { type: Sequelize.INTEGER,allowNull: false },
     pay_in_payroll_forId: { type: Sequelize.INTEGER, allowNull: false ,defaultValue:1},
