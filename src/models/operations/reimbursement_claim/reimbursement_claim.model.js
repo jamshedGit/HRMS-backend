@@ -1,7 +1,7 @@
 const Sequelize = require('sequelize');
-const {FormModel,EmployeeProfileModel,Reimbursement_configurationModel}= require('../../index');
+const {FormModel,EmployeeProfileModel,Reimbursement_configurationModel,PayrollMonthModel}= require('../../index');
 const sequelize = require('../../../config/db')
-
+const { formatDates } = require('../../../utils/common');
 const Reimbursement_claim = sequelize.define('t_reimbursement_claim', {
 	Id: {
 		type: Sequelize.INTEGER,
@@ -12,11 +12,18 @@ const Reimbursement_claim = sequelize.define('t_reimbursement_claim', {
     employeeId: { type: Sequelize.INTEGER, allowNull: false },
 	details: { type: Sequelize.STRING, },
 	file: { type: Sequelize.STRING },
-	date: { type: Sequelize.DATE },
+	date: {
+		type: Sequelize.DATE,
+		allowNull: false,
+		get() {
+			const rawValue = this.getDataValue('date');
+			return rawValue ? formatDates(rawValue) : null;
+		}
+	},
     amount: { type: Sequelize.INTEGER,allowNull: false },
-    pay_in_payroll_forId: { type: Sequelize.INTEGER, allowNull: false ,defaultValue:1},
-    pay_slip_refId: { type: Sequelize.INTEGER, allowNull: false,defaultValue:1 },
-    reimbursement_configurationId: { type: Sequelize.INTEGER, allowNull: true },
+    pay_in_payroll_forId: { type: Sequelize.INTEGER, },
+    pay_slip_refId: { type: Sequelize.INTEGER, },
+   
     isActive: { type: Sequelize.BOOLEAN, allowNull: true, defaultValue: true },
 	createdBy: {
 		type: Sequelize.INTEGER,
@@ -50,7 +57,11 @@ const Reimbursement_claim = sequelize.define('t_reimbursement_claim', {
 	targetKey: 'Id',
 	as:"ReimbursementConfiguration"
   });
+  PayrollMonthModel
 
-
-
+  Reimbursement_claim.belongsTo(PayrollMonthModel, {
+	foreignKey: 'pay_in_payroll_forId',
+	targetKey: 'Id',
+	as:"PayInPayrollForId"
+  });
 module.exports = Reimbursement_claim;

@@ -10,9 +10,9 @@ const CreateReimbursement_claimValidation = {
         employeeId: Joi.number(),
         date: Joi.date(), 
         amount: Joi.number(), 
-        pay_in_payroll_forId: Joi.number(), 
-        pay_slip_refId: Joi.number(), 
-        reimbursement_configurationId: Joi.number(), 
+        pay_in_payroll_forId: Joi.any().optional(), 
+        pay_slip_refId: Joi.any().optional(), 
+     
 
   
     }),

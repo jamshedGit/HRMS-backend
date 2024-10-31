@@ -7,17 +7,6 @@ const reimbursement_claimValidation = require("../../../../validations/operation
 
 const router = express.Router();
 
-// const storage = multer.diskStorage({
-//     destination: __dirname + '/../../../../../uploads/', // Change this to your desired folder path
-//     filename: function (req, file, cb) {
-//         cb(null, Date.now() + '-' + file.originalname.toLowerCase().split(' ').join('-'));
-//     }
-// });
-
- 
-// const upload = multer({ storage: storage });
-// router.route("/create-reimbursement-claim").post(auth(),reimbursement_claimController.createreimbursement_claim);
-// router.route("/image-upload").post(upload.single('image'), emp_profile_Controller.imageUpload);
 
 router.route("/read-reimbursement-claim").post(auth(), reimbursement_claimController.getreimbursement_claimById);
 router.route("/read-all-reimbursement-claim").post(auth(),reimbursement_claimController.getAllreimbursement_claim);
