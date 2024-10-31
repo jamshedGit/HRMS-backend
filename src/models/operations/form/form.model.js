@@ -1,8 +1,8 @@
 const Sequelize = require('sequelize');
-const { ResourceModel } = require('../..');
 
 //import Database connection configurations.
-const sequelize = require('../../../config/db')
+const sequelize = require('../../../config/db');
+const FormConfigModel = require('./form_config.model');
 
 const FormModel = sequelize.define('t_form_menu', {
 	Id: {
@@ -12,8 +12,9 @@ const FormModel = sequelize.define('t_form_menu', {
 	},
 	formName: { type: Sequelize.STRING, allowNull: true },
 	formCode: { type: Sequelize.STRING, allowNull: true },
-	parentFormID: { type: Sequelize.NUMBER, allowNull: true },
-	level: { type: Sequelize.NUMBER, allowNull: true },
+	parentFormID: { type: Sequelize.INTEGER, allowNull: true },
+	level: { type: Sequelize.INTEGER, allowNull: true },
+	subsidiaryId: { type: Sequelize.INTEGER, allowNull: true },
 	isDeleted: { type: Sequelize.BOOLEAN, allowNull: true, defaultValue: true },
 	isActive: { type: Sequelize.BOOLEAN, allowNull: true, defaultValue: true },
 	createdBy: {
@@ -29,6 +30,21 @@ const FormModel = sequelize.define('t_form_menu', {
 
 });
 
+FormConfigModel.hasMany(FormModel, { foreignKey: 'parentFormID' });
+FormModel.belongsTo(FormConfigModel, {
+    foreignKey: 'parentFormID',
+    targetKey: 'Id', 
+    onDelete: 'RESTRICT',
+    onUpdate: 'RESTRICT',
+});
 
+//We have implemented this in subsidiary model because it throwing error here.
+// SubsidiaryModel.hasMany(FormModel, { foreignKey: 'subsidiaryId' });
+// FormModel.belongsTo(SubsidiaryModel, {
+//     foreignKey: 'subsidiaryId',
+//     targetKey: 'Id', 
+//     onDelete: 'RESTRICT',
+//     onUpdate: 'RESTRICT',
+// });
 
 module.exports = FormModel;

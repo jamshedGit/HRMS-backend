@@ -11,8 +11,6 @@ const tax_slab = require('./operations/tax_slab/tax_slab.route')
 const branch = require('./operations/branch/branch.route')
 const department = require('./operations/department/dept.route')
 const emptype = require('./operations/employeeType/employeeType.route')
-const religion = require('./operations/religion/religion.route')
-const region = require('./operations/region/region.route')
 const designation = require('./operations/designation/designation.route')
 const form = require('./operations/form/form.route')
 const formdetails = require('./operations/formdetails/formdetails.route')
@@ -105,15 +103,6 @@ const defaultRoutes = [
     path: "/emptype",
     route: emptype
 
-  },
-  {
-    path: "/religion",
-    route: religion
-
-  },
-  {
-    path: "/region",
-    route: region
   },
   {
     path: "/designation",

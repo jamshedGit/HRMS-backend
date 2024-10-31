@@ -2,7 +2,7 @@ const Sequelize = require("sequelize");
 const sequelize = require("../../../config/db");
 
 const countries = sequelize.define("t_countries", {
-    id: {
+    Id: {
         type: Sequelize.INTEGER,
         autoIncrement: true,
         primaryKey: true,

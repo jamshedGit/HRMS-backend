@@ -33,8 +33,8 @@ CompanyModel.hasMany(SubsidiaryModel, { foreignKey: 'companyId' });
 SubsidiaryModel.belongsTo(CompanyModel, {
     foreignKey: 'companyId',
     targetKey: 'Id',  // Assuming 'Id' is the primary key in CompanyModel table
-    onDelete: 'CASCADE',
-    onUpdate: 'CASCADE',
+    onDelete: 'RESTRICT',
+    onUpdate: 'RESTRICT',
 });
 
 // Association with FormModel model (currencyId is a foreign key)
@@ -42,8 +42,16 @@ SubsidiaryModel.belongsTo(FormModel, {
     foreignKey: 'currencyId',
     targetKey: 'Id',  // Assuming 'Id' is the primary key in FormModel table
     as: 'currency',
-    onDelete: 'CASCADE',
-    onUpdate: 'CASCADE',
+    onDelete: 'RESTRICT',
+    onUpdate: 'RESTRICT',
+});
+
+SubsidiaryModel.hasMany(FormModel, { foreignKey: 'subsidiaryId' });
+FormModel.belongsTo(SubsidiaryModel, {
+    foreignKey: 'subsidiaryId',
+    targetKey: 'Id', 
+    onDelete: 'RESTRICT',
+    onUpdate: 'RESTRICT',
 });
 
 module.exports = SubsidiaryModel;

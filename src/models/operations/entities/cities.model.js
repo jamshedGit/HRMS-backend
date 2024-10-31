@@ -8,6 +8,7 @@ const cities = sequelize.define("t_cities", {
         autoIncrement: true,
         primaryKey: true,
     },
+    countryId: { type: Sequelize.INTEGER, allowNull: false },
     name: { type: Sequelize.STRING(70), allowNull: true },
     isActive: { type: Sequelize.BOOLEAN, allowNull: false, defaultValue: true },
     createdBy: { type: Sequelize.INTEGER, allowNull: false },
@@ -16,11 +17,13 @@ const cities = sequelize.define("t_cities", {
     updatedAt: { type: Sequelize.DATE, allowNull: true },
 });
 
+CountryModel.hasMany(cities, { foreignKey: 'countryId' });
 cities.belongsTo(CountryModel,{
-    as: 'country',
     foreignKey:'countryId',
-    onDelete:'CASCADE',
-    onUpdate:'CASCADE',
+    targetKey: 'Id',
+    onDelete:'RESTRICT',
+    onUpdate:'RESTRICT',
+    as: 'country',
 });
 
 module.exports = cities;

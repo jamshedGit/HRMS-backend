@@ -4,15 +4,15 @@ const { ResourceModel } = require('../..');
 //import Database connection configurations.
 const sequelize = require('../../../config/db')
 
-const DesigModel = sequelize.define('t_designation', {
+const FormConfigModel = sequelize.define('t_form_menu_configuration', {
 	Id: {
 		type: Sequelize.INTEGER,
 		autoIncrement: true,
 		primaryKey: true
 	},
-	designationName: { type: Sequelize.STRING, allowNull: true },
-	designationCode: { type: Sequelize.STRING, allowNull: true },
-	probationInMonth: { type: Sequelize.INTEGER, allowNull: true },
+	formName: { type: Sequelize.STRING, allowNull: true },
+	formCode: { type: Sequelize.STRING, allowNull: true },
+	isDeleted: { type: Sequelize.BOOLEAN, allowNull: true, defaultValue: true },
 	isActive: { type: Sequelize.BOOLEAN, allowNull: true, defaultValue: true },
 	createdBy: {
 		type: Sequelize.INTEGER,
@@ -27,4 +27,4 @@ const DesigModel = sequelize.define('t_designation', {
 
 });
 
-module.exports = DesigModel;
+module.exports = FormConfigModel;

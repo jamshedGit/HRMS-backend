@@ -21,16 +21,13 @@ module.exports.exitModel = require('./operations/exit/exit.model');
 module.exports.BranchModel = require('./operations/branch/branch.model');
 //Department Model
 module.exports.DeptModel = require('./operations/department/dept.model');
-//Religion Model
-module.exports.ReligionModel = require('./operations/religion/religion.model');
 //Employee Type Model
 module.exports.EmployeeTypeModel = require('./operations/employeeType/employeeType.model');
-//Employee Type Model
-module.exports.RegionModel = require('./operations/region/region.model');
 //Desingation Type Model
 module.exports.DesignationModel = require('./operations/designation/designation.model');
 //Desingation Type Model
 module.exports.FormModel = require('./operations/form/form.model');
+module.exports.FormConfigModel = require('./operations/form/form_config.model');
 //EmployeePolicyModel
 module.exports.EmployeePolicyModel = require('./operations/emppolicy/emppolicy.model');
 module.exports.ArrearPolicyModel = require('./operations/arrear_policy/arrear_policy.model');
