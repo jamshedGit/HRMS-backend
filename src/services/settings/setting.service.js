@@ -142,7 +142,7 @@ const getFormMenusMasterData = async (req, res) => {
   const FormMenusMasterData = getDdlItems(DDL_FIELD_NAMES.FormMenus, await FormModel.findAll({
     where: { isActive: true, parentFormID: req.body.Id || null },
     attributes: ['formName', 'Id','formCode']
-  }));
+  }),req.body.mergeLabel);
   console.log("getFormMenusMasterData ",FormMenusMasterData)
   if (FormMenusMasterData.length > 0) {
     FormMenusMasterData.unshift({ label: req.body.text || '--Select--', value: null,code:null,mergeLabel:"--Select--"})
