@@ -128,6 +128,11 @@ const queryaccrue_gratuity_configuration = async (
       ],
     });
 
+    
+
+
+
+
   return paginationFacts(count, limit, options.pageNumber, rows);
 };
 
@@ -189,7 +194,7 @@ const updateaccrue_gratuity_configurationById = async (
   });
   if (exist) {
     return {
-      message: "Already Exist.",
+      message: "Record already exists.",
       status: "error",
     };
   } else {

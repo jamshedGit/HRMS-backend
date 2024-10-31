@@ -21,7 +21,7 @@ const createtax_slab = catchAsync(async (req, res) => {
 
       res.status(HttpStatusCodes.INTERNAL_SERVER_ERROR).send({
         code: HttpStatusCodes.INTERNAL_SERVER_ERROR,
-        message:tax_slab.message,
+        message:HttpResponseMessages.ALREADY_EXIST,
         error: tax_slab.error || 'An unexpected error occurred',
       });
       
