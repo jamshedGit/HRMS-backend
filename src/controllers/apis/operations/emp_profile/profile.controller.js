@@ -17,7 +17,7 @@ const imageUpload = async (req, res) => {
   }
 
   // Generate the URL for the uploaded image (assuming a public uploads folder)
-  const imageUrl = `http://localhost:${3000}/uploads/${req.file.filename}`;
+  const imageUrl = `http://119.153.103.211:${3011}/uploads/${req.file.filename}`;
 
   res.json({ message: 'Image uploaded successfully!', imageUrl });
 };

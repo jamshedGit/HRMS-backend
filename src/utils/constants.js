@@ -3,6 +3,12 @@ const DDL_FIELD_NAMES = {
     labelField: 'name',
     valueField: 'id',
   },
+  city :{
+    labelField: 'name',
+    valueField: 'id',
+    codeField: 'countryId'
+  },
+
   driver :{
     labelField: 'userName',
     valueField: 'id',
