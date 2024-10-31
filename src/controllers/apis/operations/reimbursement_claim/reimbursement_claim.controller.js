@@ -102,7 +102,7 @@ const updatereimbursement_claim = catchAsync(async (req, res) => {
     const reimbursement_claim = await reimbursement_claimService.updatereimbursement_claimById(req.body.Id, req.body, req.user.Id);
 
 console.log("updated status",reimbursement_claim)
-    if (reimbursement_claim.status == "error") {
+    if (reimbursement_claim?.status == "error") {
 
         res.status(HttpStatusCodes.INTERNAL_SERVER_ERROR).send({
             code: HttpStatusCodes.INTERNAL_SERVER_ERROR,
@@ -116,7 +116,7 @@ console.log("updated status",reimbursement_claim)
 
         res.status(httpStatus.CREATED).send({
             code: HttpStatusCodes.CREATED,
-            message: HttpResponseMessages.CREATED,
+            message: HttpResponseMessages.UPDATED,
             data: reimbursement_claim
         });
     }

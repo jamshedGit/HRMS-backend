@@ -186,196 +186,20 @@ const updatereimbursement_claimById = async (
   updateBody,
   updatedBy
 ) => {
-  const { subsidiaryId, payroll_groupId } = updateBody;
-console.log(" subsidiaryId, payroll_groupId updateBody",updateBody)
 
-const overlappingSubsidiary = await Reimbursement_claimModel.findOne({
-  // where: {
-  //   Id: { [Op.ne]: Id }, // Exclude the current record
-  //   [Op.or]: 
-  //   [
-  //     { subsidiaryId: subsidiaryId }, // Wrap in an object
-  //     { payroll_groupId: payroll_groupId } // Wrap in an object
-  //   ]
-  // }
-
-  where: {
-    Id: { [Op.ne]: Id }, // Exclude the current record by ID
-    subsidiaryId: subsidiaryId,
-    payroll_groupId: payroll_groupId,
-  }
-});
-
-  console.log(" subsidiaryId, payroll_groupId overlappingSubsidiary", overlappingSubsidiary)
-  if (overlappingSubsidiary) {
-    return { message: 'Subsidiary & payroll group already exist.', status: "error" };
-  }
-
-  const Item = await Reimbursement_claimModel.findOne({
-    where: { Id: Id },
-    include: [
-      {
-        model: Reimbursement_policies_detailModel,
-        as: "policies",
-        include: [{ model: Policies_grade_detailModel, as: "grades" }],
-      },
-      {
-        model: Reimbursement_accounts_detailModel,
-        as: "accounts",
-      
-      },
-    ],
-  });
-
+  const Item = await getreimbursement_claimById(Id);
   if (!Item) {
     throw new ApiError(httpStatus.NOT_FOUND, "Record not found");
   }
 
-  const existingPolicyDetailIds = Item.policies.map(d => d.Id);
-
-
-  // Update or create child records
-  if (updateBody.policies && Array.isArray(updateBody.policies)) {
-    const newPolicyIds = [];
   
-    for (const policy of updateBody.policies) {
   
-
-      if (policy.Id) {
-        // Update existing policy detail
-        const policyDetail = await Reimbursement_policies_detailModel.findOne({
-          where: { Id: policy.Id },
-          include: [{ model: Policies_grade_detailModel, as: "grades" }],
-        });
-
-        if (policyDetail) {
-          await Policies_grade_detailModel.destroy({
-            where: { reimbursement_policies_detailId: policyDetail.Id }
-          });
-    
-          Object.assign(policyDetail, policy); // Apply updates
-          await policyDetail.save();
-
- 
-          if (policy.grades && Array.isArray(policy.grades)) {
-            console.log("policy.grades",policy.grades);
-            
-            // Create grade details, dynamically adding `salary_gradeId` if only IDs are sent
-            await Policies_grade_detailModel.bulkCreate(
-              policy.grades.map(gradeDetail => {
-                // Check if gradeDetail is just an ID (number) and dynamically add the `salary_gradeId`
-                if (typeof gradeDetail === 'number') {
-                  return {
-                    salary_gradeId: gradeDetail, // Add `salary_gradeId` when it's missing
-                    reimbursement_policies_detailId: policyDetail.Id,
-                  };
-                }
-      
-              
-                return {
-                  ...gradeDetail,
-                  reimbursement_policies_detailId: policyDetail.Id,
-                };
-              })
-            );
-          }
-        } else {
-          console.error("Policy detail not found for Id:", policy.Id);
-        }
-        newPolicyIds.push(policy.Id);
-      } else {
-        // Create new policy detail if Id is not present
-        policy.reimbursement_claimId = Item.Id; // Associate with the configuration ID
-        const newPolicyDetail = await Reimbursement_policies_detailModel.create(policy);
-        if (policy.grades && Array.isArray(policy.grades)) {
-   
-          
-          // Create grade details, dynamically adding `salary_gradeId` if only IDs are sent
-          await Policies_grade_detailModel.bulkCreate(
-            policy.grades.map(gradeDetail => {
-              // Check if gradeDetail is just an ID (number) and dynamically add the `salary_gradeId`
-              if (typeof gradeDetail === 'number') {
-                return {
-                  salary_gradeId: gradeDetail, // Add `salary_gradeId` when it's missing
-                  reimbursement_policies_detailId: newPolicyDetail.Id,
-                };
-              }
-    
-            
-              return {
-                ...gradeDetail,
-                reimbursement_policies_detailId: newPolicyDetail.Id,
-              };
-            })
-          );
-        }
-        // newPolicyIds.push(newPolicyDetail.Id);
-      }
-    }
-
-    // Delete policies not present in the incoming details
-    for (const existingId of existingPolicyDetailIds) {
-      if (!newPolicyIds.includes(existingId)) {
-        await Reimbursement_policies_detailModel.destroy({
-          where: { Id: existingId }
-        });
-      }
-    }
-  }
-
-
-  if (updateBody.accounts && Array.isArray(updateBody.accounts)) {
-    const newAccountDetailIds = [];
-
-    for (const account of updateBody.accounts) {
-  
-      if (account.Id) {
-        // Update existing detail
-   
-        const accountchildDetail = await Reimbursement_accounts_detailModel.findOne({
-          where: { Id: account.Id }
-        });
-
-        if (accountchildDetail) {
-
-          Object.assign(accountchildDetail, account); // Apply updates
-          try {
-            await accountchildDetail.save();
-          } catch (error) {
-            console.error("Error saving child detail:", error);
-          }
-        } else {
-          console.error("Child detail not found for Id:", account.Id);
-        }
-        newAccountDetailIds.push(account.Id);
-      } else {
-        // Create new detail if Id is not present
-
-        account.reimbursement_claimId = Item.Id; // Associate with the configuration ID
-        await Reimbursement_accounts_detailModel.create(account);
-        newAccountDetailIds.push(account.Id); // Add the new detail's Id
-      }
-    }
-    const existingAccountDetailIds = Item.accounts.map(d => d.Id);
-    // Delete child records that are not present in the incoming details
-    for (const existingId of existingAccountDetailIds) {
-
-      if (!newAccountDetailIds.includes(existingId)) {
- 
-        await Reimbursement_accounts_detailModel.destroy({
-          where: { Id: existingId }
-        });
-      }
-    }
-  }
-
-  // Update parent record
   updateBody.updatedBy = updatedBy;
   delete updateBody.id;
   Object.assign(Item, updateBody);
   await Item.save();
+  return  Item;
 
-  return Item;
 };
 
 
