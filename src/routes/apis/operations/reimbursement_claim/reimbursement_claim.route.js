@@ -16,6 +16,6 @@ router.route("/delete-reimbursement-claim").patch(auth(),reimbursement_claimCont
 
 
 router.route("/create-reimbursement-claim").post(auth(),reimbursement_claimController.createreimbursement_claim);
-
+router.route("/read-payroll-month").get(auth(),reimbursement_claimController.getPayrollMonth);
 
 module.exports = router;

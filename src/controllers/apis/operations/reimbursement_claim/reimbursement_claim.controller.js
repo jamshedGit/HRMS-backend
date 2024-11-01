@@ -135,11 +135,23 @@ const deletereimbursement_claim = catchAsync(async (req, res) => {
 
 
 
+    const getPayrollMonth = catchAsync(async (req, res) => {
+
+
+        const result = await reimbursement_claimService.getPayrollMonth();
+      
+        res.send({
+          code: HttpStatusCodes.OK,
+          message: HttpResponseMessages.OK,
+          data: result,
+        });
+      });
+
 module.exports = {
     createreimbursement_claim,
     getAllreimbursement_claim,
     getreimbursement_claimById,
     updatereimbursement_claim,
     deletereimbursement_claim,
-
+    getPayrollMonth
 };

@@ -1,5 +1,5 @@
 const httpStatus = require("http-status");
-const { Reimbursement_claimModel,Reimbursement_configurationModel ,EmployeeProfileModel} = require("../../../models/index");
+const { Reimbursement_claimModel,Reimbursement_configurationModel ,EmployeeProfileModel,PayrollMonthModel} = require("../../../models/index");
 const { FormModel } = require("../../../models/index");
 
 const ApiError = require("../../../utils/ApiError");
@@ -221,7 +221,108 @@ console.log("ID is deleted",Item)
   return Item;
 };
 
+// const getPayrollMonth = async () => {
+//   const result = await PayrollMonthModel.findAndCountAll({
+//     order: [['createdAt', 'DESC']],
+//   });
 
+//   // Month mapping
+//   const monthNames = [
+//     'JAN', 'FEB', 'MAR', 'APR', 'MAY', 'JUN', 
+//     'JUL', 'AUG', 'SEP', 'OCT', 'NOV', 'DEC'
+//   ];
+
+//   // Format the results into an array of objects
+//   const formattedMonths = result.rows.map(row => {
+//     const month = monthNames[row.month - 1]; // Convert month number to month name
+//     const year = row.year;
+//     return { Id: row.Id, month: `${month} ${year}` }; // Create an object with Id and month
+//   });
+
+//   // final response 
+//   return  formattedMonths // Return the array 
+
+// };
+
+// // Example usage
+// getPayrollMonth().then(response => {
+//   console.log(response);
+// }).catch(err => {
+//   console.error(err);
+// });
+
+const getPayrollMonth = async () => {
+  const monthNames = [
+    "Jan", "Feb", "Mar", "Apr", "May", "Jun",
+    "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"
+  ];
+  
+  const result = await PayrollMonthModel.findAndCountAll({});
+
+  // Sort the rows by year in descending order
+  result.rows.sort((a, b) => b.year - a.year || b.month - a.month);
+
+  // Map the results to the desired format
+  const formattedResult = result.rows.map(row => ({
+    value: row.Id, // Assuming 'id' is the field for the unique identifier
+    label: `${monthNames[row.month - 1]} ${row.year}` // Convert month number to name
+  }));
+
+  return  formattedResult
+  
+};
+
+
+
+// const getPayrollMonth = async () => {
+//   const result = await PayrollMonthModel.findAndCountAll({
+//     order: [['createdAt', 'DESC']],
+//   });
+
+//   // Month mapping for sorting
+//   const monthNames = [
+//     'DEC', 'NOV', 'OCT', 'SEP', 'AUG', 'JUL', 
+//     'JUN', 'MAY', 'APR', 'MAR', 'FEB', 'JAN'
+//   ];
+
+//   // Format the results into an array of objects
+//   const formattedMonths = result.rows.map(row => {
+//     const month = monthNames[12 - row.month]; // Convert month number to month name (reverse order)
+//     const year = row.year;
+//     return { Id: row.Id, month: `${month} ${year}` }; // Create an object with Id and month
+//   });
+
+//   // Sort the months: first by month index, then by year descending
+//   formattedMonths.sort((a, b) => {
+//     const [monthA, yearA] = a.month.split(" ");
+//     const [monthB, yearB] = b.month.split(" ");
+
+//     // Compare months by their reverse index (DEC first)
+//     const monthComparison = monthNames.indexOf(monthA) - monthNames.indexOf(monthB);
+    
+//     // If months are different, sort by month
+//     if (monthComparison !== 0) {
+//       return monthComparison;
+//     }
+
+//     // If months are the same, sort by year descending
+//     return yearB - yearA; 
+//   });
+
+//   // Create the final response object
+//   return {
+//     code: 200,
+//     message: "Successfully",
+//     data: formattedMonths // Return the sorted array of objects
+//   };
+// };
+
+// // Example usage
+// getPayrollMonth().then(response => {
+//   console.log(response);
+// }).catch(err => {
+//   console.error(err);
+// });
 
 module.exports = {
   createreimbursement_claim,
@@ -229,4 +330,5 @@ module.exports = {
   updatereimbursement_claimById,
   deletereimbursement_claimById,
   queryreimbursement_claim,
+  getPayrollMonth
 };
