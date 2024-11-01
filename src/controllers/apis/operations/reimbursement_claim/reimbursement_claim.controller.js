@@ -147,11 +147,30 @@ const deletereimbursement_claim = catchAsync(async (req, res) => {
         });
       });
 
+
+const getreimbursement_configurationPoliciesById = catchAsync(async (req, res) => {
+        console.log(req.body)
+        const policies = await reimbursement_claimService.getreimbursement_configurationPoliciesById(req.body.Id);
+        if (!policies) {
+            throw new ApiError(httpStatus.NOT_FOUND, "Policies not found");
+        }
+        res.send({
+            code: HttpStatusCodes.OK,
+            message: HttpResponseMessages.OK,
+            data: policies,
+        });
+    
+    
+    
+    });
+    
+
 module.exports = {
     createreimbursement_claim,
     getAllreimbursement_claim,
     getreimbursement_claimById,
     updatereimbursement_claim,
     deletereimbursement_claim,
-    getPayrollMonth
+    getPayrollMonth,
+    getreimbursement_configurationPoliciesById
 };
