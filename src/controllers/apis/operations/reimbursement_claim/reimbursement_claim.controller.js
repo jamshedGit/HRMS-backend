@@ -28,7 +28,7 @@ const createreimbursement_claim = catchAsync(async (req, res) => {
 
         }
         else {
-            console.log("created")
+         
 
             res.status(httpStatus.CREATED).send({
                 code: HttpStatusCodes.CREATED,
@@ -44,22 +44,17 @@ const createreimbursement_claim = catchAsync(async (req, res) => {
 
 
 const getAllreimbursement_claim = catchAsync(async (req, res) => {
-console.log("req.body",req.body)
+
     const obj = {};
     const filter = obj;
-    // const options = pick(req.body, ["sortBy", "limit", "page"]);
-    // const options = pick(req.body, req.body.queryParams['sortOrder', 'pageSize', 'pageNumber']);
+
     const options = pick(req.body.queryParams, ['sortOrder', 'pageSize', 'pageNumber']);
 
     const searchQuery = req.body.queryParams.filter.searchQuery ? req.body.queryParams.filter.searchQuery : '';
 
     const result = await reimbursement_claimService.queryreimbursement_claim(filter, options, searchQuery,req.body.employeeId);
-    console.log(result);
-    // res.send({
-    //     code: HttpStatusCodes.OK,
-    //     message: HttpResponseMessages.OK,
-    //     data: result,
-    // });
+
+
 
     if (result.status == "error") {
 
@@ -82,7 +77,7 @@ console.log("req.body",req.body)
 });
 
 const getreimbursement_claimById = catchAsync(async (req, res) => {
-    console.log(req.body)
+
     const Receipt = await reimbursement_claimService.getreimbursement_claimById(req.body.Id);
     if (!Receipt) {
         throw new ApiError(httpStatus.NOT_FOUND, "Receipt not found");
@@ -98,10 +93,10 @@ const getreimbursement_claimById = catchAsync(async (req, res) => {
 });
 
 const updatereimbursement_claim = catchAsync(async (req, res) => {
-    console.log(req.body);
+
     const reimbursement_claim = await reimbursement_claimService.updatereimbursement_claimById(req.body.Id, req.body, req.user.Id);
 
-console.log("updated status",reimbursement_claim)
+
     if (reimbursement_claim?.status == "error") {
 
         res.status(HttpStatusCodes.INTERNAL_SERVER_ERROR).send({
@@ -124,7 +119,7 @@ console.log("updated status",reimbursement_claim)
 });
 
 const deletereimbursement_claim = catchAsync(async (req, res) => {
-    console.log("req.body.Id ", req.body.Id)
+ 
     const Receipt = await reimbursement_claimService.deletereimbursement_claimById(req.body.Id);
     res.send({
         code: HttpStatusCodes.OK,
@@ -149,7 +144,7 @@ const deletereimbursement_claim = catchAsync(async (req, res) => {
 
 
 const getreimbursement_configurationPoliciesById = catchAsync(async (req, res) => {
-        console.log(req.body)
+ 
         const policies = await reimbursement_claimService.getreimbursement_configurationPoliciesById(req.body.Id);
         if (!policies) {
             throw new ApiError(httpStatus.NOT_FOUND, "Policies not found");

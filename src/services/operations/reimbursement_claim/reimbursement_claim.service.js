@@ -9,41 +9,10 @@ const { HttpStatusCodes } = require("../../../utils/constants");
 
 const Op = Sequelize.Op;
 
-// const createreimbursement_claim = async (req, reimbursement_claimBody) => {
-//   try {
-//     console.log("Creating reimbursement configuration...", reimbursement_claimBody);
-//     let  dataExists;
-//     if(reimbursement_claimBody.Id){
-//        dataExists = await Reimbursement_claimModel.findOne({
-//       where: {
-//         Id: reimbursement_claimBody.Id,
-//       },
-//     });
-//     }
-
-
-//     if (dataExists) {
-  
-//     }
-
-//     // Set createdBy field
-//     reimbursement_claimBody.createdBy = req.user.id;
-
-
-
-//     // Create the parent reimbursement configuration
-//     const addedReimbursementClaim = await Reimbursement_claimModel.create(reimbursement_claimBody);
-
-//     return await getreimbursement_claimById(addedReimbursementClaim.Id);
-//   } catch (error) {
-//     console.error("Error creating reimbursement configuration:", error);
-//     throw error; // Rethrow or handle the error as needed
-//   }
-// };
 
 const createreimbursement_claim = async (req, reimbursement_claimBody) => {
   try {
-    console.log("Processing reimbursement claim...", reimbursement_claimBody);
+ 
 
     let dataExists;
 
@@ -96,8 +65,7 @@ const queryreimbursement_claim = async (
   let limit = options.pageSize;
   let offset = 0 + (options.pageNumber - 1) * limit;
 
-console.log("reimbursement_claim employeeId claim_body",employeeId
-)
+
 
  let { count, rows } = await Reimbursement_claimModel.findAndCountAll({
     order: [["createdAt", "DESC"]],
@@ -132,7 +100,7 @@ console.log("reimbursement_claim employeeId claim_body",employeeId
 
   if(count && rows)
   {
-    console.log("count && rows")
+ 
     return paginationFacts(count, limit, options.pageNumber, rows);
   }    
   else {
@@ -181,7 +149,7 @@ const updatereimbursement_claimById = async (
   updateBody,
   updatedBy
 ) => {
-console.log(" Id,updateBody,updatedBy", Id,updateBody,updatedBy)
+
   const Item = await getreimbursement_claimById(Id);
   if (!Item) {
     throw new ApiError(httpStatus.NOT_FOUND, "Record not found");
@@ -207,7 +175,7 @@ console.log(" Id,updateBody,updatedBy", Id,updateBody,updatedBy)
 
 const deletereimbursement_claimById = async (Id) => {
   const Item = await Reimbursement_claimModel.findByPk(Id);
-console.log("ID is deleted",Item)
+
   if (!Item) {
     throw new ApiError(httpStatus.NOT_FOUND, "Item not found");
   }
@@ -240,7 +208,7 @@ const getPayrollMonth = async () => {
 
 const getreimbursement_configurationPoliciesById = async (Id) => {
   try {
-    console.log("getreimbursement_configurationPoliciesById ID",Id)
+   
     const employee = await EmployeeProfileModel.findOne({
      
       where: ({ Id :Id}),
@@ -272,35 +240,7 @@ const getreimbursement_configurationPoliciesById = async (Id) => {
       ],
     });
 
-    // const policies = await Reimbursement_configurationModel.findAll({
-    //   where: {
-    //     subsidiaryId: employee_gradeId.subsidiaryId,
-    //     payroll_groupId: employee_gradeId.payrollGroupId, // Corrected spelling
-    //   },
-   
-
-      // include: [
-      //   {
-      //     model: Reimbursement_policies_detailModel,
-      //     attributes: ["reimbursement_typeId","max_amount","attachment_required"],
-      //     as: "policies",
-      //   },
-      // ]
   
-
-
-    // const policies = await Policies_grade_detailModel.findAll({
-    //   where: { salary_gradeId:employee_gradeId.gradeId },
-   
-
-    //   include: [
-    //     {
-    //       model: Reimbursement_policies_detailModel,
-    //       attributes: ["reimbursement_typeId","max_amount","attachment_required"],
-    //       as: "policies",
-    //     },
-    //   ]
-    // });
 
     // Check if employee is found
     if (!policies) {
@@ -311,7 +251,7 @@ const getreimbursement_configurationPoliciesById = async (Id) => {
 
     return policies;
   } catch (error) {
-    console.error('Error fetching employee gradeId:', error);
+   
     throw error; // rethrow the error after logging it
   }
 };
