@@ -52,7 +52,6 @@ const DesigModel = sequelize.define('t_employee_profile', {
 	attendanceType: { type: Sequelize.NUMBER, allowNull: true },
 	dateOfBirth: { type: Sequelize.DATE, allowNull: true },
 	dateOfRetirement: { type: Sequelize.DATE, allowNull: true },
-
 	salesRep : { type: Sequelize.BOOLEAN, allowNull: true },
 	supportRep : { type: Sequelize.BOOLEAN, allowNull: true },
 	sourceOfHire : { type: Sequelize.STRING, allowNull: true },
