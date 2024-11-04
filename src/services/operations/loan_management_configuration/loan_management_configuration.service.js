@@ -384,7 +384,7 @@ const queryLoanTypes = async () => {
   });
 
   const transformedResults = [
-    { value: null, code: null, label: '--Select--' }, // Add a select option
+    { value: '', code: '', label: '--Select--' }, // Add a select option
     ...result.rows.map(item => ({
       value: item.Id,
       code: item.code,
