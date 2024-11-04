@@ -117,11 +117,14 @@ module.exports.LeaveApplicationModel = require('./operations/leave_application/l
 //Leave Application Detail Model
 module.exports.LeaveApplicationDetailModel = require('./operations/leave_application_detail/leave_application_detail.model');
 //Tax Slab Model
+
 module.exports.Tax_slabModel = require('./operations/tax_slab/tax_slab.model');
 //Salarypolicy Model
+
 module.exports.salarypolicyModel = require('./operations/salarypolicy/salarypolicy.model');
 //Loan_management_configuration Model
 module.exports.Loan_management_configurationModel = require('./operations/loan_management_configuration/loan_management_configuration.model');
+
 module.exports.Loan_management_detailModel = require('./operations/loan_management_configuration/loan_management_detail');
 
 //Gratuity_configuration Model

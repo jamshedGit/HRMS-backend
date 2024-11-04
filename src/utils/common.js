@@ -24,13 +24,20 @@ const getRouteSlugs = (req) => {
 const getDdlItems = (
   columns = { labelField: "", valueField: "", codeField: "",mergeLabel:"" },
   data = [],
+  mergeLabel=false,
   parentId = null
+ 
+
+ 
 ) => {
   return data.map((i) => ({
-    label: i[columns.labelField],
+    mergeLabel:i[columns.codeField] +" - " + i[columns.labelField],
+    label:mergeLabel? i[columns.codeField] +" - " + i[columns.labelField] : i[columns.labelField],
     value: i[columns.valueField],
     code: i[columns.codeField],
-    mergeLabel:i[columns.codeField] +" " + i[columns.labelField]
+
+
+   
   }));
 };
 
@@ -213,7 +220,7 @@ const check_range_exist = async (
     where: whereCondition,
   });
   return existingConfiguration
-    ? { message: "Already exist.", status: "error" }
+    ? { message: "Record Already exist.", status: "error" }
     : null;
 };
 

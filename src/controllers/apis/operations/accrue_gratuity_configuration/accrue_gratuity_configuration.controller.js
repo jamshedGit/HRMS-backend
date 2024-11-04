@@ -92,7 +92,7 @@ const updateaccrue_gratuity_configuration = catchAsync(async (req, res) => {
 
         res.status(httpStatus.CREATED).send({
             code: HttpStatusCodes.CREATED,
-            message: HttpResponseMessages.CREATED,
+            message: HttpResponseMessages.UPDATED,
             data: accrue_gratuity_configuration
         });
     }

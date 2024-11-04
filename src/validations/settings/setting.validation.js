@@ -43,7 +43,8 @@ const getFormMenuMasterData = {
     Id: Joi.number().integer(),
     tableName: Joi.string(),
     prefix:Joi.string(),
-    text: Joi.optional()
+    text: Joi.optional(),
+    mergeLabel:Joi.optional(),
   }),
   
 };
@@ -58,7 +59,7 @@ const getCitiesMasterData = {
   query: Joi.disallow(),
   params: Joi.disallow(),
   body: Joi.object().keys({
-    countryId: Joi.number().integer().required()
+    countryId: Joi.number().integer().optional()
   }),
 };
 
