@@ -135,3 +135,6 @@ module.exports.Reimbursement_configurationModel=require("./operations/reimbursem
 module.exports.Reimbursement_policies_detailModel=require("./operations/reimbursement_configuration/reimbursement_policies_detail.model")
 module.exports.Policies_grade_detailModel=require("./operations/reimbursement_configuration/policies_grade_detail.model")
 module.exports.Reimbursement_accounts_detailModel=require("./operations/reimbursement_configuration/reimbursement_accounts_detail.model")
+
+//Reimbursement_claim
+module.exports.Reimbursement_claimModel=require("./operations/reimbursement_claim/reimbursement_claim.model")
