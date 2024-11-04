@@ -1,5 +1,5 @@
 const httpStatus = require("http-status");
-const { LeaveApplicationModel, LeaveApplicationDetailModel, EmployeeProfileModel, LeaveTypeModel, LeaveTypePoliciesModel, LeaveManagementConfigurationModel } = require("../../../models/index");
+const { LeaveApplicationModel, LeaveApplicationDetailModel, EmployeeProfileModel, LeaveTypeModel, LeaveTypePoliciesModel, LeaveManagementConfigurationModel, EmployeeLeaveBalanceModel, FiscalSetupModel } = require("../../../models/index");
 const ApiError = require("../../../utils/ApiError");
 const Sequelize = require('sequelize');
 const { paginationFacts, formatDates, addDaysInDate, getDateDiffInDays, handleNestedData } = require("../../../utils/common");
@@ -28,9 +28,33 @@ const leaveApplicationAttributes = [
  */
 const createleaveApplication = async (req) => {
   const body = req.body;
-  const employeeData = await EmployeeProfileModel.findByPk(body.employeeId)
+  const employeeData = await EmployeeProfileModel.findByPk(body.employeeId,
+    {
+      include: [
+        {
+          model: EmployeeLeaveBalanceModel,
+          where: {
+            leaveType: body.leaveType
+          },
+          required: false, 
+          include: [
+            {
+              model: FiscalSetupModel,
+              required: true,    // Ensures LeaveBalance is only included if FiscalSetup with isActive: true exists
+              where: {
+                isActive: true,
+              },
+            },
+          ],
+        }
+      ]
+    }
+  )
   if (!employeeData) {
     throw new ApiError(httpStatus.NOT_FOUND, `No User Found`);
+  }
+  if(!employeeData.t_employee_leave_balances?.length || (employeeData.t_employee_leave_balances[0].remainingCount < getDateDiffInDays(body.from, body.to))){
+    throw new ApiError(httpStatus.FORBIDDEN, `Remaining Leaves not enough`);
   }
   const oldRecord = await getleaveApplicationData(
     {
@@ -79,6 +103,10 @@ const createleaveApplication = async (req) => {
     }
 
     await LeaveApplicationDetailModel.bulkCreate(detailData)
+    employeeData.t_employee_leave_balances[0].availedCount += createdData.days;
+    employeeData.t_employee_leave_balances[0].remainingCount -= createdData.days;
+
+    employeeData.t_employee_leave_balances[0].save();
   }
   return await getleaveApplicationData({ Id: createdData.Id }, leaveApplicationAttributes, [{ model: LeaveTypeModel, attributes: ['name'] }], true);
 };

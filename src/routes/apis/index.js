@@ -56,6 +56,7 @@ const gratuity_configuration = require('./operations/gratuity_configuration/grat
 const accrue_gratuity_configuration= require('./operations/accrue_gratuity_configuration/accrue_gratuity_configuration.route')
 const reimbursement_configuration=require('./operations/reimbursement_configuration/reimbursement_configuration.route')
 const allocate_leaves =require('./operations/allocate_leaves/allocate_leaves.route')
+const employee_leave_balance =require('./operations/employee_leave_balance/employee_leave_balance.route')
 
 
 const router = express.Router();
@@ -277,6 +278,10 @@ const defaultRoutes = [
   {
     path: "/allocate_leaves",
     route: allocate_leaves
+  }, 
+  {
+    path: "/employee_leave_balance",
+    route: employee_leave_balance
   },
 
 

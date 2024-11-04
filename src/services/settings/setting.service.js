@@ -1,5 +1,5 @@
 const { RoleModel, ResourceModel, CountryModel, CityModel, StatusTypeModel, BankModel, DeptModel, FormModel, EmployeeProfileModel, BranchModel, EmployeeSalaryRevisionModel, LeaveTypeModel, FiscalSetupModel, SubsidiaryModel } = require('../../models');
-const { getDdlItems, getAlarmTimesItems, formatDates } = require('../../utils/common');
+const { getDdlItems, getAlarmTimesItems, formatDates, createFiscalYearLabel } = require('../../utils/common');
 const { DDL_FIELD_NAMES } = require('../../utils/constants');
 const { getRoleById } = require('./role.service');
 const Sequelize = require('sequelize');
@@ -176,7 +176,7 @@ const getAllFiscalYearData = async () => {
     yearData.forEach(element => {
       if (element.startDate && element.endDate) {
         result.push({
-          label: `Year - ${new Date(element.endDate).getFullYear()} (${formatDates(new Date(element.startDate), 'dd-MMM-yyyy')} to ${formatDates(new Date(element.endDate), 'dd-MMM-yyyy')})`,
+          label: createFiscalYearLabel(element.endDate, element.startDate),
           value: element.Id,
         })
       }

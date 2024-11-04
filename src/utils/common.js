@@ -259,5 +259,19 @@ const addDaysInDate = (startDate, days = 0) => {
   return new Date(addDays(new Date(startDate), days))
 }
 
+/**
+ * 
+ * Create Label for Fiscal Year Dropdown
+ * 
+ * @param {Date} endDate 
+ * @param {Date} startDate 
+ * @returns 
+ */
+const createFiscalYearLabel = (endDate, startDate) => {
+  if(!endDate || !startDate){
+    return '';
+  }
+  return `Year - ${new Date(endDate).getFullYear()} (${formatDates(new Date(startDate), 'dd-MMM-yyyy')} to ${formatDates(new Date(endDate), 'dd-MMM-yyyy')})`
+}
 
-module.exports = { handleNestedData, getRouteSlugs, getDdlItems, getAlarmTimesItems, customPaginate, paginationFacts, createDatetime, getPathStorageFromUrl, formatDates, getDateDiffInDays, addDaysInDate, check_range_exist };
+module.exports = { handleNestedData, getRouteSlugs, getDdlItems, getAlarmTimesItems, customPaginate, paginationFacts, createDatetime, getPathStorageFromUrl, formatDates, getDateDiffInDays, addDaysInDate, check_range_exist, createFiscalYearLabel };

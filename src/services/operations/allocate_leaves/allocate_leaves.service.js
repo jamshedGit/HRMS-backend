@@ -1,10 +1,7 @@
-const httpStatus = require("http-status");
 const { AllocateLeavesModel } = require("../../../models/index");
-const ApiError = require("../../../utils/ApiError");
 const Sequelize = require('sequelize');
-const { paginationFacts } = require("../../../utils/common");
-const pick = require("../../../utils/pick");
 const { POLICY_TYPE } = require("../../../models/operations/allocate_leaves/enum/allocate_leaves.enum");
+const { allocateLeaveBalances } = require("../employee_leave_balance/employee_leave_balance.service");
 
 const Op = Sequelize.Op;
 
@@ -27,17 +24,16 @@ const createallocateLeaves = async (req) => {
   const { list, ...rest } = req.body;
   for (let index = 0; index < list.length; index++) {
     const element = list[index];
-    if (!element.Id) {
-      const payload = {
-        ...rest,
-        ...element,
-        createdBy: req.user.id
-      };
-      await AllocateLeavesModel.create(payload);
-    }
+    const payload = {
+      ...rest,
+      ...element,
+      createdBy: req.user.id
+    };
+    await AllocateLeavesModel.upsert(payload);
 
   }
   const data = await getallocateLeavesData({ ...rest }, allocateLeavesAttributes);
+  allocateLeaveBalances({ ...rest, list: data })
   return { ...rest, list: data };
 };
 
