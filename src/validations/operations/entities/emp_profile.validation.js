@@ -46,6 +46,8 @@ const createEmp_profileValidation = {
         dateOfRetirement: Joi.date(),
         gradeId: Joi.number(),
         reportTo: Joi.number(),
+        email: Joi.any().optional(),
+
         email:Joi.any().optional(),
         contactList: Joi.disallow(),
         workExperienceList: Joi.disallow(),
