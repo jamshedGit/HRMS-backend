@@ -53,3 +53,4 @@ module.exports.Gratuity_configurationService = require('./operations/gratuity_co
 module.exports.accrue_gratuity_configurationService = require('./operations/accure_gratuity_configuration/accure_gratuity_configuration.service')
 module.exports.reimbursement_configurationService=require("./operations/reimbursement_configuration/reimbursement_configuration.service")
 module.exports.reimbursement_claimService=require("./operations/reimbursement_claim/reimbursement_claim.service")
+module.exports.Employee_loan_requestService=require("./operations/employee_loan_request/employee_loan_request.service")

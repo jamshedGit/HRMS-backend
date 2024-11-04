@@ -90,6 +90,7 @@ const sequelize = require('./config/db')
 const { ResourceModel, RoleModel, AccessRightModel, UserModel, TokenModel,Loan_management_configurationModel,Loan_management_detailModel,Gratuity_configurationModel,accrue_gratuity_configurationModel,Reimbursement_configurationModel,Reimbursement_policies_detailModel,Policies_grade_detailModel,Reimbursement_accounts_detailModel, Reimbursement_claimModel
 
 } = require('./models');
+// Loan_management_detailModel.sync({ force: true });
 // Reimbursement_claimModel.sync({ force: true }); 
 // Reimbursement_configurationModel.sync({ force: true });
 // Reimbursement_accounts_detailModel.sync({ force: true });

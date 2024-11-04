@@ -1,6 +1,7 @@
 const httpStatus = require("http-status");
 const Loan_management_configurationModel = require("../../../models/index");
 const Loan_management_detailModel = require("../../../models/index");
+const LoanTypeModel = require("../../../models/index");
 const FormModel = require("../../../models/index");
 const RoleModel = require("../../../models/index");
 const ApiError = require("../../../utils/ApiError");
@@ -75,8 +76,8 @@ const createloan_management_configuration = async (
           as: "details",
           include: [
             {
-              model: FormModel.FormModel,
-              attributes: ["formName", "formCode"],
+              model: LoanTypeModel.LoanTypeModel,
+              attributes: ["code", "name"],
               as: "Loan_Type",
             },
           ],
@@ -149,8 +150,8 @@ const queryloan_management_configuration = async (
             as: "details",
             include: [
               {
-                model: FormModel.FormModel,
-                attributes: ["formName", "formCode"],
+                model: LoanTypeModel.LoanTypeModel,
+                attributes: ["code", "name"],
                 as: "Loan_Type",
              
               },
@@ -203,8 +204,8 @@ const getloan_management_configurationById = async (id) => {
         as: "details",
         include: [
           {
-            model: FormModel.FormModel,
-            attributes: ["formName", "formCode"],
+            model: LoanTypeModel.LoanTypeModel,
+            attributes: ["code", "name"],
             as: "Loan_Type",
           },
         ],
@@ -263,7 +264,7 @@ const updateloan_management_configurationById = async (
   });
   if (overlappingSubsidiary) {
 
-let result={"message":'New subsidiary overlaps with existing subsidiary.',"status":"error"}
+let result={"message":'Record already exist.',"status":"error"}
 return result;
 }
   const Item = await Loan_management_configurationModel.Loan_management_configurationModel.findOne({
@@ -373,7 +374,28 @@ const deleteloan_management_configurationById = async (Id) => {
   return Item;
 };
 
+const queryLoanTypes = async () => {
 
+  const result= await LoanTypeModel.LoanTypeModel.findAndCountAll({
+    order: [
+      ['createdAt', 'DESC']
+    ],
+    attributes: ['Id', 'code', 'name'],
+  });
+
+  const transformedResults = [
+    { value: null, code: null, label: '--Select--' }, // Add a select option
+    ...result.rows.map(item => ({
+      value: item.Id,
+      code: item.code,
+      label: item.name, // Rename 'name' to 'value'
+    })),
+  ];
+
+
+  return transformedResults;
+
+};
 
 module.exports = {
   createloan_management_configuration,
@@ -381,4 +403,5 @@ module.exports = {
   getloan_management_configurationById,
   updateloan_management_configurationById,
   deleteloan_management_configurationById,
+  queryLoanTypes,
 };

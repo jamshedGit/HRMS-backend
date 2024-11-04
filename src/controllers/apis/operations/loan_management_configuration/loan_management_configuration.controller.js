@@ -44,37 +44,6 @@ const createloan_management_configuration = catchAsync(async (req, res) => {
 });
 
 
-// const createloan_management_configuration = catchAsync(async (req, res) => {
-//   try {
-//     // Create the loan management configuration
-//     const loan_management_configuration = await loan_management_configurationService.loan_management_configurationService.createloan_management_configuration(req, req.body);
-
- 
-//     if (req.body.details && Array.isArray(req.body.details)) {
-//       const loanDetails = req.body.details.map(detail => ({
-//         ...detail,
-//         loan_management_configurationId: loan_management_configuration.Id 
-//       }));
-
-//       // Save the loan management details
-//       await Loan_management_detail.bulkCreate(loanDetails);
-//     }
-
-//     res.status(httpStatus.CREATED).send({
-//       code: HttpStatusCodes.CREATED,
-//       message: HttpResponseMessages.CREATED,
-//       data: loan_management_configuration
-//     });
-//   } catch (error) {
-//    
-//     res.status(httpStatus.INTERNAL_SERVER_ERROR).send({
-//       code: HttpStatusCodes.INTERNAL_SERVER_ERROR,
-//       message: HttpResponseMessages.INTERNAL_SERVER_ERROR,
-//     });
-//   }
-// });
-
-
 
 
 const getAllloan_management_configuration= catchAsync(async (req, res) => {
@@ -150,7 +119,16 @@ const deleteloan_management_configuration = catchAsync(async (req, res) => {
   });
 });
 
-
+const getAllLoanType = catchAsync(async (req, res) => {
+  
+  const result = await loan_management_configurationService.loan_management_configurationService.queryLoanTypes();
+  console.log(result);
+  res.send({
+    code: HttpStatusCodes.OK,
+    message: HttpResponseMessages.OK,
+    data: result,
+  });
+});
 
 module.exports = {
   createloan_management_configuration,
@@ -158,5 +136,6 @@ module.exports = {
   getloan_management_configurationById,
   updateloan_management_configuration,
   deleteloan_management_configuration,
+  getAllLoanType,
  
 };

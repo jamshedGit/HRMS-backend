@@ -18,8 +18,6 @@ const Loan_management_configuration = sequelize.define('t_loan_management_config
     emp_loan_account: { type: Sequelize.INTEGER, allowNull: false },
     installment_deduction_percentage: { type: Sequelize.DECIMAL, allowNull: false },
     installment_deduction_basis_type: { type: Sequelize.INTEGER, allowNull: false },
-
-    
     isActive: { type: Sequelize.BOOLEAN, allowNull: true, defaultValue: true },
 	createdBy: {
 		type: Sequelize.INTEGER,
