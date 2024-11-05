@@ -26,11 +26,11 @@ const Employee_loan_request = sequelize.define('t_employee_loan_request', {
 			return rawValue ? formatDates(rawValue) : null;
 		}
 	},
+	total_loan_amount: { type: Sequelize.INTEGER,allowNull: false },
     total_installment: { type: Sequelize.INTEGER,allowNull: false },
     reason: { type: Sequelize.STRING, },
     approval_statusId: { type: Sequelize.INTEGER,allowNull: false,defaultValue: 1 },
     statusId: { type: Sequelize.INTEGER,allowNull: false,defaultValue: 1 },
-	companyId: { type: Sequelize.INTEGER,allowNull: false ,defaultValue: 1},
     subsidiaryId: { type: Sequelize.INTEGER,allowNull: false,defaultValue: 1 },
 	companyId: { type: Sequelize.INTEGER,allowNull: false ,defaultValue: 1},
     isActive: { type: Sequelize.BOOLEAN, allowNull: true, defaultValue: true },

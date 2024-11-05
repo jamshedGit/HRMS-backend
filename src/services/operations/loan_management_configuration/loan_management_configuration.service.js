@@ -3,7 +3,7 @@ const Loan_management_configurationModel = require("../../../models/index");
 const Loan_management_detailModel = require("../../../models/index");
 const LoanTypeModel = require("../../../models/index");
 const FormModel = require("../../../models/index");
-const RoleModel = require("../../../models/index");
+
 const ApiError = require("../../../utils/ApiError");
 const Sequelize = require("sequelize");
 const { paginationFacts } = require("../../../utils/common");
@@ -92,10 +92,7 @@ const createloan_management_configuration = async (
           attributes: ["formName", "formCode"],
           as: "Account",
         },
-        {
-          model: RoleModel.RoleModel,
-          attributes: ["name"],
-        },
+        
       ],
     });
 
@@ -176,12 +173,6 @@ const queryloan_management_configuration = async (
             as: "EmpLoanAccount",
           },
        
-
-          { 
-            model: RoleModel.RoleModel,
-            attributes: ["name"],
-          
-          },
         ],
       }
     );
@@ -220,10 +211,7 @@ const getloan_management_configurationById = async (id) => {
         attributes: ["formName", "formCode"],
         as: "Account",
       },
-      {
-        model: RoleModel.RoleModel,
-        attributes: ["name"],
-      },
+      
     ],
   });
 

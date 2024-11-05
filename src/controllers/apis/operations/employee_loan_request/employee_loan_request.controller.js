@@ -11,7 +11,7 @@ const {
 } = require("../../../../utils/constants");
 
 const createEmployee_loan_request = catchAsync(async (req, res) => {
-
+console.log("createEmployee_loan_request body",req.body)
     try {
 
 

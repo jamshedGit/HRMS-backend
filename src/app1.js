@@ -87,10 +87,10 @@ const sequelize = require('./config/db')
 	
 // Import the user model we have defined
 // const RoleModel = require('./models/setups/role.model')
-const { ResourceModel, RoleModel, AccessRightModel, UserModel, TokenModel,Loan_management_configurationModel,Loan_management_detailModel,Gratuity_configurationModel,accrue_gratuity_configurationModel,Reimbursement_configurationModel,Reimbursement_policies_detailModel,Policies_grade_detailModel,Reimbursement_accounts_detailModel, Reimbursement_claimModel
+const {Employee_loan_requestModel, ResourceModel, RoleModel, AccessRightModel, UserModel, TokenModel,Loan_management_configurationModel,Loan_management_detailModel,Gratuity_configurationModel,accrue_gratuity_configurationModel,Reimbursement_configurationModel,Reimbursement_policies_detailModel,Policies_grade_detailModel,Reimbursement_accounts_detailModel, Reimbursement_claimModel
 
 } = require('./models');
-// Loan_management_detailModel.sync({ force: true });
+// Employee_loan_requestModel.sync({ force: true }); 
 // Reimbursement_claimModel.sync({ force: true }); 
 // Reimbursement_configurationModel.sync({ force: true });
 // Reimbursement_accounts_detailModel.sync({ force: true });
