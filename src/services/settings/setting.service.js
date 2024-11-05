@@ -1,4 +1,4 @@
-const { RoleModel, ResourceModel, CountryModel, CityModel, StatusTypeModel, BankModel, DeptModel, FormModel, EmployeeProfileModel, BranchModel, EmployeeSalaryRevisionModel, LeaveTypeModel, FiscalSetupModel, SubsidiaryModel } = require('../../models');
+const { RoleModel, ResourceModel, CountryModel, CityModel, StatusTypeModel, BankModel, DeptModel, FormModel, EmployeeProfileModel, BranchModel, EmployeeSalaryRevisionModel, LeaveTypeModel, FiscalSetupModel, SubsidiaryModel, LeaveManagementConfigurationModel, LeaveTypePoliciesModel } = require('../../models');
 const { getDdlItems, getAlarmTimesItems, formatDates, createFiscalYearLabel } = require('../../utils/common');
 const { DDL_FIELD_NAMES } = require('../../utils/constants');
 const { getRoleById } = require('./role.service');
@@ -148,13 +148,50 @@ const getFormMenusMasterData = async (req, res) => {
   return FormMenusMasterData
 };
 
-const getLeaveTypesData = async () => {
-  const LeaveTypeData = getDdlItems(DDL_FIELD_NAMES.LeaveType, await LeaveTypeModel.findAll({
-    attributes: ['name', 'Id']
-  }));
-  if (LeaveTypeData.length > 0) {
-    LeaveTypeData.unshift({ label: '--Select--', value: null })
+/**
+ * 
+ * Leave Type Dropdown Data
+ * If employee Id is there in the request then we have to get Leave Type dropdown data according to the Leave Types that are assigned in the Leave Management Configurations
+ * else we just send all Leave Types
+ * 
+ * @param {Number|Null} employeeId 
+ * @returns 
+ */
+const getLeaveTypesData = async (employeeId) => {
+  let LeaveTypeData = [];
+  if (employeeId) {
+    const employeeWithLeaveConfig = await EmployeeProfileModel.findByPk(employeeId, { attributes: ['Id', 'subsidiaryId', 'gradeId', 'employeeTypeId'] })
+    if (employeeWithLeaveConfig) {
+      const leaveConfigData = await LeaveManagementConfigurationModel.findOne({
+        where: {
+          subsidiaryId: employeeWithLeaveConfig.subsidiaryId,
+          gradeId: employeeWithLeaveConfig.gradeId,
+          employeeTypeId: employeeWithLeaveConfig.employeeTypeId
+        },
+        attributes: ['Id'],
+        include: [
+          {
+            model: LeaveTypePoliciesModel,
+            attributes: ['leaveType']
+          }
+        ]
+      })
+
+      if (leaveConfigData?.t_leave_type_policies?.length) {
+        LeaveTypeData = getDdlItems(DDL_FIELD_NAMES.LeaveType, await LeaveTypeModel.findAll({
+          where: { Id: leaveConfigData?.t_leave_type_policies.map((el) => el.leaveType) },
+          attributes: ['name', 'Id']
+        }));
+      }
+
+    }
   }
+  else {
+    LeaveTypeData = getDdlItems(DDL_FIELD_NAMES.LeaveType, await LeaveTypeModel.findAll({
+      attributes: ['name', 'Id']
+    }));
+  }
+  LeaveTypeData.unshift({ label: '--Select--', value: null })
   return LeaveTypeData
 };
 
@@ -195,7 +232,7 @@ const getCitiesMasterData = async (countryId) => {
   }
   const citiesMasterData = getDdlItems(DDL_FIELD_NAMES.city, await CityModel.findAll({
     where: filter,
-    attributes: ['id', 'name','countryId']
+    attributes: ['id', 'name', 'countryId']
   }));
   return citiesMasterData
 };

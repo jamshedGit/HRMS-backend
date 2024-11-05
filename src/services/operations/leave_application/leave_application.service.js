@@ -36,7 +36,7 @@ const createleaveApplication = async (req) => {
           where: {
             leaveType: body.leaveType
           },
-          required: false, 
+          required: false,
           include: [
             {
               model: FiscalSetupModel,
@@ -53,7 +53,7 @@ const createleaveApplication = async (req) => {
   if (!employeeData) {
     throw new ApiError(httpStatus.NOT_FOUND, `No User Found`);
   }
-  if(!employeeData.t_employee_leave_balances?.length || (employeeData.t_employee_leave_balances[0].remainingCount < getDateDiffInDays(body.from, body.to))){
+  if (!employeeData.t_employee_leave_balances?.length || (employeeData.t_employee_leave_balances[0].remainingCount < getDateDiffInDays(body.from, body.to))) {
     throw new ApiError(httpStatus.FORBIDDEN, `Remaining Leaves not enough`);
   }
   const oldRecord = await getleaveApplicationData(
@@ -80,7 +80,7 @@ const createleaveApplication = async (req) => {
   if (!body.file) {
     const isFileRequired = await checkAttachmentRequired(employeeData, body)
     if (isFileRequired) {
-      throw new ApiError(httpStatus.BAD_REQUEST, `File is required for this Leave type`);
+      throw new ApiError(httpStatus.BAD_REQUEST, `Attachment is required for this Leave type`);
     }
   }
   const payload = {

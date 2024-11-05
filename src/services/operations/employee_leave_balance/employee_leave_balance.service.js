@@ -34,14 +34,24 @@ const initialValues = {
 /**
  * Allocate leave Balance
  * 
- * @param {Object} req 
+ * @param {Object} data 
  * @returns 
  */
 const allocateLeaveBalances = async (data) => {
   const YearData = await FiscalSetupModel.findByPk(data.yearId, {
     attributes: ['startDate', 'endDate', 'Id']
   });
-  console.log(':::::data::::::', JSON.stringify(data))
+
+
+  const oldYearData = await FiscalSetupModel.findOne({
+    where: {
+      isActive: false
+    },
+    order: [['createdAt', 'DESC']],
+    attributes: ['startDate', 'endDate', 'Id']
+  });
+
+
   const employeeData = await EmployeeProfileModel.findAll({
     where: {
       subsidiaryId: data.subsidiaryId,
@@ -55,7 +65,8 @@ const allocateLeaveBalances = async (data) => {
         attributes: ['Id', 'leaveType'],
         where: {
           from: { [Op.gte]: YearData.startDate }, // `from` date should be on or after startDate
-          to: { [Op.lte]: YearData.endDate }      // `to` date should be on or before endDate
+          to: { [Op.lte]: YearData.endDate },      // `to` date should be on or before endDate
+          isActive: true
         },
         include: [
           {
@@ -66,17 +77,47 @@ const allocateLeaveBalances = async (data) => {
             ],
           }
         ]
+      },
+      {
+        model: EmployeeLeaveBalanceModel,
+        where: {
+          yearId: oldYearData.Id,
+          remainingCount: { [Op.gte]: 0 }
+        },
+        required: false,
+        attributes: ['Id', 'leaveType', 'remainingCount']
       }
     ],
-  })
-  console.log(':::::employeeData::::::', JSON.stringify(employeeData))
-  console.log(':::::YearData::::::', JSON.stringify(YearData))
+  });
 
   if (employeeData?.length) {
-    data.list.forEach((al) => {
+    data.list.forEach(async (al) => {
       employeeData.forEach(async (emp) => {
+        //Initialize values for Leave balance Record
         const init = { ...initialValues };
 
+        //This is to check if there are any leaves remaining of last year of the same leave type that are to be carry forwarded
+        if (emp.t_employee_leave_balances?.length) {
+          const oldBalance = emp.t_employee_leave_balances.find(el => el.leaveType == al.leaveType);
+
+          if (oldBalance) {
+            const allocationPolicy = await AllocateLeavesModel.findOne({
+              where: {
+                subsidiaryId: data.subsidiaryId,
+                cycleTypeId: data.cycleTypeId,
+                yearId: oldYearData.Id,
+                leaveType: al.leaveType,
+                policyType: 1
+              },
+              attributes: ['policyType', 'maxCount']
+            })
+            if (allocationPolicy && oldBalance.remainingCount && allocationPolicy.maxCount) {
+              init.carryForwardCount = oldBalance.remainingCount > allocationPolicy.maxCount ? allocationPolicy.maxCount : oldBalance.remainingCount
+            }
+          }
+        }
+
+        //assigned fixed values to initialized values so we don't have to worry about them later
         Object.assign(init, {
           employeeId: emp.Id,
           leaveType: al.leaveType,
@@ -84,6 +125,7 @@ const allocateLeaveBalances = async (data) => {
           allocatedCount: al.leaveCount
         });
 
+        //Get the number of Availed Leaves of Employee. If no leave is availed then it will set 0
         const availedCount = emp.t_leave_applications.reduce((prev, curr) => {
           if (curr.leaveType == al.leaveType) {
             return prev + (curr?.t_leave_application_details?.length || 0)
@@ -91,13 +133,19 @@ const allocateLeaveBalances = async (data) => {
           return prev
         }, 0)
 
+        //Set availed count
         init.availedCount = availedCount;
 
+        //Set remaining count
         init.remainingCount = availedCount > init.allocatedCount ? 0 : init.allocatedCount - availedCount;
-        if (al.policyType == POLICY_TYPE[2])
-          init.encashmentCount = init.remainingCount > al.maxCount ? al.maxCount : init.remainingCount;
 
+        //Add carry forward count to remaining count if there are any leaves from previous year that are carry forwarded
+        init.remainingCount += init.carryForwardCount
 
+        //Try updating considering there is record that is already present.
+        //if the record is updated then it will increase the affectedCount number. 
+        //if there was no previous record found to update that means no record was affected so we will create new record in the check below
+        //This way is used because Sequelize doesn't support upsert method with where option
         const [affectedCount] = await EmployeeLeaveBalanceModel.update(
           { ...init }, // new values to update
           {
@@ -154,7 +202,8 @@ const createLeaveBalance = async (req) => {
         where: {
           from: { [Op.gte]: YearData.startDate }, // `from` date should be on or after startDate
           to: { [Op.lte]: YearData.endDate },      // `to` date should be on or before endDate
-          leaveType: body.leaveType
+          leaveType: body.leaveType,
+          isActive: true
         },
         include: [
           {
@@ -173,14 +222,6 @@ const createLeaveBalance = async (req) => {
 
   if (employeeData?.length) {
     const employee = employeeData[0];
-    const policyData = await AllocateLeavesModel.findOne({
-      where: {
-        subsidiaryId: employee.subsidiaryId,
-        cycleTypeId: employee.cycleTypeId,
-        yearId: body.yearId,
-        leaveType: body.leaveType
-      }
-    })
 
     const availedCount = employee.t_leave_applications.reduce((prev, curr) => {
       if (curr.leaveType == body.leaveType) {
@@ -192,8 +233,6 @@ const createLeaveBalance = async (req) => {
     payload.availedCount = availedCount;
 
     payload.remainingCount = availedCount > payload.allocatedCount ? 0 : payload.allocatedCount - availedCount;
-    if (policyData?.policyType == POLICY_TYPE[2])
-      payload.encashmentCount = payload.remainingCount > policyData.maxCount ? policyData.maxCount : payload.remainingCount;
 
     const createdData = await EmployeeLeaveBalanceModel.create({
       ...payload // values to set for the new record
@@ -237,20 +276,13 @@ const getLeaveBalance = async (filters, attributes = null, include = null) => {
 
 /**
  * 
- * Get All Leave Balance with Pagination
+ * Get All Leave Balance
  * 
  * @param {Object} req 
  * @returns 
  */
 const getAllLeaveBalance = async (req) => {
   const body = req.body;
-  const leaveTypes = await LeaveTypeModel.findAll({
-    where: {
-      isActive: true
-    },
-    attributes: ['name', 'Id']
-  })
-
   const employeeData = await EmployeeProfileModel.findByPk(body.employeeId,
     {
       attributes: ['Id'],
@@ -268,25 +300,29 @@ const getAllLeaveBalance = async (req) => {
               },
               attributes: ['startDate', 'endDate']
             },
+            {
+              model: LeaveTypeModel,
+              attributes: ['name']
+            }
           ],
         }
       ]
     }
   )
 
-  const data = leaveTypes.map((lt)=> {
-    const leaveData = employeeData.t_employee_leave_balances.find(lb => lb.leaveType == lt.Id);
+  const data = employeeData.t_employee_leave_balances.map((lb) => {
     return {
-      leaveTypeName: lt.name,
-      yearName: leaveData?.t_fiscal_setup ? createFiscalYearLabel(leaveData.t_fiscal_setup.endDate, leaveData.t_fiscal_setup.startDate) : 'NA',
-      allocatedCount: leaveData?.allocatedCount || 0,
-      availedCount: leaveData?.availedCount || 0,
-      remainingCount: leaveData?.remainingCount || 0,
-      carryForwardCount: leaveData?.carryForwardCount || 0,
-      lateCount: leaveData?.lateCount || 0,
-      encashmentCount: leaveData?.encashmentCount || 0,
+      leaveTypeName: lb?.t_leave_type?.name || '',
+      yearName: lb?.t_fiscal_setup ? createFiscalYearLabel(lb.t_fiscal_setup.endDate, lb.t_fiscal_setup.startDate) : 'NA',
+      allocatedCount: lb?.allocatedCount || 0,
+      availedCount: lb?.availedCount || 0,
+      remainingCount: lb?.remainingCount || 0,
+      carryForwardCount: lb?.carryForwardCount || 0,
+      lateCount: lb?.lateCount || 0,
+      encashmentCount: lb?.encashmentCount || 0,
     }
-  })
+  });
+
   return data
 };
 

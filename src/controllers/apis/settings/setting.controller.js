@@ -88,7 +88,7 @@ const getAllLeaveType = catchAsync(async (req, res) => {
   res.send({  
     code: HttpStatusCodes.OK,
     message: HttpResponseMessages.OK,
-    data: await settingService.getLeaveTypesData(),
+    data: await settingService.getLeaveTypesData(req.body.employeeId),
   });
 });
 
