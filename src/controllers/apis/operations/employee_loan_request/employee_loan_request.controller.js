@@ -44,7 +44,7 @@ console.log("createEmployee_loan_request body",req.body)
 
 
 const getAllEmployee_loan_request = catchAsync(async (req, res) => {
-
+    console.log("queryEmployee_loan_request employeeId hit",req.body)
     const obj = {};
     const filter = obj;
 

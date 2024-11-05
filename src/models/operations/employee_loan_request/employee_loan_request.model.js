@@ -8,6 +8,7 @@ const Employee_loan_request = sequelize.define('t_employee_loan_request', {
 		autoIncrement: true,
 		primaryKey: true
 	},
+	employeeId: { type: Sequelize.INTEGER, allowNull: false },
     loan_typeId: { type: Sequelize.INTEGER, allowNull: false },
     monthly_installment: { type: Sequelize.FLOAT, allowNull: false },
 	applied_date: {
@@ -49,11 +50,12 @@ const Employee_loan_request = sequelize.define('t_employee_loan_request', {
 
 
   
-//   Employee_loan_request.belongsTo(FormModel, {
-// 	foreignKey: 'reimbursement_typeId',
-// 	targetKey: 'Id',
-// 	as:"ReimbursementType"
-//   });
+Employee_loan_request.belongsTo(EmployeeProfileModel, {
+	foreignKey: 'employeeId',
+	targetKey: 'Id',
+	as:"Employee"
+  });
+    
   
 
 module.exports = Employee_loan_request;

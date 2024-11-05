@@ -65,7 +65,7 @@ const queryEmployee_loan_request = async (
   let limit = options.pageSize;
   let offset = 0 + (options.pageNumber - 1) * limit;
 
-
+console.log("queryEmployee_loan_request employeeId",employeeId)
 
  let { count, rows } = await Employee_loan_requestModel.findAndCountAll({
     order: [["createdAt", "DESC"]],
@@ -77,21 +77,13 @@ const queryEmployee_loan_request = async (
   
     
         include: [
-          {
-            model: FormModel,
-            attributes: ["formName", "formCode"],
-            as: "ReimbursementType",
-          },
+          
           {
             model: EmployeeProfileModel,
             attributes: ["firstName"],
             as: "Employee",
           },
-          {
-            model: Reimbursement_configurationModel,
-            attributes: ["subsidiaryId","payroll_groupId"],
-            as: "ReimbursementConfiguration",
-          },
+     
        
     
     ],
