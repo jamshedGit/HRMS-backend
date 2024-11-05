@@ -143,16 +143,16 @@ const deleteEmployee_loan_request = catchAsync(async (req, res) => {
       });
 
 
-const getreimbursement_configurationPoliciesById = catchAsync(async (req, res) => {
+const getloan_configurationDetailsById = catchAsync(async (req, res) => {
  
-        const policies = await Employee_loan_requestService.getreimbursement_configurationPoliciesById(req.body.Id);
-        if (!policies) {
-            throw new ApiError(httpStatus.NOT_FOUND, "Policies not found");
+        const details = await Employee_loan_requestService.getloan_configurationDetailsById(req.body.Id);
+        if (!details) {
+            throw new ApiError(httpStatus.NOT_FOUND, "Details not found");
         }
         res.send({
             code: HttpStatusCodes.OK,
             message: HttpResponseMessages.OK,
-            data: policies,
+            data: details,
         });
     
     
@@ -167,5 +167,5 @@ module.exports = {
     updateEmployee_loan_request,
     deleteEmployee_loan_request,
     getPayrollMonth,
-    getreimbursement_configurationPoliciesById
+    getloan_configurationDetailsById
 };

@@ -17,4 +17,6 @@ router.route("/delete-employee-loan-request").patch(auth(),employee_loan_request
 
 router.route("/create-employee-loan-request").post(auth(),employee_loan_requestController.createEmployee_loan_request);
 
+router.route("/read-loan-configuration-details").post(auth(),employee_loan_requestController.getloan_configurationDetailsById);
+
 module.exports = router;

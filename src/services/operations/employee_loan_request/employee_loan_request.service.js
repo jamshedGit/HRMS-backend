@@ -1,6 +1,5 @@
 const httpStatus = require("http-status");
-const { Employee_loan_requestModel,Reimbursement_configurationModel ,EmployeeProfileModel,PayrollMonthModel,Reimbursement_policies_detailModel,Policies_grade_detailModel} = require("../../../models/index");
-const { FormModel } = require("../../../models/index");
+const {EmployeeSalaryModel, Employee_loan_requestModel,Loan_management_configurationModel ,EmployeeProfileModel,Loan_management_detailModel} = require("../../../models/index");
 
 const ApiError = require("../../../utils/ApiError");
 const Sequelize = require("sequelize");
@@ -115,14 +114,7 @@ console.log("queryEmployee_loan_request employeeId",employeeId)
 const getEmployee_loan_requestById = async (id) => {
   return Employee_loan_requestModel.findOne({
     where: { Id: id },
-    include: [
-      {
-        model: FormModel,
-        attributes: ["formName", "formCode"],
-        as: "ReimbursementType",
-      },
-  
-    ],
+
   });
 
 
@@ -198,53 +190,67 @@ const getPayrollMonth = async () => {
   
 };
 
-const getreimbursement_configurationPoliciesById = async (Id) => {
+const getloan_configurationDetailsById = async (Id) => {
   try {
-   
+    // Retrieve employee profile with joining date
     const employee = await EmployeeProfileModel.findOne({
-     
-      where: ({ Id :Id}),
+      where: { Id: Id },
+      attributes: ['Id', 'subsidiaryId','dateOfJoining'] // Ensure joiningDate is selected
     });
 
     // Check if employee is found
     if (!employee) {
       throw new Error('Employee not found');
     }
+console.log("EmployeeSalaryModel Id",Id)
+    // Retrieve compensation benefits with basic and gross salary
+    const salary = await EmployeeSalaryModel.findOne({
+      where: { employeeId: Id },
+      attributes: ['grossSalary', 'basicSalary'] // Select basic and gross fields
+    });
 
+    // Check if salary detail is found
+    console.log("EmployeeSalaryModel salary",salary)
+    if (!salary) {
+      throw new Error('Salary detail not found');
+    }
 
-    const policies = await Reimbursement_configurationModel.findOne({
+    // Retrieve loan management configuration details
+    const details = await Loan_management_configurationModel.findOne({
       where: {
         subsidiaryId: employee.subsidiaryId,
-        payroll_groupId: employee.payrollGroupId, // Ensure correct field name
       },
       include: [
         {
-          model: Reimbursement_policies_detailModel,
-          as: "policies", // Use the alias defined in the association
-          include: [
-            {
-              model: Policies_grade_detailModel,
-              as: "grades", // Use the alias defined in the association
-              where: { salary_gradeId: employee.gradeId }, // Match the grade ID
-            },
-          ],
-        },
+          model: Loan_management_detailModel,
+          as: "details", // Use the alias defined in the association
+          attributes: { exclude: ['createdAt', 'updatedAt', 'createdBy', 'updatedBy'] } // Exclude unnecessary fields
+        }
       ],
+      attributes: { exclude: ['createdAt', 'updatedAt', 'createdBy', 'updatedBy'] } // Exclude unnecessary fields from main model
     });
 
-  
-
-    // Check if employee is found
-    if (!policies) {
-      throw new Error('Policies not found');
+    // Check if loan management configuration details are found
+    if (!details) {
+      throw new Error('Loan detail not found');
     }
 
-    
+    // Combine employee, salary, and loan details in the return object
+    return {
+      employee: {
+        ...employee.toJSON(), // Convert Sequelize model instance to plain object
+        joiningDate: employee.joiningDate // Include joining date
+      },
+      salary: {
+        
+        gross: salary.grossSalary,
+        basic: salary.basicSalary,
+      },
+      loanDetails: details
+    };
 
-    return policies;
   } catch (error) {
-   
-    throw error; // rethrow the error after logging it
+    throw error; // Rethrow the error after logging it
   }
 };
 
@@ -257,5 +263,5 @@ module.exports = {
   deleteEmployee_loan_requestById,
   queryEmployee_loan_request,
   getPayrollMonth,
-  getreimbursement_configurationPoliciesById
+  getloan_configurationDetailsById
 };
