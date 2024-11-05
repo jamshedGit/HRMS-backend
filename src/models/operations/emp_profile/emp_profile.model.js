@@ -52,7 +52,27 @@ const DesigModel = sequelize.define('t_employee_profile', {
 	attendanceType: { type: Sequelize.NUMBER, allowNull: true },
 	dateOfBirth: { type: Sequelize.DATE, allowNull: true },
 	dateOfRetirement: { type: Sequelize.DATE, allowNull: true },
+	salesRep : { type: Sequelize.BOOLEAN, allowNull: true },
+	supportRep : { type: Sequelize.BOOLEAN, allowNull: true },
+	sourceOfHire : { type: Sequelize.STRING, allowNull: true },
+	lastReviewDate : { type: Sequelize.DATE, allowNull: true },
+	nextReviewDate : { type: Sequelize.DATE, allowNull: true },
+	laborCardNo : { type: Sequelize.STRING, allowNull: true },
+	drivingLicenseExpiry : { type: Sequelize.DATE, allowNull: true },
+	emiratesId : { type: Sequelize.STRING, allowNull: true },
+	emiratesNo : { type: Sequelize.STRING, allowNull: true },
+	passportExpiry : { type: Sequelize.DATE, allowNull: true },
+	nicExpiry : { type: Sequelize.DATE, allowNull: true },
+	deligation : { type: Sequelize.STRING, allowNull: true },
+	personId : { type: Sequelize.STRING, allowNull: true },
+	routingCode : { type: Sequelize.STRING, allowNull: true },
+	contractType : { type: Sequelize.STRING, allowNull: true },
+	cycleType : { type: Sequelize.STRING, allowNull: true },
+	requireDeligation : { type: Sequelize.BOOLEAN, allowNull: true },
+	
 	isActive: { type: Sequelize.BOOLEAN, allowNull: true, defaultValue: true },
+
+
 	createdBy: {
 		type: Sequelize.INTEGER,
 		allowNull: true,
