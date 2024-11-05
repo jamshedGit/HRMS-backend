@@ -15,7 +15,7 @@ const Employee_loan_request = sequelize.define('t_employee_loan_request', {
 		type: Sequelize.DATE,
 		allowNull: false,
 		get() {
-			const rawValue = this.getDataValue('date');
+			const rawValue = this.getDataValue('applied_date');
 			return rawValue ? formatDates(rawValue) : null;
 		}
 	},
@@ -23,7 +23,7 @@ const Employee_loan_request = sequelize.define('t_employee_loan_request', {
 		type: Sequelize.DATE,
 		allowNull: false,
 		get() {
-			const rawValue = this.getDataValue('date');
+			const rawValue = this.getDataValue('installment_start_date');
 			return rawValue ? formatDates(rawValue) : null;
 		}
 	},
