@@ -4,7 +4,6 @@ const ApiError = require("../../../utils/ApiError");
 const Sequelize = require('sequelize');
 const { paginationFacts, formatDates, addDaysInDate, getDateDiffInDays, handleNestedData } = require("../../../utils/common");
 const pick = require("../../../utils/pick");
-const { include } = require("underscore");
 
 const Op = Sequelize.Op;
 
@@ -206,7 +205,7 @@ const updateleaveApplicationById = async (body, updatedBy) => {
  * @returns 
  */
 const deleteleaveApplicationById = async (id) => {
-  const oldRecord = await getleaveApplicationById(id);
+  const oldRecord = await getleaveApplicationById(id, ['Id', 'employeeId', 'leaveType', 'days']);
   if (!oldRecord) {
     throw new ApiError(httpStatus.NOT_FOUND, "Record not found");
   }
@@ -217,6 +216,32 @@ const deleteleaveApplicationById = async (id) => {
       applicationId: oldRecord.Id
     }
   })
+
+  const leaveBalance = await EmployeeLeaveBalanceModel.findOne({
+    where: {
+      employeeId: oldRecord.employeeId,
+      leaveType: oldRecord.leaveType,
+    },
+    include: [
+      {
+        model: FiscalSetupModel,
+        required: true,    // Ensures LeaveBalance is only included if FiscalSetup with isActive: true exists
+        where: {
+          isActive: true,
+        },
+        attributes: ['Id']
+      },
+    ],
+  })
+
+  if(leaveBalance && oldRecord.days){
+    leaveBalance.availedCount -= oldRecord.days;
+    leaveBalance.remainingCount += oldRecord.days;
+
+    leaveBalance.save();
+  }
+
+
   return oldRecord;
 };
 
