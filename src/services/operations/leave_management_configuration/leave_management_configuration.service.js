@@ -1,5 +1,5 @@
 const httpStatus = require("http-status");
-const { LeaveManagementConfigurationModel, LeaveTypePoliciesModel, LeaveTypeSalaryDeductionPoliciesModel, FormModel } = require("../../../models/index");
+const { LeaveManagementConfigurationModel, LeaveTypePoliciesModel, LeaveTypeSalaryDeductionPoliciesModel, FormModel, SubsidiaryModel } = require("../../../models/index");
 const ApiError = require("../../../utils/ApiError");
 const Sequelize = require('sequelize');
 const { paginationFacts, handleNestedData } = require("../../../utils/common");
@@ -20,8 +20,7 @@ const includeData = [
     model: LeaveTypeSalaryDeductionPoliciesModel
   },
   {
-    model: FormModel,
-    as: 'subsidiary'
+    model: SubsidiaryModel,
   },
   {
     model: FormModel,
@@ -36,9 +35,8 @@ const includeData = [
 //Include options required for Leave Management Configuration Table view
 const LeaveManagementConfigurationInclude = [
   {
-    model: FormModel,
-    attributes: [['formName', 'subsidiaryName']],
-    as: 'subsidiary',
+    model: SubsidiaryModel,
+    attributes: [['name', 'subsidiaryName']]
   },
   {
     model: FormModel,
@@ -89,7 +87,7 @@ const getAllleaveManagementConfiguration = async (req) => {
   const limit = options.pageSize;
   const offset = 0 + (options.pageNumber - 1) * limit;
   const queryFilters = [
-    { Name: Sequelize.where(Sequelize.fn('LOWER', Sequelize.col('formName')), 'LIKE', '%' + searchQuery + '%') }, //Filter data By subsidiary name
+    { Name: Sequelize.where(Sequelize.fn('LOWER', Sequelize.col('name')), 'LIKE', '%' + searchQuery + '%') }, //Filter data By subsidiary name
   ]
 
   //Get all Leave Configuration data from DB with count for pagination
@@ -99,9 +97,8 @@ const getAllleaveManagementConfiguration = async (req) => {
     ],
     include: [  //Include Subsidiary, Employee Type, Grade from Their Tables
       {
-        model: FormModel,
-        attributes: [['formName', 'subsidiaryName']],
-        as: 'subsidiary',
+        model: SubsidiaryModel,
+        attributes: [['name', 'subsidiaryName']],
         where: {
           [Op.or]: queryFilters,
         }

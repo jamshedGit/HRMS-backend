@@ -136,5 +136,10 @@ module.exports.Reimbursement_policies_detailModel=require("./operations/reimburs
 module.exports.Policies_grade_detailModel=require("./operations/reimbursement_configuration/policies_grade_detail.model")
 module.exports.Reimbursement_accounts_detailModel=require("./operations/reimbursement_configuration/reimbursement_accounts_detail.model")
 
+//Employee Leave Balance Model
+module.exports.EmployeeLeaveBalanceModel = require('./operations/employee_leave_balance/employee_leave_balance.model');
+
+//Allocate Leaves Model
+module.exports.AllocateLeavesModel = require('./operations/allocate_leaves/allocate_leaves.model');
 //Reimbursement_claim
 module.exports.Reimbursement_claimModel=require("./operations/reimbursement_claim/reimbursement_claim.model")
