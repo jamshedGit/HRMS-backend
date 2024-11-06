@@ -37,7 +37,8 @@ const Policies_grade_detail = sequelize.define(
 Policies_grade_detail.belongsTo(Reimbursement_policies_detailModel, {
   foreignKey: "reimbursement_policies_detailId",
   targetKey: "Id", // Optional alias
-     onDelete: 'CASCADE'
+     onDelete: 'CASCADE',
+     as: "policies",
 });
 
 Reimbursement_policies_detailModel.hasMany(Policies_grade_detail, {

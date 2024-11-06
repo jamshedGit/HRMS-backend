@@ -161,7 +161,16 @@ const queryContactInfo = async () => {
  * @returns {Promise<ReceiptModel>}
  */
 const getEmp_profileById = async (id) => {
-  return Emp_profileModel.EmployeeProfileModel.findByPk(id);
+  //return Emp_profileModel.EmployeeProfileModel.findByPk(id);
+
+  const results = await sequelize.query('CALL usp_GetAllEmployeeProfileDetails(:employeeId)', {
+    replacements: { employeeId: id || 'null' },
+    type: Sequelize.QueryTypes.RAW // Use RAW type for executing stored procedures
+  });
+
+  console.log("::13::",results);
+
+  return results[0]
 };
 
 const getContactInfoByEmployeeId = async (id) => {
@@ -195,7 +204,9 @@ const getContactInfoByEmployeeId = async (id) => {
  * @returns {Promise<ReceiptModel>}
  */
 const updateEmp_profileById = async (Id, updateBody, updatedBy) => {
+  console.log("::ddd::",Id);
   const Item = await getEmp_profileById(Id);
+  console.log("::Item",Item)
   if (!Item) {
     throw new ApiError(httpStatus.NOT_FOUND, "record not found");
   }
@@ -206,7 +217,13 @@ const updateEmp_profileById = async (Id, updateBody, updatedBy) => {
   updateBody.updatedBy = updatedBy;
   delete updateBody.id;
   Object.assign(Item, updateBody);
-  await Item.save();
+  //await Emp_profileModel.EmployeeProfileModel.update(Item);
+
+  const updatedItem = await Emp_profileModel.EmployeeProfileModel.update(Item, {
+    where: {
+      Id: Id, // replace `itemId` with the actual identifier for the record you want to update
+    },
+  });
   return;
 };
 

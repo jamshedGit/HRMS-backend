@@ -141,3 +141,5 @@ module.exports.EmployeeLeaveBalanceModel = require('./operations/employee_leave_
 
 //Allocate Leaves Model
 module.exports.AllocateLeavesModel = require('./operations/allocate_leaves/allocate_leaves.model');
+//Reimbursement_claim
+module.exports.Reimbursement_claimModel=require("./operations/reimbursement_claim/reimbursement_claim.model")
