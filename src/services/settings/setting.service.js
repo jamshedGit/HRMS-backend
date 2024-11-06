@@ -144,9 +144,9 @@ const getFormMenusMasterData = async (req, res) => {
     attributes: ['formName', 'Id','formCode']
   }),req.body.mergeLabel);
 
-  if (FormMenusMasterData.length > 0) {
-    FormMenusMasterData.unshift({ label: req.body.text || '--Select--', value: null, code: null, mergeLabel: "--Select--" })
-  }
+  // if (FormMenusMasterData.length > 0) {
+  //   FormMenusMasterData.unshift({ label: req.body.text || '--Select--', value: null, code: null, mergeLabel: "--Select--" })
+  // }
   return FormMenusMasterData
 };
 
