@@ -25,7 +25,7 @@ const createallocateLeaves = catchAsync(async (req, res) => {
 
 /**
  * 
- * Get All Allocate Leaves with Pagination
+ * Get All Allocate Leaves
  * 
  * @param {Object} req 
  * @returns res

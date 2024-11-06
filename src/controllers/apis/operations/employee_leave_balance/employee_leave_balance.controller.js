@@ -23,7 +23,7 @@ const createLeaveBalance = catchAsync(async (req, res) => {
 
 /**
  * 
- * Get All Employee Leave Balance with Pagination
+ * Get All Employee Leave Balance
  * 
  * @param {Object} req 
  * @returns res
@@ -52,25 +52,8 @@ const getLeaveBalanceByFilters = catchAsync(async (req, res) => {
   });
 });
 
-/**
- * Update Single Employee Leave Balance By Id
- * 
- * @param {Object} body 
- * @param {Number} updatedBy 
- * @returns res
- */
-const updateLeaveBalance = catchAsync(async (req, res) => {
-  const data = await employeeLeaveBalanceServicePage.updateLeaveBalance(req.body, req.user.Id);
-  res.send({
-    code: HttpStatusCodes.OK,
-    message: HttpResponseMessages.OK,
-    data: data,
-  });
-});
-
 module.exports = {
   getAllLeaveBalances,
   getLeaveBalanceByFilters,
   createLeaveBalance,
-  updateLeaveBalance,
 };

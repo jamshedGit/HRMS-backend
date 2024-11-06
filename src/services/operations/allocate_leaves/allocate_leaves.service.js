@@ -15,7 +15,7 @@ const allocateLeavesAttributes = [
 ]
 
 /**
- * Create Allocate Leaves
+ * Create Allocate Leaves and Allocate Balances to Each Employee
  * 
  * @param {Object} req 
  * @returns 

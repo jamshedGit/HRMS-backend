@@ -27,6 +27,8 @@ const leaveApplicationAttributes = [
  */
 const createleaveApplication = async (req) => {
   const body = req.body;
+
+  //Get Employee Data by Employee Id with Employee Leave balances of current active fiscal year
   const employeeData = await EmployeeProfileModel.findByPk(body.employeeId,
     {
       attributes: ['Id', 'employeeTypeId', 'subsidiaryId', 'gradeId', 'gender', 'maritalStatus'],
@@ -40,7 +42,7 @@ const createleaveApplication = async (req) => {
           include: [
             {
               model: FiscalSetupModel,
-              required: true,    // Ensures LeaveBalance is only included if FiscalSetup with isActive: true exists
+              required: true,    // Ensures LeaveBalance is only included if FiscalSetup with isActive: true exists. This will only get data of Leave Balance whose fiscal year is currently active
               where: {
                 isActive: true,
               },
@@ -53,9 +55,11 @@ const createleaveApplication = async (req) => {
   if (!employeeData) {
     throw new ApiError(httpStatus.NOT_FOUND, `No User Found`);
   }
+  //Check if employee have leave balance remaining of this leave type
   if (!employeeData.t_employee_leave_balances?.length || (employeeData.t_employee_leave_balances[0].remainingCount < getDateDiffInDays(body.from, body.to))) {
     throw new ApiError(httpStatus.FORBIDDEN, `Remaining Leaves not enough`);
   }
+  //Check if there is already an old application present that crosses with new date range
   const oldRecord = await getleaveApplicationData(
     {
       employeeId: body.employeeId,
@@ -77,6 +81,7 @@ const createleaveApplication = async (req) => {
   if (oldRecord) {
     throw new ApiError(httpStatus.CONFLICT, `Already have leave present for following dates ${formatDates(oldRecord.from)} - ${formatDates(oldRecord.to)}`);
   }
+  //if Attachment is not provided then check if the attachment is required for this leave type or not
   if (!body.file) {
     const isFileRequired = await checkAttachmentRequired(employeeData, body)
     if (isFileRequired) {
@@ -90,6 +95,7 @@ const createleaveApplication = async (req) => {
     days: getDateDiffInDays(body.from, body.to)
     // subsidiaryId: employeeData.subsidiaryId,
   };
+  //Create Leave Application if it's valid
   const createdData = await LeaveApplicationModel.create(payload);
   if (createdData) {
     const numberOfRecords = createdData.days;
@@ -102,11 +108,12 @@ const createleaveApplication = async (req) => {
       })
     }
 
-    await LeaveApplicationDetailModel.bulkCreate(detailData)
+    await LeaveApplicationDetailModel.bulkCreate(detailData);
+
+    //Update Leave Balance after saving leave Application
     employeeData.t_employee_leave_balances[0].availedCount += createdData.days;
     employeeData.t_employee_leave_balances[0].remainingCount -= createdData.days;
-
-    employeeData.t_employee_leave_balances[0].save();
+    await employeeData.t_employee_leave_balances[0].save();
   }
   return await getleaveApplicationData({ Id: createdData.Id }, leaveApplicationAttributes, [{ model: LeaveTypeModel, attributes: ['name'] }], true);
 };
@@ -194,7 +201,7 @@ const updateleaveApplicationById = async (body, updatedBy) => {
   const oldRecord = await getleaveApplicationById(body.Id)
   body.updatedBy = updatedBy;
   Object.assign(oldRecord, body);
-  const updatedData = await oldRecord.save({ fields: ['remarks', 'file'] });
+  const updatedData = await oldRecord.save({ fields: ['remarks', 'file'] }); //Only update remarks and file fields
   return getleaveApplicationData({ Id: updatedData.Id }, leaveApplicationAttributes, [{ model: LeaveTypeModel, attributes: ['name'] }], true);;
 };
 
@@ -209,6 +216,7 @@ const deleteleaveApplicationById = async (id) => {
   if (!oldRecord) {
     throw new ApiError(httpStatus.NOT_FOUND, "Record not found");
   }
+  //Set isActive to false for Leave Application and it's Leave Application detail records
   Object.assign(oldRecord, { isActive: false })
   await oldRecord.save({ fields: ['isActive'] });
   await LeaveApplicationDetailModel.update({ isActive: false }, {
@@ -217,6 +225,7 @@ const deleteleaveApplicationById = async (id) => {
     }
   })
 
+  //Get Leave Balance to update Leave Balance when Leave Application is deleted
   const leaveBalance = await EmployeeLeaveBalanceModel.findOne({
     where: {
       employeeId: oldRecord.employeeId,
@@ -234,6 +243,7 @@ const deleteleaveApplicationById = async (id) => {
     ],
   })
 
+  //Update Leave Balance
   if(leaveBalance && oldRecord.days){
     leaveBalance.availedCount -= oldRecord.days;
     leaveBalance.remainingCount += oldRecord.days;
@@ -245,6 +255,14 @@ const deleteleaveApplicationById = async (id) => {
   return oldRecord;
 };
 
+/**
+ * 
+ * This function will check if attachment is required for the selected Leave type
+ * 
+ * @param {Object} employeeData 
+ * @param {Object} body 
+ * @returns 
+ */
 const checkAttachmentRequired = async (employeeData, body) => {
   const configurationWithPolicy = await LeaveManagementConfigurationModel.findOne({
     where: {

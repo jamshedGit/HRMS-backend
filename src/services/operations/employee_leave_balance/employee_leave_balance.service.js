@@ -8,7 +8,7 @@ const { POLICY_TYPE } = require("../../../models/operations/allocate_leaves/enum
 
 const Op = Sequelize.Op;
 
-//Attributes required for Allocate Leaves Table view
+//Attributes required for Leave Balance UI view
 const leaveBalanceAttributes = [
   'allocatedCount',
   'availedCount',
@@ -19,6 +19,7 @@ const leaveBalanceAttributes = [
   'Id',
 ]
 
+//Initial record values of Leave Balance
 const initialValues = {
   employeeId: '',
   leaveType: '',
@@ -32,26 +33,31 @@ const initialValues = {
 }
 
 /**
- * Allocate leave Balance
+ * Allocate leave Balance to every employee 
  * 
  * @param {Object} data 
  * @returns 
  */
 const allocateLeaveBalances = async (data) => {
+  //Get Year start and end dates to get leaves of employee in between that year
   const YearData = await FiscalSetupModel.findByPk(data.yearId, {
     attributes: ['startDate', 'endDate', 'Id']
   });
 
 
+  //Get Old Year data to get Old remaining leaves in case of carry forward
   const oldYearData = await FiscalSetupModel.findOne({
     where: {
       isActive: false
     },
     order: [['createdAt', 'DESC']],
-    attributes: ['startDate', 'endDate', 'Id']
+    attributes: ['Id']
   });
 
 
+  //Get All Employee according to subsidiary and cycletypeId that we get from allocations data
+  //Also include Leave Application Details to check what leaves employee has taken in that year
+  //We include Leave Balance as well to get Leave Balance of previous year that have leaves remaining so we can carry forward those leaves if that applies
   const employeeData = await EmployeeProfileModel.findAll({
     where: {
       subsidiaryId: data.subsidiaryId,
@@ -168,7 +174,7 @@ const allocateLeaveBalances = async (data) => {
 };
 
 /**
- * Create Leave Balance
+ * Create Leave Balance Manually of an employee
  * 
  * @param {Object} req 
  * @returns 
@@ -177,6 +183,7 @@ const createLeaveBalance = async (req) => {
   const body = req.body;
   const payload = { ...initialValues }
 
+  //Check if Old record of leave balance is present then throw error
   const oldRecord = await getLeaveBalance({ employeeId: body.employeeId, leaveType: body.leaveType, yearId: body.yearId }, ['Id']);
   if (oldRecord) {
     throw new ApiError(httpStatus.CONFLICT, "Record already present.");
@@ -185,10 +192,12 @@ const createLeaveBalance = async (req) => {
   Object.assign(payload, body)
   payload.createdBy = req.user.Id
 
+  //Get Year data start date and end date so we can get leaves of that year of employee
   const YearData = await FiscalSetupModel.findByPk(body.yearId, {
     attributes: ['startDate', 'endDate', 'Id']
   });
 
+  //Get Employee data with Leave Applications and Leaves detail so we can calculate how many leaves employee has already taken
   const employeeData = await EmployeeProfileModel.findAll({
     where: {
       Id: body.employeeId,
@@ -223,6 +232,7 @@ const createLeaveBalance = async (req) => {
   if (employeeData?.length) {
     const employee = employeeData[0];
 
+    //Get availed count
     const availedCount = employee.t_leave_applications.reduce((prev, curr) => {
       if (curr.leaveType == body.leaveType) {
         return prev + (curr?.t_leave_application_details?.length || 0)
@@ -230,8 +240,10 @@ const createLeaveBalance = async (req) => {
       return prev
     }, 0)
 
+    //Set availed count
     payload.availedCount = availedCount;
 
+    //set remaining count
     payload.remainingCount = availedCount > payload.allocatedCount ? 0 : payload.allocatedCount - availedCount;
 
     const createdData = await EmployeeLeaveBalanceModel.create({
@@ -276,7 +288,7 @@ const getLeaveBalance = async (filters, attributes = null, include = null) => {
 
 /**
  * 
- * Get All Leave Balance
+ * Get All Leave Balances of Employee by Employee Id
  * 
  * @param {Object} req 
  * @returns 
@@ -294,7 +306,7 @@ const getAllLeaveBalance = async (req) => {
           include: [
             {
               model: FiscalSetupModel,
-              required: true,    // Ensures LeaveBalance is only included if FiscalSetup with isActive: true exists
+              required: true,    // Ensures LeaveBalance is only included if FiscalSetup with isActive: true exists. This check will ensure that only leave balances of current year will be returned
               where: {
                 isActive: true,
               },
@@ -327,32 +339,13 @@ const getAllLeaveBalance = async (req) => {
 };
 
 /**
- * Create Leave Balance
+ * get Leave Balance By Filters provided in body
  * 
- * @param {Object} req 
+ * @param {Object} body 
  * @returns 
  */
 const getLeaveBalanceByFilters = async (body) => {
   return await getLeaveBalance({ ...body }, leaveBalanceAttributes)
-};
-
-/**
- * Update Single Leave Balance By Id
- * 
- * @param {Object} body 
- * @param {Number} updatedBy 
- * @returns 
- */
-const updateLeaveBalance = async (body, updatedBy) => {
-  const oldRecord = await getLeaveBalance({ Id: body.Id });
-  if (!oldRecord) {
-    throw new ApiError(httpStatus.NOT_FOUND, "Record not found");
-  }
-  body.updatedBy = updatedBy;
-  Object.assign(oldRecord, body);
-  const updatedData = await oldRecord.save();
-  const data = await getLeaveBalance({ Id: updatedData.Id }, leaveBalanceAttributes);
-  return data;
 };
 
 module.exports = {
@@ -360,5 +353,4 @@ module.exports = {
   createLeaveBalance,
   getAllLeaveBalance,
   getLeaveBalanceByFilters,
-  updateLeaveBalance
 };
