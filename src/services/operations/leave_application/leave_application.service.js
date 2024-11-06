@@ -30,6 +30,7 @@ const createleaveApplication = async (req) => {
   const body = req.body;
   const employeeData = await EmployeeProfileModel.findByPk(body.employeeId,
     {
+      attributes: ['Id', 'employeeTypeId', 'subsidiaryId', 'gradeId', 'gender', 'maritalStatus'],
       include: [
         {
           model: EmployeeLeaveBalanceModel,
