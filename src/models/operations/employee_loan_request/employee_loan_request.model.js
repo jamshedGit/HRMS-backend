@@ -1,5 +1,5 @@
 const Sequelize = require('sequelize');
-const {FormModel,EmployeeProfileModel,Reimbursement_configurationModel,PayrollMonthModel}= require('../../index');
+const {FormModel,EmployeeProfileModel,Reimbursement_configurationModel,PayrollMonthModel,LoanTypeModel}= require('../../index');
 const sequelize = require('../../../config/db')
 const { formatDates } = require('../../../utils/common');
 const Employee_loan_request = sequelize.define('t_employee_loan_request', {
@@ -9,6 +9,7 @@ const Employee_loan_request = sequelize.define('t_employee_loan_request', {
 		primaryKey: true
 	},
 	employeeId: { type: Sequelize.INTEGER, allowNull: false },
+	employee_loan_accountId: { type: Sequelize.INTEGER,allowNull: false },
     loan_typeId: { type: Sequelize.INTEGER, allowNull: false },
     monthly_installment: { type: Sequelize.FLOAT, allowNull: false },
 	applied_date: {
@@ -30,8 +31,11 @@ const Employee_loan_request = sequelize.define('t_employee_loan_request', {
 	total_loan_amount: { type: Sequelize.INTEGER,allowNull: false },
     total_installment: { type: Sequelize.INTEGER,allowNull: false },
     reason: { type: Sequelize.STRING, },
-    approval_statusId: { type: Sequelize.INTEGER,allowNull: false,defaultValue: 1 },
-    statusId: { type: Sequelize.INTEGER,allowNull: false,defaultValue: 1 },
+	loan_amount_paid: { type: Sequelize.INTEGER },
+	loan_amount_remaining: { type: Sequelize.INTEGER },
+	approval_statusId: { type: Sequelize.INTEGER,allowNull: false,defaultValue: 1 },
+	statusId: { type: Sequelize.INTEGER,allowNull: false,defaultValue: 1 },
+	approval_byId: { type: Sequelize.INTEGER,allowNull: false,defaultValue: 1 },
     subsidiaryId: { type: Sequelize.INTEGER,allowNull: false,defaultValue: 1 },
 	companyId: { type: Sequelize.INTEGER,allowNull: false ,defaultValue: 1},
     isActive: { type: Sequelize.BOOLEAN, allowNull: true, defaultValue: true },
@@ -48,7 +52,12 @@ const Employee_loan_request = sequelize.define('t_employee_loan_request', {
 
 });
 
-
+Employee_loan_request.belongsTo(LoanTypeModel, {
+	foreignKey: 'loan_typeId',
+	targetKey: 'Id',
+	as:"LoanType"
+  });
+    
   
 Employee_loan_request.belongsTo(EmployeeProfileModel, {
 	foreignKey: 'employeeId',
@@ -56,6 +65,13 @@ Employee_loan_request.belongsTo(EmployeeProfileModel, {
 	as:"Employee"
   });
     
+
+  
+  Employee_loan_request.belongsTo(FormModel, {
+	foreignKey: 'employee_loan_accountId',
+	targetKey: 'Id',
+	as:"EmployeeLoanAccount"
+  });
   
 
 module.exports = Employee_loan_request;

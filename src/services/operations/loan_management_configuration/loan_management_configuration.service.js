@@ -22,6 +22,8 @@ const createloan_management_configuration = async (
   req,
   loan_management_configurationBody
 ) => {
+
+  console.log("loan_management_config11",req.body)
   try {
     loan_management_configurationBody.createdBy = req.user.id;
 
@@ -92,6 +94,14 @@ const createloan_management_configuration = async (
           attributes: ["formName", "formCode"],
           as: "Account",
         },
+
+        {
+          model: FormModel.FormModel,
+          attributes: ["formName", "formCode"],
+          as: "EmpLoanAccount",
+        },
+
+        
         
       ],
     });

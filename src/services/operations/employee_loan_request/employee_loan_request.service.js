@@ -1,5 +1,5 @@
 const httpStatus = require("http-status");
-const {EmployeeSalaryModel, Employee_loan_requestModel,Loan_management_configurationModel ,EmployeeProfileModel,Loan_management_detailModel} = require("../../../models/index");
+const {EmployeeSalaryModel, Employee_loan_requestModel,Loan_management_configurationModel ,EmployeeProfileModel,Loan_management_detailModel, PayrollMonthModel,FormModel,LoanTypeModel} = require("../../../models/index");
 
 const ApiError = require("../../../utils/ApiError");
 const Sequelize = require("sequelize");
@@ -64,7 +64,7 @@ const queryEmployee_loan_request = async (
   let limit = options.pageSize;
   let offset = 0 + (options.pageNumber - 1) * limit;
 
-console.log("queryEmployee_loan_request employeeId",employeeId)
+
 
  let { count, rows } = await Employee_loan_requestModel.findAndCountAll({
     order: [["createdAt", "DESC"]],
@@ -78,12 +78,19 @@ console.log("queryEmployee_loan_request employeeId",employeeId)
         include: [
           
           {
-            model: EmployeeProfileModel,
-            attributes: ["firstName"],
-            as: "Employee",
+            model:LoanTypeModel ,
+            attributes: ["name"],
+            as: "LoanType",
           },
+          
      
        
+          {
+            model: FormModel,
+            attributes: ["formName", "formCode"],
+            as: "EmployeeLoanAccount",
+          },
+      
     
     ],
    
@@ -114,6 +121,20 @@ console.log("queryEmployee_loan_request employeeId",employeeId)
 const getEmployee_loan_requestById = async (id) => {
   return Employee_loan_requestModel.findOne({
     where: { Id: id },
+    include:[
+      {
+        model: FormModel,
+        attributes: ["formName", "formCode"],
+        as: "EmployeeLoanAccount",
+      },
+      {
+        model: FormModel,
+        attributes: ["formName", "formCode"],
+        as: "EmployeeLoanAccount",
+      },
+
+    ]
+
 
   });
 
@@ -169,26 +190,7 @@ const deleteEmployee_loan_requestById = async (Id) => {
 };
 
 
-const getPayrollMonth = async () => {
-  const monthNames = [
-    "Jan", "Feb", "Mar", "Apr", "May", "Jun",
-    "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"
-  ];
-  
-  const result = await PayrollMonthModel.findAndCountAll({});
 
-  // Sort the rows by year in descending order
-  result.rows.sort((a, b) => b.year - a.year || b.month - a.month);
-
-  // Map the results to the desired format
-  const formattedResult = result.rows.map(row => ({
-    value: row.Id, // Assuming 'id' is the field for the unique identifier
-    label: `${monthNames[row.month - 1]} ${row.year}` // Convert month number to name
-  }));
-
-  return  formattedResult
-  
-};
 
 const getloan_configurationDetailsById = async (Id) => {
   try {
@@ -202,7 +204,7 @@ const getloan_configurationDetailsById = async (Id) => {
     if (!employee) {
       throw new Error('Employee not found');
     }
-console.log("EmployeeSalaryModel Id",Id)
+
     // Retrieve compensation benefits with basic and gross salary
     const salary = await EmployeeSalaryModel.findOne({
       where: { employeeId: Id },
@@ -210,7 +212,7 @@ console.log("EmployeeSalaryModel Id",Id)
     });
 
     // Check if salary detail is found
-    console.log("EmployeeSalaryModel salary",salary)
+
     if (!salary) {
       throw new Error('Salary detail not found');
     }
@@ -235,6 +237,19 @@ console.log("EmployeeSalaryModel Id",Id)
       throw new Error('Loan detail not found');
     }
 
+    console.log("percentage details",details)
+
+    const payroll_month= await PayrollMonthModel.findOne({
+      order: [
+        ['createdAt', 'DESC']
+      ],
+      where: {
+       
+        isActive: true
+      },
+     
+    });
+  
     // Combine employee, salary, and loan details in the return object
     return {
       employee: {
@@ -246,7 +261,9 @@ console.log("EmployeeSalaryModel Id",Id)
         gross: salary.grossSalary,
         basic: salary.basicSalary,
       },
-      loanDetails: details
+      loanDetails: details,
+      payroll:payroll_month
+
     };
 
   } catch (error) {
@@ -262,6 +279,5 @@ module.exports = {
   updateEmployee_loan_requestById,
   deleteEmployee_loan_requestById,
   queryEmployee_loan_request,
-  getPayrollMonth,
   getloan_configurationDetailsById
 };
