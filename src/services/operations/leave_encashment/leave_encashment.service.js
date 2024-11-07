@@ -52,33 +52,8 @@ const createleaveEncashment = async (req) => {
       ]
     }
   )
-  if (!employeeData) {
-    throw new ApiError(httpStatus.NOT_FOUND, `No User Found`);
-  }
-  //Check if employee have leave balance remaining of this leave type
-  if (!employeeData.t_employee_leave_balances?.length) {
-    throw new ApiError(httpStatus.FORBIDDEN, `Remaining Leaves not enough`);
-  }
-
-  const policyData = await AllocateLeavesModel.findOne({
-    where: {
-      subsidiaryId: employeeData.subsidiaryId,
-      cycleTypeId: employeeData.cycleTypeId,
-      yearId: body.yearId,
-      leaveType: body.leaveType,
-      policyType: 2
-    },
-    attributes: ['maxCount']
-  })
-
-  if (!policyData) {
-    throw new ApiError(httpStatus.FORBIDDEN, `Cannot Encash for this leave Type`);
-  }
-
-  const maxCountwithEnchashment = body.days + employeeData.t_employee_leave_balances[0].encashmentCount;
-  if (policyData.maxCount < maxCountwithEnchashment) {
-    throw new ApiError(httpStatus.FORBIDDEN, `Maximum ${policyData?.maxCount - employeeData.t_employee_leave_balances[0].encashmentCount} leaves can be encashed for this type`);
-  }
+  //Check if data is valid to be saved in DB
+  await checkIsValid(employeeData, body);
 
   const payload = {
     ...body,
@@ -96,6 +71,47 @@ const createleaveEncashment = async (req) => {
   }
   return await getleaveEncashmentData({ Id: createdData.Id }, leaveEncashmentAttributes, [{ model: LeaveTypeModel, attributes: ['name'] }], true);
 };
+
+/**
+ * 
+ * This function is to check if the request is valid otherwise throw error to inform the user
+ * 
+ * @param {Object} employeeData 
+ * @param {Object} body 
+ */
+const checkIsValid = async (employeeData, body)=> {
+  //Check if Employee is correct
+  if (!employeeData) {
+    throw new ApiError(httpStatus.NOT_FOUND, `No User Found`);
+  }
+  //Check if employee have leave balance remaining of this leave type
+  if (!employeeData.t_employee_leave_balances?.length) {
+    throw new ApiError(httpStatus.FORBIDDEN, `Remaining Leaves not enough`);
+  }
+
+  //Get Policy to check if the encashment is possible for this leave type
+  const policyData = await AllocateLeavesModel.findOne({
+    where: {
+      subsidiaryId: employeeData.subsidiaryId,
+      cycleTypeId: employeeData.cycleTypeId,
+      yearId: body.yearId,
+      leaveType: body.leaveType,
+      policyType: 2
+    },
+    attributes: ['maxCount']
+  })
+
+  //If there is no Encashment policy for this leave type
+  if (!policyData) {
+    throw new ApiError(httpStatus.FORBIDDEN, `Cannot Encash for this leave Type`);
+  }
+
+  //Check if the encashment leaves doesn't exceed the maximum number of leaves that can be encashed according to policy
+  const maxCountwithEnchashment = body.days + employeeData.t_employee_leave_balances[0].encashmentCount;
+  if (policyData.maxCount < maxCountwithEnchashment) {
+    throw new ApiError(httpStatus.FORBIDDEN, `Maximum ${policyData?.maxCount - employeeData.t_employee_leave_balances[0].encashmentCount} leaves can be encashed for this type`);
+  }
+}
 
 
 /**
