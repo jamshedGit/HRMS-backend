@@ -10,31 +10,6 @@ const Employee_loan_request_detail = require("../../../models/operations/employe
 const Op = Sequelize.Op;
 
 
-// const createEmployee_loan_request = async (req, Employee_loan_requestBody) => {
-//   try {
- 
-//     if(Employee_loan_requestBody.total_loan_amount<Employee_loan_requestBody.monthly_installment){
-
-//         throw new Error('Loan amount must be greater');
-
-//     }
-
-
-//     const userId = req.user.id;
- 
-//       Employee_loan_requestBody.loan_amount_remaining = Employee_loan_requestBody.total_loan_amount;
-//       Employee_loan_requestBody.createdBy = userId;
-//       const addedReimbursementClaim = await Employee_loan_requestModel.create(Employee_loan_requestBody);
-
-//       // Return the new record
-//       return await getEmployee_loan_requestById(addedReimbursementClaim.Id);
-//     // }
-//   } catch (error) {
-//     console.error("Error processing reimbursement claim:", error);
-//     throw error;
-//   }
-// };
-
 
 const createEmployee_loan_request = async (req, Employee_loan_requestBody) => {
   try {
@@ -89,7 +64,7 @@ const createEmployee_loan_request = async (req, Employee_loan_requestBody) => {
     return await getEmployee_loan_requestById(addedReimbursementClaim.Id);
 
   } catch (error) {
-    console.error("Error processing loan request:", error);
+    
     throw error;
   }
 };
@@ -315,7 +290,7 @@ const getloan_configurationDetailsById = async (Id) => {
       throw new Error('Loan detail not found');
     }
 
-    console.log("percentage details",details)
+    
 
     const payroll_month= await PayrollMonthModel.findOne({
       order: [

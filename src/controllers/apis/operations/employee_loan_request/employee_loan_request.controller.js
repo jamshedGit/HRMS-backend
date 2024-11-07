@@ -11,7 +11,7 @@ const {
 } = require("../../../../utils/constants");
 
 const createEmployee_loan_request = catchAsync(async (req, res) => {
-console.log("createEmployee_loan_request body",req.body)
+
     try {
 
 
@@ -38,13 +38,13 @@ console.log("createEmployee_loan_request body",req.body)
         }
 
     } catch (error) {
-        console.log(error);
+        
     }
 });
 
 
 const getAllEmployee_loan_request = catchAsync(async (req, res) => {
-    console.log("queryEmployee_loan_request employeeId hit",req.body)
+   
     const obj = {};
     const filter = obj;
 
