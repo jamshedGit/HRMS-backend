@@ -34,6 +34,7 @@ const getAllItem = {
   params: Joi.disallow(),
   body: Joi.object().keys({
     employeeId: Joi.number().required(),
+    yearId: Joi.number().required(),
     sortOrder: Joi.string().required(),
     pageSize: Joi.number().required(),
     pageNumber: Joi.number().required(),

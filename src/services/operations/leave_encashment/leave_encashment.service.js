@@ -1,5 +1,5 @@
 const httpStatus = require("http-status");
-const { LeaveApplicationModel, EmployeeProfileModel, LeaveTypeModel, EmployeeLeaveBalanceModel, FiscalSetupModel, AllocateLeavesModel, LeaveEncashmentModel } = require("../../../models/index");
+const { EmployeeProfileModel, LeaveTypeModel, EmployeeLeaveBalanceModel, FiscalSetupModel, AllocateLeavesModel, LeaveEncashmentModel } = require("../../../models/index");
 const ApiError = require("../../../utils/ApiError");
 const Sequelize = require('sequelize');
 const { paginationFacts, handleNestedData } = require("../../../utils/common");
@@ -13,7 +13,8 @@ const leaveEncashmentAttributes = [
   'leaveType',
   'days',
   'Id',
-  'isActive'
+  'isActive',
+  'createdAt'
 ]
 
 /**
@@ -73,9 +74,9 @@ const createleaveEncashment = async (req) => {
   if (!policyData) {
     throw new ApiError(httpStatus.FORBIDDEN, `Cannot Encash for this leave Type`);
   }
-  
+
   const maxCountwithEnchashment = body.days + employeeData.t_employee_leave_balances[0].encashmentCount;
-  if (policyData.maxCount < maxCountwithEnchashment ) {
+  if (policyData.maxCount < maxCountwithEnchashment) {
     throw new ApiError(httpStatus.FORBIDDEN, `Maximum ${policyData?.maxCount - employeeData.t_employee_leave_balances[0].encashmentCount} leaves can be encashed for this type`);
   }
 
@@ -93,7 +94,7 @@ const createleaveEncashment = async (req) => {
 
     employeeData.t_employee_leave_balances[0].save();
   }
-  return createdData
+  return await getleaveEncashmentData({ Id: createdData.Id }, leaveEncashmentAttributes, [{ model: LeaveTypeModel, attributes: ['name'] }], true);
 };
 
 
@@ -136,7 +137,7 @@ const getAllleaveEncashment = async (req) => {
  * @returns 
  */
 const getleaveEncashmentById = async (id, attributes = null) => {
-  return LeaveApplicationModel.findByPk(id, {
+  return LeaveEncashmentModel.findByPk(id, {
     attributes: attributes || leaveEncashmentAttributes,
   });
 };
@@ -162,10 +163,10 @@ const getleaveEncashmentData = async (filters, attributes = null, include = null
   }
 
   if (handleNested) {
-    const data = await LeaveApplicationModel.findOne(options);
+    const data = await LeaveEncashmentModel.findOne(options);
     return handleNestedData(data)
   }
-  return await LeaveApplicationModel.findOne(options);
+  return await LeaveEncashmentModel.findOne(options);
 };
 
 /**
