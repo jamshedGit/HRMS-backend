@@ -1,5 +1,6 @@
 const { Model, DataTypes } = require('sequelize');
-const sequelize = require('../../../config/db')
+const sequelize = require('../../../config/db');
+const Att_Model = require('../attendance_configuration/attendance_configuration.model');
 
 // Define the User model
 class LeaveTypeModel extends Model {
@@ -68,6 +69,15 @@ LeaveTypeModel.init(
     modelName: 't_leave_type',
   }
 );
+
+Att_Model.belongsTo(LeaveTypeModel, {
+	foreignKey: 'leave_typeId',
+  as: "leavetype",
+	targetKey: 'Id',  // Assuming 'Id' is the primary key in FormModel table
+	onDelete: 'RESTRICT',
+	onUpdate: 'CASCADE',
+});
+
 
 
 module.exports = LeaveTypeModel;

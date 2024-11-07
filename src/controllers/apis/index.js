@@ -12,6 +12,8 @@ module.exports.loanTypeSetup = require('./operations/loan_type/loan_type.control
 module.exports.payrollProcessPolicy = require('./operations/payroll_process_policy/payroll_process_policy.controller')
 module.exports.leaveManagementConfiguration = require('./operations/leave_management_configuration/leave_management_configuration.controller')
 module.exports.leaveApplication = require('./operations/leave_application/leave_application.controller')
+module.exports.attendance_configuration = require('./operations/attendance_configuration/attendance_configuration.controller')
+
 
 
 
