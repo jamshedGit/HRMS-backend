@@ -9,7 +9,6 @@ const createLoan_management_configurationValidation = {
         subsidiaryId: Joi.number(),
         accountId: Joi.number(),
         installment_deduction_percentage: Joi.number().precision(2).required(), 
-        human_resource_role: Joi.number(),
         emp_loan_account: Joi.number(),
         installment_deduction_basis_type: Joi.number(),
         details: Joi.array(),

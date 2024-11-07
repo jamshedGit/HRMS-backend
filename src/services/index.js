@@ -54,5 +54,6 @@ module.exports.accrue_gratuity_configurationService = require('./operations/accu
 module.exports.allocateLeavesServicePage = require("./operations/allocate_leaves/allocate_leaves.service")
 module.exports.employeeLeaveBalanceServicePage = require("./operations/employee_leave_balance/employee_leave_balance.service")
 module.exports.reimbursement_configurationService=require("./operations/reimbursement_configuration/reimbursement_configuration.service")
-module.exports.attendance_configuration=require("./operations/attendance_configuration/attendance_configuration.service")
 module.exports.reimbursement_claimService=require("./operations/reimbursement_claim/reimbursement_claim.service")
+module.exports.Employee_loan_requestService=require("./operations/employee_loan_request/employee_loan_request.service")
+module.exports.attendance_configuration=require("./operations/attendance_configuration/attendance_configuration.service")
