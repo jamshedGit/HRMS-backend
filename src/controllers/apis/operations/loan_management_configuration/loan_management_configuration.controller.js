@@ -39,7 +39,7 @@ const createloan_management_configuration = catchAsync(async (req, res) => {
   }
 
   } catch (error) {
-    console.log(error);        
+       
   }
 });
 
@@ -122,7 +122,7 @@ const deleteloan_management_configuration = catchAsync(async (req, res) => {
 const getAllLoanType = catchAsync(async (req, res) => {
   
   const result = await loan_management_configurationService.loan_management_configurationService.queryLoanTypes();
-  console.log(result);
+
   res.send({
     code: HttpStatusCodes.OK,
     message: HttpResponseMessages.OK,
