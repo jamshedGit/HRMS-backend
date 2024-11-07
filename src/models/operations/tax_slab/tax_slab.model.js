@@ -15,6 +15,8 @@ const Tax_slabModel = sequelize.define('t_tax_slab', {
 	to_amount: { type: Sequelize.INTEGER },
 	percentage: { type: Sequelize.DECIMAL, allowNull: false },
     fixed_amount: { type: Sequelize.INTEGER, allowNull: false },
+	subsidiaryId: { type: Sequelize.INTEGER,allowNull: false,defaultValue: 1 },
+	companyId: { type: Sequelize.INTEGER,allowNull: false ,defaultValue: 1},
 	isActive: { type: Sequelize.BOOLEAN, allowNull: true, defaultValue: true },
 	createdBy: {
 		type: Sequelize.INTEGER,
