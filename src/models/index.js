@@ -138,3 +138,6 @@ module.exports.Reimbursement_accounts_detailModel=require("./operations/reimburs
 
 //Reimbursement_claim
 module.exports.Reimbursement_claimModel=require("./operations/reimbursement_claim/reimbursement_claim.model")
+
+//Attendance Configuration
+module.exports.Attendance_ConfigurationModel = require("./operations/attendance_configuration/attendance_configuration.model")

@@ -57,6 +57,7 @@ const accrue_gratuity_configuration= require('./operations/accrue_gratuity_confi
 const reimbursement_configuration=require('./operations/reimbursement_configuration/reimbursement_configuration.route')
 const reimbursement_claim=require('./operations/reimbursement_claim/reimbursement_claim.route')
 
+const attendance_configuration=require('./operations/attendance_configuration/attendance_configuration.route')
 
 const router = express.Router();
 
@@ -277,6 +278,10 @@ const defaultRoutes = [
   {
     path: "/reimbursement_claim",
     route: reimbursement_claim
+  },
+  {
+    path: "/attendance_configuration",
+    route: attendance_configuration
   },
 
 
