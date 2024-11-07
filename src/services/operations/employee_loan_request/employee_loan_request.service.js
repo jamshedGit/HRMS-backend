@@ -181,9 +181,20 @@ const getEmployee_loan_requestById = async (id) => {
         attributes: ["formName", "formCode"],
         as: "EmployeeLoanAccount",
       },
+      {
+        model: Employee_loan_request_detail,
+        attributes: ["is_deducted"],
+        as: "details",
+        where: {
+          is_deducted: true,  // Only include details where is_deducted is true
+        },
+        required: false,
+      },
+
+
 
     ]
-
+ 
 
   });
 
@@ -248,7 +259,7 @@ const deleteEmployee_loan_requestById = async (Id) => {
 
   // Step 3: If there are child records with deductions, prevent deletion
   if (checkRecordsWithDeduction.length > 0) {
-    throw new ApiError(httpStatus.BAD_REQUEST, "Deduction process started");
+    throw new ApiError(httpStatus.BAD_REQUEST, "Unable to delete: This transaction is already processed for previous months");
   }
   
 
