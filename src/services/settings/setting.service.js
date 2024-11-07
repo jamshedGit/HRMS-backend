@@ -1,5 +1,5 @@
-const { RoleModel, ResourceModel, CountryModel, CityModel, StatusTypeModel, BankModel, DeptModel, FormModel, EmployeeProfileModel, BranchModel, EmployeeSalaryRevisionModel, LeaveTypeModel } = require('../../models');
-const { getDdlItems, getAlarmTimesItems } = require('../../utils/common');
+const { RoleModel, ResourceModel, CountryModel, CityModel, StatusTypeModel, BankModel, DeptModel, FormModel, EmployeeProfileModel, BranchModel, EmployeeSalaryRevisionModel, LeaveTypeModel, FiscalSetupModel, SubsidiaryModel, LeaveManagementConfigurationModel, LeaveTypePoliciesModel } = require('../../models');
+const { getDdlItems, getAlarmTimesItems, formatDates, createFiscalYearLabel } = require('../../utils/common');
 const { DDL_FIELD_NAMES } = require('../../utils/constants');
 const { getRoleById } = require('./role.service');
 const Sequelize = require('sequelize');
@@ -138,7 +138,6 @@ const getRevisionHistoryByEmpId = async (employeeId) => {
 
 
 const getFormMenusMasterData = async (req, res) => {
-  console.log("mm:", req.body.Id)
   const FormMenusMasterData = getDdlItems(DDL_FIELD_NAMES.FormMenus, await FormModel.findAll({
     where: { isActive: true, parentFormID: req.body.Id || null },
     attributes: ['formName', 'Id','formCode']
@@ -150,15 +149,80 @@ const getFormMenusMasterData = async (req, res) => {
   return FormMenusMasterData
 };
 
-const getLeaveTypesData = async () => {
-  const LeaveTypeData = getDdlItems(DDL_FIELD_NAMES.LeaveType, await LeaveTypeModel.findAll({
-    attributes: ['name', 'Id']
-  }));
-  if (LeaveTypeData.length > 0) {
-    LeaveTypeData.unshift({ label: '--Select--', value: null })
+/**
+ * 
+ * Leave Type Dropdown Data
+ * If employee Id is there in the request then we have to get Leave Type dropdown data according to the Leave Types that are assigned in the Leave Management Configurations
+ * else we just send all Leave Types
+ * 
+ * @param {Number|Null} employeeId 
+ * @returns 
+ */
+const getLeaveTypesData = async (employeeId) => {
+  let LeaveTypeData = [];
+  if (employeeId) {
+    const employeeWithLeaveConfig = await EmployeeProfileModel.findByPk(employeeId, { attributes: ['Id', 'subsidiaryId', 'gradeId', 'employeeTypeId'] })
+    if (employeeWithLeaveConfig) {
+      const leaveConfigData = await LeaveManagementConfigurationModel.findOne({
+        where: {
+          subsidiaryId: employeeWithLeaveConfig.subsidiaryId,
+          gradeId: employeeWithLeaveConfig.gradeId,
+          employeeTypeId: employeeWithLeaveConfig.employeeTypeId
+        },
+        attributes: ['Id'],
+        include: [
+          {
+            model: LeaveTypePoliciesModel,
+            attributes: ['leaveType']
+          }
+        ]
+      })
+
+      if (leaveConfigData?.t_leave_type_policies?.length) {
+        LeaveTypeData = getDdlItems(DDL_FIELD_NAMES.LeaveType, await LeaveTypeModel.findAll({
+          where: { Id: leaveConfigData?.t_leave_type_policies.map((el) => el.leaveType) },
+          attributes: ['name', 'Id']
+        }));
+      }
+
+    }
   }
+  else {
+    LeaveTypeData = getDdlItems(DDL_FIELD_NAMES.LeaveType, await LeaveTypeModel.findAll({
+      attributes: ['name', 'Id']
+    }));
+  }
+  LeaveTypeData.unshift({ label: '--Select--', value: null })
   return LeaveTypeData
 };
+
+
+const getAllSubsidiaryData = async () => {
+  const subsidiaryData = getDdlItems(DDL_FIELD_NAMES.Subsidiary, await SubsidiaryModel.findAll({
+    where: { isActive: true },
+    attributes: ['name', 'Id']
+  }));
+  return subsidiaryData
+};
+
+const getAllFiscalYearData = async () => {
+  const result = []
+  const yearData = await FiscalSetupModel.findAll({
+    attributes: ['startDate', 'endDate', 'Id']
+  });
+  if (yearData.length) {
+    yearData.forEach(element => {
+      if (element.startDate && element.endDate) {
+        result.push({
+          label: createFiscalYearLabel(element.endDate, element.startDate),
+          value: element.Id,
+        })
+      }
+    });
+  }
+  return result;
+};
+
 
 const getCitiesMasterData = async (countryId) => {
   const filter = { isActive: true }
@@ -169,7 +233,7 @@ const getCitiesMasterData = async (countryId) => {
   }
   const citiesMasterData = getDdlItems(DDL_FIELD_NAMES.city, await CityModel.findAll({
     where: filter,
-    attributes: ['id', 'name','countryId']
+    attributes: ['id', 'name', 'countryId']
   }));
   return citiesMasterData
 };
@@ -182,7 +246,6 @@ const getCitiesMasterData = async (countryId) => {
 
 const GetLastInserted_ID_ByTableName = async (tableName, prefix) => {
   try {
-    console.log("tableName", tableName, prefix);
     const results = await sequelize.query('CALL GetLastInsertedIdByTableName(:tableName,:prefix)', {
       replacements: { tableName: tableName, prefix: prefix },
       type: Sequelize.QueryTypes.RAW // Use RAW type for executing stored procedures
@@ -209,5 +272,7 @@ module.exports = {
   GetLastInserted_ID_ByTableName,
   get_Bank_Branch_MasterData,
   getRevisionHistoryByEmpId,
-  getLeaveTypesData
+  getLeaveTypesData,
+  getAllSubsidiaryData,
+  getAllFiscalYearData
 };

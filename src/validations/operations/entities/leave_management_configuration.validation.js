@@ -16,7 +16,7 @@ const createItem = {
       Joi.object().keys({
         leaveType: Joi.number().required(),
         gender: Joi.number().allow(null).required(),
-        minExp: Joi.number().required(),
+        minExp: Joi.optional(),
         maxAllowed: Joi.number().required(),
         attachmentRequired: Joi.boolean().required(),
         maritalStatus: Joi.number().allow(null).required(),
@@ -53,7 +53,7 @@ const updateItem = {
         Id: Joi.number().optional(),
         leaveType: Joi.number().required(),
         gender: Joi.number().allow(null).required(),
-        minExp: Joi.number().required(),
+        minExp: Joi.optional(),
         maxAllowed: Joi.number().required(),
         attachmentRequired: Joi.boolean().required(),
         maritalStatus: Joi.number().allow(null).required(),

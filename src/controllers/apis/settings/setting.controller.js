@@ -88,7 +88,23 @@ const getAllLeaveType = catchAsync(async (req, res) => {
   res.send({  
     code: HttpStatusCodes.OK,
     message: HttpResponseMessages.OK,
-    data: await settingService.getLeaveTypesData(),
+    data: await settingService.getLeaveTypesData(req.body.employeeId),
+  });
+});
+
+const getAllSubsidiaries = catchAsync(async (req, res) => {
+  res.send({  
+    code: HttpStatusCodes.OK,
+    message: HttpResponseMessages.OK,
+    data: await settingService.getAllSubsidiaryData(),
+  });
+});
+
+const getAllFiscalYears = catchAsync(async (req, res) => {
+  res.send({  
+    code: HttpStatusCodes.OK,
+    message: HttpResponseMessages.OK,
+    data: await settingService.getAllFiscalYearData(),
   });
 });
 
@@ -146,5 +162,7 @@ module.exports = {
   GetLastInserted_ID_ByTableName,
   get_Bank_Branch_MasterData,
   getRevisionHistoryByEmpId,
-  getAllLeaveType
+  getAllLeaveType,
+  getAllSubsidiaries,
+  getAllFiscalYears
 };

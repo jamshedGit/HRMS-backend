@@ -70,6 +70,11 @@ const DDL_FIELD_NAMES = {
     valueField: 'Id',
   },
 
+  Subsidiary:{
+    labelField: 'name',
+    valueField: 'Id',
+  },
+
   SalaryRevisionKeys:{
     labelField: 'reviewDate',
     valueField: 'Id',
