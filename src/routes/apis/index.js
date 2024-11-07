@@ -58,6 +58,7 @@ const reimbursement_configuration = require('./operations/reimbursement_configur
 const allocate_leaves = require('./operations/allocate_leaves/allocate_leaves.route')
 const employee_leave_balance = require('./operations/employee_leave_balance/employee_leave_balance.route')
 const reimbursement_claim=require('./operations/reimbursement_claim/reimbursement_claim.route')
+const leave_encashment = require('./operations/leave_encashment/leave_encashment.route');
 
 
 const router = express.Router();
@@ -288,7 +289,10 @@ const defaultRoutes = [
     path: "/reimbursement_claim",
     route: reimbursement_claim
   },
-
+  {
+    path: "/leave_encashment",
+    route: leave_encashment
+  },
 
 ];
 

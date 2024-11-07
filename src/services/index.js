@@ -55,3 +55,4 @@ module.exports.allocateLeavesServicePage = require("./operations/allocate_leaves
 module.exports.employeeLeaveBalanceServicePage = require("./operations/employee_leave_balance/employee_leave_balance.service")
 module.exports.reimbursement_configurationService=require("./operations/reimbursement_configuration/reimbursement_configuration.service")
 module.exports.reimbursement_claimService=require("./operations/reimbursement_claim/reimbursement_claim.service")
+module.exports.LeaveEncashmentServicePage = require('./operations/leave_encashment/leave_encashment.service')
