@@ -113,12 +113,16 @@ const allocateLeaveBalances = async (data) => {
                 cycleTypeId: data.cycleTypeId,
                 yearId: oldYearData.Id,
                 leaveType: al.leaveType,
-                policyType: 1
               },
               attributes: ['policyType', 'maxCount']
             })
             if (allocationPolicy && oldBalance.remainingCount && allocationPolicy.maxCount) {
-              init.carryForwardCount = oldBalance.remainingCount > allocationPolicy.maxCount ? allocationPolicy.maxCount : oldBalance.remainingCount
+              if(POLICY_TYPE[allocationPolicy.policyType] == POLICY_TYPE[1]){
+                init.carryForwardCount = oldBalance.remainingCount > allocationPolicy.maxCount ? allocationPolicy.maxCount : oldBalance.remainingCount
+              }
+              else if(POLICY_TYPE[allocationPolicy.policyType] == POLICY_TYPE[2]){
+                init.encashmentCount = oldBalance.remainingCount > allocationPolicy.maxCount ? allocationPolicy.maxCount : oldBalance.remainingCount
+              }
             }
           }
         }
@@ -145,8 +149,9 @@ const allocateLeaveBalances = async (data) => {
         //Set remaining count
         init.remainingCount = availedCount > init.allocatedCount ? 0 : init.allocatedCount - availedCount;
 
-        //Add carry forward count to remaining count if there are any leaves from previous year that are carry forwarded
+        //Add carry forward count and encashment Count to remaining count if there are any leaves from previous year that are carry forwarded or Encashed
         init.remainingCount += init.carryForwardCount
+        init.remainingCount += init.encashmentCount
 
         //Try updating considering there is record that is already present.
         //if the record is updated then it will increase the affectedCount number. 
