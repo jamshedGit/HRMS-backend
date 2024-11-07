@@ -34,7 +34,9 @@ const updateItem = {
     createdAt: Joi.disallow(),
     updatedBy:Joi.disallow(),
     updatedAt: Joi.disallow(),
-    t_leave_type: Joi.optional()
+    t_leave_type: Joi.optional(),
+    leavetype:Joi.optional(),
+    subs:Joi.optional(),
   }),
 };
 
