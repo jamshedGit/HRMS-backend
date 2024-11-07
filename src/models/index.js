@@ -139,3 +139,4 @@ module.exports.Reimbursement_accounts_detailModel=require("./operations/reimburs
 //Reimbursement_claim
 module.exports.Reimbursement_claimModel=require("./operations/reimbursement_claim/reimbursement_claim.model")
 module.exports.Employee_loan_requestModel=require("./operations/employee_loan_request/employee_loan_request.model")
+module.exports.Employee_loan_request_detailModel=require("./operations/employee_loan_request/employee_loan_request_detail.model")

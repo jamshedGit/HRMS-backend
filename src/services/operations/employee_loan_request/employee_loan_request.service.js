@@ -1,46 +1,95 @@
 const httpStatus = require("http-status");
-const {EmployeeSalaryModel, Employee_loan_requestModel,Loan_management_configurationModel ,EmployeeProfileModel,Loan_management_detailModel, PayrollMonthModel,FormModel,LoanTypeModel} = require("../../../models/index");
+const {EmployeeSalaryModel, Employee_loan_requestModel,Loan_management_configurationModel ,EmployeeProfileModel,Loan_management_detailModel, PayrollMonthModel,FormModel,LoanTypeModel, Employee_loan_request_detailModel} = require("../../../models/index");
 
 const ApiError = require("../../../utils/ApiError");
 const Sequelize = require("sequelize");
 const { paginationFacts } = require("../../../utils/common");
 const { HttpStatusCodes } = require("../../../utils/constants");
+const Employee_loan_request_detail = require("../../../models/operations/employee_loan_request/employee_loan_request_detail.model");
 
 const Op = Sequelize.Op;
 
 
+// const createEmployee_loan_request = async (req, Employee_loan_requestBody) => {
+//   try {
+ 
+//     if(Employee_loan_requestBody.total_loan_amount<Employee_loan_requestBody.monthly_installment){
+
+//         throw new Error('Loan amount must be greater');
+
+//     }
+
+
+//     const userId = req.user.id;
+ 
+//       Employee_loan_requestBody.loan_amount_remaining = Employee_loan_requestBody.total_loan_amount;
+//       Employee_loan_requestBody.createdBy = userId;
+//       const addedReimbursementClaim = await Employee_loan_requestModel.create(Employee_loan_requestBody);
+
+//       // Return the new record
+//       return await getEmployee_loan_requestById(addedReimbursementClaim.Id);
+//     // }
+//   } catch (error) {
+//     console.error("Error processing reimbursement claim:", error);
+//     throw error;
+//   }
+// };
+
+
 const createEmployee_loan_request = async (req, Employee_loan_requestBody) => {
   try {
- 
-
-    let dataExists;
-
-    if (Employee_loan_requestBody.Id) {
-      // Check if a record with this ID already exists
-      dataExists = await Employee_loan_requestModel.findOne({
-        where: { Id: Employee_loan_requestBody.Id },
-      });
+    if (Employee_loan_requestBody.total_loan_amount < Employee_loan_requestBody.monthly_installment) {
+      throw new Error('Loan amount must be greater than monthly installment');
     }
 
-    // Set createdBy or updatedBy field
     const userId = req.user.id;
-    if (dataExists) {
-      // Update existing record
-      Employee_loan_requestBody.updatedBy = userId;
-      await dataExists.update(Employee_loan_requestBody);
 
-      // Return the updated record
-      return await getEmployee_loan_requestById(Employee_loan_requestBody.Id);
-    } else {
-      // Create new record
-      Employee_loan_requestBody.createdBy = userId;
-      const addedReimbursementClaim = await Employee_loan_requestModel.create(Employee_loan_requestBody);
+    // Initial setup
+    Employee_loan_requestBody.loan_amount_remaining = Employee_loan_requestBody.total_loan_amount;
+    Employee_loan_requestBody.createdBy = userId;
 
-      // Return the new record
-      return await getEmployee_loan_requestById(addedReimbursementClaim.Id);
+    // Create the parent loan request record
+    const addedReimbursementClaim = await Employee_loan_requestModel.create(Employee_loan_requestBody);
+
+    // Get the details for installments and add them to the detail table
+    let remainingLoanAmount = Employee_loan_requestBody.total_loan_amount;
+    let currentDate = new Date(Employee_loan_requestBody.installment_start_date);
+
+    for (let i = 0; i < Employee_loan_requestBody.total_installment; i++) {
+      let installmentAmount = Employee_loan_requestBody.monthly_installment;
+
+      // Update the remaining loan balance after each installment
+      // remainingLoanAmount -= installmentAmount;
+      // if(remainingLoanAmount<installmentAmount){
+      //   installmentAmount=remainingLoanAmount
+      // }
+
+      if (i === Employee_loan_requestBody.total_installment - 1) {
+        installmentAmount = remainingLoanAmount; 
+        remainingLoanAmount=0; // Adjust last installment to the remaining balance
+      } else {
+        remainingLoanAmount -= installmentAmount; // Deduct the regular installment from the remaining balance
+      }
+
+      // Create a detail entry for each installment
+      await Employee_loan_request_detailModel.create({
+        emp_loan_reqId: addedReimbursementClaim.Id,
+        employeeId: Employee_loan_requestBody.employeeId,
+        amount_received: installmentAmount,
+        running_balance: remainingLoanAmount,
+        payroll_month_date: currentDate,
+        createdBy: userId,
+      });
+
+      // Move to the next month
+      currentDate.setMonth(currentDate.getMonth() + 1);  // Increment the month by 1
     }
+
+    // Return the new record along with its details
+    return await getEmployee_loan_requestById(addedReimbursementClaim.Id);
+
   } catch (error) {
-    console.error("Error processing reimbursement claim:", error);
+    console.error("Error processing loan request:", error);
     throw error;
   }
 };
@@ -160,6 +209,11 @@ const updateEmployee_loan_requestById = async (
     throw new ApiError(httpStatus.NOT_FOUND, "Record not found");
   }
 
+  if(updateBody.total_loan_amount<updateBody.monthly_installment){
+
+    throw new Error('Loan amount must be greater');
+
+}
   
   
   updateBody.updatedBy = updatedBy;
@@ -184,6 +238,19 @@ const deleteEmployee_loan_requestById = async (Id) => {
   if (!Item) {
     throw new ApiError(httpStatus.NOT_FOUND, "Item not found");
   }
+
+  const checkRecordsWithDeduction = await Employee_loan_request_detail.findAll({
+    where: {
+      emp_loan_reqId: Id,
+      is_deducted: true
+    }
+  });
+
+  // Step 3: If there are child records with deductions, prevent deletion
+  if (checkRecordsWithDeduction.length > 0) {
+    throw new ApiError(httpStatus.BAD_REQUEST, "Deduction process started");
+  }
+  
 
   await Item.destroy();
   return Item;
