@@ -32,6 +32,7 @@ const createAttendanceConfiguration = catchAsync(async (req, res) => {
  * @returns res
  */
 const updateAttendanceConfiguration = catchAsync(async (req, res) => {
+  console.log("fds",req.body)
   const updatedAttendanceConfigurationData = await attendance_configuration.updateAttendanceConfigurationById(req.body, req.user.Id);
   res.send({
     code: HttpStatusCodes.OK,

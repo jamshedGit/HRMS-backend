@@ -89,8 +89,14 @@ const getAttendanceConfigurationById = async (id) => {
     include: [
       {
         model: AttendanceConfigurationModel.LeaveTypeModel,
-        attributes: ["Id", "name","type"],
+        attributes: ["Id", ["name","leaveTypeName"],"type"],
+        as: "leavetype",
+      },
+      {
        
+        model: AttendanceConfigurationModel.SubsidiaryModel,
+        attributes: ["Id", ["name","subsName"]],
+        as: "subs"
       }
     ],
   });
@@ -121,9 +127,10 @@ const getAttConfigData = async (filters, attributes = null, include = null) => {
  * @returns {Promise<ReceiptModel>}
  */
 const updateAttendanceConfigurationById = async (body, updatedBy) => {
+  console.log(":ss1",body);
   let oldRecord = await getAttConfigData({ subsidiaryId: body.subsidiaryId });
   if (oldRecord && oldRecord.Id != body.Id) {
-    throw new ApiError(httpStatus.FORBIDDEN, `subsidiary already in use ${body.subsidiaryId}. Please use another subsidiary`);
+    throw new ApiError(httpStatus.FORBIDDEN, `subsidiary already in use ${body.subs.subsName}. Please use another subsidiary`);
   }
   else {
     oldRecord = await getAttendanceConfigurationById(body.Id)
@@ -132,6 +139,7 @@ const updateAttendanceConfigurationById = async (body, updatedBy) => {
   
   Object.assign(oldRecord, body);
   const updatedData = await oldRecord.save();
+  console.log(":ss:",updatedData);
   const data = await getAttendanceConfigurationById(updatedData.Id)
   return data;
 };
