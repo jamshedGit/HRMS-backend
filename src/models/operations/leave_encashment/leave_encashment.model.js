@@ -75,6 +75,7 @@ leaveEnchasmentModel.belongsTo(FiscalSetupModel, {
   onUpdate: 'CASCADE',
 });
 
+//This hook will be triggered whenever a new record is created in Leave Encashment table that will set current Active Payroll Month Id in payrollMonthId key in Encashment Record
 leaveEnchasmentModel.beforeCreate(async (record, options) => {
   // Find the active record in PayrollMonthModel
   const activeRecord = await PayrollMonthModel.findOne({
