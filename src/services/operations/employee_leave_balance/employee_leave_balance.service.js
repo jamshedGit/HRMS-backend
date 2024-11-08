@@ -87,7 +87,7 @@ const allocateLeaveBalances = async (data) => {
       {
         model: EmployeeLeaveBalanceModel,
         where: {
-          yearId: oldYearData.Id,
+          yearId: oldYearData?.Id || '',
           remainingCount: { [Op.gte]: 0 }
         },
         required: false,
