@@ -319,7 +319,7 @@ const getAllLeaveBalance = async (req) => {
             },
             {
               model: LeaveTypeModel,
-              attributes: ['name']
+              attributes: ['name', 'Id']
             }
           ],
         }
@@ -330,6 +330,7 @@ const getAllLeaveBalance = async (req) => {
   const data = employeeData.t_employee_leave_balances.map((lb) => {
     return {
       leaveTypeName: lb?.t_leave_type?.name || '',
+      leaveType: lb?.t_leave_type?.Id || '',
       yearName: lb?.t_fiscal_setup ? createFiscalYearLabel(lb.t_fiscal_setup.endDate, lb.t_fiscal_setup.startDate) : 'NA',
       allocatedCount: lb?.allocatedCount || 0,
       availedCount: lb?.availedCount || 0,
