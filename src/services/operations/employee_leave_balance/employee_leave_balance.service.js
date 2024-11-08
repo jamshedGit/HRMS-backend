@@ -101,7 +101,7 @@ const allocateLeaveBalances = async (data) => {
         //Initialize values for Leave balance Record
         const init = { ...initialValues };
 
-        //This is to check if there are any leaves remaining of last year of the same leave type that are to be carry forwarded
+        //This is to check if there are any leaves remaining of last year of the same leave type that are to be carry forwarded or are to be encashed for old year
         if (emp.t_employee_leave_balances?.length) {
           const oldBalance = emp.t_employee_leave_balances.find(el => el.leaveType == al.leaveType);
 
@@ -115,16 +115,18 @@ const allocateLeaveBalances = async (data) => {
               },
               attributes: ['policyType', 'maxCount']
             })
+
             if (allocationPolicy && oldBalance.remainingCount && allocationPolicy.maxCount) {
+              //If Leaves are carry forwarded then they will be added to new year record
               if(POLICY_TYPE[allocationPolicy.policyType] == POLICY_TYPE[1]){
                 init.carryForwardCount = oldBalance.remainingCount > allocationPolicy.maxCount ? allocationPolicy.maxCount : oldBalance.remainingCount;
               }
+              //If leaves are encashed then they will be added to encashed key in the old balance record and a record of their encashment is created in Leave Encashment table
               else if(POLICY_TYPE[allocationPolicy.policyType] == POLICY_TYPE[2]){
                 oldBalance.encashmentCount += oldBalance.remainingCount > allocationPolicy.maxCount ? allocationPolicy.maxCount : oldBalance.remainingCount;
                 oldBalance.remainingCount -= oldBalance.encashmentCount;
 
                 await oldBalance.save()
-
 
                 const payload = {
                   subsidiaryId: data.subsidiaryId,
@@ -163,9 +165,8 @@ const allocateLeaveBalances = async (data) => {
         //Set remaining count
         init.remainingCount = availedCount > init.allocatedCount ? 0 : init.allocatedCount - availedCount;
 
-        //Add carry forward count and encashment Count to remaining count if there are any leaves from previous year that are carry forwarded or Encashed
+        //Add carry forward count to remaining count if there are any leaves from previous year that are carry forwarded
         init.remainingCount += init.carryForwardCount
-        init.remainingCount += init.encashmentCount
 
         //Try updating considering there is record that is already present.
         //if the record is updated then it will increase the affectedCount number. 
