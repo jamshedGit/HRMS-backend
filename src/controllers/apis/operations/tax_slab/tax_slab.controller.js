@@ -34,7 +34,7 @@ const createtax_slab = catchAsync(async (req, res) => {
     });
 
   } catch (error) {
-    console.log(error);        
+      
   }
 });
 
