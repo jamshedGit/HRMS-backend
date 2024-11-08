@@ -15,6 +15,7 @@ router.route("/delete-loan-management-configuration").patch(auth(),loan_manageme
 
 
 router.route("/create-loan-management-configuration").post(auth(), validate(loan_management_configurationValidation.createLoan_management_configurationValidation),loan_management_configurationController.createloan_management_configuration);
+router.route("/get-all-loan-type").get(auth(),loan_management_configurationController.getAllLoanType);
 
 
 module.exports = router;

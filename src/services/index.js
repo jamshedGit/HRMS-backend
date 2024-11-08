@@ -56,3 +56,5 @@ module.exports.employeeLeaveBalanceServicePage = require("./operations/employee_
 module.exports.reimbursement_configurationService=require("./operations/reimbursement_configuration/reimbursement_configuration.service")
 module.exports.reimbursement_claimService=require("./operations/reimbursement_claim/reimbursement_claim.service")
 module.exports.LeaveEncashmentServicePage = require('./operations/leave_encashment/leave_encashment.service')
+module.exports.Employee_loan_requestService=require("./operations/employee_loan_request/employee_loan_request.service")
+module.exports.attendance_configuration=require("./operations/attendance_configuration/attendance_configuration.service")
