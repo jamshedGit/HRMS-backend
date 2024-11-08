@@ -83,7 +83,7 @@ const DesigModel = sequelize.define('t_employee_profile', {
 	},
 	createdAt: { type: Sequelize.DATE, allowNull: true },
 	updatedAt: { type: Sequelize.DATE, allowNull: true },
-	cycleTypeId: { type: Sequelize.INTEGER, allowNull: true },
+	
 });
 
 
