@@ -1,5 +1,5 @@
 const httpStatus = require("http-status");
-const { AllocateLeavesModel, EmployeeProfileModel, LeaveApplicationModel, LeaveApplicationDetailModel, FiscalSetupModel, EmployeeLeaveBalanceModel, LeaveTypeModel } = require("../../../models/index");
+const { AllocateLeavesModel, EmployeeProfileModel, LeaveApplicationModel, LeaveApplicationDetailModel, FiscalSetupModel, EmployeeLeaveBalanceModel, LeaveTypeModel, LeaveEncashmentModel } = require("../../../models/index");
 const ApiError = require("../../../utils/ApiError");
 const Sequelize = require('sequelize');
 const { paginationFacts, createFiscalYearLabel } = require("../../../utils/common");
@@ -91,7 +91,6 @@ const allocateLeaveBalances = async (data) => {
           remainingCount: { [Op.gte]: 0 }
         },
         required: false,
-        attributes: ['Id', 'leaveType', 'remainingCount']
       }
     ],
   });
@@ -118,10 +117,25 @@ const allocateLeaveBalances = async (data) => {
             })
             if (allocationPolicy && oldBalance.remainingCount && allocationPolicy.maxCount) {
               if(POLICY_TYPE[allocationPolicy.policyType] == POLICY_TYPE[1]){
-                init.carryForwardCount = oldBalance.remainingCount > allocationPolicy.maxCount ? allocationPolicy.maxCount : oldBalance.remainingCount
+                init.carryForwardCount = oldBalance.remainingCount > allocationPolicy.maxCount ? allocationPolicy.maxCount : oldBalance.remainingCount;
               }
               else if(POLICY_TYPE[allocationPolicy.policyType] == POLICY_TYPE[2]){
-                init.encashmentCount = oldBalance.remainingCount > allocationPolicy.maxCount ? allocationPolicy.maxCount : oldBalance.remainingCount
+                oldBalance.encashmentCount += oldBalance.remainingCount > allocationPolicy.maxCount ? allocationPolicy.maxCount : oldBalance.remainingCount;
+                oldBalance.remainingCount -= oldBalance.encashmentCount;
+
+                await oldBalance.save()
+
+
+                const payload = {
+                  subsidiaryId: data.subsidiaryId,
+                  employeeId: emp.Id,
+                  leaveType: al.leaveType,
+                  yearId: oldYearData.Id,
+                  days: oldBalance.encashmentCount,
+                  reason: 'Leave Balance Encashment on year end',
+                }
+
+                await LeaveEncashmentModel.create(payload);
               }
             }
           }
