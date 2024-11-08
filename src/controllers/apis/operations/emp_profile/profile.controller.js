@@ -17,7 +17,7 @@ const imageUpload = async (req, res) => {
   }
 
   // Generate the URL for the uploaded image (assuming a public uploads folder)
-  const imageUrl = `http://localhost:${3000}/uploads/${req.file.filename}`;
+  const imageUrl = `http://119.153.103.211:${3011}/uploads/${req.file.filename}`;
 
   res.json({ message: 'Image uploaded successfully!', imageUrl });
 };
@@ -118,6 +118,18 @@ const updateEmp_profile = catchAsync(async (req, res) => {
   });
 });
 
+const SP_getContactDetailByEmployeeId = catchAsync(async (req, res) => {
+  // req.body.profile_image = req.file.filename
+   console.log("contact emp",req.body);
+   const Receipt = await Emp_profileformService.EmpProfileServicePage.SP_getContactDetailByEmployeeId(req.body.Id);
+   res.send({
+     code: HttpStatusCodes.OK,
+     message: HttpResponseMessages.OK,
+     data: Receipt,
+   });
+ });
+ 
+
 
 const updateContactById = catchAsync(async (req, res) => {
   // req.body.profile_image = req.file.filename
@@ -152,6 +164,16 @@ const deleteEmp_profile = catchAsync(async (req, res) => {
   });
 });
 
+const getProfileView = catchAsync(async (req, res) => {
+  const Receipt = await Emp_profileformService.EmpProfileServicePage.getProfileView(req.params.id);
+  res.send({
+    code: HttpStatusCodes.OK,
+    message: HttpResponseMessages.OK,
+    data: Receipt,
+  });
+});
+
+
 
 module.exports = {
   createEmp_profile,
@@ -163,5 +185,7 @@ module.exports = {
   getAllContactInfo,
   getContactInfoByEmployeeId,
   updateContactById,
-  usp_GetAllEmployeeProfileDetails
+  usp_GetAllEmployeeProfileDetails,
+  getProfileView,
+  SP_getContactDetailByEmployeeId
 };

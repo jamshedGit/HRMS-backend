@@ -1,7 +1,7 @@
-const moment = require("moment");
+const moment = require('moment');
+const { format, differenceInDays, addDays } = require('date-fns');
 const Sequelize = require("sequelize");
 const Op = Sequelize.Op;
-
 const modelMapping = require("../models/index");
 
 const getRouteSlugs = (req) => {
@@ -24,13 +24,20 @@ const getRouteSlugs = (req) => {
 const getDdlItems = (
   columns = { labelField: "", valueField: "", codeField: "",mergeLabel:"" },
   data = [],
+  mergeLabel=false,
   parentId = null
+ 
+
+ 
 ) => {
   return data.map((i) => ({
-    label: i[columns.labelField],
+    mergeLabel:i[columns.codeField] +" - " + i[columns.labelField],
+    label:mergeLabel? i[columns.codeField] +" - " + i[columns.labelField] : i[columns.labelField],
     value: i[columns.valueField],
     code: i[columns.codeField],
-    mergeLabel:i[columns.codeField] +" " + i[columns.labelField]
+
+
+   
   }));
 };
 
@@ -133,28 +140,28 @@ const getPathStorageFromUrl = (url) => {
  * @returns
  */
 const handleNestedData = (data) => {
-  if (Array.isArray(data)) {
-    data.forEach((el) => {
-      Object.keys(el?.dataValues).forEach((keys) => {
-        if (el.dataValues[keys] && typeof el.dataValues[keys] == "object") {
-          Object.entries(el.dataValues[keys]?.dataValues || {}).forEach(
-            (val) => {
-              el.dataValues[val[0]] = val[1];
-            }
-          );
+  const sortedData = JSON.parse(JSON.stringify(data))
+  if (Array.isArray(sortedData)) {
+    sortedData.forEach((el) => {
+      Object.keys(el).forEach((keys) => {
+        if (el[keys] && typeof el[keys] == 'object') {
+          Object.entries(el[keys] || {}).forEach((val) => {
+            el[val[0]] = val[1];
+          })
         }
-      });
-    });
-    return data;
-  } else {
-    Object.keys(data.dataValues).forEach((keys) => {
-      if (data.dataValues[keys] && typeof data.dataValues[keys] == "object") {
-        Object.entries(data.dataValues[keys].dataValues).forEach((val) => {
-          data.dataValues[val[0]] = val[1];
-        });
+      })
+    })
+    return sortedData;
+  }
+  else {
+    Object.keys(sortedData).forEach((keys) => {
+      if (sortedData[keys] && typeof sortedData[keys] == 'object') {
+        Object.entries(sortedData[keys] || {}).forEach((val) => {
+          sortedData[val[0]] = val[1];
+        })
       }
-    });
-    return data;
+    })
+    return sortedData;
   }
 };
 
@@ -213,129 +220,65 @@ const check_range_exist = async (
     where: whereCondition,
   });
   return existingConfiguration
-    ? { message: "Already exist.", status: "error" }
+    ? { message: "Record Already exist.", status: "error" }
     : null;
 };
 
+/**
+ * 
+ * function to return formatted date
+ * 
+ * @param {Date|String} date 
+ * @param {String} dateFormat 
+ * @returns 
+ */
+const formatDates = (date, dateFormat = null) => {
+  if(!date)
+    return null;
 
+  return format(new Date(date), dateFormat || 'dd/MMM/yyyy')
+}
 
-//     // Validate that max is greater than min
-//     console.log("check_range_exist 1",body);
-//     if (body[maxField] < body[minField]) {
-//       return { message: 'Min value must be less than Max value.', status: 'error' };
-//     }
-//     const model = modelMapping[table];
-//     const whereCondition = await model.findOne({
-//       where: {
-//           id: { [Op.ne]: body.Id  },
-//         [Op.or]: [
-//           {  [minField]: { [Op.between]: [ body[minField], body[maxField]]} },
-//           {[maxField]: { [Op.between]: [ body[minField],body[maxField]]} },
-//           { [minField]: { [Op.lte]:  body[minField] }, [maxField]: { [Op.gte]: body[maxField] } }
-//         ]
-//       }
-//     });
+/**
+ * 
+ * Get Diff in days between two provided dates
+ * 
+ * @param {Date|String} startDate 
+ * @param {Date|String} endDate 
+ * @returns 
+ */
+const getDateDiffInDays = (startDate, endDate) => {
+  if (startDate && endDate) {
+    return differenceInDays(new Date(endDate), new Date(startDate)) + 1;
+  }
+  return 0;
+}
 
-//     console.log("whereCondition whereCondition",whereCondition)
+/**
+ * 
+ * Add provided number of days in provided date
+ * 
+ * @param {Date|string} startDate 
+ * @param {Number} days 
+ * @returns 
+ */
+const addDaysInDate = (startDate, days = 0) => {
+  return new Date(addDays(new Date(startDate), days))
+}
 
-//     // Add required fields from fieldMappings
-//     let existingConfiguration;
-//     if (whereCondition && Array.isArray(fieldMappings) && fieldMappings.length > 0) {
-//       fieldMappings.forEach(field => {
-//         if (fieldMappings[field] !== undefined) {
-//           whereCondition[fieldMappings[field]] = body[fieldMappings[field]];
-//         }
-//       });
+/**
+ * 
+ * Create Label for Fiscal Year Dropdown
+ * 
+ * @param {Date} endDate 
+ * @param {Date} startDate 
+ * @returns 
+ */
+const createFiscalYearLabel = (endDate, startDate) => {
+  if(!endDate || !startDate){
+    return '';
+  }
+  return `Year - ${new Date(endDate).getFullYear()} (${formatDates(new Date(startDate), 'dd-MMM-yyyy')} to ${formatDates(new Date(endDate), 'dd-MMM-yyyy')})`
+}
 
-//      existingConfiguration = await model.findOne({
-//         where: whereCondition,
-//       });
-//     }
-
-//     // Query to check for existing configuration
-
-//   console.log("existingConfiguration existingConfiguration",existingConfiguration)
-//     return existingConfiguration ? { message: 'Already exist.', status: 'error' } : null;
-
-// };
-// const update_range_exist = async (
-//   body,
-//   table,
-//   minField,
-//   maxField,
-//   fieldMappings = []
-// ) => {
-//   // Validate that max is greater than min
-//   console.log("check_range_exist 1", body);
-//   if (body[maxField] < body[minField]) {
-//     return {
-//       message: "Min value must be less than Max value.",
-//       status: "error",
-//     };
-//   }
-
-//   const model = modelMapping[table];
-//   if (!model) {
-//     throw new Error(`Model ${table} not found`);
-//   }
-
-//   // Build the initial where condition
-//   // const whereCondition = {
-//   //   [Op.or]: [
-//   //     { [minField]: { [Op.between]: [body[minField], body[maxField]] } },
-//   //     { [maxField]: { [Op.between]: [body[minField], body[maxField]] } },
-//   //     {
-//   //       [minField]: { [Op.lte]: body[minField] },
-//   //       [maxField]: { [Op.gte]: body[maxField] },
-//   //     },
-//   //   ],
-//   // };
-
-//   // // Add required fields from fieldMappings
-//   // if (Array.isArray(fieldMappings) && fieldMappings.length > 0) {
-//   //   fieldMappings.forEach((field) => {
-//   //     if (body[fieldMappings[field]] !== undefined) {
-//   //       whereCondition[fieldMappings[field]] = body[fieldMappings[field]];
-//   //     }
-//   //   });
-//   // }
-
-//   const existingConfiguration = await Gratuity_configurationModel.findOne({
-//     where: {
-//       [Op.and]: [
-//         { subsidiaryId: updateBody.subsidiaryId },
-//         { contract_typeId: updateBody.contract_typeId },
-//         { id: { [Op.ne]: updateBody.Id } },
-//         {
-//           [Op.or]: [
-//             { min_year: { [Op.between]: [min_year, max_year] } },
-//             { max_year: { [Op.between]: [min_year, max_year] } },
-//             {
-//               min_year: { [Op.lte]: min_year },
-//               max_year: { [Op.gte]: max_year },
-//             },
-//           ],
-//         },
-//       ],
-//     },
-//   });
-
-
-//   return existingConfiguration
-//     ? { message: "Already exist.", status: "error" }
-//     : null;
-// };
-
-
-module.exports = {
-  handleNestedData,
-  getRouteSlugs,
-  getDdlItems,
-  getAlarmTimesItems,
-  customPaginate,
-  paginationFacts,
-  createDatetime,
-  getPathStorageFromUrl,
-  check_range_exist,
-  // update_range_exist,
-};
+module.exports = { handleNestedData, getRouteSlugs, getDdlItems, getAlarmTimesItems, customPaginate, paginationFacts, createDatetime, getPathStorageFromUrl, formatDates, getDateDiffInDays, addDaysInDate, check_range_exist, createFiscalYearLabel };

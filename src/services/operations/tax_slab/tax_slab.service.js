@@ -44,7 +44,7 @@ const createtax_slab = async (req, tax_slabBody) => {
 
     if (existingSlab) {
 
-      let result={"message":'New tax slab overlaps with existing slabs. Cannot insert the record.',"status":"error"}
+      let result={"message":'Record already exist.',"status":"error"}
       return result;
         // return 'New tax slab overlaps with existing slabs. Cannot insert the record.';
         // throw new ApiError(httpStatus.NOT_FOUND, "New tax slab overlaps with existing slabs. Cannot insert the record.");
@@ -79,7 +79,7 @@ const querytax_slab = async (filter, options, searchQuery) => {
 
   const { count, rows } = await Tax_slabModel.Tax_slabModel.findAndCountAll({
     order: [
-      ['createdAt', 'DESC']
+      ['from_amount', 'ASC']
     ],
     where: {
       [Op.or]: queryFilters,
@@ -142,7 +142,7 @@ const updatetax_slabById = async (Id, updateBody, updatedBy) => {
 
     if (overlappingSlab) {
 
-    let result={"message":'New tax slab overlaps with existing slabs. Cannot update the record.',"status":"error"}
+    let result={"message":'Record already exist.',"status":"error"}
     return result;
     }
 

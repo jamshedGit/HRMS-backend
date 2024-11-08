@@ -14,12 +14,9 @@ const Loan_management_configuration = sequelize.define('t_loan_management_config
 
     subsidiaryId: { type: Sequelize.INTEGER,allowNull: false },
 	accountId: { type: Sequelize.INTEGER },
-	human_resource_role: { type: Sequelize.INTEGER, allowNull: false },
     emp_loan_account: { type: Sequelize.INTEGER, allowNull: false },
-    installment_deduction_percentage: { type: Sequelize.DECIMAL, allowNull: false },
+    installment_deduction_percentage:{ type: Sequelize.DECIMAL(5, 2), allowNull: false },
     installment_deduction_basis_type: { type: Sequelize.INTEGER, allowNull: false },
-
-    
     isActive: { type: Sequelize.BOOLEAN, allowNull: true, defaultValue: true },
 	createdBy: {
 		type: Sequelize.INTEGER,
@@ -48,13 +45,15 @@ Loan_management_configuration.belongsTo(FormModel.FormModel, {
 	as:"Account"
   });
 
-
-
-
-  Loan_management_configuration.belongsTo(RoleModel.RoleModel, {
-	foreignKey: 'human_resource_role',
-	targetKey: 'id', // Optional alias
+  Loan_management_configuration.belongsTo(FormModel.FormModel, {
+	foreignKey: 'emp_loan_account',
+	targetKey: 'Id',
+	as:"EmpLoanAccount"
   });
+
+
+
+
 
 
 

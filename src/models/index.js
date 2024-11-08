@@ -111,16 +111,40 @@ module.exports.LeaveTypePoliciesModel = require('./operations/leave_type_policie
 //Leave Type Salary Deduction Policies Model
 module.exports.LeaveTypeSalaryDeductionPoliciesModel = require('./operations/leave_type_salary_deduction_policies/leave_type_salary_deduction_policies.model');
 
+//Leave Application Model
+module.exports.LeaveApplicationModel = require('./operations/leave_application/leave_application.model');
+
+//Leave Application Detail Model
+module.exports.LeaveApplicationDetailModel = require('./operations/leave_application_detail/leave_application_detail.model');
 //Tax Slab Model
+
 module.exports.Tax_slabModel = require('./operations/tax_slab/tax_slab.model');
 //Salarypolicy Model
+
 module.exports.salarypolicyModel = require('./operations/salarypolicy/salarypolicy.model');
 //Loan_management_configuration Model
 module.exports.Loan_management_configurationModel = require('./operations/loan_management_configuration/loan_management_configuration.model');
+
 module.exports.Loan_management_detailModel = require('./operations/loan_management_configuration/loan_management_detail');
 
 //Gratuity_configuration Model
 module.exports.Gratuity_configurationModel = require('./operations/gratuity_configuration/gratuity_configuration.model');
 module.exports.accrue_gratuity_configurationModel = require('./operations/accrue_gratuity_configuration/accrue_gratuity_configuration');
 
+module.exports.Reimbursement_configurationModel=require("./operations/reimbursement_configuration/reimbursement_configuration.model")
+module.exports.Reimbursement_policies_detailModel=require("./operations/reimbursement_configuration/reimbursement_policies_detail.model")
+module.exports.Policies_grade_detailModel=require("./operations/reimbursement_configuration/policies_grade_detail.model")
+module.exports.Reimbursement_accounts_detailModel=require("./operations/reimbursement_configuration/reimbursement_accounts_detail.model")
 
+//Employee Leave Balance Model
+module.exports.EmployeeLeaveBalanceModel = require('./operations/employee_leave_balance/employee_leave_balance.model');
+
+//Allocate Leaves Model
+module.exports.AllocateLeavesModel = require('./operations/allocate_leaves/allocate_leaves.model');
+//Reimbursement_claim
+module.exports.Reimbursement_claimModel=require("./operations/reimbursement_claim/reimbursement_claim.model")
+module.exports.Employee_loan_requestModel=require("./operations/employee_loan_request/employee_loan_request.model")
+module.exports.Employee_loan_request_detailModel=require("./operations/employee_loan_request/employee_loan_request_detail.model")
+
+//Attendance Configuration
+module.exports.Attendance_ConfigurationModel = require("./operations/attendance_configuration/attendance_configuration.model")

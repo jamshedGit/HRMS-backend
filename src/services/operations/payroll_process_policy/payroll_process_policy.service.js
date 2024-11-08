@@ -76,7 +76,8 @@ const createPayrollPolicy = async (req, payollBodyObj) => {
       journalBankAccountId: element.journalBankAccountId,
       bankCode: element.bankCode,
       bankAccountNo: element.bankAccountNo,
-      bankName: element.bankName
+      bankName: element.bankName,
+      isDefault: element.isDefault
     })
   });
   const payroll_bankInfoPolicy = await PayrollBankInfoPolicy.bulkCreate(listBankInfoPayroll);
@@ -116,6 +117,7 @@ const queryPayrollPolicy = async (filter, options, searchQuery) => {
     },
     offset: offset,
     limit: limit,
+    
   });
 
 
@@ -162,18 +164,84 @@ const getPayrollPolicyById = async (id) => {
  * @param {Object} updateBody
  * @returns {Promise<ReceiptModel>}
  */
-const updatePayrollPolicyById = async (Id, updateBody, updatedBy) => {
+const updatePayrollPolicyById = async (Id, updateBody, updatedBy,payollBodyObj) => {
   console.log("tool", Id, updateBody, updatedBy)
   const Item = await getPayrollPolicyById(Id);
   if (!Item) {
     throw new ApiError(httpStatus.NOT_FOUND, "record not found");
   }
-  //console.log("Update Receipt Id" , item);
-  // updateBody.slug = updateBody.name.replace(/ /g, "-").toLowerCase()
+  
   updateBody.updatedBy = updatedBy;
   delete updateBody.id;
   Object.assign(Item, updateBody);
   await Item.save();
+  const emailRecipentObj = []
+  const listEOBIAllowancesObj = []
+  const listSESSIAllowancesObj = []
+  const listBankInfoPayroll = []
+  const res_email = await sequelize.query(' delete from tran_email_recipents_setup where payrollConfigurationId = ' + Id );
+  const res_payroll = await sequelize.query(' delete from tran_payroll_policy_bank_info where payrollConfigurationId = ' + Id );
+  const eobi_allowance = await sequelize.query(' delete from tran_payroll_policy_eobiallowances where payrollConfigurationId = ' + Id );
+  const sessi_allowance = await sequelize.query(' delete from tran_payroll_policy_sessiallowance where payrollConfigurationId = ' + Id );
+  
+   /// For Insert Employee sending email ID's
+   payollBodyObj.emailRecipentList.forEach(element => {
+
+    emailRecipentObj.push({
+      subsidiaryId: payollBodyObj.body.subsidiaryId,
+      companyId: payollBodyObj.body.companyId || 1,
+      payrollConfigurationId: updateBody.Id,
+      employeeId: element,
+      email_sender_Id: updateBody.sender_emailId
+    })
+
+  });
+
+  const emailRecipentResponse = await PayrollEmailRecipentModel.bulkCreate(emailRecipentObj);
+  // --- END
+
+  // this method used for bulk inserting employee EOBI Allowances
+  payollBodyObj.eobiAllowancesList.forEach(element => {
+    listEOBIAllowancesObj.push({
+      subsidiaryId: payollBodyObj.body.subsidiaryId,
+      companyId: payollBodyObj.body.companyId || 1,
+      payrollConfigurationId: updateBody.Id,
+      earningId: element,
+    })
+  });
+
+  const eobiAllowanceResp = await PayrollEOBIAllowancesModel.bulkCreate(listEOBIAllowancesObj);
+
+  // SESSI Allowance
+
+  payollBodyObj.sessiAllowanceList.forEach(element => {
+    listSESSIAllowancesObj.push({
+      subsidiaryId: payollBodyObj.body.subsidiaryId,
+      companyId: payollBodyObj.body.companyId || 1,
+      payrollConfigurationId: updateBody.Id,
+      earningId: element,
+    })
+  });
+
+  const sessiAllowanceResp = await PayrollSessiAllowanceModel.bulkCreate(listSESSIAllowancesObj);
+  //  END
+
+  // Insert Into BankInfo 
+  payollBodyObj.bankInfoList.forEach(element => {
+    listBankInfoPayroll.push({
+      subsidiaryId: payollBodyObj.body.subsidiaryId,
+      companyId: payollBodyObj.body.companyId || 1,
+      payrollConfigurationId: updateBody.Id,
+      journalBankAccountId: element.journalBankAccountId,
+      bankCode: element.bankCode,
+      bankAccountNo: element.bankAccountNo,
+      bankName: element.bankName,
+      isDefault: element.isDefault
+    })
+  });
+  const payroll_bankInfoPolicy = await PayrollBankInfoPolicy.bulkCreate(listBankInfoPayroll);
+
+
   return;
 };
 

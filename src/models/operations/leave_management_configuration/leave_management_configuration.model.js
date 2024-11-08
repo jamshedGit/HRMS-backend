@@ -1,6 +1,6 @@
 const { Model, DataTypes } = require('sequelize');
 const sequelize = require('../../../config/db');
-const { EmployeeProfileModel, FormModel } = require('../..');
+const { EmployeeProfileModel, FormModel, SubsidiaryModel } = require('../..');
 
 // Define the User model
 class LeaveManagementConfigurationModel extends Model {
@@ -66,11 +66,10 @@ LeaveManagementConfigurationModel.init(
   }
 );
 
-// Association with EmployeeProfileModel model (subsidiaryId is a foreign key)
-LeaveManagementConfigurationModel.belongsTo(FormModel, {
+// Association with Subsidiary model (subsidiaryId is a foreign key)
+LeaveManagementConfigurationModel.belongsTo(SubsidiaryModel, {
   foreignKey: 'subsidiaryId',
   targetKey: 'Id',  // Assuming 'Id' is the primary key in LeaveType table
-  as: 'subsidiary',
   onDelete: 'CASCADE',
   onUpdate: 'CASCADE',
 });

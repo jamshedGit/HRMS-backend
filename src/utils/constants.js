@@ -3,6 +3,12 @@ const DDL_FIELD_NAMES = {
     labelField: 'name',
     valueField: 'id',
   },
+  city :{
+    labelField: 'name',
+    valueField: 'id',
+    codeField: 'countryId'
+  },
+
   driver :{
     labelField: 'userName',
     valueField: 'id',
@@ -64,6 +70,11 @@ const DDL_FIELD_NAMES = {
     valueField: 'Id',
   },
 
+  Subsidiary:{
+    labelField: 'name',
+    valueField: 'Id',
+  },
+
   SalaryRevisionKeys:{
     labelField: 'reviewDate',
     valueField: 'Id',
@@ -85,6 +96,7 @@ const HttpResponseMessages = {
   OK: 'Successfully',
   // OK: 'Successfully',
   CREATED: 'Successfully Created',
+  UPDATED: 'Successfully Updated',
   NO_CONTENT: 'No Content',
   BAD_REQUEST: 'Bad Request',
   UNAUTHORIZED: 'Unauthorized access',
@@ -92,5 +104,6 @@ const HttpResponseMessages = {
   FORBIDDEN: 'Forbidden to access required resource',
   NOT_FOUND: 'Resource not found',
   INTERNAL_SERVER_ERROR: 'Something went wrong',
+  ALREADY_EXIST:"Record already exist"
 };
 module.exports = { DDL_FIELD_NAMES, HttpStatusCodes, HttpResponseMessages };

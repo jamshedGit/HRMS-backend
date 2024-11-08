@@ -43,12 +43,21 @@ const getFormMenuMasterData = {
     Id: Joi.number().integer(),
     tableName: Joi.string(),
     prefix:Joi.string(),
-    text: Joi.optional()
+    text: Joi.optional(),
+    mergeLabel:Joi.optional(),
   }),
   
 };
 
 const getAllLeaveType = {
+  query: Joi.disallow(),
+  params: Joi.disallow(),
+  body: Joi.object().keys({
+    employeeId: Joi.optional()
+  }),
+}
+
+const getAllSubsidiaries = {
   query: Joi.disallow(),
   params: Joi.disallow(),
   body: Joi.disallow(),
@@ -58,7 +67,7 @@ const getCitiesMasterData = {
   query: Joi.disallow(),
   params: Joi.disallow(),
   body: Joi.object().keys({
-    countryId: Joi.number().integer().required()
+    countryId: Joi.number().integer().optional()
   }),
 };
 
@@ -193,5 +202,6 @@ module.exports = {
   getFormMenuMasterData,
   getAllEmployees,
   getEmpSalaryRevisionByEmpId,
-  getAllLeaveType
+  getAllLeaveType,
+  getAllSubsidiaries
 };
