@@ -119,11 +119,82 @@ const createloan_management_configuration = async (
  * @param {number} [options.page] - Current page (default = 1)
  * @returns {Promise<QueryResult>}
  */
-const queryloan_management_configuration = async (
-  filter,
-  options,
-  searchQuery
-) => {
+// const queryloan_management_configuration = async (
+//   filter,
+//   options,
+//   searchQuery
+// ) => {
+//   let limit = options.pageSize;
+//   let offset = 0 + (options.pageNumber - 1) * limit;
+
+//   searchQuery = searchQuery.toLowerCase();
+//   const queryFilters = [
+//     {
+//       emp_loan_account: Sequelize.where(
+//         Sequelize.fn("", Sequelize.col("emp_loan_account")),
+//         "LIKE",
+//         "%" + searchQuery + "%"
+//       ),
+//     },
+//   ];
+
+//   const { count, rows } =
+//     await Loan_management_configurationModel.findAndCountAll(
+//       {
+//         order: [
+//           [Sequelize.col("Subsidiary.name"), "ASC"],   // Order by Subsidiary name
+//           [Sequelize.col("Account.formName"), "ASC"],  // Order by Contract Type (formName)
+      
+//         ],
+      
+//         where: {
+//           [Op.or]: queryFilters,
+//           // isActive: true
+//         },
+//         offset: offset,
+//         limit: limit,
+//         include: [
+
+//           {
+//             model: SubsidiaryModel,
+//             attributes: ["name"],
+//             as: "Subsidiary",
+//           },
+//           {
+//             model:Loan_management_detailModel,
+//             as: "details",
+//             include: [
+//               {
+//                 model: LoanTypeModel,
+//                 attributes: ["code", "name"],
+//                 as: "Loan_Type",
+             
+//               },
+//             ]
+         
+//           },
+  
+     
+//           {
+//             model:FormModel,
+//             attributes: ["formName", "formCode"],
+//             as: "Account",
+//           },
+
+//           {
+//             model: FormModel,
+//             attributes: ["formName", "formCode"],
+//             as: "EmpLoanAccount",
+//           },
+       
+//         ],
+//       }
+//     );
+
+//   return paginationFacts(count, limit, options.pageNumber, rows);
+// };
+
+const queryloan_management_configuration = async (filter, options, searchQuery) => {
   let limit = options.pageSize;
   let offset = 0 + (options.pageNumber - 1) * limit;
 
@@ -138,55 +209,48 @@ const queryloan_management_configuration = async (
     },
   ];
 
-  const { count, rows } =
-    await Loan_management_configurationModel.findAndCountAll(
+  const { count, rows } = await Loan_management_configurationModel.findAndCountAll({
+    order: [
+      ["Subsidiary", "name", "ASC"],   // Use the alias and attribute name instead of Sequelize.col()
+    ],
+    where: {
+      [Op.or]: queryFilters,
+      // isActive: true
+    },
+    offset: offset,
+    limit: limit,
+    include: [
       {
-        order: [["createdAt", "DESC"]],
-        where: {
-          [Op.or]: queryFilters,
-          // isActive: true
-        },
-        offset: offset,
-        limit: limit,
+        model: Loan_management_detailModel,
+        as: "details",
         include: [
           {
-            model:Loan_management_detailModel,
-            as: "details",
-            include: [
-              {
-                model: LoanTypeModel,
-                attributes: ["code", "name"],
-                as: "Loan_Type",
-             
-              },
-            ]
-         
+            model: LoanTypeModel,
+            attributes: ["code", "name"],
+            as: "Loan_Type",
           },
-  
-          {
-            model: SubsidiaryModel,
-            attributes: ["name"],
-            as: "Subsidiary",
-          },
-          {
-            model:FormModel,
-            attributes: ["formName", "formCode"],
-            as: "Account",
-          },
-
-          {
-            model: FormModel,
-            attributes: ["formName", "formCode"],
-            as: "EmpLoanAccount",
-          },
-       
         ],
-      }
-    );
+      },
+      {
+        model: SubsidiaryModel,
+        attributes: ["name"],
+        as: "Subsidiary", // Ensure alias matches here
+      },
+      {
+        model: FormModel,
+        attributes: ["formName", "formCode"],
+        as: "Account", // Ensure alias is unique
+      },
+      {
+        model: FormModel,
+        attributes: ["formName", "formCode"],
+        as: "EmpLoanAccount", // Ensure alias is unique
+      },
+    ],
+  });
 
   return paginationFacts(count, limit, options.pageNumber, rows);
 };
-
 
 /**
  * Get Item by id
@@ -344,7 +408,7 @@ return result;
 
 
 const deleteloan_management_configurationById = async (Id) => {
-  console.log("deleteloan_management_configurationById ID",Id)
+
   const Item = await getloan_management_configurationById(Id, {
     include: [
       {

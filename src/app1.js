@@ -101,8 +101,8 @@ const {Employee_loan_request_detailModel,Employee_loan_requestModel, ResourceMod
 
 // accrue_gratuity_configurationModel.sync({ force: true });
 // Gratuity_configurationModel.sync({ force: true });
-// Loan_management_configurationModel.sync({ alter: true });
-// Loan_management_detailModel.sync({ alter: true });
+// Loan_management_configurationModel.sync({ force: true });
+// Loan_management_detailModel.sync({ force: true });
 
 
 	
