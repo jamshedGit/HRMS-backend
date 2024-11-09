@@ -1,5 +1,5 @@
 const httpStatus = require("http-status");
-const { accrue_gratuity_configurationModel } = require("../../../models/index");
+const { accrue_gratuity_configurationModel, SubsidiaryModel } = require("../../../models/index");
 const { FormModel } = require("../../../models/index");
 
 const ApiError = require("../../../utils/ApiError");
@@ -37,8 +37,8 @@ const createaccrue_gratuity_configuration = async (
       {
         include: [
           {
-            model: FormModel,
-            attributes: ["formName", "formCode"],
+            model: SubsidiaryModel,
+            attributes: ["name"],
             as: "Subsidiary",
           },
           {
@@ -62,7 +62,7 @@ const createaccrue_gratuity_configuration = async (
 
     return result;
   } catch (error) {
-    console.error("Error creating gratuity configuration:", error);
+  
     throw error; // Rethrow or handle the error as needed
   }
 };
@@ -106,8 +106,8 @@ const queryaccrue_gratuity_configuration = async (
       limit: limit,
       include: [
         {
-          model: FormModel,
-          attributes: ["formName", "formCode"],
+          model: SubsidiaryModel,
+          attributes: ["name"],
           as: "Subsidiary",
         },
         {
@@ -146,8 +146,8 @@ const getaccrue_gratuity_configurationById = async (id) => {
     where: { Id: id },
     include: [
       {
-        model: FormModel,
-        attributes: ["formName", "formCode"],
+        model: SubsidiaryModel,
+        attributes: ["name"],
         as: "Subsidiary",
       },
       {
