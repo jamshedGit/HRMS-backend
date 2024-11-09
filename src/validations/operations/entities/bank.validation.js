@@ -13,7 +13,7 @@ const createBranchValidation = {
     params: Joi.disallow(),
     body: Joi.object().keys({
         Name: Joi.string(),
-        bankId: Joi.number(),
+        BankId: Joi.number(),
         branchCode: Joi.string(),
         countryId: Joi.number(),
         cityId: Joi.number(),
@@ -23,9 +23,9 @@ const createBranchValidation = {
         contactPerson: Joi.string(),
         address: Joi.string(),
         accOpeningDate: Joi.date(),
-        accNoForSalary: Joi.string(),
-        accNoForPF: Joi.string(),
-        accNoForGrad: Joi.string(),
+        accNoForSalary: Joi.any().optional(),
+        accNoForPF:Joi.any().optional(),
+        accNoForGrad: Joi.any().optional(),
     }),
 };
 
