@@ -11,12 +11,12 @@ const {
 } = require("../../../../utils/constants");
 
 const creategratuity_configuration = catchAsync(async (req, res) => {
-console.log("gratuity hit")
+
   try {
 
 
     const gratuity_configuration = await Gratuity_configurationService.creategratuity_configuration(req, req.body);
-console.log("Unable to create",gratuity_configuration)
+
     if (gratuity_configuration?.status && gratuity_configuration.status === "error") {
 
       res.status(HttpStatusCodes.INTERNAL_SERVER_ERROR).send({
@@ -29,7 +29,7 @@ console.log("Unable to create",gratuity_configuration)
     }
     else{
   
-        console.log("Unable to create ")
+      
      res.status(httpStatus.CREATED).send({
       code: HttpStatusCodes.CREATED,
       message:gratuity_configuration.message,
@@ -38,7 +38,7 @@ console.log("Unable to create",gratuity_configuration)
   }
 
   } catch (error) {
-    // throw error     
+    throw error     
   }
 });
 
