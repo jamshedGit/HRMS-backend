@@ -1,7 +1,7 @@
 const Sequelize = require('sequelize');
-const { ResourceModel } = require('../..');
-const FormModel= require('../../index');
-const RoleModel=require('../../index');
+const { ResourceModel, SubsidiaryModel } = require('../..');
+const {FormModel,}= require('../../index');
+
 //import Database connection configurations.
 const sequelize = require('../../../config/db')
 
@@ -12,7 +12,8 @@ const Loan_management_configuration = sequelize.define('t_loan_management_config
 		primaryKey: true
 	},
 
-    subsidiaryId: { type: Sequelize.INTEGER,allowNull: false },
+	subsidiaryId: { type: Sequelize.INTEGER,allowNull: false},
+	companyId: { type: Sequelize.INTEGER,allowNull: false, defaultValue: 1 },
 	accountId: { type: Sequelize.INTEGER },
     emp_loan_account: { type: Sequelize.INTEGER, allowNull: false },
     installment_deduction_percentage:{ type: Sequelize.DECIMAL(5, 2), allowNull: false },
@@ -32,20 +33,20 @@ const Loan_management_configuration = sequelize.define('t_loan_management_config
 });
 
 
-Loan_management_configuration.belongsTo(FormModel.FormModel, {
+Loan_management_configuration.belongsTo(SubsidiaryModel, {
 	foreignKey: 'subsidiaryId',
 	targetKey: 'Id',
 		as:"Subsidiary"
   });
 
   
-Loan_management_configuration.belongsTo(FormModel.FormModel, {
+Loan_management_configuration.belongsTo(FormModel, {
 	foreignKey: 'accountId',
 	targetKey: 'Id',
 	as:"Account"
   });
 
-  Loan_management_configuration.belongsTo(FormModel.FormModel, {
+  Loan_management_configuration.belongsTo(FormModel, {
 	foreignKey: 'emp_loan_account',
 	targetKey: 'Id',
 	as:"EmpLoanAccount"
