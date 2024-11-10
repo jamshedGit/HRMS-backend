@@ -16,12 +16,24 @@ const { Attendance_ConfigurationModel } = require("../../../../models");
  * @returns res
  */
 const createAttendanceConfiguration = catchAsync(async (req, res) => {
-  const createdAttendanceConfiguration = await attendance_configuration.createAttendanceConfiguration(req);
-  res.send({
-    code: HttpStatusCodes.OK,
-    message: HttpResponseMessages.OK,
-    data: createdAttendanceConfiguration,
-  });
+  try {
+    const createdAttendanceConfiguration = await attendance_configuration.createAttendanceConfiguration(req);
+    res.send({
+      code: HttpStatusCodes.OK,
+      message: HttpResponseMessages.OK,
+      data: createdAttendanceConfiguration,
+    });
+  }
+  catch (error) {
+
+    if (error.parent.errno === 1062) {
+      throw new ApiError(httpStatus.NOT_FOUND, "Duplicate entry not allowed!");
+    }
+    else {
+
+      throw error;
+    }
+  }
 });
 
 /**
@@ -32,7 +44,7 @@ const createAttendanceConfiguration = catchAsync(async (req, res) => {
  * @returns res
  */
 const updateAttendanceConfiguration = catchAsync(async (req, res) => {
-  console.log("fds",req.body)
+  console.log("fds", req.body)
   const updatedAttendanceConfigurationData = await attendance_configuration.updateAttendanceConfigurationById(req.body, req.user.Id);
   res.send({
     code: HttpStatusCodes.OK,
