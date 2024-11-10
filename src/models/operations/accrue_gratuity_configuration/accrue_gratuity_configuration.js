@@ -1,5 +1,5 @@
 const Sequelize = require('sequelize');
-const FormModel= require('../../index');
+const {FormModel, SubsidiaryModel}= require('../../index');
 const sequelize = require('../../../config/db')
 
 const accrue_gratuity_configuration = sequelize.define('t_accrue_gratuity_configuration', {
@@ -10,6 +10,7 @@ const accrue_gratuity_configuration = sequelize.define('t_accrue_gratuity_config
 	},
 
     subsidiaryId: { type: Sequelize.INTEGER,allowNull: false },
+	companyId: { type: Sequelize.INTEGER,allowNull: false ,defaultValue: 1},
 	graduity_expense_accountId: { type: Sequelize.INTEGER,allowNull: false },
 	graduity_payable_accountId: { type: Sequelize.INTEGER,allowNull: false },
     bank_cash_accountId: { type: Sequelize.INTEGER,allowNull: false },
@@ -29,25 +30,25 @@ const accrue_gratuity_configuration = sequelize.define('t_accrue_gratuity_config
 });
 
 
-accrue_gratuity_configuration.belongsTo(FormModel.FormModel, {
+accrue_gratuity_configuration.belongsTo(SubsidiaryModel, {
 	foreignKey: 'subsidiaryId',
 	targetKey: 'Id',
 		as:"Subsidiary"
   });
 
   
-  accrue_gratuity_configuration.belongsTo(FormModel.FormModel, {
+  accrue_gratuity_configuration.belongsTo(FormModel, {
 	foreignKey: 'graduity_expense_accountId',
 	targetKey: 'Id',
 	as:"GraduityExpenseAccount"
   });
 
-  accrue_gratuity_configuration.belongsTo(FormModel.FormModel, {
+  accrue_gratuity_configuration.belongsTo(FormModel, {
 	foreignKey: 'graduity_payable_accountId',
 	targetKey: 'Id',
 	as:"GraduityPayableAccount"
   });
-  accrue_gratuity_configuration.belongsTo(FormModel.FormModel, {
+  accrue_gratuity_configuration.belongsTo(FormModel, {
 	foreignKey: 'bank_cash_accountId',
 	targetKey: 'Id',
 	as:"BankCashAccount"

@@ -38,7 +38,7 @@ const createaccrue_gratuity_configuration = catchAsync(async (req, res) => {
         }
 
     } catch (error) {
-        console.log(error);
+        throw error; 
     }
 });
 

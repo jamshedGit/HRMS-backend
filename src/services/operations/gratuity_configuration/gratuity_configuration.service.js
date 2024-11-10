@@ -1,6 +1,6 @@
 const httpStatus = require("http-status");
 const { Gratuity_configurationModel } = require("../../../models/index");
-const { FormModel } = require("../../../models/index");
+const { FormModel,SubsidiaryModel } = require("../../../models/index");
 
 const ApiError = require("../../../utils/ApiError");
 const Sequelize = require("sequelize");
@@ -35,9 +35,13 @@ const creategratuity_configuration = async (
 
     if (existingConfiguration) {
     
-
+      let result = {
+        message: "Unable to Save: Gratuity Slab overlaps with existing slabs.",
+        status: "error",
+      };
+      return result;
       // let result={"message":'This Already exists. Save not allowed.',"status":"error"}
-      return existingConfiguration;
+      // return existingConfiguration;
     }
 
     // Create the Gratuity configuration
@@ -51,8 +55,8 @@ const creategratuity_configuration = async (
       {
         include: [
           {
-            model: FormModel,
-            attributes: ["formName", "formCode"],
+            model: SubsidiaryModel,
+            attributes: ["name"],
             as: "Subsidiary",
           },
           {
@@ -66,8 +70,7 @@ const creategratuity_configuration = async (
 
     return result;
   } catch (error) {
-    console.error("Error creating gratuity configuration:", error);
-    throw error; // Rethrow or handle the error as needed
+  throw error
   }
 };
 
@@ -96,7 +99,12 @@ const querygratuity_configuration = async (filter, options, searchQuery) => {
   ];
 
   const { count, rows } = await Gratuity_configurationModel.findAndCountAll({
-    order: [["createdAt", "DESC"]],
+    // order: [["createdAt", "DESC"]],
+    order: [
+      [Sequelize.col("Subsidiary.name"), "ASC"],   // Order by Subsidiary name
+      [Sequelize.col("Contract_Type.formName"), "ASC"],  // Order by Contract Type (formName)
+      [Sequelize.col("min_year"), "ASC"],  // Order by Minimum Year
+    ],
     where: {
       [Op.or]: queryFilters,
       // isActive: true
@@ -105,8 +113,8 @@ const querygratuity_configuration = async (filter, options, searchQuery) => {
     limit: limit,
     include: [
       {
-        model: FormModel,
-        attributes: ["formName", "formCode"],
+        model: SubsidiaryModel,
+        attributes: ["name"],
         as: "Subsidiary",
       },
       {
@@ -130,8 +138,8 @@ const getgratuity_configurationById = async (id) => {
     where: { Id: id },
     include: [
       {
-        model: FormModel,
-        attributes: ["formName", "formCode"],
+        model: SubsidiaryModel,
+        attributes: ["name"],
         as: "Subsidiary",
       },
       {
@@ -200,7 +208,7 @@ const updategratuity_configurationById = async (Id, updateBody, updatedBy) => {
   if (existingConfiguration) {
    
     let result = {
-      message: "New data overlaps with existing data.",
+      message: "Unable to Save: Gratuity Slab overlaps with existing slabs.",
       status: "error",
     };
     return result;

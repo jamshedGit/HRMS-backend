@@ -14,8 +14,7 @@ const createExchangeRate = catchAsync(async (req, res) => {
   // console.log("reqested User", req.user.id);
   try {
 
-    console.log("insert ExchangeRate")
-    console.log(req.body);
+   
     const ExchangeRate = await ExchangeRateformService.ExchangeRateServicePage.createExchangeRate(req, req.body);
     res.status(httpStatus.CREATED).send({
       code: HttpStatusCodes.CREATED,
@@ -24,7 +23,17 @@ const createExchangeRate = catchAsync(async (req, res) => {
     });
 
   } catch (error) {
-    console.log(error);
+   
+     if (error.parent.errno === 1062) {
+      throw new ApiError(httpStatus.NOT_FOUND, "Duplicate entry not allowed!");
+    }
+    else {
+     
+      throw error;
+    }
+
+
+
   }
 });
 
@@ -61,7 +70,7 @@ const SP_getAllExchangeRateInfoByEmpId = catchAsync(async (req, res) => {
 
 
 const SP_getAllEarningDeductionList = catchAsync(async (req, res) => {
-  console.log("SP_getAllEarningDeductionList Controller",req.body)
+  console.log("SP_getAllEarningDeductionList Controller", req.body)
 
   const list = await ExchangeRateformService.ExchangeRateServicePage.SP_GetAllEarningDeductionList(req.body.flag);
   if (!list) {

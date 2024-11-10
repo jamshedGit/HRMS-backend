@@ -1,5 +1,5 @@
 const Sequelize = require('sequelize');
-const FormModel= require('../../index');
+const {FormModel,SubsidiaryModel}= require('../../index');
 const sequelize = require('../../../config/db')
 
 const Gratuity_configuration = sequelize.define('t_gratuity_configuration', {
@@ -9,7 +9,8 @@ const Gratuity_configuration = sequelize.define('t_gratuity_configuration', {
 		primaryKey: true
 	},
 
-    subsidiaryId: { type: Sequelize.INTEGER,allowNull: false },
+	subsidiaryId: { type: Sequelize.INTEGER,allowNull: false},
+	companyId: { type: Sequelize.INTEGER,allowNull: false, defaultValue: 1 },
 	contract_typeId: { type: Sequelize.INTEGER,allowNull: false },
 	basis_of_gratuityId: { type: Sequelize.INTEGER, allowNull: false },
    num_of_days: { type: Sequelize.INTEGER, allowNull: false },
@@ -33,14 +34,14 @@ const Gratuity_configuration = sequelize.define('t_gratuity_configuration', {
 });
 
 
-Gratuity_configuration.belongsTo(FormModel.FormModel, {
+Gratuity_configuration.belongsTo(SubsidiaryModel, {
 	foreignKey: 'subsidiaryId',
 	targetKey: 'Id',
 		as:"Subsidiary"
   });
 
   
-  Gratuity_configuration.belongsTo(FormModel.FormModel, {
+  Gratuity_configuration.belongsTo(FormModel, {
 	foreignKey: 'contract_typeId',
 	targetKey: 'Id',
 	as:"Contract_Type"

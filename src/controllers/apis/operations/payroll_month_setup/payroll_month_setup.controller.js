@@ -13,9 +13,7 @@ const {
 const createPayrollMonth = catchAsync(async (req, res) => {
   // console.log("reqested User", req.user.id);
   try {
-
-    console.log("insert PayrollMonth")
-    console.log(req.body);
+   
     const PayrollMonth = await PayrollMonthServicePage.PayrollMonthServicePage.createPayrollMonth(req, req.body);
 
     res.status(httpStatus.CREATED).send({
@@ -24,13 +22,20 @@ const createPayrollMonth = catchAsync(async (req, res) => {
       data: PayrollMonth
     });
 
-  } catch (error) {
-    console.log(error);        
-  }
+  }  catch (error) {
+   
+    if (error.parent.errno === 1062) {
+     throw new ApiError(httpStatus.NOT_FOUND, "Duplicate entry not allowed!");
+   }
+   else {
+    
+     throw error;
+   }
+ }
 });
 
 const getAllPayrollMonth = catchAsync(async (req, res) => {
-  console.log("get PayrollMonths");
+ 
   const obj = {};
   const filter = obj;
   // const options = pick(req.body, ["sortBy", "limit", "page"]);
