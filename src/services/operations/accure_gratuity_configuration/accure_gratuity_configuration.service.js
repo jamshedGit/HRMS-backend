@@ -97,7 +97,9 @@ const queryaccrue_gratuity_configuration = async (
 
   const { count, rows } =
     await accrue_gratuity_configurationModel.findAndCountAll({
-      order: [["createdAt", "DESC"]],
+      order: [
+        ["Subsidiary", "name", "ASC"],   // Use the alias and attribute name
+      ],
       where: {
         [Op.or]: queryFilters,
         // isActive: true
