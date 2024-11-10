@@ -1,8 +1,5 @@
 const httpStatus = require("http-status");
-const Loan_management_configurationModel = require("../../../models/index");
-const Loan_management_detailModel = require("../../../models/index");
-const LoanTypeModel = require("../../../models/index");
-const FormModel = require("../../../models/index");
+const {Loan_management_configurationModel,Loan_management_detailModel,LoanTypeModel,FormModel,SubsidiaryModel} = require("../../../models/index");
 
 const ApiError = require("../../../utils/ApiError");
 const Sequelize = require("sequelize");
@@ -29,7 +26,7 @@ const createloan_management_configuration = async (
 
 
     //check
-    const existingConfiguration = await Loan_management_configurationModel.Loan_management_configurationModel.findOne({
+    const existingConfiguration = await Loan_management_configurationModel.findOne({
       where: { subsidiaryId: loan_management_configurationBody.subsidiaryId },
     });
 
@@ -41,7 +38,7 @@ const createloan_management_configuration = async (
 
     // Create the loan management configuration
     const addedloan_management_configurationObj =
-      await Loan_management_configurationModel.Loan_management_configurationModel.create(
+      await Loan_management_configurationModel.create(
         loan_management_configurationBody
       );
 
@@ -62,7 +59,7 @@ const createloan_management_configuration = async (
       );
 
       for (const detail of loanDetails) {
-        await Loan_management_detailModel.Loan_management_detailModel.create(
+        await Loan_management_detailModel.create(
           detail
         );
       }
@@ -70,33 +67,33 @@ const createloan_management_configuration = async (
 
     // return addedloan_management_configurationObj;
 
-    const populatedConfiguration = await Loan_management_configurationModel.Loan_management_configurationModel.findOne({
+    const populatedConfiguration = await Loan_management_configurationModel.findOne({
       where: { Id: addedloan_management_configurationObj.Id },
       include: [
         {
-          model: Loan_management_detailModel.Loan_management_detailModel,
+          model:Loan_management_detailModel,
           as: "details",
           include: [
             {
-              model: LoanTypeModel.LoanTypeModel,
+              model: LoanTypeModel,
               attributes: ["code", "name"],
               as: "Loan_Type",
             },
           ],
         },
         {
-          model: FormModel.FormModel,
-          attributes: ["formName", "formCode"],
+          model: SubsidiaryModel,
+          attributes: ["name"],
           as: "Subsidiary",
         },
         {
-          model: FormModel.FormModel,
+          model: FormModel,
           attributes: ["formName", "formCode"],
           as: "Account",
         },
 
         {
-          model: FormModel.FormModel,
+          model: FormModel,
           attributes: ["formName", "formCode"],
           as: "EmpLoanAccount",
         },
@@ -108,7 +105,7 @@ const createloan_management_configuration = async (
 
     return populatedConfiguration;
   } catch (error) {
-    console.error("Error creating loan management configuration:", error);
+  
     throw error; // Rethrow or handle the error as needed
   }
 };
@@ -122,11 +119,82 @@ const createloan_management_configuration = async (
  * @param {number} [options.page] - Current page (default = 1)
  * @returns {Promise<QueryResult>}
  */
-const queryloan_management_configuration = async (
-  filter,
-  options,
-  searchQuery
-) => {
+// const queryloan_management_configuration = async (
+//   filter,
+//   options,
+//   searchQuery
+// ) => {
+//   let limit = options.pageSize;
+//   let offset = 0 + (options.pageNumber - 1) * limit;
+
+//   searchQuery = searchQuery.toLowerCase();
+//   const queryFilters = [
+//     {
+//       emp_loan_account: Sequelize.where(
+//         Sequelize.fn("", Sequelize.col("emp_loan_account")),
+//         "LIKE",
+//         "%" + searchQuery + "%"
+//       ),
+//     },
+//   ];
+
+//   const { count, rows } =
+//     await Loan_management_configurationModel.findAndCountAll(
+//       {
+//         order: [
+//           [Sequelize.col("Subsidiary.name"), "ASC"],   // Order by Subsidiary name
+//           [Sequelize.col("Account.formName"), "ASC"],  // Order by Contract Type (formName)
+      
+//         ],
+      
+//         where: {
+//           [Op.or]: queryFilters,
+//           // isActive: true
+//         },
+//         offset: offset,
+//         limit: limit,
+//         include: [
+
+//           {
+//             model: SubsidiaryModel,
+//             attributes: ["name"],
+//             as: "Subsidiary",
+//           },
+//           {
+//             model:Loan_management_detailModel,
+//             as: "details",
+//             include: [
+//               {
+//                 model: LoanTypeModel,
+//                 attributes: ["code", "name"],
+//                 as: "Loan_Type",
+             
+//               },
+//             ]
+         
+//           },
+  
+     
+//           {
+//             model:FormModel,
+//             attributes: ["formName", "formCode"],
+//             as: "Account",
+//           },
+
+//           {
+//             model: FormModel,
+//             attributes: ["formName", "formCode"],
+//             as: "EmpLoanAccount",
+//           },
+       
+//         ],
+//       }
+//     );
+
+//   return paginationFacts(count, limit, options.pageNumber, rows);
+// };
+
+const queryloan_management_configuration = async (filter, options, searchQuery) => {
   let limit = options.pageSize;
   let offset = 0 + (options.pageNumber - 1) * limit;
 
@@ -141,55 +209,48 @@ const queryloan_management_configuration = async (
     },
   ];
 
-  const { count, rows } =
-    await Loan_management_configurationModel.Loan_management_configurationModel.findAndCountAll(
+  const { count, rows } = await Loan_management_configurationModel.findAndCountAll({
+    order: [
+      ["Subsidiary", "name", "ASC"],   // Use the alias and attribute name instead of Sequelize.col()
+    ],
+    where: {
+      [Op.or]: queryFilters,
+      // isActive: true
+    },
+    offset: offset,
+    limit: limit,
+    include: [
       {
-        order: [["createdAt", "DESC"]],
-        where: {
-          [Op.or]: queryFilters,
-          // isActive: true
-        },
-        offset: offset,
-        limit: limit,
+        model: Loan_management_detailModel,
+        as: "details",
         include: [
           {
-            model: Loan_management_detailModel.Loan_management_detailModel,
-            as: "details",
-            include: [
-              {
-                model: LoanTypeModel.LoanTypeModel,
-                attributes: ["code", "name"],
-                as: "Loan_Type",
-             
-              },
-            ]
-         
+            model: LoanTypeModel,
+            attributes: ["code", "name"],
+            as: "Loan_Type",
           },
-  
-          {
-            model: FormModel.FormModel,
-            attributes: ["formName", "formCode"],
-            as: "Subsidiary",
-          },
-          {
-            model: FormModel.FormModel,
-            attributes: ["formName", "formCode"],
-            as: "Account",
-          },
-
-          {
-            model: FormModel.FormModel,
-            attributes: ["formName", "formCode"],
-            as: "EmpLoanAccount",
-          },
-       
         ],
-      }
-    );
+      },
+      {
+        model: SubsidiaryModel,
+        attributes: ["name"],
+        as: "Subsidiary", // Ensure alias matches here
+      },
+      {
+        model: FormModel,
+        attributes: ["formName", "formCode"],
+        as: "Account", // Ensure alias is unique
+      },
+      {
+        model: FormModel,
+        attributes: ["formName", "formCode"],
+        as: "EmpLoanAccount", // Ensure alias is unique
+      },
+    ],
+  });
 
   return paginationFacts(count, limit, options.pageNumber, rows);
 };
-
 
 /**
  * Get Item by id
@@ -197,27 +258,27 @@ const queryloan_management_configuration = async (
  * @returns {Promise<ReceiptModel>}
  */
 const getloan_management_configurationById = async (id) => {
-  return Loan_management_configurationModel.Loan_management_configurationModel.findOne({
+  return Loan_management_configurationModel.findOne({
     where: { Id:id },
     include: [
       {
-        model: Loan_management_detailModel.Loan_management_detailModel,
+        model: Loan_management_detailModel,
         as: "details",
         include: [
           {
-            model: LoanTypeModel.LoanTypeModel,
+            model: LoanTypeModel,
             attributes: ["code", "name"],
             as: "Loan_Type",
           },
         ],
       },
       {
-        model: FormModel.FormModel,
-        attributes: ["formName", "formCode"],
+        model: SubsidiaryModel,
+        attributes: ["name"],
         as: "Subsidiary",
       },
       {
-        model: FormModel.FormModel,
+        model: FormModel,
         attributes: ["formName", "formCode"],
         as: "Account",
       },
@@ -250,7 +311,7 @@ const updateloan_management_configurationById = async (
   const { subsidiaryId} = updateBody;
 
 
-  const overlappingSubsidiary = await Loan_management_configurationModel.Loan_management_configurationModel.findOne({
+  const overlappingSubsidiary = await Loan_management_configurationModel.findOne({
     where: {
         Id: { [Op.ne]: Id },
       [Op.or]: [
@@ -265,11 +326,11 @@ const updateloan_management_configurationById = async (
 let result={"message":'Record already exist.',"status":"error"}
 return result;
 }
-  const Item = await Loan_management_configurationModel.Loan_management_configurationModel.findOne({
+  const Item = await Loan_management_configurationModel.findOne({
     where: { Id: Id },
     include: [
       {
-        model: Loan_management_detailModel.Loan_management_detailModel,
+        model: Loan_management_detailModel,
         as: "details",
       },
     ],
@@ -293,7 +354,7 @@ return result;
       if (detail.Id) {
         // Update existing detail
    
-        const childDetail = await Loan_management_detailModel.Loan_management_detailModel.findOne({
+        const childDetail = await Loan_management_detailModel.findOne({
           where: { Id: detail.Id }
         });
 
@@ -303,17 +364,17 @@ return result;
           try {
             await childDetail.save();
           } catch (error) {
-            console.error("Error saving child detail:", error);
+            throw error
           }
         } else {
-          console.error("Child detail not found for Id:", detail.Id);
+          throw new ApiError('Failed', 500);
         }
         newDetailIds.push(detail.Id);
       } else {
         // Create new detail if Id is not present
       
         detail.loan_management_configurationId = Item.Id; // Associate with the configuration ID
-        await Loan_management_detailModel.Loan_management_detailModel.create(detail);
+        await Loan_management_detailModel.create(detail);
         newDetailIds.push(detail.Id); // Add the new detail's Id
       }
     }
@@ -323,7 +384,7 @@ return result;
 
       if (!newDetailIds.includes(existingId)) {
  
-        await Loan_management_detailModel.Loan_management_detailModel.destroy({
+        await Loan_management_detailModel.destroy({
           where: { Id: existingId }
         });
       }
@@ -347,10 +408,11 @@ return result;
 
 
 const deleteloan_management_configurationById = async (Id) => {
+
   const Item = await getloan_management_configurationById(Id, {
     include: [
       {
-        model: Loan_management_detailModel.Loan_management_detailModel,
+        model: Loan_management_detailModel,
         as: "details", // Make sure this matches the alias used in your associations
       },
     ],
@@ -374,7 +436,7 @@ const deleteloan_management_configurationById = async (Id) => {
 
 const queryLoanTypes = async () => {
 
-  const result= await LoanTypeModel.LoanTypeModel.findAndCountAll({
+  const result= await LoanTypeModel.findAndCountAll({
     order: [
       ['createdAt', 'DESC']
     ],
@@ -382,7 +444,7 @@ const queryLoanTypes = async () => {
   });
 
   const transformedResults = [
-    { value: '', code: '', label: '--Select--' }, // Add a select option
+    { value: '', code: '', label: 'Select--' }, // Add a select option
     ...result.rows.map(item => ({
       value: item.Id,
       code: item.code,
