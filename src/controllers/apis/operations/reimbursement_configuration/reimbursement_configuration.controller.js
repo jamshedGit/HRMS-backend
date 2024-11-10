@@ -28,7 +28,7 @@ const createreimbursement_configuration = catchAsync(async (req, res) => {
 
         }
         else {
-            console.log("created")
+          
 
             res.status(httpStatus.CREATED).send({
                 code: HttpStatusCodes.CREATED,
@@ -38,7 +38,7 @@ const createreimbursement_configuration = catchAsync(async (req, res) => {
         }
 
     } catch (error) {
-        console.log(error);
+      
     }
 });
 
@@ -52,7 +52,7 @@ const getAllreimbursement_configuration = catchAsync(async (req, res) => {
     const searchQuery = req.body.filter.searchQuery ? req.body.filter.searchQuery : '';
 
     const result = await reimbursement_configurationService.queryreimbursement_configuration(filter, options, searchQuery);
-    console.log(result);
+   
     res.send({
         code: HttpStatusCodes.OK,
         message: HttpResponseMessages.OK,
@@ -61,7 +61,7 @@ const getAllreimbursement_configuration = catchAsync(async (req, res) => {
 });
 
 const getreimbursement_configurationById = catchAsync(async (req, res) => {
-    console.log(req.body)
+  
     const Receipt = await reimbursement_configurationService.getreimbursement_configurationById(req.body.Id);
     if (!Receipt) {
         throw new ApiError(httpStatus.NOT_FOUND, "Receipt not found");
@@ -74,10 +74,10 @@ const getreimbursement_configurationById = catchAsync(async (req, res) => {
 });
 
 const updatereimbursement_configuration = catchAsync(async (req, res) => {
-    console.log(req.body);
+  
     const reimbursement_configuration = await reimbursement_configurationService.updatereimbursement_configurationById(req.body.Id, req.body, req.user.Id);
 
-console.log("updated status",reimbursement_configuration)
+
     if (reimbursement_configuration.status == "error") {
 
         res.status(HttpStatusCodes.INTERNAL_SERVER_ERROR).send({
@@ -100,7 +100,7 @@ console.log("updated status",reimbursement_configuration)
 });
 
 const deletereimbursement_configuration = catchAsync(async (req, res) => {
-    console.log("req.body.Id ", req.body.Id)
+
     const Receipt = await reimbursement_configurationService.deletereimbursement_configurationById(req.body.Id);
     res.send({
         code: HttpStatusCodes.OK,

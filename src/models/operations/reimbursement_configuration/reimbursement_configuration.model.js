@@ -1,5 +1,5 @@
 const Sequelize = require('sequelize');
-const FormModel= require('../../index');
+const {FormModel,SubsidiaryModel}= require('../../index');
 const sequelize = require('../../../config/db')
 
 const Reimbursement_configuration = sequelize.define('t_reimbursement_configuration', {
@@ -9,7 +9,8 @@ const Reimbursement_configuration = sequelize.define('t_reimbursement_configurat
 		primaryKey: true
 	},
 
-    subsidiaryId: { type: Sequelize.INTEGER,allowNull: false },
+	subsidiaryId: { type: Sequelize.INTEGER,allowNull: false},
+	companyId: { type: Sequelize.INTEGER,allowNull: false, defaultValue: 1 },
 	payroll_groupId: { type: Sequelize.INTEGER,allowNull: false },
 	cycle_typeId: { type: Sequelize.INTEGER,allowNull: false },
 
@@ -29,20 +30,20 @@ const Reimbursement_configuration = sequelize.define('t_reimbursement_configurat
 });
 
 
-Reimbursement_configuration.belongsTo(FormModel.FormModel, {
+Reimbursement_configuration.belongsTo(SubsidiaryModel, {
 	foreignKey: 'subsidiaryId',
 	targetKey: 'Id',
 		as:"Subsidiary"
   });
 
   
-  Reimbursement_configuration.belongsTo(FormModel.FormModel, {
+  Reimbursement_configuration.belongsTo(FormModel, {
 	foreignKey: 'payroll_groupId',
 	targetKey: 'Id',
 	as:"PayrollGroup"
   });
   
-  Reimbursement_configuration.belongsTo(FormModel.FormModel, {
+  Reimbursement_configuration.belongsTo(FormModel, {
 	foreignKey: 'cycle_typeId',
 	targetKey: 'Id',
 	as:"CycleType"
