@@ -8,6 +8,8 @@ const Reimbursement_claim = sequelize.define('t_reimbursement_claim', {
 		autoIncrement: true,
 		primaryKey: true
 	},
+	subsidiaryId: { type: Sequelize.INTEGER,defaultValue: 1 },
+	companyId: { type: Sequelize.INTEGER,allowNull: false, defaultValue: 1 },
     reimbursement_typeId: { type: Sequelize.INTEGER, allowNull: false },
     employeeId: { type: Sequelize.INTEGER, allowNull: false },
 	details: { type: Sequelize.STRING, },
