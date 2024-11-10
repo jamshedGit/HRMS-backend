@@ -24,9 +24,16 @@ const createTaxSetup = catchAsync(async (req, res) => {
       data: TaxSetup
     });
 
-  } catch (error) {
-    console.log(error);        
-  }
+  }  catch (error) {
+   
+    if (error.parent.errno === 1062) {
+     throw new ApiError(httpStatus.NOT_FOUND, "Duplicate entry not allowed!");
+   }
+   else {
+    
+     throw error;
+   }
+ }
 });
 
 const getAllTaxSetup = catchAsync(async (req, res) => {

@@ -28,9 +28,16 @@ const createEmployeeType = catchAsync(async (req, res) => {
       data: Bank
     });
 
-  } catch (error) {
-    console.log(error);
-  }
+  }  catch (error) {
+   
+    if (error.parent.errno === 1062) {
+     throw new ApiError(httpStatus.NOT_FOUND, "Duplicate entry not allowed!");
+   }
+   else {
+    
+     throw error;
+   }
+ }
 });
 
 const getAllEmployeeType = catchAsync(async (req, res) => {

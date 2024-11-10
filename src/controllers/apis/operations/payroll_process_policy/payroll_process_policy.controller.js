@@ -23,9 +23,16 @@ const create_Payroll_Process_Policy = catchAsync(async (req, res) => {
       data: _Payroll_Process_Policy
     });
 
-  } catch (error) {
-    console.log(error);        
-  }
+  }  catch (error) {
+   
+    if (error.parent.errno === 1062) {
+     throw new ApiError(httpStatus.NOT_FOUND, "Duplicate entry not allowed!");
+   }
+   else {
+    
+     throw error;
+   }
+ }
 });
 
 const getAll_Payroll_Process_Policy = catchAsync(async (req, res) => {
