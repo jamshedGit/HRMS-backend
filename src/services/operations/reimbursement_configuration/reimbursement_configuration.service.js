@@ -1,5 +1,5 @@
 const httpStatus = require("http-status");
-const { Reimbursement_configurationModel,Reimbursement_policies_detailModel,Policies_grade_detailModel,Reimbursement_accounts_detailModel } = require("../../../models/index");
+const { Reimbursement_configurationModel,Reimbursement_policies_detailModel,Policies_grade_detailModel,Reimbursement_accounts_detailModel ,SubsidiaryModel} = require("../../../models/index");
 const { FormModel } = require("../../../models/index");
 
 const ApiError = require("../../../utils/ApiError");
@@ -12,7 +12,7 @@ const Op = Sequelize.Op;
 
 const createreimbursement_configuration = async (req, reimbursement_configurationBody) => {
   try {
-    console.log("Creating reimbursement configuration...",reimbursement_configurationBody);
+  
 
     // Check if the parent configuration already exists
     const subsidiaryExists = await Reimbursement_configurationModel.findOne({
@@ -37,7 +37,7 @@ const createreimbursement_configuration = async (req, reimbursement_configuratio
 
     // Check if policies exist and create them
     if (addedReimbursementConfiguration && Array.isArray(reimbursement_configurationBody.policies)) {
-      console.log("addedReimbursementConfiguration child")
+     
       const createdPolicies = await Reimbursement_policies_detailModel.bulkCreate(
         reimbursement_configurationBody.policies.map(policy => ({
           ...policy,
@@ -52,7 +52,7 @@ const createreimbursement_configuration = async (req, reimbursement_configuratio
         const createdPolicy = createdPolicies.find(p => p.reimbursement_typeId === policy.reimbursement_typeId);
     
         if (createdPolicy && Array.isArray(policy.grades)) {
-          console.log("policy.grades", policy.grades);
+   
           
           // Create grade details, dynamically adding `salary_gradeId` if only IDs are sent
           await Policies_grade_detailModel.bulkCreate(
@@ -98,7 +98,7 @@ const createreimbursement_configuration = async (req, reimbursement_configuratio
     // return "Done"
 
   } catch (error) {
-    console.error("Error creating reimbursement configuration:", error);
+    
     throw error; // Rethrow or handle the error as needed
   }
 };
@@ -136,7 +136,10 @@ const queryreimbursement_configuration = async (
 
 
   const { count, rows } = await Reimbursement_configurationModel.findAndCountAll({
-    order: [["createdAt", "DESC"]],
+    order: [
+      ["Subsidiary", "name", "ASC"], 
+      ["PayrollGroup", "formName", "ASC"],   // Use the alias and attribute name instead of Sequelize.col()
+    ],
     where: {
       [Op.or]: queryFilters,
       // isActive: true
@@ -184,10 +187,11 @@ const queryreimbursement_configuration = async (
         ],
       },
       {
-        model: FormModel,
-        attributes: ["formName", "formCode"],
+        model: SubsidiaryModel,
+        attributes: ["name"],
         as: "Subsidiary",
       },
+
       {
         model: FormModel,
         attributes: ["formName", "formCode"],
@@ -213,7 +217,7 @@ const queryreimbursement_configuration = async (
 
 
 const getreimbursement_configurationById = async (id) => {
-  console.log("final id", id);
+ 
 
   // Fetch the reimbursement configuration
   const result = await Reimbursement_configurationModel.findOne({
@@ -258,10 +262,11 @@ const getreimbursement_configurationById = async (id) => {
         ],
       },
       {
-        model: FormModel,
-        attributes: ["formName", "formCode"],
+        model: SubsidiaryModel,
+        attributes: ["name"],
         as: "Subsidiary",
       },
+
       {
         model: FormModel,
         attributes: ["formName", "formCode"],
@@ -287,7 +292,7 @@ const getreimbursement_configurationById = async (id) => {
         }
       });
     }
-    console.log("transformedResult", id);
+  
     return transformedResult;
   }
 
@@ -308,17 +313,10 @@ const updatereimbursement_configurationById = async (
   updatedBy
 ) => {
   const { subsidiaryId, payroll_groupId } = updateBody;
-console.log(" subsidiaryId, payroll_groupId updateBody",updateBody)
+
 
 const overlappingSubsidiary = await Reimbursement_configurationModel.findOne({
-  // where: {
-  //   Id: { [Op.ne]: Id }, // Exclude the current record
-  //   [Op.or]: 
-  //   [
-  //     { subsidiaryId: subsidiaryId }, // Wrap in an object
-  //     { payroll_groupId: payroll_groupId } // Wrap in an object
-  //   ]
-  // }
+
 
   where: {
     Id: { [Op.ne]: Id }, // Exclude the current record by ID
@@ -327,7 +325,7 @@ const overlappingSubsidiary = await Reimbursement_configurationModel.findOne({
   }
 });
 
-  console.log(" subsidiaryId, payroll_groupId overlappingSubsidiary", overlappingSubsidiary)
+
   if (overlappingSubsidiary) {
     return { message: 'Subsidiary & payroll group already exist.', status: "error" };
   }
@@ -379,7 +377,7 @@ const overlappingSubsidiary = await Reimbursement_configurationModel.findOne({
 
  
           if (policy.grades && Array.isArray(policy.grades)) {
-            console.log("policy.grades",policy.grades);
+ 
             
             // Create grade details, dynamically adding `salary_gradeId` if only IDs are sent
             await Policies_grade_detailModel.bulkCreate(
@@ -401,7 +399,7 @@ const overlappingSubsidiary = await Reimbursement_configurationModel.findOne({
             );
           }
         } else {
-          console.error("Policy detail not found for Id:", policy.Id);
+
         }
         newPolicyIds.push(policy.Id);
       } else {
@@ -463,10 +461,10 @@ const overlappingSubsidiary = await Reimbursement_configurationModel.findOne({
           try {
             await accountchildDetail.save();
           } catch (error) {
-            console.error("Error saving child detail:", error);
+            throw error
           }
         } else {
-          console.error("Child detail not found for Id:", account.Id);
+         
         }
         newAccountDetailIds.push(account.Id);
       } else {
@@ -509,7 +507,7 @@ const overlappingSubsidiary = await Reimbursement_configurationModel.findOne({
 
 const deletereimbursement_configurationById = async (Id) => {
   const Item = await Reimbursement_configurationModel.findByPk(Id);
-console.log("ID is deleted",Item)
+
   if (!Item) {
     throw new ApiError(httpStatus.NOT_FOUND, "Item not found");
   }

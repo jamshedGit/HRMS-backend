@@ -93,7 +93,7 @@ const {Employee_loan_request_detailModel,Employee_loan_requestModel, ResourceMod
 // Employee_loan_request_detailModel.sync({ force: true }); 
 // Employee_loan_requestModel.sync({ force: true }); 
 // Reimbursement_claimModel.sync({ force: true }); 
-// Reimbursement_configurationModel.sync({ force: true });
+// Reimbursement_configurationModel.sync({ alter: true });
 // Reimbursement_accounts_detailModel.sync({ force: true });
 // Reimbursement_policies_detailModel.sync({ force: true });
 // Policies_grade_detailModel.sync({ force: true });
