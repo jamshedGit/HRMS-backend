@@ -101,6 +101,7 @@ const {Tax_slabModel,Employee_loan_request_detailModel,Employee_loan_requestMode
 
 
 // accrue_gratuity_configurationModel.sync({ force: true });
+//1
 // Gratuity_configurationModel.sync({ force: true });
 // Loan_management_configurationModel.sync({ force: true });
 // Loan_management_detailModel.sync({ force: true });

@@ -29,16 +29,16 @@ const creategratuity_configuration = catchAsync(async (req, res) => {
     }
     else{
   
-        
+      
      res.status(httpStatus.CREATED).send({
       code: HttpStatusCodes.CREATED,
-      message: HttpResponseMessages.CREATED,
+      message:gratuity_configuration.message,
       data: gratuity_configuration
     });
   }
 
   } catch (error) {
-    console.log(error);        
+    throw error     
   }
 });
 
@@ -75,15 +75,15 @@ const getgratuity_configurationById = catchAsync(async (req, res) => {
 
 const updategratuity_configuration = catchAsync(async (req, res) => {
 
-  const loan_management_configuration = await Gratuity_configurationService.updategratuity_configurationById(req.body.Id, req.body, req.user.Id);
+  const gratuity_configuration = await Gratuity_configurationService.updategratuity_configurationById(req.body.Id, req.body, req.user.Id);
   
   
-  if(loan_management_configuration.status=="error"){
+  if(gratuity_configuration.status=="error"){
 
     res.status(HttpStatusCodes.INTERNAL_SERVER_ERROR).send({
       code: HttpStatusCodes.INTERNAL_SERVER_ERROR,
-      message:loan_management_configuration.message,
-      error: loan_management_configuration.error || 'An unexpected error occurred',
+      message:gratuity_configuration.message,
+      error: gratuity_configuration.error || 'An unexpected error occurred',
     });
     
 
@@ -93,7 +93,7 @@ const updategratuity_configuration = catchAsync(async (req, res) => {
    res.status(httpStatus.CREATED).send({
     code: HttpStatusCodes.CREATED,
     message: HttpResponseMessages.CREATED,
-    data: loan_management_configuration
+    data: gratuity_configuration
   });
 }
   
