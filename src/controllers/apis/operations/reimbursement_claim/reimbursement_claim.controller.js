@@ -38,7 +38,7 @@ const createreimbursement_claim = catchAsync(async (req, res) => {
         }
 
     } catch (error) {
-        console.log(error);
+    
     }
 });
 

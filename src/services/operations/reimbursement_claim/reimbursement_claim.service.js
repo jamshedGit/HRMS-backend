@@ -41,7 +41,7 @@ const createreimbursement_claim = async (req, reimbursement_claimBody) => {
       return await getreimbursement_claimById(addedReimbursementClaim.Id);
     }
   } catch (error) {
-    console.error("Error processing reimbursement claim:", error);
+   
     throw error;
   }
 };
