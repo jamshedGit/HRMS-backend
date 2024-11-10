@@ -4,7 +4,7 @@ const createDeductionValidation = {
     query: Joi.disallow(),
     params: Joi.disallow(),
     body: Joi.object().keys({
-        deductionCode: Joi.string(),
+        deductionCode: Joi.any().optional(),
         deductionName: Joi.string(),
         linkedAttendance: Joi.boolean(),
         loan: Joi.boolean(),
