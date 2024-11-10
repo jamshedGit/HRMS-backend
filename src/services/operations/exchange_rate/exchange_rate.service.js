@@ -16,14 +16,21 @@ const Op = Sequelize.Op;
  * @returns {Promise<ExchangeRate>}
  */
 const createExchangeRate = async (req, ExchangeRateBody) => {
-  console.log("ExchangeRate Body", ExchangeRateBody)
-  // ExchangeRateBody.slug = ExchangeRateBody.name.replace(/ /g, "-").toLowerCase();
-  console.log(req.user.id);
-  ExchangeRateBody.createdBy = req.user.id;
-  console.log(ExchangeRateBody, "body");
-  const addedExchangeRateObj = await ExchangeRateModel.ExchangeRateModel.create(ExchangeRateBody);
-  //authSMSSend(addedExchangeRateObj.dataValues);  // Quick send message at the time of donation
-  return addedExchangeRateObj;
+  try {
+
+
+    console.log("ExchangeRate Body", ExchangeRateBody)
+    // ExchangeRateBody.slug = ExchangeRateBody.name.replace(/ /g, "-").toLowerCase();
+    console.log(req.user.id);
+    ExchangeRateBody.createdBy = req.user.id;
+    console.log(ExchangeRateBody, "body");
+    const addedExchangeRateObj = await ExchangeRateModel.ExchangeRateModel.create(ExchangeRateBody);
+    //authSMSSend(addedExchangeRateObj.dataValues);  // Quick send message at the time of donation
+    return addedExchangeRateObj;
+  } catch (error) {
+    console.log("exchange rate error",error)
+    throw error;
+  }
 };
 
 
@@ -65,7 +72,7 @@ const queryExchangeRates = async (filter, options, searchQuery) => {
 
 };
 
-const SP_getAllExchangeRateInfo = async (filter, options, searchQuery,empId) => {
+const SP_getAllExchangeRateInfo = async (filter, options, searchQuery, empId) => {
   try {
     console.log("ExchangeRate section")
     const results = await sequelize.query('CALL usp_GetAllCurrecnyExchangeRate()');
@@ -77,7 +84,7 @@ const SP_getAllExchangeRateInfo = async (filter, options, searchQuery,empId) => 
     console.log("searchlist", searchlist)
     let count = searchlist.length;
     const rows = searchlist.slice(offset, offset + limit)
-    
+
     return paginationFacts(count, limit, options.pageNumber, rows); // 
   } catch (error) {
     throw new ApiError(httpStatus.INTERNAL_SERVER_ERROR, error);
@@ -87,7 +94,7 @@ const SP_getAllExchangeRateInfo = async (filter, options, searchQuery,empId) => 
 
 const SP_getAllExchangeRateInfoByEmpId = async (empId) => {
   try {
-    console.log("ExchangeRate empID",empId);
+    console.log("ExchangeRate empID", empId);
     const results = await sequelize.query('CALL usp_GetAllExchangeRatesByEmpId(:employeeId)', {
       replacements: { employeeId: empId || 'null' },
       type: Sequelize.QueryTypes.RAW // Use RAW type for executing stored procedures
@@ -101,7 +108,7 @@ const SP_getAllExchangeRateInfoByEmpId = async (empId) => {
 
 const SP_GetAllEarningDeductionList = async (flagId) => {
   try {
-    console.log("SP_GetAllEarningDeductionList empID",flagId);
+    console.log("SP_GetAllEarningDeductionList empID", flagId);
     const results = await sequelize.query('CALL usp_GetEarningDeductionResultSet(:flag)', {
       replacements: { flag: flagId || 1 },
       type: Sequelize.QueryTypes.RAW // Use RAW type for executing stored procedures

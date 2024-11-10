@@ -24,7 +24,14 @@ const createEarning = catchAsync(async (req, res) => {
     });
 
   } catch (error) {
-    console.log(error);        
+
+    if (error.parent.errno === 1062) {
+      throw new ApiError(httpStatus.NOT_FOUND, "Duplicate entry not allowed!");
+    }
+    else {
+
+      throw error;
+    }
   }
 });
 
@@ -34,8 +41,8 @@ const getAllEarning = catchAsync(async (req, res) => {
   const filter = obj;
   // const options = pick(req.body, ["sortBy", "limit", "page"]);
   const options = pick(req.body, ['sortOrder', 'pageSize', 'pageNumber']);
-  const searchQuery = req.body.filter.searchQuery? req.body.filter.searchQuery : '';
-  const result = await EarningformService.EarningServicePage.SP_getAllEarningInfo(filter, options,searchQuery,req.body.id);
+  const searchQuery = req.body.filter.searchQuery ? req.body.filter.searchQuery : '';
+  const result = await EarningformService.EarningServicePage.SP_getAllEarningInfo(filter, options, searchQuery, req.body.id);
   console.log(result);
   res.send({
     code: HttpStatusCodes.OK,
@@ -84,7 +91,7 @@ const updateEarning = catchAsync(async (req, res) => {
 });
 
 const deleteEarning = catchAsync(async (req, res) => {
-  console.log("req.body.Id " ,req.body.Id)
+  console.log("req.body.Id ", req.body.Id)
   const Receipt = await EarningformService.EarningServicePage.deleteEarningById(req.body.Id);
   res.send({
     code: HttpStatusCodes.OK,
