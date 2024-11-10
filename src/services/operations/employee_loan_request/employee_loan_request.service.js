@@ -13,8 +13,14 @@ const Op = Sequelize.Op;
 
 const createEmployee_loan_request = async (req, Employee_loan_requestBody) => {
   try {
+    
     if (Employee_loan_requestBody.total_loan_amount < Employee_loan_requestBody.monthly_installment) {
-      throw new Error('Loan amount must be greater than monthly installment');
+    
+       return {
+        message: "Loan amount must be greater than monthly installment",
+        status: "error",
+      };
+      // throw new ApiError('Loan amount must be greater than monthly installment');
     }
 
     const userId = req.user.id;
@@ -196,10 +202,15 @@ const updateEmployee_loan_requestById = async (
   }
 
   if(updateBody.total_loan_amount<updateBody.monthly_installment){
+    return {
+      message: "Loan amount must be greater than monthly installment",
+      status: "error",
+    };
 
-    throw new Error('Loan amount must be greater');
+    // throw new Error('Loan amount must be greater');
 
 }
+
   
   
   updateBody.updatedBy = updatedBy;
@@ -246,6 +257,7 @@ const deleteEmployee_loan_requestById = async (Id) => {
 
 
 const getloan_configurationDetailsById = async (Id) => {
+
   try {
     // Retrieve employee profile with joining date
     const employee = await EmployeeProfileModel.findOne({
