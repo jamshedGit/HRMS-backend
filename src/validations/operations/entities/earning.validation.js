@@ -10,7 +10,7 @@ const createEarningValidation = {
         linkedAttendance: Joi.boolean(),
         isTaxable: Joi.boolean(),
         mappedAllowance: Joi.string(),
-        account: Joi.string(),
+        account: Joi.any().optional(),
     }),
 };
 
