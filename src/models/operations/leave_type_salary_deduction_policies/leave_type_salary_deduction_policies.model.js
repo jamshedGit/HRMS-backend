@@ -23,12 +23,20 @@ LeaveTypeSalaryDeductionPoliciesModel.init(
       allowNull: true
     },
     minLeave: {
-      type: DataTypes.INTEGER,
-      allowNull: true
+      type: DataTypes.FLOAT,
+      allowNull: true,
+      get() {
+        const rawValue = this.getDataValue('minLeave');
+        return typeof rawValue != 'undefined' ? Number(rawValue) : null;
+      }
     },
     maxLeave: {
-      type: DataTypes.INTEGER,
-      allowNull: true
+      type: DataTypes.FLOAT,
+      allowNull: true,
+      get() {
+        const rawValue = this.getDataValue('maxLeave');
+        return typeof rawValue != 'undefined' ? Number(rawValue) : null;
+      }
     },
     deduction: {
       type: DataTypes.FLOAT,

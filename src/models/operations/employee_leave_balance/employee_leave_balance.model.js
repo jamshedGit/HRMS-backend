@@ -9,12 +9,49 @@ const employeeLeaveBalanceModel = sequelize.define('t_employee_leave_balance', {
     employeeId: { type: Sequelize.INTEGER, allowNull: false },
     leaveType: { type: Sequelize.INTEGER, allowNull: false },
     yearId: { type: Sequelize.INTEGER, allowNull: false },
-    allocatedCount: { type: Sequelize.INTEGER, allowNull: true },
-    availedCount: { type: Sequelize.INTEGER, allowNull: true },
-    remainingCount: { type: Sequelize.INTEGER, allowNull: true },
-    carryForwardCount: { type: Sequelize.INTEGER, allowNull: true },
-    lateCount: { type: Sequelize.INTEGER, allowNull: true },
-    encashmentCount: { type: Sequelize.INTEGER, allowNull: true },
+    allocatedCount: {
+        type: Sequelize.FLOAT,
+        allowNull: true,
+        get() {
+            const rawValue = this.getDataValue('allocatedCount');
+            return typeof rawValue != 'undefined' ? Number(rawValue) : null;
+        }
+    },
+    availedCount: {
+        type: Sequelize.FLOAT, allowNull: true,
+        get() {
+            const rawValue = this.getDataValue('availedCount');
+            return typeof rawValue != 'undefined' ? Number(rawValue) : null;
+        }
+    },
+    remainingCount: {
+        type: Sequelize.FLOAT, allowNull: true,
+        get() {
+            const rawValue = this.getDataValue('remainingCount');
+            return typeof rawValue != 'undefined' ? Number(rawValue) : null;
+        }
+    },
+    carryForwardCount: {
+        type: Sequelize.FLOAT, allowNull: true,
+        get() {
+            const rawValue = this.getDataValue('carryForwardCount');
+            return typeof rawValue != 'undefined' ? Number(rawValue) : null;
+        }
+    },
+    lateCount: {
+        type: Sequelize.FLOAT, allowNull: true,
+        get() {
+            const rawValue = this.getDataValue('lateCount');
+            return typeof rawValue != 'undefined' ? Number(rawValue) : null;
+        }
+    },
+    encashmentCount: {
+        type: Sequelize.FLOAT, allowNull: true,
+        get() {
+            const rawValue = this.getDataValue('encashmentCount');
+            return typeof rawValue != 'undefined' ? Number(rawValue) : null;
+        }
+    },
     isActive: { type: Sequelize.BOOLEAN, allowNull: true, defaultValue: 1 },
     createdBy: { type: Sequelize.INTEGER, allowNull: true },
     updatedBy: { type: Sequelize.INTEGER, allowNull: true },

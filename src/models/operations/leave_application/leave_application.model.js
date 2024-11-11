@@ -19,7 +19,7 @@ const leaveApplicationModel = sequelize.define('t_leave_application', {
 		allowNull: false,
 		get() {
 			const rawValue = this.getDataValue('from');
-			return rawValue ? formatDates(rawValue) : null;
+			return typeof rawValue != 'undefined' ? formatDates(rawValue) : null;
 		}
 	},
 	to: {
@@ -27,14 +27,20 @@ const leaveApplicationModel = sequelize.define('t_leave_application', {
 		allowNull: false,
 		get() {
 			const rawValue = this.getDataValue('to');
-			return rawValue ? formatDates(rawValue) : null;
+			return typeof rawValue != 'undefined' ? formatDates(rawValue) : null;
 		}
 	},
 	leaveType: {
 		type: Sequelize.INTEGER,
 		allowNull: false
 	},
-	days: { type: Sequelize.INTEGER, allowNull: false },
+	days: {
+		type: Sequelize.FLOAT, allowNull: false,
+		get() {
+			const rawValue = this.getDataValue('days');
+			return typeof rawValue != 'undefined' ? Number(rawValue) : null;
+		}
+	},
 	remarks: { type: Sequelize.STRING, allowNull: true },
 	file: { type: Sequelize.STRING, allowNull: true },
 	isActive: { type: Sequelize.BOOLEAN, allowNull: true, defaultValue: 1 },

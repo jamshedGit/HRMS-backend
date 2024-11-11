@@ -92,6 +92,14 @@ const getAllLeaveType = catchAsync(async (req, res) => {
   });
 });
 
+const getEncashmentLeaveType = catchAsync(async (req, res) => {
+  res.send({  
+    code: HttpStatusCodes.OK,
+    message: HttpResponseMessages.OK,
+    data: await settingService.getEncashmentLeaveTypeData(req.body.employeeId, req.body.yearId),
+  });
+});
+
 const getAllSubsidiaries = catchAsync(async (req, res) => {
   res.send({  
     code: HttpStatusCodes.OK,
@@ -164,5 +172,6 @@ module.exports = {
   getRevisionHistoryByEmpId,
   getAllLeaveType,
   getAllSubsidiaries,
-  getAllFiscalYears
+  getAllFiscalYears,
+  getEncashmentLeaveType
 };
