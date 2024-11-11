@@ -78,9 +78,7 @@ const allocateLeaveBalances = async (data) => {
           {
             model: LeaveApplicationDetailModel,
             required: false,
-            attributes: [
-              'Id'
-            ],
+            attributes: ['Id', 'day'],
           }
         ]
       },
@@ -118,11 +116,11 @@ const allocateLeaveBalances = async (data) => {
 
             if (allocationPolicy && oldBalance.remainingCount && allocationPolicy.maxCount) {
               //If Leaves are carry forwarded then they will be added to new year record
-              if(POLICY_TYPE[allocationPolicy.policyType] == POLICY_TYPE[1]){
+              if (POLICY_TYPE[allocationPolicy.policyType] == POLICY_TYPE[1]) {
                 init.carryForwardCount = oldBalance.remainingCount > allocationPolicy.maxCount ? allocationPolicy.maxCount : oldBalance.remainingCount;
               }
               //If leaves are encashed then they will be added to encashed key in the old balance record and a record of their encashment is created in Leave Encashment table
-              else if(POLICY_TYPE[allocationPolicy.policyType] == POLICY_TYPE[2]){
+              else if (POLICY_TYPE[allocationPolicy.policyType] == POLICY_TYPE[2]) {
                 oldBalance.encashmentCount += oldBalance.remainingCount > allocationPolicy.maxCount ? allocationPolicy.maxCount : oldBalance.remainingCount;
                 oldBalance.remainingCount -= oldBalance.encashmentCount;
 
@@ -154,7 +152,10 @@ const allocateLeaveBalances = async (data) => {
         //Get the number of Availed Leaves of Employee. If no leave is availed then it will set 0
         const availedCount = emp.t_leave_applications.reduce((prev, curr) => {
           if (curr.leaveType == al.leaveType) {
-            return prev + (curr?.t_leave_application_details?.length || 0)
+            const detailCount = curr?.t_leave_application_details?.reduce((detailPrev, detailCurr) => {
+              return detailPrev + (detailCurr.day || 0)
+            }, 0) || 0;
+            return prev + detailCount;
           }
           return prev
         }, 0)
@@ -238,9 +239,7 @@ const createLeaveBalance = async (req) => {
           {
             model: LeaveApplicationDetailModel,
             required: false,
-            attributes: [
-              'Id'
-            ],
+            attributes: ['Id', 'day'],
           }
         ],
 
@@ -255,7 +254,10 @@ const createLeaveBalance = async (req) => {
     //Get availed count
     const availedCount = employee.t_leave_applications.reduce((prev, curr) => {
       if (curr.leaveType == body.leaveType) {
-        return prev + (curr?.t_leave_application_details?.length || 0)
+        const detailCount = curr?.t_leave_application_details?.reduce((detailPrev, detailCurr) => {
+          return detailPrev + (detailCurr.day || 0)
+        }, 0) || 0;
+        return prev + detailCount;
       }
       return prev
     }, 0)

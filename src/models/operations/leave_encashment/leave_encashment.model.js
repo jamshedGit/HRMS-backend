@@ -16,7 +16,12 @@ const leaveEnchasmentModel = sequelize.define('t_leave_encashment', {
   leaveType: { type: Sequelize.INTEGER, allowNull: false },
   yearId: { type: Sequelize.INTEGER, allowNull: false },
   payrollMonthId: { type: Sequelize.INTEGER, allowNull: true },
-  days: { type: Sequelize.INTEGER, allowNull: false },
+  days: { type: Sequelize.FLOAT, allowNull: false,
+    get() {
+			const rawValue = this.getDataValue('days');
+			return typeof rawValue != 'undefined' ? Number(rawValue) : null;
+		}
+   },
   reason: { type: Sequelize.STRING, allowNull: true },
   isActive: { type: Sequelize.BOOLEAN, allowNull: true, defaultValue: 1 },
   createdBy: {

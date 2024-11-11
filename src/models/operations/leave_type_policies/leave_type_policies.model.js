@@ -31,8 +31,12 @@ LeaveTypePoliciesModel.init(
       allowNull: true
     },
     maxAllowed: {
-      type: DataTypes.INTEGER,
-      allowNull: true
+      type: DataTypes.FLOAT,
+      allowNull: true,
+      get() {
+        const rawValue = this.getDataValue('maxAllowed');
+        return typeof rawValue != 'undefined' ? Number(rawValue) : null;
+      }
     },
     attachmentRequired: {
       type: DataTypes.BOOLEAN,
