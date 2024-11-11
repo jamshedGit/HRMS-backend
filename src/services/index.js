@@ -57,3 +57,4 @@ module.exports.reimbursement_configurationService=require("./operations/reimburs
 module.exports.reimbursement_claimService=require("./operations/reimbursement_claim/reimbursement_claim.service")
 module.exports.Employee_loan_requestService=require("./operations/employee_loan_request/employee_loan_request.service")
 module.exports.attendance_configuration=require("./operations/attendance_configuration/attendance_configuration.service")
+module.exports.employee_shift=require("./operations/employee_shift/employee_shift.service")
