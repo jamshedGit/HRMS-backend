@@ -1,4 +1,4 @@
-const { RoleModel, ResourceModel, CountryModel, CityModel, StatusTypeModel, BankModel, DeptModel, FormModel, EmployeeProfileModel, BranchModel, EmployeeSalaryRevisionModel, LeaveTypeModel, FiscalSetupModel, SubsidiaryModel, LeaveManagementConfigurationModel, LeaveTypePoliciesModel } = require('../../models');
+const { RoleModel, ResourceModel, CountryModel, CityModel, StatusTypeModel, BankModel, DeptModel, FormModel, EmployeeProfileModel, BranchModel, EmployeeSalaryRevisionModel, LeaveTypeModel, FiscalSetupModel, SubsidiaryModel, LeaveManagementConfigurationModel, LeaveTypePoliciesModel, AllocateLeavesModel } = require('../../models');
 const { getDdlItems, getAlarmTimesItems, formatDates, createFiscalYearLabel } = require('../../utils/common');
 const { DDL_FIELD_NAMES } = require('../../utils/constants');
 const { getRoleById } = require('./role.service');
@@ -140,8 +140,8 @@ const getRevisionHistoryByEmpId = async (employeeId) => {
 const getFormMenusMasterData = async (req, res) => {
   const FormMenusMasterData = getDdlItems(DDL_FIELD_NAMES.FormMenus, await FormModel.findAll({
     where: { isActive: true, parentFormID: req.body.Id || null },
-    attributes: ['formName', 'Id','formCode']
-  }),req.body.mergeLabel);
+    attributes: ['formName', 'Id', 'formCode']
+  }), req.body.mergeLabel);
 
   // if (FormMenusMasterData.length > 0) {
   //   FormMenusMasterData.unshift({ label: req.body.text || '--Select--', value: null, code: null, mergeLabel: "--Select--" })
@@ -191,6 +191,69 @@ const getLeaveTypesData = async (employeeId) => {
     LeaveTypeData = getDdlItems(DDL_FIELD_NAMES.LeaveType, await LeaveTypeModel.findAll({
       attributes: ['name', 'Id']
     }));
+  }
+  LeaveTypeData.unshift({ label: '--Select--', value: null })
+  return LeaveTypeData
+};
+
+/**
+ * 
+ * Leave Type Dropdown Data
+ * Get Leave Type Only that are encashable in current active year by employee Id
+ * 
+ * @param {Number|Null} employeeId 
+ * @returns 
+ */
+const getEncashmentLeaveTypeData = async (employeeId, yearId) => {
+  let LeaveTypeData = [];
+  if (employeeId && yearId) {
+    const employeeWithLeaveConfig = await EmployeeProfileModel.findByPk(employeeId, { attributes: ['Id', 'subsidiaryId', 'gradeId', 'employeeTypeId', 'cycleTypeId'] })
+    if (employeeWithLeaveConfig) {
+      const leaveConfigData = await LeaveManagementConfigurationModel.findOne({
+        where: {
+          subsidiaryId: employeeWithLeaveConfig.subsidiaryId,
+          gradeId: employeeWithLeaveConfig.gradeId,
+          employeeTypeId: employeeWithLeaveConfig.employeeTypeId
+        },
+        attributes: ['Id'],
+        include: [
+          {
+            model: LeaveTypePoliciesModel,
+            attributes: ['leaveType']
+          }
+        ]
+      })
+
+      if (leaveConfigData?.t_leave_type_policies?.length) {
+        const allocatedData = await AllocateLeavesModel.findAll({
+          where: {
+            leaveType: leaveConfigData?.t_leave_type_policies.map((el) => el.leaveType),
+            subsidiaryId: employeeWithLeaveConfig.subsidiaryId,
+            cycleTypeId: employeeWithLeaveConfig.cycleTypeId,
+            yearId: yearId,
+            policyType: 2
+          },
+          attributes: ['leaveType', 'maxCount'],
+        })
+
+        if (allocatedData?.length) {
+          const leaveData = await LeaveTypeModel.findAll({
+            where: { Id: allocatedData?.map((el) => el.leaveType) },
+            attributes: ['name', 'Id']
+          });
+
+          LeaveTypeData = leaveData.map((el) => {
+            return {
+              label: el.name,
+              value: el.Id,
+              limit: allocatedData.find(ad =>  ad.leaveType == el.Id)?.maxCount || 0
+            }
+          })
+
+        }
+      }
+
+    }
   }
   LeaveTypeData.unshift({ label: '--Select--', value: null })
   return LeaveTypeData
@@ -274,5 +337,6 @@ module.exports = {
   getRevisionHistoryByEmpId,
   getLeaveTypesData,
   getAllSubsidiaryData,
-  getAllFiscalYearData
+  getAllFiscalYearData,
+  getEncashmentLeaveTypeData
 };

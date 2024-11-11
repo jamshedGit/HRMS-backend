@@ -15,9 +15,23 @@ const allocateLeavesModel = sequelize.define('t_allocate_leaves', {
 	yearId: { type: Sequelize.INTEGER, allowNull: true },
 	companyId: { type: Sequelize.INTEGER, allowNull: true },
 	leaveType: { type: Sequelize.INTEGER, allowNull: true },
-	leaveCount: { type: Sequelize.INTEGER, allowNull: true },
+	leaveCount: {
+		type: Sequelize.FLOAT,
+		allowNull: true,
+		get() {
+			const rawValue = this.getDataValue('leaveCount');
+			return typeof rawValue != 'undefined' ? Number(rawValue) : null;
+		}
+	},
 	policyType: { type: Sequelize.INTEGER, allowNull: true },
-	maxCount: { type: Sequelize.INTEGER, allowNull: true },
+	maxCount: {
+		type: Sequelize.FLOAT,
+		allowNull: true,
+		get() {
+			const rawValue = this.getDataValue('maxCount');
+			return typeof rawValue != 'undefined' ? Number(rawValue) : null;
+		}
+	},
 	isActive: { type: Sequelize.BOOLEAN, allowNull: true, defaultValue: 1 },
 	createdBy: { type: Sequelize.INTEGER, allowNull: true },
 	updatedBy: { type: Sequelize.INTEGER, allowNull: true },
