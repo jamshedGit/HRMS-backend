@@ -87,8 +87,8 @@ const sequelize = require('./config/db')
 	
 // Import the user model we have defined
 // const RoleModel = require('./models/setups/role.model')
-const {Tax_slabModel,Employee_loan_request_detailModel,Employee_loan_requestModel, ResourceModel, RoleModel, AccessRightModel, UserModel, TokenModel,Loan_management_configurationModel,Loan_management_detailModel,Gratuity_configurationModel,accrue_gratuity_configurationModel,Reimbursement_configurationModel,Reimbursement_policies_detailModel,Policies_grade_detailModel,Reimbursement_accounts_detailModel, Reimbursement_claimModel
-
+const {Tax_slabModel,Employee_loan_request_detailModel,Employee_loan_requestModel, ResourceModel, RoleModel, AccessRightModel, UserModel, TokenModel,Loan_management_configurationModel,Loan_management_detailModel,Gratuity_configurationModel,accrue_gratuity_configurationModel,Reimbursement_configurationModel,Reimbursement_policies_detailModel,Policies_grade_detailModel,Reimbursement_accounts_detailModel, Reimbursement_claimModel,
+HolidaysModel,
 } = require('./models');
 // Tax_slabModel.sync({ force: true }); 
 // Employee_loan_request_detailModel.sync({ force: true }); 
@@ -105,7 +105,7 @@ const {Tax_slabModel,Employee_loan_request_detailModel,Employee_loan_requestMode
 // Gratuity_configurationModel.sync({ force: true });
 // Loan_management_configurationModel.sync({ force: true });
 // Loan_management_detailModel.sync({ force: true });
-
+HolidaysModel.sync({ force: true });
 
 	
 // Create all the table defined using

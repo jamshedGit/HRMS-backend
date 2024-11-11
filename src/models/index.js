@@ -148,3 +148,4 @@ module.exports.Employee_loan_request_detailModel=require("./operations/employee_
 
 //Attendance Configuration
 module.exports.Attendance_ConfigurationModel = require("./operations/attendance_configuration/attendance_configuration.model")
+module.exports.HolidaysModel = require("./operations/holidays/holidays.model")

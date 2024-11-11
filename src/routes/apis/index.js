@@ -61,6 +61,7 @@ const reimbursement_claim=require('./operations/reimbursement_claim/reimbursemen
 const employee_loan_request=require('./operations/employee_loan_request/employee_loan_request.route')
 
 const attendance_configuration=require('./operations/attendance_configuration/attendance_configuration.route')
+const holidays=require('./operations/holidays/holidays.route')
 
 const router = express.Router();
 
@@ -298,6 +299,10 @@ const defaultRoutes = [
   {
     path: "/attendance_configuration",
     route: attendance_configuration
+  },
+  {
+    path: "/holidays",
+    route: holidays
   },
 
 
