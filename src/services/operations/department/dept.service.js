@@ -157,11 +157,48 @@ const deleteDeptById = async (Id) => {
 
 
 
+const sp_GetAllDepartments = async (filter, options, searchQuery) => {
+  try {
+    console.log("mggg::")
+    const results = await sequelize.query('CALL usp_GetAllDepartments()', {
+     
+      type: Sequelize.QueryTypes.RAW // Use RAW type for executing stored procedures
+    });
+
+    let limit = options.pageSize;
+    let offset = 0 + (options.pageNumber - 1) * limit;
+    searchQuery = searchQuery.toLowerCase();
+    let searchlist = filterByValue(results, searchQuery);
+   
+    let count = searchlist.length;
+    const rows = searchlist.slice(offset, offset + limit)
+
+    return paginationFacts(count, limit, options.pageNumber, rows); // 
+  } catch (error) {
+    throw new ApiError(httpStatus.INTERNAL_SERVER_ERROR, error);
+  }
+};
+
+function filterByValue(array, string) {
+
+  if (!string) {
+    return array;
+  }
+  return array.filter(o => Object.keys(o).some(k => {
+    return o['earningName'].toLowerCase().includes(string.toLowerCase()) || o['deductionName'].toLowerCase().includes(string.toLowerCase())
+  }
+  )
+  );
+}
+
+
+
 module.exports = {
   createDept,
   queryDept,
   getDeptById,
   updateDeptById,
   deleteDeptById,
-  queryParentDept
+  queryParentDept,
+  sp_GetAllDepartments
 };
