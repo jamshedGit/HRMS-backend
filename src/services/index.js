@@ -59,3 +59,4 @@ module.exports.LeaveEncashmentServicePage = require('./operations/leave_encashme
 module.exports.Employee_loan_requestService=require("./operations/employee_loan_request/employee_loan_request.service")
 module.exports.attendance_configuration=require("./operations/attendance_configuration/attendance_configuration.service")
 module.exports.employee_shift=require("./operations/employee_shift/employee_shift.service")
+module.exports.EmployeeRosterServicePage = require('./operations/employee_roster/employee_roster.service')
