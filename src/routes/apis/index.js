@@ -62,6 +62,7 @@ const leave_encashment = require('./operations/leave_encashment/leave_encashment
 const employee_loan_request=require('./operations/employee_loan_request/employee_loan_request.route')
 
 const attendance_configuration=require('./operations/attendance_configuration/attendance_configuration.route')
+const holidays=require('./operations/holidays/holidays.route')
 const employee_shift=require('./operations/employee_shift/employee_shift.route')
 
 const router = express.Router();
@@ -304,6 +305,10 @@ const defaultRoutes = [
   {
     path: "/attendance_configuration",
     route: attendance_configuration
+  },
+  {
+    path: "/holidays",
+    route: holidays
   },
 
   {

@@ -153,3 +153,4 @@ module.exports.Attendance_ConfigurationModel = require("./operations/attendance_
 
 // Employee Shift Model
 module.exports.Employee_ShiftModel = require("./operations/employee_shift/employee_shift.model")
+module.exports.HolidaysModel= require("./operations/holidays/holidays.model")
