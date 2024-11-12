@@ -7,7 +7,7 @@ const createFormValidation = {
        code: Joi.string(),
         name: Joi.string(),
         linkedAttendance: Joi.boolean(),
-        mapped: Joi.string(),
+        mapped: Joi.any().optional(),
         account: Joi.string(),
     }),
 };

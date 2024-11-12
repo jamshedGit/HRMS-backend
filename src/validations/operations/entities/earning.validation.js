@@ -11,6 +11,7 @@ const createEarningValidation = {
         isTaxable: Joi.boolean(),
         mappedAllowance: Joi.string(),
         account: Joi.any().optional(),
+        
     }),
 };
 
