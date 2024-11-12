@@ -39,7 +39,7 @@ const createholidays = async (
 
  
     const isExist=await HolidaysModel.findOne({
-      where:{subsidiaryId:holidaysBody.subsidiaryId, name:holidaysBody.name,
+      where:{subsidiaryId:holidaysBody.subsidiaryId,
         from_date:newStartDate}
 
     })
@@ -212,8 +212,10 @@ const updateholidaysById = async (Id, updateBody, updatedBy) => {
 
 
   const isExist=await HolidaysModel.findOne({
-    where:{subsidiaryId:updateBody.subsidiaryId, name:updateBody.name,
-      from_date:newStartDate}
+    where:{subsidiaryId:updateBody.subsidiaryId,
+      from_date:newStartDate,
+      id: { [Op.ne]: updateBody.id } ,// Exclude the current record using its id
+    }
 
   })
   console.log("isExist",isExist)
