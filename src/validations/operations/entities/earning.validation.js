@@ -5,12 +5,12 @@ const createEarningValidation = {
     params: Joi.disallow(),
     body: Joi.object().keys({
         
-        earningCode: Joi.string(),
+        earningCode: Joi.string(), 
         earningName: Joi.string(),
         linkedAttendance: Joi.boolean(),
         isTaxable: Joi.boolean(),
         mappedAllowance: Joi.string(),
-        account: Joi.string(),
+        account: Joi.any().optional(),
     }),
 };
 

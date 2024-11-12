@@ -55,8 +55,12 @@ const createleaveApplication = async (req) => {
   if (!employeeData) {
     throw new ApiError(httpStatus.NOT_FOUND, `No User Found`);
   }
+  
+  // If it's a half day then set half day value in days otherwise get days from difference in from and to dates
+  const days = Number(body.days) == 0.5 ? Number(body.days) : getDateDiffInDays(body.from, body.to);
+  
   //Check if employee have leave balance remaining of this leave type
-  if (!employeeData.t_employee_leave_balances?.length || (employeeData.t_employee_leave_balances[0].remainingCount < getDateDiffInDays(body.from, body.to))) {
+  if (!employeeData.t_employee_leave_balances?.length || (employeeData.t_employee_leave_balances[0].remainingCount < days)) {
     throw new ApiError(httpStatus.FORBIDDEN, `Remaining Leaves not enough`);
   }
   //Check if there is already an old application present that crosses with new date range
@@ -92,7 +96,7 @@ const createleaveApplication = async (req) => {
     ...body,
     createdBy: req.user.id,
     // companyId: 1,
-    days: getDateDiffInDays(body.from, body.to)
+    days: days
     // subsidiaryId: employeeData.subsidiaryId,
   };
   //Create Leave Application if it's valid
@@ -104,6 +108,7 @@ const createleaveApplication = async (req) => {
       detailData.push({
         applicationId: createdData.Id,
         date: addDaysInDate(createdData.from, i),
+        day: days == 0.5 ? days : 1,
         createdBy: req.user.id
       })
     }

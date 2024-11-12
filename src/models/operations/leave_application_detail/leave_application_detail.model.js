@@ -11,6 +11,13 @@ const leaveApplicationDetailModel = sequelize.define('t_leave_application_detail
 		primaryKey: true
 	},
 	applicationId: { type: Sequelize.INTEGER, allowNull: false },
+	day: {
+		type: Sequelize.FLOAT, allowNull: true,
+		get() {
+			const rawValue = this.getDataValue('day');
+			return typeof rawValue != 'undefined' ? Number(rawValue) : null;
+		}
+	},
 	date: { type: Sequelize.DATE, allowNull: false },
 	isActive: { type: Sequelize.BOOLEAN, allowNull: true, defaultValue: 1 },
 	createdBy: {
