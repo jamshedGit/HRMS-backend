@@ -105,7 +105,7 @@ HolidaysModel,
 // Gratuity_configurationModel.sync({ force: true });
 // Loan_management_configurationModel.sync({ force: true });
 // Loan_management_detailModel.sync({ force: true });
-HolidaysModel.sync({ force: true });
+// HolidaysModel.sync({ force: true });
 
 	
 // Create all the table defined using

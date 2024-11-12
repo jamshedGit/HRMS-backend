@@ -18,10 +18,40 @@ const createholidays = async (
   holidaysBody
 ) => {
   try {
- console.log("holidaysBody",holidaysBody)
+    const normalizeDate = (date) => {
+      const newDate = new Date(Date.UTC(date.getFullYear(), date.getMonth(), date.getDate()));
+      newDate.setUTCHours(0, 0, 0, 0); // Normalize to midnight UTC
+      return newDate;
+    };
+    
+    // Example of adding one day (24 hours) to the date
+    const addOneDay = (date) => {
+      const newDate = new Date(date);
+      newDate.setUTCDate(newDate.getUTCDate()); // Add one day (UTC date)
+      return newDate;
+    };
+
+
     holidaysBody.createdBy = req.user.id;
+  
+    const newStartDate = addOneDay(normalizeDate(new Date(holidaysBody.from_date)));
+    const newEndTDate = addOneDay(normalizeDate(new Date(holidaysBody.to_date)));
+
+ 
+    const isExist=await HolidaysModel.findOne({
+      where:{subsidiaryId:holidaysBody.subsidiaryId, name:holidaysBody.name,
+        from_date:newStartDate}
+
+    })
+    console.log("isExist",isExist)
+    if(isExist){
+      throw new ApiError(httpStatus.BAD_REQUEST, "This holiday already exist in current year");
+
+    }
 
 
+    holidaysBody.from_date=newStartDate;
+    holidaysBody.to_date=newEndTDate;
     const holidaysObj = await HolidaysModel.create(
       holidaysBody
     );
@@ -35,6 +65,16 @@ const createholidays = async (
             model: SubsidiaryModel,
             attributes: ["name"],
             as: "Subsidiary",
+          },
+          {
+            model: FormModel,
+            attributes: ["formName", "formCode"],
+            as: "Religion",
+          },
+          {
+            model: FormModel,
+            attributes: ["formName", "formCode"],
+            as: "Holiday_type",
           },
       
         ],
@@ -64,7 +104,7 @@ const queryholidays = async (filter, options, searchQuery) => {
   const queryFilters = [
     {
       min_year: Sequelize.where(
-        Sequelize.fn("", Sequelize.col("min_year")),
+        Sequelize.fn("", Sequelize.col("t_holidays.name")),
         "LIKE",
         "%" + searchQuery + "%"
       ),
@@ -73,11 +113,10 @@ const queryholidays = async (filter, options, searchQuery) => {
 
   const { count, rows } = await HolidaysModel.findAndCountAll({
     // order: [["createdAt", "DESC"]],
-    order: [
-      [Sequelize.col("Subsidiary.name"), "ASC"],   // Order by Subsidiary name
-      [Sequelize.col("Contract_Type.formName"), "ASC"],  // Order by Contract Type (formName)
-      [Sequelize.col("min_year"), "ASC"],  // Order by Minimum Year
-    ],
+    // order: [
+    //   [Sequelize.col("Subsidiary.name"), "ASC"],   // Order by Subsidiary name
+     
+    // ],
     where: {
       [Op.or]: queryFilters,
       // isActive: true
@@ -93,7 +132,12 @@ const queryholidays = async (filter, options, searchQuery) => {
       {
         model: FormModel,
         attributes: ["formName", "formCode"],
-        as: "Contract_Type",
+        as: "Religion",
+      },
+      {
+        model: FormModel,
+        attributes: ["formName", "formCode"],
+        as: "Holiday_type",
       },
     ],
   });
@@ -118,16 +162,17 @@ const getholidaysById = async (id) => {
       {
         model: FormModel,
         attributes: ["formName", "formCode"],
-        as: "Contract_Type",
+        as: "Religion",
+      },
+      {
+        model: FormModel,
+        attributes: ["formName", "formCode"],
+        as: "Holiday_type",
       },
     ],
   });
 
-  // return populatedConfiguration;
 
-  // return Loan_management_configurationModel.Loan_management_configurationModel.findByPk(
-  //   id
-  // );
 };
 
 /**
@@ -146,54 +191,49 @@ const updateholidaysById = async (Id, updateBody, updatedBy) => {
     throw new ApiError(httpStatus.NOT_FOUND, "Record not found");
   }
 
-  // const existingConfiguration=await update_range_exist (updateBody, "holidaysModel","min_year", "max_year", fieldMappings=["subsidiaryId","contract_typeId"])
+  const normalizeDate = (date) => {
+    const newDate = new Date(Date.UTC(date.getFullYear(), date.getMonth(), date.getDate()));
+    newDate.setUTCHours(0, 0, 0, 0); // Normalize to midnight UTC
+    return newDate;
+  };
+  
+  // Example of adding one day (24 hours) to the date
+  const addOneDay = (date) => {
+    const newDate = new Date(date);
+    newDate.setUTCDate(newDate.getUTCDate()); // Add one day (UTC date)
+    return newDate;
+  };
 
-  const { min_year, max_year } = updateBody;
 
-  if (min_year >= max_year) {
-    let result = {
-      message: "Min year must be less than To Max year",
-      status: "error",
-    };
-    return result;
+
+
+  const newStartDate = addOneDay(normalizeDate(new Date(updateBody.from_date)));
+  const newEndTDate = addOneDay(normalizeDate(new Date(updateBody.to_date)));
+
+
+  const isExist=await HolidaysModel.findOne({
+    where:{subsidiaryId:updateBody.subsidiaryId, name:updateBody.name,
+      from_date:newStartDate}
+
+  })
+  console.log("isExist",isExist)
+  if(isExist){
+    throw new ApiError(httpStatus.BAD_REQUEST, "This holiday already exist in current year");
+
   }
 
-  const existingConfiguration = await HolidaysModel.findOne({
-    where: {
-      [Op.and]: [
-        { subsidiaryId: updateBody.subsidiaryId },
-        { contract_typeId: updateBody.contract_typeId },
-        { id: { [Op.ne]: updateBody.Id } },
-        {
-          [Op.or]: [
-            { min_year: { [Op.between]: [min_year, max_year] } },
-            { max_year: { [Op.between]: [min_year, max_year] } },
-            {
-              min_year: { [Op.lte]: min_year },
-              max_year: { [Op.gte]: max_year },
-            },
-          ],
-        },
-      ],
-    },
-  });
 
-  if (existingConfiguration) {
-   
-    let result = {
-      message: "Unable to Save: Gratuity Slab overlaps with existing slabs.",
-      status: "error",
-    };
-    return result;
-  } else {
-   
+  updateBody.from_date=newStartDate;
+  updateBody.to_date=newEndTDate;
+
+
     updateBody.updatedBy = updatedBy;
     delete updateBody.id; // Optionally keep this if your model has a primary key
 
     Object.assign(Item, updateBody);
     await Item.save();
     return Item;
-  }
+  
 };
 
 /**

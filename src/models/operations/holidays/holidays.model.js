@@ -2,7 +2,8 @@ const Sequelize = require('sequelize');
 const { SubsidiaryModel,ReligionModel,FormModel } = require('../..');
 
 //import Database connection configurations.
-const sequelize = require('../../../config/db')
+const sequelize = require('../../../config/db');
+const { formatDates } = require('../../../utils/common');
 
 const HolidaysModel = sequelize.define('t_holidays', {
 	Id: {
@@ -12,8 +13,22 @@ const HolidaysModel = sequelize.define('t_holidays', {
 	},
 	name: { type: Sequelize.STRING,allowNull: false },
 	religionId: { type: Sequelize.INTEGER, },
-    from_date: { type: Sequelize.DATE,allowNull: false },
-	to_date: { type: Sequelize.DATE, allowNull: false },
+	from_date: {
+		type: Sequelize.DATE,
+		allowNull: false,
+		get() {
+			const rawValue = this.getDataValue('from_date');
+			return rawValue ? formatDates(rawValue) : null;
+		}
+	},
+	to_date: {
+		type: Sequelize.DATE,
+		allowNull: false,
+		get() {
+			const rawValue = this.getDataValue('to_date');
+			return rawValue ? formatDates(rawValue) : null;
+		}
+	},
 	number_of_days: { type: Sequelize.INTEGER, allowNull: false },
 	holiday_typeId: { type: Sequelize.INTEGER,allowNull: false},
 	subsidiaryId: { type: Sequelize.INTEGER,allowNull: false },
