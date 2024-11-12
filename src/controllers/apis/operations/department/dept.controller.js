@@ -17,7 +17,7 @@ const createDept = catchAsync(async (req, res) => {
 
     console.log("insert department")
     console.log("req body", req.body);
-   
+
     req.body.createdBY = req.user.id;
     const Bank = await deptFormService.createDept(req, req.body);
 
@@ -27,16 +27,16 @@ const createDept = catchAsync(async (req, res) => {
       data: Bank
     });
 
-  }  catch (error) {
-   
+  } catch (error) {
+
     if (error.parent.errno === 1062) {
-     throw new ApiError(httpStatus.NOT_FOUND, "Duplicate entry not allowed!");
-   }
-   else {
-    
-     throw error;
-   }
- }
+      throw new ApiError(httpStatus.NOT_FOUND, "Duplicate entry not allowed!");
+    }
+    else {
+
+      throw error;
+    }
+  }
 });
 
 const getAllDept = catchAsync(async (req, res) => {
@@ -46,8 +46,8 @@ const getAllDept = catchAsync(async (req, res) => {
   // const options = pick(req.body, ["sortBy", "limit", "page"]);
   const options = pick(req.body, ['sortOrder', 'pageSize', 'pageNumber']);
   const searchQuery = req.body.filter.searchQuery ? req.body.filter.searchQuery : '';
-  const result = await deptFormService.queryDept(filter, options, searchQuery);
-  console.log("my result",result);
+  const result = await deptFormService.sp_GetAllDepartments(filter, options, searchQuery);
+  console.log("pppp",result);
   res.send({
     code: HttpStatusCodes.OK,
     message: HttpResponseMessages.OK,
@@ -56,13 +56,26 @@ const getAllDept = catchAsync(async (req, res) => {
 });
 
 const getAllParentDept = catchAsync(async (req, res) => {
-  console.log("get parent dept");
+   console.log("get parent dept");
+  // const obj = {};
+  // const filter = obj;
+  // // const options = pick(req.body, ["sortBy", "limit", "page"]);
+  // const options = pick(req.body, ['sortOrder', 'pageSize', 'pageNumber']);
+  // const searchQuery = req.body.filter.searchQuery ? req.body.filter.searchQuery : '';
+  // const result = await deptFormService.queryDept(filter, options, searchQuery);
+  // console.log(result);
+  // res.send({
+  //   code: HttpStatusCodes.OK,
+  //   message: HttpResponseMessages.OK,
+  //   data: result,
+  // });
+ // console.log("get Compensation_Beneftis");
   const obj = {};
   const filter = obj;
   // const options = pick(req.body, ["sortBy", "limit", "page"]);
   const options = pick(req.body, ['sortOrder', 'pageSize', 'pageNumber']);
   const searchQuery = req.body.filter.searchQuery ? req.body.filter.searchQuery : '';
-  const result = await deptFormService.queryDept(filter, options, searchQuery);
+  const result = await deptFormService.sp_GetAllDepartments(filter, options, searchQuery);
   console.log(result);
   res.send({
     code: HttpStatusCodes.OK,
