@@ -13,7 +13,6 @@ const Model = sequelize.define('t_loan_type_setup', {
 	code : { type: Sequelize.BOOLEAN, allowNull: true, defaultValue: true },
 	name  : { type: Sequelize.BOOLEAN, allowNull: true, defaultValue: true },
 	linkedAttendance : { type: Sequelize.BOOLEAN, allowNull: true, defaultValue: true },
-	mapped : { type: Sequelize.STRING, allowNull: true, defaultValue: true },
 	account : { type: Sequelize.STRING, allowNull: true, defaultValue: true },
 	isActive: { type: Sequelize.BOOLEAN, allowNull: true, defaultValue: true },
 	createdBy: {
