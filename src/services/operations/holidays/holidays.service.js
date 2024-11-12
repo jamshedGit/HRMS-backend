@@ -112,11 +112,11 @@ const queryholidays = async (filter, options, searchQuery) => {
   ];
 
   const { count, rows } = await HolidaysModel.findAndCountAll({
-    // order: [["createdAt", "DESC"]],
-    // order: [
-    //   [Sequelize.col("Subsidiary.name"), "ASC"],   // Order by Subsidiary name
+    order: [["createdAt", "DESC"]],
+    order: [
+      [Sequelize.col("Subsidiary.name"), "ASC"],   // Order by Subsidiary name
      
-    // ],
+    ],
     where: {
       [Op.or]: queryFilters,
       // isActive: true
