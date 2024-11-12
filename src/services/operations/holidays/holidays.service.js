@@ -43,7 +43,7 @@ const createholidays = async (
         from_date:newStartDate}
 
     })
-    console.log("isExist",isExist)
+   
     if(isExist){
       throw new ApiError(httpStatus.BAD_REQUEST, "This holiday already exist in current year");
 
@@ -218,7 +218,7 @@ const updateholidaysById = async (Id, updateBody, updatedBy) => {
     }
 
   })
-  console.log("isExist",isExist)
+
   if(isExist){
     throw new ApiError(httpStatus.BAD_REQUEST, "This holiday already exist in current year");
 
