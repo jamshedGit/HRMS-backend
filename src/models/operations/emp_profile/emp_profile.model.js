@@ -64,10 +64,10 @@ const DesigModel = sequelize.define('t_employee_profile', {
 	passportExpiry : { type: Sequelize.DATE, allowNull: true },
 	nicExpiry : { type: Sequelize.DATE, allowNull: true },
 	deligation : { type: Sequelize.STRING, allowNull: true },
-	personId : { type: Sequelize.STRING, allowNull: true },
+	personId : { type: Sequelize.INTEGER, allowNull: true },
 	routingCode : { type: Sequelize.STRING, allowNull: true },
-	contractType : { type: Sequelize.STRING, allowNull: true },
-	cycleType : { type: Sequelize.STRING, allowNull: true },
+	contractTypeId : { type: Sequelize.INTEGER, allowNull: true },
+	cycleTypeId : { type: Sequelize.INTEGER, allowNull: true },
 	requireDeligation : { type: Sequelize.BOOLEAN, allowNull: true },
 	
 	isActive: { type: Sequelize.BOOLEAN, allowNull: true, defaultValue: true },
