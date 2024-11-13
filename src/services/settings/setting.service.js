@@ -1,5 +1,5 @@
-const { RoleModel, ResourceModel, CountryModel, CityModel, StatusTypeModel, BankModel, DeptModel, FormModel, EmployeeProfileModel, BranchModel, EmployeeSalaryRevisionModel, LeaveTypeModel, FiscalSetupModel, SubsidiaryModel, LeaveManagementConfigurationModel, LeaveTypePoliciesModel, AllocateLeavesModel } = require('../../models');
-const { getDdlItems, getAlarmTimesItems, formatDates, createFiscalYearLabel } = require('../../utils/common');
+const { RoleModel, ResourceModel, CountryModel, CityModel, StatusTypeModel, BankModel, DeptModel, FormModel, EmployeeProfileModel, BranchModel, EmployeeSalaryRevisionModel, LeaveTypeModel, FiscalSetupModel, SubsidiaryModel, LeaveManagementConfigurationModel, LeaveTypePoliciesModel, AllocateLeavesModel, Employee_ShiftModel } = require('../../models');
+const { getDdlItems, getAlarmTimesItems, formatDates, createFiscalYearLabel, createEmployeeShiftLabel } = require('../../utils/common');
 const { DDL_FIELD_NAMES } = require('../../utils/constants');
 const { getRoleById } = require('./role.service');
 const Sequelize = require('sequelize');
@@ -268,6 +268,23 @@ const getAllSubsidiaryData = async () => {
   return subsidiaryData
 };
 
+const getAllEmployeeShift = async () => {
+  const result = [];
+  const shiftData = await Employee_ShiftModel.findAll({
+    where: { isActive: true },
+    attributes: ['name', 'Id', 'startTime', 'endTime']
+  })
+  if(shiftData?.length){
+    shiftData.forEach(el => {
+      result.push({
+        label: createEmployeeShiftLabel(el.name, el.endTime, el.startTime),
+        value: el.Id
+      })
+    })
+  }
+  return result
+};
+
 const getAllFiscalYearData = async () => {
   const result = []
   const yearData = await FiscalSetupModel.findAll({
@@ -338,5 +355,6 @@ module.exports = {
   getLeaveTypesData,
   getAllSubsidiaryData,
   getAllFiscalYearData,
-  getEncashmentLeaveTypeData
+  getEncashmentLeaveTypeData,
+  getAllEmployeeShift
 };

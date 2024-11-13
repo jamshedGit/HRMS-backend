@@ -11,6 +11,7 @@ const employeeRosterDetailModel = sequelize.define('t_employee_roster_detail', {
         primaryKey: true
     },
     rosterId: { type: Sequelize.INTEGER, allowNull: false },
+    shiftId: { type: Sequelize.INTEGER, allowNull: false },
     date: { type: Sequelize.DATE, allowNull: false },
     isActive: { type: Sequelize.BOOLEAN, allowNull: true, defaultValue: 1 },
     createdBy: {

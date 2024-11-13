@@ -26,7 +26,8 @@ const employeeRosterAttributes = [
 const createEmployeeRoster = async (req) => {
   const body = req.body;
   const { list, ...rest } = body;
-  const employeeIds = list.map((el) => el.employeeId);
+  const employeeIds = Array.from(new Set(list.map((el) => el.employeeId))); //Get All Employee Ids Uniqued
+
   const oldRecord = await getemployeeRosterData(
     {
       employeeId: employeeIds,
@@ -48,30 +49,42 @@ const createEmployeeRoster = async (req) => {
     [{ model: EmployeeProfileModel, attributes: ['firstName'] }, { model: Employee_ShiftModel, attributes: ['name'] }]
   )
   if (oldRecord?.length) {
-    let message = `Employees already have following shift assigned: `
-    oldRecord.forEach((rec) => {
-      message += `${rec.t_employee_profile.firstName} -- ${rec.from} - ${rec.to} in Shift: ${rec.t_employee_shift.name} \n`
-    })
+    const names = Array.from(new Set(oldRecord.map((el) => el.t_employee_profile.firstName)))
+    let message = `${names.join(', ')} already have shift assigned within this range`
     throw new ApiError(httpStatus.FORBIDDEN, message);
   }
-  employeeIds.forEach(async (empId) => {
-    const payload = {
-      ...rest,
-      employeeId: empId,
-      createdBy: req.user.id,
-    }
-    const rosterData = await EmployeeRosterModel.create(payload);
-    const noOfRecords = getDateDiffInDays(rosterData.from, rosterData.to);
-    const detailData = [];
-    for (let i = 0; i < noOfRecords; i++) {
-      detailData.push({
-        rosterId: rosterData.Id,
-        date: addDaysInDate(rosterData.from, i),
-        createdBy: req.user.id
-      })
-    }
+  const employeeRecords = await EmployeeProfileModel.findAll({
+    where: {
+      Id: employeeIds,
+      dateOfJoining: { [Sequelize.Op.gt]: rest.from }
+    },
+    attributes: ['dateOfJoining', 'Id']
+  })
 
-    await EmployeeRosterDetailModel.bulkCreate(detailData);
+  employeeIds.forEach(async (empId) => {
+    const newEmployee = employeeRecords.find(rec => rec.Id == empId);
+    if (!newEmployee || new Date(newEmployee.dateOfJoining).getTime() < new Date(rest.to).getTime()) {
+      const payload = {
+        ...rest,
+        employeeId: empId,
+        createdBy: req.user.id,
+        from: newEmployee?.dateOfJoining ? new Date(newEmployee.dateOfJoining) : rest.from
+      }
+      const rosterData = await EmployeeRosterModel.create(payload);
+      if (rosterData) {
+        const noOfRecords = getDateDiffInDays(rosterData.from, rosterData.to);
+        const detailData = [];
+        for (let i = 0; i < noOfRecords; i++) {
+          detailData.push({
+            rosterId: rosterData.Id,
+            shiftId: rosterData.shiftId,
+            date: addDaysInDate(rosterData.from, i),
+            createdBy: req.user.id
+          })
+        }
+        await EmployeeRosterDetailModel.bulkCreate(detailData);
+      }
+    }
   });
 
   return []
@@ -174,7 +187,12 @@ const updateEmployeeRosterById = async (body, updatedBy) => {
   }
   body.updatedBy = updatedBy;
   Object.assign(oldRecord[0], body);
-  const updatedData = await oldRecord[0].save({ fields: ['shiftId'] });
+  const updatedData = await oldRecord[0].save({ fields: ['shiftId', 'updatedBy'] });
+  await EmployeeRosterDetailModel.update({ shiftId: body.shiftId, updatedBy: body.updatedBy }, {
+    where: {
+      rosterId: oldRecord[0].Id
+    }
+  })
   const data = await getemployeeRosterData({ Id: updatedData.Id }, employeeRosterAttributes, [{ model: EmployeeProfileModel, attributes: ['firstName'] }, { model: Employee_ShiftModel, attributes: ['name'] }], true)
   return data;
 };
