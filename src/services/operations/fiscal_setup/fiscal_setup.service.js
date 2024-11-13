@@ -40,15 +40,15 @@ const createFiscalSetup = async (req, FiscalSetupBody) => {
  * @returns {Promise<QueryResult>}
  */
 const queryFiscalSetups = async (filter, options, searchQuery) => {
-  
+   console.log("dds",searchQuery)
   let limit = options.pageSize;
   let offset = 0 + (options.pageNumber - 1) * limit;
   
   searchQuery = searchQuery.toLowerCase();
   const queryFilters = [
-    { Name: Sequelize.where(Sequelize.fn('LOWER', Sequelize.col('startDate')), 'LIKE', '%' + searchQuery + '%') },
+    { startDate: Sequelize.where(Sequelize.fn('LOWER', Sequelize.col('startDate')), 'LIKE', '%' + searchQuery + '%') },
+    { endDate: Sequelize.where(Sequelize.fn('LOWER', Sequelize.col('endDate')), 'LIKE', '%' + searchQuery + '%') },
   ]
-
 
   const { count, rows } = await FiscalSetupModel.FiscalSetupModel.findAndCountAll({
     order: [
