@@ -7,30 +7,30 @@ const sequelize = require('../../../config/db');
 const SubsidiaryModel = require('../subsidiary/subsidiary.model');
 const { LeaveTypeModel } = require('../..');
 
-const Att_Model = sequelize.define('t_employee_shift', {
+const Model = sequelize.define('t_employee_shift', {
 	Id: {
 		type: Sequelize.INTEGER,
 		autoIncrement: true,
 		primaryKey: true
 	},
-	subsidiaryId: { type: Sequelize.INTEGER, allowNull: true, defaultValue: true },
-    companyId : { type: Sequelize.INTEGER, allowNull: true, defaultValue: true },
-    name : { type: Sequelize.STRING, allowNull: true, defaultValue: true },
-    shiftCode : { type: Sequelize.STRING, allowNull: true, defaultValue: true },
-    startTime : { type: Sequelize.DATE, allowNull: true, defaultValue: true },
-    endTime   : { type: Sequelize.DATE, allowNull: true, defaultValue: true },
-    workingdays  : { type: Sequelize.INTEGER, allowNull: true, defaultValue: true },
-    lateIn  : { type: Sequelize.DATE, allowNull: true, defaultValue: true },
-    lateOut  : { type: Sequelize.DATE, allowNull: true, defaultValue: true },
-    halfDayStart  : { type: Sequelize.DATE, allowNull: true, defaultValue: true },
-    halfDayEnd  : { type: Sequelize.DATE, allowNull: true, defaultValue: true },
-    breakStartTime  : { type: Sequelize.DATE, allowNull: true, defaultValue: true },
-    breakEndTime  : { type: Sequelize.DATE, allowNull: true, defaultValue: true },
-    isOverTime: { type: Sequelize.BOOLEAN, allowNull: true, defaultValue: true },
-    overStartTime  : { type: Sequelize.DATE, allowNull: true, defaultValue: true },
-    interShifGap: { type: Sequelize.STRING, allowNull: true, defaultValue: true },
-    isIncludeInterShifGap : { type: Sequelize.BOOLEAN, allowNull: true, defaultValue: true },
-	isActive: { type: Sequelize.BOOLEAN, allowNull: true, defaultValue: true },
+	subsidiaryId: { type: Sequelize.INTEGER, allowNull: false },
+	companyId: { type: Sequelize.INTEGER, allowNull: false },
+	name: { type: Sequelize.STRING, allowNull: true },
+	shiftCode: { type: Sequelize.STRING, allowNull: true },
+	shiftType: { type: Sequelize.STRING, allowNull: true },
+	startTime: { type: Sequelize.STRING, allowNull: true },
+	endTime: { type: Sequelize.STRING, allowNull: true },
+	workingdays: { type: Sequelize.STRING, allowNull: true },
+	earlyIn: { type: Sequelize.STRING, allowNull: true },
+	earlyOut: { type: Sequelize.STRING, allowNull: true },
+	halfDayStart: { type: Sequelize.STRING, allowNull: true },
+	halfDayEnd: { type: Sequelize.STRING, allowNull: true },
+	breakTimeStart: { type: Sequelize.STRING, allowNull: true },
+	breakTimeEnd: { type: Sequelize.STRING, allowNull: true },
+	isOverTime: { type: Sequelize.BOOLEAN, allowNull: true },
+	overTimeStart: { type: Sequelize.STRING, allowNull: true },
+	interShiftGap: { type: Sequelize.INTEGER, allowNull: true },
+	isIncludeInterShifGap: { type: Sequelize.BOOLEAN, allowNull: true },
 	createdBy: {
 		type: Sequelize.INTEGER,
 		allowNull: true,
@@ -47,7 +47,7 @@ const Att_Model = sequelize.define('t_employee_shift', {
 
 
 
-Att_Model.belongsTo(SubsidiaryModel, {
+Model.belongsTo(SubsidiaryModel, {
 	foreignKey: 'subsidiaryId',
 	as: "subs",
 	targetKey: 'Id',  // Assuming 'Id' is the primary key in FormModel table
@@ -68,4 +68,4 @@ Att_Model.belongsTo(SubsidiaryModel, {
 
 
 
-module.exports = Att_Model;
+module.exports = Model;

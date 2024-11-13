@@ -1,6 +1,6 @@
 const httpStatus = require("http-status");
 const axios = require("axios")
-const AttendanceConfigurationModel = require("../../../models/index");
+const EmployeeShiftModel = require("../../../models/index");
 const ApiError = require("../../../utils/ApiError");
 const sequelize = require("../../../config/db");
 const Sequelize = require('sequelize');
@@ -14,14 +14,14 @@ const { LEAVE_TYPE, FORBIDDEN_CODES } = require("../../../models/operations/leav
 const Op = Sequelize.Op;
 /**
  * Create a Item
- * @param {Object} AttendanceConfigurationBody
- * @returns {Promise<AttendanceConfiguration>}
+ * @param {Object} EmployeeShiftBody
+ * @returns {Promise<EmployeeShift>}
  */
-const createAttendanceConfiguration = async (req) => {
+const createEmployeeShift = async (req) => {
   try {
     req.body.createdBy = req.user.id;
-    const addedAttendanceConfigurationObj = await AttendanceConfigurationModel.Attendance_ConfigurationModel.create(req.body);
-    return addedAttendanceConfigurationObj;
+    const addedEmployeeShiftObj = await EmployeeShiftModel.Employee_ShiftModel.create(req.body);
+    return addedEmployeeShiftObj;
   }
   catch (error) {
 
@@ -46,7 +46,7 @@ const createAttendanceConfiguration = async (req) => {
    * @param {number} [options.page] - Current page (default = 1)
    * @returns {Promise<QueryResult>}
    */
-  const queryAttendanceConfigurations = async (req) => {
+  const queryEmployeeShifts = async (req) => {
     const options = pick(req.body, ['sortOrder', 'pageSize', 'pageNumber']);
     const searchQuery = req?.body?.filter?.searchQuery?.toLowerCase() || '';  //Get search field value for filtering
     const limit = options.pageSize;
@@ -56,28 +56,12 @@ const createAttendanceConfiguration = async (req) => {
     ]
 
 
-    const { count, rows } = await AttendanceConfigurationModel.Attendance_ConfigurationModel.findAndCountAll({
+    const { count, rows } = await EmployeeShiftModel.Employee_ShiftModel.findAndCountAll({
       order: [
         ['createdAt', 'DESC']
       ],
 
-      include: [
-        {
-          model: AttendanceConfigurationModel.LeaveTypeModel,
-          attributes: ["Id", ["name", "leaveTypeName"], "type"],
-          as: "leavetype",
-        },
-        {
-          where: {
-            [Op.or]: queryFilters,
-
-            // isActive: true
-          },
-          model: AttendanceConfigurationModel.SubsidiaryModel,
-          attributes: ["Id", ["name", "subsName"]],
-          as: "subs"
-        }
-      ],
+    
 
       offset: offset,
       limit: limit,
@@ -93,19 +77,19 @@ const createAttendanceConfiguration = async (req) => {
    * @param {ObjectId} id
    * @returns {Promise<ReceiptModel>}
    */
-  const getAttendanceConfigurationById = async (id) => {
-    return AttendanceConfigurationModel.Attendance_ConfigurationModel.findByPk(id, {
+  const getEmployeeShiftById = async (id) => {
+    return EmployeeShiftModel.Attendance_ConfigurationModel.findByPk(id, {
 
 
       include: [
         {
-          model: AttendanceConfigurationModel.LeaveTypeModel,
+          model: EmployeeShiftModel.LeaveTypeModel,
           attributes: ["Id", ["name", "leaveTypeName"], "type"],
           as: "leavetype",
         },
         {
 
-          model: AttendanceConfigurationModel.SubsidiaryModel,
+          model: EmployeeShiftModel.SubsidiaryModel,
           attributes: ["Id", ["name", "subsName"]],
           as: "subs"
         }
@@ -127,7 +111,7 @@ const createAttendanceConfiguration = async (req) => {
       options.include = include
     }
 
-    return await AttendanceConfigurationModel.Attendance_ConfigurationModel.findOne(options);
+    return await EmployeeShiftModel.Attendance_ConfigurationModel.findOne(options);
   };
 
 
@@ -137,21 +121,21 @@ const createAttendanceConfiguration = async (req) => {
    * @param {Object} updateBody
    * @returns {Promise<ReceiptModel>}
    */
-  const updateAttendanceConfigurationById = async (body, updatedBy) => {
+  const updateEmployeeShiftById = async (body, updatedBy) => {
     console.log(":ss1", body);
     let oldRecord = await getAttConfigData({ subsidiaryId: body.subsidiaryId });
     if (oldRecord && oldRecord.Id != body.Id) {
       throw new ApiError(httpStatus.FORBIDDEN, `subsidiary already in use ${body.subs.subsName}. Please use another subsidiary`);
     }
     else {
-      oldRecord = await getAttendanceConfigurationById(body.Id)
+      oldRecord = await getEmployeeShiftById(body.Id)
     }
     body.updatedBy = updatedBy;
 
     Object.assign(oldRecord, body);
     const updatedData = await oldRecord.save();
     console.log(":ss:", updatedData);
-    const data = await getAttendanceConfigurationById(updatedData.Id)
+    const data = await getEmployeeShiftById(updatedData.Id)
     return data;
   };
 
@@ -160,9 +144,9 @@ const createAttendanceConfiguration = async (req) => {
    * @param {ObjectId} Id
    * @returns {Promise<ReceiptModel>}
    */
-  const deleteAttendanceConfigurationById = async (Id) => {
+  const deleteEmployeeShiftById = async (Id) => {
 
-    const Item = await getAttendanceConfigurationById(Id);
+    const Item = await getEmployeeShiftById(Id);
     if (!Item) {
       throw new ApiError(httpStatus.NOT_FOUND, "Item not found");
     }
@@ -173,9 +157,9 @@ const createAttendanceConfiguration = async (req) => {
 
 
   module.exports = {
-    createAttendanceConfiguration,
-    queryAttendanceConfigurations,
-    getAttendanceConfigurationById,
-    updateAttendanceConfigurationById,
-    deleteAttendanceConfigurationById
+    createEmployeeShift,
+    queryEmployeeShifts,
+    getEmployeeShiftById,
+    updateEmployeeShiftById,
+    deleteEmployeeShiftById
   };

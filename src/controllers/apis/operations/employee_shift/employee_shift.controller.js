@@ -1,12 +1,12 @@
 const httpStatus = require("http-status");
 const ApiError = require("../../../../utils/ApiError");
 const catchAsync = require("../../../../utils/catchAsync");
-const { attendance_configuration } = require("../../../../services/index");
+const { employee_shift } = require("../../../../services/index");
 const {
   HttpStatusCodes,
   HttpResponseMessages,
 } = require("../../../../utils/constants");
-const { Attendance_ConfigurationModel } = require("../../../../models");
+const { Employee_ShiftModel } = require("../../../../models");
 
 
 /**
@@ -17,7 +17,7 @@ const { Attendance_ConfigurationModel } = require("../../../../models");
  */
 const createEmployeeShift = catchAsync(async (req, res) => {
   try {
-    const createdEmployeeShift = await attendance_configuration.createEmployeeShift(req);
+    const createdEmployeeShift = await employee_shift.createEmployeeShift(req);
     res.send({
       code: HttpStatusCodes.OK,
       message: HttpResponseMessages.OK,
@@ -45,7 +45,7 @@ const createEmployeeShift = catchAsync(async (req, res) => {
  */
 const updateEmployeeShift = catchAsync(async (req, res) => {
   console.log("fds", req.body)
-  const updatedEmployeeShiftData = await attendance_configuration.updateEmployeeShiftById(req.body, req.user.Id);
+  const updatedEmployeeShiftData = await employee_shift.updateEmployeeShiftById(req.body, req.user.Id);
   res.send({
     code: HttpStatusCodes.OK,
     message: HttpResponseMessages.OK,
@@ -61,7 +61,7 @@ const updateEmployeeShift = catchAsync(async (req, res) => {
  * @returns res
  */
 const getEmployeeShiftById = catchAsync(async (req, res) => {
-  const EmployeeShiftData = await attendance_configuration.getEmployeeShiftById(req.params.id);
+  const EmployeeShiftData = await employee_shift.getEmployeeShiftById(req.params.id);
   if (!EmployeeShiftData) {
     throw new ApiError(httpStatus.NOT_FOUND, "No Data found");
   }
@@ -80,7 +80,7 @@ const getEmployeeShiftById = catchAsync(async (req, res) => {
  * @returns res
  */
 const getAllEmployeeShift = catchAsync(async (req, res) => {
-  const result = await attendance_configuration.queryEmployeeShifts(req);
+  const result = await employee_shift.queryEmployeeShifts(req);
   res.send({
     code: HttpStatusCodes.OK,
     message: HttpResponseMessages.OK,
@@ -95,7 +95,7 @@ const getAllEmployeeShift = catchAsync(async (req, res) => {
  * @returns res
  */
 const deleteEmployeeShift = catchAsync(async (req, res) => {
-  const EmployeeShiftData = await attendance_configuration.deleteEmployeeShiftById(req.params.id);
+  const EmployeeShiftData = await employee_shift.deleteEmployeeShiftById(req.params.id);
   res.send({
     code: HttpStatusCodes.OK,
     message: HttpResponseMessages.OK,
@@ -103,23 +103,13 @@ const deleteEmployeeShift = catchAsync(async (req, res) => {
   });
 });
 
-const getEmployeeShiftDropdownData = catchAsync(async (req, res) => {
-  const dropdownData = await EmployeeShiftServicePage.getDropdownData();
-  if (!dropdownData) {
-    throw new ApiError(httpStatus.NOT_FOUND, "No Data found");
-  }
-  res.send({
-    code: HttpStatusCodes.OK,
-    message: HttpResponseMessages.OK,
-    data: dropdownData,
-  });
-});
+
 
 module.exports = {
   createEmployeeShift,
   getEmployeeShiftById,
   updateEmployeeShift,
   getAllEmployeeShift,
-  deleteEmployeeShift,
-  getEmployeeShiftDropdownData
+  deleteEmployeeShift
+  
 };
