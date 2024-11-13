@@ -268,6 +268,12 @@ const getAllSubsidiaryData = async () => {
   return subsidiaryData
 };
 
+/**
+ * 
+ * Get All Employee Shifts data for dropdown.
+ * 
+ * @returns 
+ */
 const getAllEmployeeShift = async () => {
   const result = [];
   const shiftData = await Employee_ShiftModel.findAll({

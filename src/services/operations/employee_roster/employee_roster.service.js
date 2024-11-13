@@ -25,9 +25,10 @@ const employeeRosterAttributes = [
  */
 const createEmployeeRoster = async (req) => {
   const body = req.body;
-  const { list, ...rest } = body;
+  const { list, ...rest } = body;  //Seperate List of Employees from Body
   const employeeIds = Array.from(new Set(list.map((el) => el.employeeId))); //Get All Employee Ids Uniqued
 
+  //Check if Old Record of Any Choosen Employee Exists in the provided dates
   const oldRecord = await getemployeeRosterData(
     {
       employeeId: employeeIds,
@@ -49,10 +50,13 @@ const createEmployeeRoster = async (req) => {
     [{ model: EmployeeProfileModel, attributes: ['firstName'] }, { model: Employee_ShiftModel, attributes: ['name'] }]
   )
   if (oldRecord?.length) {
+    //If Old Record exists then throw error with names of Employees that have shift assigned. there can be multiple record of multiple employees so we use set to unique the names from the records
     const names = Array.from(new Set(oldRecord.map((el) => el.t_employee_profile.firstName)))
     let message = `${names.join(', ')} already have shift assigned within this range`
     throw new ApiError(httpStatus.FORBIDDEN, message);
   }
+
+  //Get Date of joining of Employees that will join after the selected start of roster date ('from' key)
   const employeeRecords = await EmployeeProfileModel.findAll({
     where: {
       Id: employeeIds,
@@ -62,6 +66,7 @@ const createEmployeeRoster = async (req) => {
   })
 
   employeeIds.forEach(async (empId) => {
+    //Check if Employee there is an employee with joining date after then set it's roster date from it's date of joining else let it set as the chosen start date of roster('from' key)
     const newEmployee = employeeRecords.find(rec => rec.Id == empId);
     if (!newEmployee || new Date(newEmployee.dateOfJoining).getTime() < new Date(rest.to).getTime()) {
       const payload = {
@@ -187,12 +192,14 @@ const updateEmployeeRosterById = async (body, updatedBy) => {
   }
   body.updatedBy = updatedBy;
   Object.assign(oldRecord[0], body);
-  const updatedData = await oldRecord[0].save({ fields: ['shiftId', 'updatedBy'] });
+  const updatedData = await oldRecord[0].save({ fields: ['shiftId', 'updatedBy'] }); // update only ShiftId and updatedBy fields no matter whatever is in body
+  // Update Shift Id in Roster Detail Model as well
   await EmployeeRosterDetailModel.update({ shiftId: body.shiftId, updatedBy: body.updatedBy }, {
     where: {
       rosterId: oldRecord[0].Id
     }
   })
+  //Get data according to how UI expects
   const data = await getemployeeRosterData({ Id: updatedData.Id }, employeeRosterAttributes, [{ model: EmployeeProfileModel, attributes: ['firstName'] }, { model: Employee_ShiftModel, attributes: ['name'] }], true)
   return data;
 };
@@ -209,6 +216,8 @@ const deleteEmployeeRosterById = async (id) => {
     throw new ApiError(httpStatus.NOT_FOUND, "Record not found");
   }
   Object.assign(oldRecord[0], { isActive: false })
+
+  //Set isActive false in parent and child records when deleted
   await oldRecord[0].save({ fields: ['isActive'] });
 
   await EmployeeRosterDetailModel.update({ isActive: false }, {

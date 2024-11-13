@@ -285,6 +285,7 @@ const createFiscalYearLabel = (endDate, startDate) => {
  * 
  * Create Label for Employee Shift Dropdown
  * 
+ * @param {String} name 
  * @param {Date} endDate 
  * @param {Date} startDate 
  * @returns 
