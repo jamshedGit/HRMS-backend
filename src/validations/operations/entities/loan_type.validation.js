@@ -4,10 +4,10 @@ const createFormValidation = {
     query: Joi.disallow(),
     params: Joi.disallow(),
     body: Joi.object().keys({
-       code: Joi.string(),
+        code: Joi.string(),
         name: Joi.string(),
         linkedAttendance: Joi.boolean(),
-        mapped: Joi.string(),
+        mapped: Joi.any().optional(),
         account: Joi.string(),
     }),
 };
