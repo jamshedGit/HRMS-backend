@@ -110,7 +110,7 @@ const getAllEmployeeRoster = async (req) => {
 
   const { count, rows } = await EmployeeRosterModel.findAndCountAll({
     order: [
-      ['createdAt', 'DESC']
+      ['from', 'DESC']
     ],
     where: {
       isActive: true
