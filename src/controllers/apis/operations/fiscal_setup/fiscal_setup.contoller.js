@@ -25,7 +25,14 @@ const create_FiscalSetup = catchAsync(async (req, res) => {
     });
 
   } catch (error) {
-    console.log(error);        
+
+    if (error.parent.errno === 1062) {
+      throw new ApiError(httpStatus.NOT_FOUND, "Duplicate entry not allowed!");
+    }
+    else {
+
+      throw error;
+    }
   }
 });
 
@@ -35,9 +42,9 @@ const getAll_FiscalSetup = catchAsync(async (req, res) => {
   const filter = obj;
   // const options = pick(req.body, ["sortBy", "limit", "page"]);
   const options = pick(req.body, ['sortOrder', 'pageSize', 'pageNumber']);
-  const searchQuery = req.body.filter.searchQuery? req.body.filter.searchQuery : '';
-  const result = await FiscalSetupServicePage.FiscalSetupServicePage.queryFiscalSetups(filter, options,searchQuery);
-  console.log("resp2",result);
+  const searchQuery = req.body.filter.searchQuery ? req.body.filter.searchQuery : '';
+  const result = await FiscalSetupServicePage.FiscalSetupServicePage.queryFiscalSetups(filter, options, searchQuery);
+
   res.send({
     code: HttpStatusCodes.OK,
     message: HttpResponseMessages.OK,
@@ -46,8 +53,7 @@ const getAll_FiscalSetup = catchAsync(async (req, res) => {
 });
 
 const get_FiscalSetupById = catchAsync(async (req, res) => {
-  console.log("_FiscalSetup Controller get_FiscalSetupId")
-  console.log(req.body)
+
   const Receipt = await FiscalSetupServicePage.FiscalSetupServicePage.getFiscalSetupById(req.body.Id);
   if (!Receipt) {
     throw new ApiError(httpStatus.NOT_FOUND, "Receipt not found");
@@ -60,7 +66,7 @@ const get_FiscalSetupById = catchAsync(async (req, res) => {
 });
 
 const update_FiscalSetup = catchAsync(async (req, res) => {
-  console.log(req.body);
+
   const Receipt = await FiscalSetupServicePage.FiscalSetupServicePage.updateFiscalSetupById(req.body.Id, req.body, req.user.Id);
   res.send({
     code: HttpStatusCodes.OK,
@@ -70,7 +76,7 @@ const update_FiscalSetup = catchAsync(async (req, res) => {
 });
 
 const delete_FiscalSetup = catchAsync(async (req, res) => {
-  console.log("req.body.Id " ,req.body.Id)
+
   const Receipt = await FiscalSetupServicePage.FiscalSetupServicePage.deleteFiscalSetupById(req.body.Id);
   res.send({
     code: HttpStatusCodes.OK,

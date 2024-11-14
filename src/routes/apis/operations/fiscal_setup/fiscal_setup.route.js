@@ -6,7 +6,7 @@ const itemValidation = require("../../../../validations/operations/entities/fisc
 
 const router = express.Router();
 
-router.route("/read-fiscal-setup").post(auth(), validate(itemValidation.createItem), form_controller.get_FiscalSetupById);
+router.route("/read-fiscal-setup").post(auth(), validate(itemValidation.createItem1), form_controller.get_FiscalSetupById);
 router.route("/read-all-fiscal-setup").post(auth(), form_controller.getAll_FiscalSetup);
 router.route("/create-fiscal-setup").post(auth(), validate(itemValidation.createItem), form_controller.create_FiscalSetup);
 router.route("/update-fiscal-setup").put(auth(), form_controller.update_FiscalSetup);
