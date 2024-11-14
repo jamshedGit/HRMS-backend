@@ -38,7 +38,7 @@ const LeaveManagementConfigurationInclude = [
     model: SubsidiaryModel,
     attributes: [['name', 'subsidiaryName']]
   },
-  {
+  /*{
     model: FormModel,
     as: 'employeeType',
     attributes: [['formName', 'employeeTypeName']]
@@ -47,7 +47,7 @@ const LeaveManagementConfigurationInclude = [
     model: FormModel,
     as: 'grade',
     attributes: [['formName', 'gradeName']]
-  },
+  },*/
 ]
 
 //Attributes required for Leave Management Configuration Table view
@@ -64,7 +64,7 @@ const leaveManagementConfigurationAttributes = [
  */
 const createleaveManagementConfiguration = async (req) => {
   const { leavetypePolicies, leaveTypeSalaryDeductionPolicies, ...payload } = req.body //Seperate Policies data from Leave Configuration data
-  const createdData = await LeaveManagementConfigurationModel.create(payload);  //Create Leave Configuration Data
+  const createdData = await LeaveManagementConfigurationModel.create({...payload, employeeTypeId: null, gradeId: null});  //Create Leave Configuration Data
   if (createdData) {  //If Leave Configuration is created then create the tables data
     const createdPolicyData = await LeaveTypePoliciesModel.bulkCreate(leavetypePolicies.map((el) => ({ ...el, leaveManagementConfigId: createdData.Id })))
     const createdSalaryDeductionData = await LeaveTypeSalaryDeductionPoliciesModel.bulkCreate(leaveTypeSalaryDeductionPolicies.map((el) => ({ ...el, leaveManagementConfigId: createdData.Id })))
@@ -103,7 +103,7 @@ const getAllleaveManagementConfiguration = async (req) => {
           [Op.or]: queryFilters,
         }
       },
-      {
+      /*{
         model: FormModel,
         as: 'employeeType',
         attributes: [['formName', 'employeeTypeName']]
@@ -112,7 +112,7 @@ const getAllleaveManagementConfiguration = async (req) => {
         model: FormModel,
         as: 'grade',
         attributes: [['formName', 'gradeName']]
-      },
+      },*/
     ],
     attributes: leaveManagementConfigurationAttributes,
     offset: offset,
@@ -147,7 +147,7 @@ const getleaveManagementConfigurationByForEdit = async (body) => {
   if (body) {
     const data = await getleaveManagementConfigurationData(
       { ...body },
-      ['subsidiaryId', 'employeeTypeId', 'gradeId', 'weekend', 'isSandwich', 'Id'],
+      ['subsidiaryId', 'weekend', 'isSandwich', 'Id'],
       [
         {
           model: LeaveTypePoliciesModel,
@@ -213,7 +213,7 @@ const updateleaveManagementConfigurationById = async (body, updatedBy) => {
   const { leavetypePolicies, leaveTypeSalaryDeductionPolicies, ...payload } = body  //Seperate Policies data from Leave Configuration data
   oldRecord = await getleaveManagementConfigurationById(payload.Id) // Get Old Data By Id
   body.updatedBy = updatedBy;
-  Object.assign(oldRecord, payload);  //Update Old Data with New Data
+  Object.assign(oldRecord, {...payload, employeeTypeId: null, gradeId: null});  //Update Old Data with New Data
   const updatedData = await oldRecord.save();
 
   //If Configuration data is updated then upsert Table data into Leave Type Policies and Leave Type Salary Deductions policies table

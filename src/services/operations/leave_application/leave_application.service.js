@@ -271,9 +271,7 @@ const deleteleaveApplicationById = async (id) => {
 const checkAttachmentRequired = async (employeeData, body) => {
   const configurationWithPolicy = await LeaveManagementConfigurationModel.findOne({
     where: {
-      employeeTypeId: employeeData.employeeTypeId,
       subsidiaryId: employeeData.subsidiaryId,
-      gradeId: employeeData.gradeId,
     },
     include: [
       {
