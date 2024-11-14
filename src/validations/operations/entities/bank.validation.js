@@ -17,7 +17,7 @@ const createBranchValidation = {
         branchCode: Joi.string(),
         countryId: Joi.number(),
         cityId: Joi.number(),
-        phone: Joi.string(),
+        phone: Joi.any().optional(),
         fax: Joi.any().optional(),
         email: Joi.any().optional(),
         contactPerson:Joi.any().optional(),
