@@ -20,7 +20,7 @@ const branch = sequelize.define('t_bank_branch', {
 	 email: { type: Sequelize.STRING, allowNull:true },
 	 contactPerson: { type: Sequelize.STRING, allowNull:true },
 	 address: { type: Sequelize.STRING, allowNull:true },
-	 accOpeningDate:{ type: Sequelize.DATE, allowNull:true },
+	 accOpeningDate:{ type: Sequelize.DATE, allowNull:true,defaultValue: new Date() },
 	 accNoForSalary: { type: Sequelize.STRING, allowNull:true },
 	 accNoForGrad: { type: Sequelize.STRING, allowNull:true },
 	 accNoForPF: { type: Sequelize.STRING, allowNull:true },
