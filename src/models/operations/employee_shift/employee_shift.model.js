@@ -41,7 +41,7 @@ const Model = sequelize.define('t_employee_shift', {
 	},
 	createdAt: { type: Sequelize.DATE, allowNull: true },
 	updatedAt: { type: Sequelize.DATE, allowNull: true },
-
+	isActive: { type: Sequelize.BOOLEAN, allowNull: true ,defaultValue: true},
 });
 
 

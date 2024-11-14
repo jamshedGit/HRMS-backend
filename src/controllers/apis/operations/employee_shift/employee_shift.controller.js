@@ -80,6 +80,7 @@ const getEmployeeShiftById = catchAsync(async (req, res) => {
  * @returns res
  */
 const getAllEmployeeShift = catchAsync(async (req, res) => {
+   console.log("shift controller:")
   const result = await employee_shift.queryEmployeeShifts(req);
   res.send({
     code: HttpStatusCodes.OK,

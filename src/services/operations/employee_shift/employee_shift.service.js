@@ -47,12 +47,14 @@ const createEmployeeShift = async (req) => {
    * @returns {Promise<QueryResult>}
    */
   const queryEmployeeShifts = async (req) => {
+
+     console.log("get_all_shift")
     const options = pick(req.body, ['sortOrder', 'pageSize', 'pageNumber']);
     const searchQuery = req?.body?.filter?.searchQuery?.toLowerCase() || '';  //Get search field value for filtering
     const limit = options.pageSize;
     const offset = 0 + (options.pageNumber - 1) * limit;
     const queryFilters = [
-      { Name: Sequelize.where(Sequelize.fn('LOWER', Sequelize.col('subs.name')), 'LIKE', '%' + searchQuery + '%') },
+      { name: Sequelize.where(Sequelize.fn('LOWER', Sequelize.col('name')), 'LIKE', '%' + searchQuery + '%') },
     ]
 
 
