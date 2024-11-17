@@ -68,7 +68,7 @@ const getAll_onetime_earning = catchAsync(async (req, res) => {
 });
 
 const get_onetime_earningById = catchAsync(async (req, res) => {
-  console.log("_onetime_earning Controller get_onetime_earningId")
+  console.log("get_earning_byId")
   console.log(req.body)
   const Receipt = await onetime_earningformService.OneTimeEarningService.getOneTimeEarningById(req.body.Id);
   if (!Receipt) {
