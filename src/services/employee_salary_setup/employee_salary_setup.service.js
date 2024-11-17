@@ -110,7 +110,7 @@ function filterByValue(array, string) {
     return array;
   }
   return array.filter(o => Object.keys(o).some(k => {
-    return o['EmployeeSalaryCode'].toLowerCase().includes(string.toLowerCase()) || o['EmployeeSalaryName'].toLowerCase().includes(string.toLowerCase())
+    return o['employeeName'].toLowerCase().includes(string.toLowerCase()) || o['employeeCode'].toLowerCase().includes(string.toLowerCase())
   }
   )
   );
