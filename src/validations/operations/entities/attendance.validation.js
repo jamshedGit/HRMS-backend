@@ -67,6 +67,19 @@ const getAllItem = {
 };
 
 /**
+ * For Getting Single Attendance Records By Id in Params
+ */
+const getSingleItemByFilters = {
+  query: Joi.disallow(),
+  params: Joi.disallow(),
+  body: Joi.object().keys({
+    attDateIn: Joi.date().required(),
+    employeeId: Joi.number().required(),
+  })
+};
+
+
+/**
  * For Getting Attendance Dropdown data
  */
 const getItemWihoutId = {
@@ -92,5 +105,6 @@ module.exports = {
   getSingleItem,
   getAllItem,
   deleteSingleItem,
-  getItemWihoutId
+  getItemWihoutId,
+  getSingleItemByFilters
 };

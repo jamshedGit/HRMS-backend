@@ -59,6 +59,21 @@ const getattendanceById = catchAsync(async (req, res) => {
 });
 
 /**
+ * Get Single Attendance By Id
+ * 
+ * @param {Number} id 
+ * @returns res
+ */
+const getattendanceByFilters = catchAsync(async (req, res) => {
+  const data = await AttendanceServicePage.getattendanceByFilters(req);
+  res.send({
+    code: HttpStatusCodes.OK,
+    message: HttpResponseMessages.OK,
+    data: data,
+  });
+});
+
+/**
  * 
  * Get All Attendance with Pagination
  * 
@@ -92,6 +107,7 @@ const deleteattendance = catchAsync(async (req, res) => {
 module.exports = {
   createattendance,
   getattendanceById,
+  getattendanceByFilters,
   updateattendance,
   getAllattendance,
   deleteattendance

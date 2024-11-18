@@ -2,8 +2,9 @@ const httpStatus = require("http-status");
 const { AttendanceModel, EmployeeProfileModel } = require("../../../models/index");
 const ApiError = require("../../../utils/ApiError");
 const Sequelize = require('sequelize');
-const { paginationFacts } = require("../../../utils/common");
+const { paginationFacts, addDaysInDate } = require("../../../utils/common");
 const pick = require("../../../utils/pick");
+const { startOfDay, endOfDay } = require("date-fns");
 
 const Op = Sequelize.Op;
 
@@ -46,7 +47,7 @@ const createAttendance = async (req) => {
     attDate: body.attDateIn
   };
   const createdData = await AttendanceModel.create(payload);
-  const data = await getattendanceById(createdData.Id, attendanceAttributes);
+  const data = await getAttendanceById(createdData.Id, attendanceAttributes)
   return data;
 };
 
@@ -97,6 +98,18 @@ const getAttendanceById = async (id, options = null) => {
   });
 };
 
+const getattendanceByFilters = async (req) => {
+  const body = req.body;
+  const startOfDayDate = startOfDay(new Date(body.attDateIn));
+  const endOfDayDate = endOfDay(new Date(body.attDateIn));
+  return await getattendanceData({
+    employeeId: body.employeeId,
+    attDateIn: {
+      [Op.between]: [startOfDayDate, endOfDayDate],  // Filters between start and end of the day
+    },
+  }, attendanceAttributes) || { ...body, attDateOut: body.attDateIn }
+}
+
 
 /**
  * 
@@ -138,7 +151,7 @@ const updateAttendanceById = async (body, updatedBy) => {
   body.attDate = body.attDateIn
   Object.assign(oldRecord, body);
   const updatedData = await oldRecord.save({ fields: ['comments', 'attDate', 'attDateIn', 'attDateOut', 'timeIn', 'timeOut'] });
-  const data = await getattendanceById(updatedData.Id, attendanceAttributes)
+  const data = await getAttendanceById(updatedData.Id, attendanceAttributes)
   return data;
 };
 
@@ -163,5 +176,6 @@ module.exports = {
   getAttendanceById,
   updateAttendanceById,
   deleteAttendanceById,
-  createAttendance
+  createAttendance,
+  getattendanceByFilters
 };

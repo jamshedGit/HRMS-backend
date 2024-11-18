@@ -10,6 +10,7 @@ router.route("/create-attendance").post(auth(), validate(itemValidation.createIt
 router.route("/update-attendance").put(auth(), validate(itemValidation.updateItem), form_controller.updateattendance);
 router.route("/read-all-attendance").post(auth(), validate(itemValidation.getAllItem), form_controller.getAllattendance);
 router.route("/read-attendance/:id").get(auth(), validate(itemValidation.getSingleItem), form_controller.getattendanceById);
+router.route("/read-attendance-data").post(auth(), validate(itemValidation.getSingleItemByFilters), form_controller.getattendanceByFilters);
 router.route("/delete-attendance/:id").delete(auth(), validate(itemValidation.deleteSingleItem), form_controller.deleteattendance);
 
 module.exports = router;
