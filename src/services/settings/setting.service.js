@@ -113,7 +113,7 @@ const getEmployeesMasterData = async () => {
 
 const getDeptMasterData = async () => {
   const DeptMasterData = getDdlItems(DDL_FIELD_NAMES.DeptName, await DeptModel.findAll({
-    where: { isActive: true, parentDept: null },
+    where: { isActive: true },
     attributes: ['deptId', 'deptName']
   }));
   return DeptMasterData
