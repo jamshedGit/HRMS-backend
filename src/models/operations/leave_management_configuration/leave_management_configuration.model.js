@@ -24,11 +24,11 @@ LeaveManagementConfigurationModel.init(
     },
     employeeTypeId: {
       type: DataTypes.INTEGER,
-      allowNull: false
+      allowNull: true
     },
     gradeId: {
       type: DataTypes.INTEGER,
-      allowNull: false
+      allowNull: true
     },
     weekend: {
       type: DataTypes.JSON,

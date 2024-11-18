@@ -12,7 +12,7 @@ const OnetimeAllowance = sequelize.define('t_onetime_earning', {
 	},
 	
 	employeeId: { type: Sequelize.INTEGER, allowNull: true },
-	earning_Id: { type: Sequelize.INTEGER, allowNull: true },
+	earning_deduction_Id: { type: Sequelize.INTEGER, allowNull: true },
     amount : { type: Sequelize.DECIMAL, allowNull: true },
     month : { type: Sequelize.DATE, allowNull: true },
     remarks : { type: Sequelize.STRING, allowNull: true },

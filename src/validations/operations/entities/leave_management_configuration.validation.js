@@ -8,8 +8,8 @@ const createItem = {
   params: Joi.disallow(),
   body: Joi.object().keys({
     subsidiaryId: Joi.number().required(),
-    employeeTypeId: Joi.number().required(),
-    gradeId: Joi.number().required(),
+    employeeTypeId: Joi.number().optional(),
+    gradeId: Joi.number().optional(),
     weekend: Joi.array().optional(),
     isSandwich: Joi.boolean().optional(),
     leavetypePolicies: Joi.array().items(
@@ -44,8 +44,8 @@ const updateItem = {
   body: Joi.object().keys({
     Id: Joi.number().required(),
     subsidiaryId: Joi.number().required(),
-    employeeTypeId: Joi.number().required(),
-    gradeId: Joi.number().required(),
+    employeeTypeId: Joi.number().optional(),
+    gradeId: Joi.number().optional(),
     weekend: Joi.array().optional(),
     isSandwich: Joi.boolean().optional(),
     leavetypePolicies: Joi.array().items(
@@ -82,13 +82,13 @@ const getSingleItem = {
   body: Joi.object().keys({
     Id: Joi.number(),
     subsidiaryId: Joi.number(),
-    employeeTypeId: Joi.number(),
-    gradeId: Joi.number(),
+    employeeTypeId: Joi.optional(),
+    gradeId: Joi.optional(),
   }).custom((value, helpers) => {
-    const { Id, subsidiaryId, employeeTypeId, gradeId } = value;
+    const { Id, subsidiaryId } = value;
 
-    if (Id == null && (subsidiaryId == null || employeeTypeId == null || gradeId == null)) {
-      return helpers.error('Either Id is required or subsidiaryId, employeeTypeId, gradeId are required'); // Custom error if neither condition is met
+    if (Id == null && (subsidiaryId == null)) {
+      return helpers.error('Either Id is required or subsidiaryId are required'); // Custom error if neither condition is met
     }
 
     return value; // Return the value if validation passes
