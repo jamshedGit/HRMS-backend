@@ -19,7 +19,7 @@ const Model = sequelize.define('t_employee_shift', {
 	shiftType: { type: Sequelize.INTEGER, allowNull: true },
 	startTime: { type: Sequelize.STRING(4), allowNull: true },
 	endTime: { type: Sequelize.STRING(4), allowNull: true },
-	workingdays: { type: Sequelize.STRING(250), allowNull: true }y
+	workingdays: { type: Sequelize.STRING(250), allowNull: true }
 	,
 	earlyIn: { type: Sequelize.STRING(4), allowNull: true },
 	earlyOut: { type: Sequelize.STRING(4), allowNull: true },
