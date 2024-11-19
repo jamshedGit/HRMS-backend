@@ -24,8 +24,9 @@ const createEmployeeShift = async (req) => {
     return addedEmployeeShiftObj;
   }
   catch (error) {
-
+    
     if (error.parent.errno === 1062) {
+   
       throw new ApiError(httpStatus.NOT_FOUND, "Duplicate entry not allowed!");
     }
     else {
@@ -37,131 +38,132 @@ const createEmployeeShift = async (req) => {
 
 
 
-  /**
-   * Query for Items
-   * @param {Object} filter -  Mongo filter
-   * @param {Object} options - Query options
-   * @param {string} [options.sortBy] - Sort option in the format: sortField:(desc|asc)
-   * @param {number} [options.limit] - Maximum number of results per page (default = 10)
-   * @param {number} [options.page] - Current page (default = 1)
-   * @returns {Promise<QueryResult>}
-   */
-  const queryEmployeeShifts = async (req) => {
+/**
+ * Query for Items
+ * @param {Object} filter -  Mongo filter
+ * @param {Object} options - Query options
+ * @param {string} [options.sortBy] - Sort option in the format: sortField:(desc|asc)
+ * @param {number} [options.limit] - Maximum number of results per page (default = 10)
+ * @param {number} [options.page] - Current page (default = 1)
+ * @returns {Promise<QueryResult>}
+ */
+const queryEmployeeShifts = async (req) => {
 
-     console.log("get_all_shift")
-    const options = pick(req.body, ['sortOrder', 'pageSize', 'pageNumber']);
-    const searchQuery = req?.body?.filter?.searchQuery?.toLowerCase() || '';  //Get search field value for filtering
-    const limit = options.pageSize;
-    const offset = 0 + (options.pageNumber - 1) * limit;
-    const queryFilters = [
-      { name: Sequelize.where(Sequelize.fn('LOWER', Sequelize.col('name')), 'LIKE', '%' + searchQuery + '%') },
-    ]
-
-
-    const { count, rows } = await EmployeeShiftModel.Employee_ShiftModel.findAndCountAll({
-      order: [
-        ['createdAt', 'DESC']
-      ],
-
-    
-
-      offset: offset,
-      limit: limit,
-    });
+  console.log("get_all_shift")
+  const options = pick(req.body, ['sortOrder', 'pageSize', 'pageNumber']);
+  const searchQuery = req?.body?.filter?.searchQuery?.toLowerCase() || '';  //Get search field value for filtering
+  const limit = options.pageSize;
+  const offset = 0 + (options.pageNumber - 1) * limit;
+  const queryFilters = [
+    { name: Sequelize.where(Sequelize.fn('LOWER', Sequelize.col('name')), 'LIKE', '%' + searchQuery + '%') },
+  ]
 
 
-    return paginationFacts(count, limit, options.pageNumber, rows);
-
-  };
-
-  /**
-   * Get Item by id
-   * @param {ObjectId} id
-   * @returns {Promise<ReceiptModel>}
-   */
-  const getEmployeeShiftById = async (id) => {
-    return EmployeeShiftModel.Attendance_ConfigurationModel.findByPk(id, {
-
-
-      include: [
-        {
-          model: EmployeeShiftModel.LeaveTypeModel,
-          attributes: ["Id", ["name", "leaveTypeName"], "type"],
-          as: "leavetype",
-        },
-        {
-
-          model: EmployeeShiftModel.SubsidiaryModel,
-          attributes: ["Id", ["name", "subsName"]],
-          as: "subs"
-        }
-      ],
-    });
-
-  };
-
-
-  const getAttConfigData = async (filters, attributes = null, include = null) => {
-    const options = {};
-    if (filters) {
-      options.where = filters
-    }
-    if (attributes) {
-      options.attributes = attributes
-    }
-    if (include) {
-      options.include = include
-    }
-
-    return await EmployeeShiftModel.Attendance_ConfigurationModel.findOne(options);
-  };
-
-
-  /**
-   * Update Item by id
-   * @param {ObjectId} ReceiptId
-   * @param {Object} updateBody
-   * @returns {Promise<ReceiptModel>}
-   */
-  const updateEmployeeShiftById = async (body, updatedBy) => {
-    console.log(":ss1", body);
-    let oldRecord = await getAttConfigData({ subsidiaryId: body.subsidiaryId });
-    if (oldRecord && oldRecord.Id != body.Id) {
-      throw new ApiError(httpStatus.FORBIDDEN, `subsidiary already in use ${body.subs.subsName}. Please use another subsidiary`);
-    }
-    else {
-      oldRecord = await getEmployeeShiftById(body.Id)
-    }
-    body.updatedBy = updatedBy;
-
-    Object.assign(oldRecord, body);
-    const updatedData = await oldRecord.save();
-    console.log(":ss:", updatedData);
-    const data = await getEmployeeShiftById(updatedData.Id)
-    return data;
-  };
-
-  /**
-   * Delete Item by id
-   * @param {ObjectId} Id
-   * @returns {Promise<ReceiptModel>}
-   */
-  const deleteEmployeeShiftById = async (Id) => {
-
-    const Item = await getEmployeeShiftById(Id);
-    if (!Item) {
-      throw new ApiError(httpStatus.NOT_FOUND, "Item not found");
-    }
-    await Item.destroy();
-    return Item;
-  };
+  const { count, rows } = await EmployeeShiftModel.Employee_ShiftModel.findAndCountAll({
+    order: [
+      ['createdAt', 'DESC']
+    ],
 
 
 
-  module.exports = {
-    createEmployeeShift,
-    queryEmployeeShifts,
-    getEmployeeShiftById,
-    updateEmployeeShiftById,
-    deleteEmployeeShiftById
-  };
+    offset: offset,
+    limit: limit,
+  });
+
+
+  return paginationFacts(count, limit, options.pageNumber, rows);
+
+};
+
+/**
+ * Get Item by id
+ * @param {ObjectId} id
+ * @returns {Promise<ReceiptModel>}
+ */
+const getEmployeeShiftById = async (id) => {
+
+
+  const a = EmployeeShiftModel.Employee_ShiftModel.findByPk(id, {
+
+
+    include: [
+     
+      {
+
+        model: EmployeeShiftModel.SubsidiaryModel,
+        attributes: ["Id", ["name", "subsName"]],
+        as: "subs",
+      }
+    ],
+  });
+  console.log("pak", a);
+  return a;
+};
+
+
+const getAttConfigData = async (filters, attributes = null, include = null) => {
+  const options = {};
+  if (filters) {
+    options.where = filters
+  }
+  if (attributes) {
+    options.attributes = attributes
+  }
+  if (include) {
+    options.include = include
+  }
+
+  return await EmployeeShiftModel.Attendance_ConfigurationModel.findOne(options);
+};
+
+
+/**
+ * Update Item by id
+ * @param {ObjectId} ReceiptId
+ * @param {Object} updateBody
+ * @returns {Promise<ReceiptModel>}
+ */
+const updateEmployeeShiftById = async (body, updatedBy) => {
+  console.log(":ss1", body);
+
+  
+  let oldRecord = await getAttConfigData({ subsidiaryId: body.subsidiaryId });
+  // if (oldRecord && oldRecord.Id != body.Id) {
+  //   throw new ApiError(httpStatus.FORBIDDEN, `subsidiary already in use ${body.subs.subsName}. Please use another subsidiary`);
+  // }
+  // else {
+    oldRecord = await getEmployeeShiftById(body.Id)
+  //}
+  body.updatedBy = updatedBy;
+
+  Object.assign(oldRecord, body);
+  const updatedData = await oldRecord.save();
+  console.log(":ss:", updatedData);
+  const data = await getEmployeeShiftById(updatedData.Id)
+  return data;
+};
+
+/**
+ * Delete Item by id
+ * @param {ObjectId} Id
+ * @returns {Promise<ReceiptModel>}
+ */
+const deleteEmployeeShiftById = async (Id) => {
+
+  const Item = await getEmployeeShiftById(Id);
+  if (!Item) {
+    throw new ApiError(httpStatus.NOT_FOUND, "Item not found");
+  }
+  await Item.destroy();
+  return Item;
+};
+
+
+
+module.exports = {
+  createEmployeeShift,
+  queryEmployeeShifts,
+  getEmployeeShiftById,
+  updateEmployeeShiftById,
+  deleteEmployeeShiftById
+};

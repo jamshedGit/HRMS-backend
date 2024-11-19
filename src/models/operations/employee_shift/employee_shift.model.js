@@ -57,7 +57,7 @@ Model.belongsTo(SubsidiaryModel, {
 
 //  -- This is include in leaveTypeModel due to some issue for sync here
 
-// Att_Model.belongsTo(LeaveTypeModel, {
+// Model.belongsTo(LeaveTypeModel, {
 // 	foreignKey: 'leave_typeId',
 // 	targetKey: 'Id',  // Assuming 'Id' is the primary key in FormModel table
 // 	onDelete: 'RESTRICT',

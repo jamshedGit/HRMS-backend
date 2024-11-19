@@ -25,14 +25,7 @@ const createEmployeeShift = catchAsync(async (req, res) => {
     });
   }
   catch (error) {
-
-    if (error.parent.errno === 1062) {
-      throw new ApiError(httpStatus.NOT_FOUND, "Duplicate entry not allowed!");
-    }
-    else {
-
       throw error;
-    }
   }
 });
 
@@ -61,7 +54,9 @@ const updateEmployeeShift = catchAsync(async (req, res) => {
  * @returns res
  */
 const getEmployeeShiftById = catchAsync(async (req, res) => {
+  
   const EmployeeShiftData = await employee_shift.getEmployeeShiftById(req.params.id);
+  console.log("request::",EmployeeShiftData)
   if (!EmployeeShiftData) {
     throw new ApiError(httpStatus.NOT_FOUND, "No Data found");
   }
