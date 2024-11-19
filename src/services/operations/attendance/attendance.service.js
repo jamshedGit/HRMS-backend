@@ -10,9 +10,7 @@ const Op = Sequelize.Op;
 
 //Attributes required for Attendance Table view
 const attendanceAttributes = [
-  'subsidiaryId',
   'employeeId',
-  'employeeCode',
   'comments',
   'attDate',
   'attDateIn',
@@ -21,6 +19,21 @@ const attendanceAttributes = [
   'timeOut',
   'Id',
   'isActive',
+  'shiftCode',
+  'interShifGap',
+  'shiftStartTime',
+  'shiftEndTime',
+  'shiftWorkingHours',
+  'shiftLateIn',
+  'shiftEarlyOut',
+  'shiftHalfDayStart',
+  'shiftHalfDayEnd',
+  'isOverTime',
+  'isIncludeInterShifGap',
+  'lateInHours',
+  'overtimeStart',
+  'oT',
+  'approvedOT'
 ]
 
 /**
@@ -150,7 +163,7 @@ const updateAttendanceById = async (body, updatedBy) => {
   body.updatedBy = updatedBy;
   body.attDate = body.attDateIn
   Object.assign(oldRecord, body);
-  const updatedData = await oldRecord.save({ fields: ['comments', 'attDate', 'attDateIn', 'attDateOut', 'timeIn', 'timeOut'] });
+  const updatedData = await oldRecord.save({ fields: ['comments', 'attDate', 'attDateIn', 'attDateOut', 'timeIn', 'timeOut', 'updatedBy'] });
   const data = await getAttendanceById(updatedData.Id, attendanceAttributes)
   return data;
 };
