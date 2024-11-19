@@ -37,7 +37,7 @@ const createEmployeeShift = catchAsync(async (req, res) => {
  * @returns res
  */
 const updateEmployeeShift = catchAsync(async (req, res) => {
-  console.log("fds", req.body)
+  
   const updatedEmployeeShiftData = await employee_shift.updateEmployeeShiftById(req.body, req.user.Id);
   res.send({
     code: HttpStatusCodes.OK,
@@ -56,7 +56,7 @@ const updateEmployeeShift = catchAsync(async (req, res) => {
 const getEmployeeShiftById = catchAsync(async (req, res) => {
   
   const EmployeeShiftData = await employee_shift.getEmployeeShiftById(req.params.id);
-  console.log("request::",EmployeeShiftData)
+  
   if (!EmployeeShiftData) {
     throw new ApiError(httpStatus.NOT_FOUND, "No Data found");
   }
@@ -75,7 +75,7 @@ const getEmployeeShiftById = catchAsync(async (req, res) => {
  * @returns res
  */
 const getAllEmployeeShift = catchAsync(async (req, res) => {
-   console.log("shift controller:")
+  
   const result = await employee_shift.queryEmployeeShifts(req);
   res.send({
     code: HttpStatusCodes.OK,

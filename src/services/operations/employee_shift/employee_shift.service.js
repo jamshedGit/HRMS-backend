@@ -49,7 +49,6 @@ const createEmployeeShift = async (req) => {
  */
 const queryEmployeeShifts = async (req) => {
 
-  console.log("get_all_shift")
   const options = pick(req.body, ['sortOrder', 'pageSize', 'pageNumber']);
   const searchQuery = req?.body?.filter?.searchQuery?.toLowerCase() || '';  //Get search field value for filtering
   const limit = options.pageSize;
@@ -96,7 +95,7 @@ const getEmployeeShiftById = async (id) => {
       }
     ],
   });
-  console.log("pak", a);
+  
   return a;
 };
 
@@ -124,9 +123,7 @@ const getAttConfigData = async (filters, attributes = null, include = null) => {
  * @returns {Promise<ReceiptModel>}
  */
 const updateEmployeeShiftById = async (body, updatedBy) => {
-  console.log(":ss1", body);
 
-  
   let oldRecord = await getAttConfigData({ subsidiaryId: body.subsidiaryId });
   // if (oldRecord && oldRecord.Id != body.Id) {
   //   throw new ApiError(httpStatus.FORBIDDEN, `subsidiary already in use ${body.subs.subsName}. Please use another subsidiary`);
@@ -138,7 +135,7 @@ const updateEmployeeShiftById = async (body, updatedBy) => {
 
   Object.assign(oldRecord, body);
   const updatedData = await oldRecord.save();
-  console.log(":ss:", updatedData);
+  
   const data = await getEmployeeShiftById(updatedData.Id)
   return data;
 };
