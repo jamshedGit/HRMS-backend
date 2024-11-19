@@ -61,7 +61,16 @@ const getAllItem = {
     pageSize: Joi.number().required(),
     pageNumber: Joi.number().required(),
     filter: Joi.object().keys({
-      searchQuery: Joi.optional()
+      subsidiaryId: Joi.number().allow('').optional(),
+      departmentId: Joi.number().allow('').optional(),
+      reportTo: Joi.number().allow('').optional(),
+      gradeId: Joi.number().allow('').optional(),
+      designationId: Joi.number().allow('').optional(),
+      locationId: Joi.number().allow('').optional(),
+      attendanceType: Joi.number().allow('').optional(),
+      employeeId: Joi.number().allow('').optional(),
+      from: Joi.date().allow('').optional(),
+      to: Joi.date().allow('').optional(),
     })
   }),
 };

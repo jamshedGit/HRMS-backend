@@ -2,7 +2,7 @@ const httpStatus = require("http-status");
 const { AttendanceModel, EmployeeProfileModel } = require("../../../models/index");
 const ApiError = require("../../../utils/ApiError");
 const Sequelize = require('sequelize');
-const { paginationFacts, addDaysInDate } = require("../../../utils/common");
+const { paginationFacts, addDaysInDate, handleNestedData } = require("../../../utils/common");
 const pick = require("../../../utils/pick");
 const { startOfDay, endOfDay } = require("date-fns");
 
@@ -74,28 +74,79 @@ const createAttendance = async (req) => {
  */
 const getAllattendance = async (req) => {
   const options = pick(req.body, ['sortOrder', 'pageSize', 'pageNumber']);
-  const searchQuery = req?.body?.filter?.searchQuery?.toLowerCase() || '';  //Get search field value for filtering
+  const filter = req?.body?.filter || {};
   const limit = options.pageSize;
   const offset = 0 + (options.pageNumber - 1) * limit;
-  const queryFilters = [
-    { Name: Sequelize.where(Sequelize.fn('LOWER', Sequelize.col('name')), 'LIKE', '%' + searchQuery + '%') },
-  ]
+
+  const employeeFilter = {};
+
+  if (filter.subsidiaryId) employeeFilter.subsidiaryId = filter.subsidiaryId;
+  if (filter.departmentId) employeeFilter.departmentId = filter.departmentId;
+  if (filter.reportTo) employeeFilter.reportTo = filter.reportTo;
+  if (filter.gradeId) employeeFilter.gradeId = filter.gradeId;
+  if (filter.designationId) employeeFilter.designationId = filter.designationId;
+  if (filter.locationId) employeeFilter.locationId = filter.locationId;
+  if (filter.attendanceType) employeeFilter.attendanceType = filter.attendanceType;
+  if (filter.employeeId) employeeFilter.Id = filter.employeeId;
+
+  let attendanceFilter = {};
+
+  if (filter.from) {
+    if (filter.to) {
+      const startOfDayDate = startOfDay(new Date(filter.from));
+      const endOfDayDate = endOfDay(new Date(filter.to));
+      attendanceFilter = {
+        attDateIn: {
+          [Op.between]: [startOfDayDate, endOfDayDate],  // Filters between start and end of the day
+        }
+      }
+    }
+  }
+
+  if (!Object.keys(employeeFilter).length && !Object.keys(attendanceFilter).length) {
+    return paginationFacts(0, limit, options.pageNumber, []);
+  }
+
 
   const { count, rows } = await AttendanceModel.findAndCountAll({
     order: [
-      ['createdAt', 'DESC']
+      ['attDateIn', 'DESC']
     ],
     where: {
-      [Op.or]: queryFilters,
+      ...attendanceFilter,
       isActive: true
     },
-    attributes: attendanceAttributes,
+    include: [
+      {
+        model: EmployeeProfileModel,
+        where: employeeFilter,
+        required: true,
+        attributes: [[Sequelize.literal(`CONCAT(firstName, ' ', lastName)`), 'fullName'],]
+      }
+    ],
+    attributes: [
+      'employeeCode',
+      [
+        Sequelize.literal(`DATE_FORMAT(attDateIn, '%e-%b-%Y')`),
+        'attDateIn',
+      ],
+      [
+        Sequelize.literal(`DATE_FORMAT(attDateOut, '%e-%b-%Y')`),
+        'attDateOut',
+      ],
+      'timeIn',
+      'timeOut',
+      'comments'
+    ],
     offset: offset,
     limit: limit,
   });
 
+  const updatedRows = handleNestedData(rows)
+
   //Send paginated data
-  return paginationFacts(count, limit, options.pageNumber, rows);
+  return paginationFacts(count, limit, options.pageNumber, updatedRows);
+
 };
 
 
