@@ -4,6 +4,7 @@ const { POLICY_TYPE } = require("../../../models/operations/allocate_leaves/enum
 const { allocateLeaveBalances } = require("../employee_leave_balance/employee_leave_balance.service");
 const httpStatus = require("http-status");
 const ApiError = require("../../../utils/ApiError");
+const { differenceInMinutes } = require("date-fns");
 
 const Op = Sequelize.Op;
 
@@ -13,6 +14,7 @@ const allocateLeavesAttributes = [
   'leaveCount',
   'policyType',
   'maxCount',
+  'updatedAt',
   'Id',
 ]
 
@@ -24,6 +26,19 @@ const allocateLeavesAttributes = [
  */
 const createallocateLeaves = async (req) => {
   const { list, ...rest } = req.body;
+
+  const latestUpdatedAt = list.find(el => {
+    return el.updatedAt && differenceInMinutes(
+      new Date(),
+      new Date(el.updatedAt)
+    ) <= 3
+  })
+
+  if(latestUpdatedAt){
+    throw new ApiError(httpStatus.CONFLICT, 'Allocating Leave balance is already in progress. Please update after some time.');
+  }
+
+
   //This function is to check and throw error if allocated Count of any leave type exceeds it's maxAllowed Limit
   await checkLeaveTypeLimits(req.body);
 
