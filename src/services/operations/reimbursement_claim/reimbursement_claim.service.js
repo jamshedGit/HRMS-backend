@@ -191,7 +191,9 @@ const getPayrollMonth = async () => {
     "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"
   ];
   
-  const result = await PayrollMonthModel.findAndCountAll({});
+  const result = await PayrollMonthModel.findAndCountAll({
+    where: { isActive:true },
+  });
 
   // Sort the rows by year in descending order
   result.rows.sort((a, b) => b.year - a.year || b.month - a.month);
