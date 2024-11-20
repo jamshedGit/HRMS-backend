@@ -78,6 +78,7 @@ const getAllattendance = async (req) => {
   const limit = options.pageSize;
   const offset = 0 + (options.pageNumber - 1) * limit;
 
+  //Prepare Employee Table Filters if any
   const employeeFilter = {};
 
   if (filter.subsidiaryId) employeeFilter.subsidiaryId = filter.subsidiaryId;
@@ -89,6 +90,7 @@ const getAllattendance = async (req) => {
   if (filter.attendanceType) employeeFilter.attendanceType = filter.attendanceType;
   if (filter.employeeId) employeeFilter.Id = filter.employeeId;
 
+  //Prepare Attendance Table Filters if any
   let attendanceFilter = {};
 
   if (filter.from) {
@@ -103,11 +105,13 @@ const getAllattendance = async (req) => {
     }
   }
 
+  //If no filter is present then send back response with no data
   if (!Object.keys(employeeFilter).length && !Object.keys(attendanceFilter).length) {
     return paginationFacts(0, limit, options.pageNumber, []);
   }
 
 
+  //Get data according to filters
   const { count, rows } = await AttendanceModel.findAndCountAll({
     order: [
       ['attDateIn', 'DESC']
@@ -142,6 +146,7 @@ const getAllattendance = async (req) => {
     limit: limit,
   });
 
+  //Handle nested data that comes with include
   const updatedRows = handleNestedData(rows)
 
   //Send paginated data
