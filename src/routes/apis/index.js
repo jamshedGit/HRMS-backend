@@ -65,6 +65,7 @@ const attendance_configuration=require('./operations/attendance_configuration/at
 const holidays=require('./operations/holidays/holidays.route')
 const employee_shift=require('./operations/employee_shift/employee_shift.route')
 const attendance=require('./operations/attendance/attendance.route')
+const employee_roster = require('./operations/employee_roster/employee_roster.route');
 
 const router = express.Router();
 
@@ -319,6 +320,10 @@ const defaultRoutes = [
   {
     path: "/attendance",
     route: attendance
+  },
+  {
+    path: "/employee_roster",
+    route: employee_roster
   },
 
 ];

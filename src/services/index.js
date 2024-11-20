@@ -61,3 +61,4 @@ module.exports.attendance_configuration=require("./operations/attendance_configu
 module.exports.HolidaysService=require("./operations/holidays/holidays.service")
 module.exports.employee_shift=require("./operations/employee_shift/employee_shift.service")
 module.exports.AttendanceServicePage=require("./operations/attendance/attendance.service")
+module.exports.EmployeeRosterServicePage = require('./operations/employee_roster/employee_roster.service')
