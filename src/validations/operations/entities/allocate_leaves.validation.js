@@ -7,7 +7,7 @@ const createItem = {
   query: Joi.disallow(),
   params: Joi.disallow(),
   body: Joi.object().keys({
-    subsidiaryId: Joi.number().optional(),
+    subsidiaryId: Joi.number().required(),
     cycleTypeId: Joi.number().optional(),
     yearId: Joi.number().optional(),
     list: Joi.array().items(
@@ -17,6 +17,7 @@ const createItem = {
         leaveCount: Joi.number().required(),
         policyType: Joi.number().required(),
         maxCount: Joi.number().required(),
+        updatedAt: Joi.any().optional()
       })
     ).min(1).required(),
   }),
