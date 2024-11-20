@@ -159,7 +159,7 @@ const deleteDeptById = async (Id) => {
 
 const sp_GetAllDepartments = async (filter, options, searchQuery) => {
   try {
-    console.log("mggg::")
+    console.log("mggg::",searchQuery)
     const results = await sequelize.query('CALL usp_GetAllDepartments()', {
      
       type: Sequelize.QueryTypes.RAW // Use RAW type for executing stored procedures
@@ -167,7 +167,7 @@ const sp_GetAllDepartments = async (filter, options, searchQuery) => {
 
     let limit = options.pageSize;
     let offset = 0 + (options.pageNumber - 1) * limit;
-    searchQuery = searchQuery.toLowerCase();
+    searchQuery = searchQuery;
     let searchlist = filterByValue(results, searchQuery);
    
     let count = searchlist.length;
@@ -185,7 +185,7 @@ function filterByValue(array, string) {
     return array;
   }
   return array.filter(o => Object.keys(o).some(k => {
-    return o['earningName'].toLowerCase().includes(string.toLowerCase()) || o['deductionName'].toLowerCase().includes(string.toLowerCase())
+    return o['department'].toLowerCase().includes(string.toLowerCase()) || o['deptCode'].toLowerCase().includes(string.toLowerCase())
   }
   )
   );

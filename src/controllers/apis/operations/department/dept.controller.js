@@ -85,7 +85,7 @@ const getAllParentDept = catchAsync(async (req, res) => {
 });
 
 const getDeptById = catchAsync(async (req, res) => {
-  console.log("dept Controller department Id", req.body.deptId.deptId)
+  console.log("dept Controller department Id", req.body)
   console.log(req.body)
   const dept = await deptFormService.getDeptById(req.body.deptId);
   if (!dept) {

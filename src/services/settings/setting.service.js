@@ -113,7 +113,7 @@ const getEmployeesMasterData = async () => {
 
 const getDeptMasterData = async () => {
   const DeptMasterData = getDdlItems(DDL_FIELD_NAMES.DeptName, await DeptModel.findAll({
-    where: { isActive: true, parentDept: null },
+    where: { isActive: true },
     attributes: ['deptId', 'deptName']
   }));
   return DeptMasterData
@@ -166,8 +166,6 @@ const getLeaveTypesData = async (employeeId) => {
       const leaveConfigData = await LeaveManagementConfigurationModel.findOne({
         where: {
           subsidiaryId: employeeWithLeaveConfig.subsidiaryId,
-          gradeId: employeeWithLeaveConfig.gradeId,
-          employeeTypeId: employeeWithLeaveConfig.employeeTypeId
         },
         attributes: ['Id'],
         include: [
@@ -212,8 +210,6 @@ const getEncashmentLeaveTypeData = async (employeeId, yearId) => {
       const leaveConfigData = await LeaveManagementConfigurationModel.findOne({
         where: {
           subsidiaryId: employeeWithLeaveConfig.subsidiaryId,
-          gradeId: employeeWithLeaveConfig.gradeId,
-          employeeTypeId: employeeWithLeaveConfig.employeeTypeId
         },
         attributes: ['Id'],
         include: [

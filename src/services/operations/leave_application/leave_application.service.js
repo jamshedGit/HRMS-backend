@@ -4,6 +4,7 @@ const ApiError = require("../../../utils/ApiError");
 const Sequelize = require('sequelize');
 const { paginationFacts, formatDates, addDaysInDate, getDateDiffInDays, handleNestedData } = require("../../../utils/common");
 const pick = require("../../../utils/pick");
+const { startOfDay, endOfDay } = require("date-fns");
 
 const Op = Sequelize.Op;
 
@@ -63,6 +64,8 @@ const createleaveApplication = async (req) => {
   if (!employeeData.t_employee_leave_balances?.length || (employeeData.t_employee_leave_balances[0].remainingCount < days)) {
     throw new ApiError(httpStatus.FORBIDDEN, `Remaining Leaves not enough`);
   }
+  const startDate = startOfDay(new Date(body.from));
+  const endDate = endOfDay(new Date(body.to));
   //Check if there is already an old application present that crosses with new date range
   const oldRecord = await getleaveApplicationData(
     {
@@ -70,14 +73,14 @@ const createleaveApplication = async (req) => {
       isActive: true,
       [Sequelize.Op.or]: [
         {
-          from: { [Sequelize.Op.between]: [body.from, body.to] }
+          from: { [Sequelize.Op.between]: [startDate, endDate] }
         },
         {
-          to: { [Sequelize.Op.between]: [body.from, body.to] }
+          to: { [Sequelize.Op.between]: [startDate, endDate] }
         },
         {
-          from: { [Sequelize.Op.lte]: body.from },
-          to: { [Sequelize.Op.gte]: body.to }
+          from: { [Sequelize.Op.lte]: startDate },
+          to: { [Sequelize.Op.gte]: endDate }
         }
       ]
     }
@@ -96,8 +99,8 @@ const createleaveApplication = async (req) => {
     ...body,
     createdBy: req.user.id,
     // companyId: 1,
-    days: days
-    // subsidiaryId: employeeData.subsidiaryId,
+    days: days,
+    subsidiaryId: employeeData.subsidiaryId,
   };
   //Create Leave Application if it's valid
   const createdData = await LeaveApplicationModel.create(payload);
@@ -271,9 +274,7 @@ const deleteleaveApplicationById = async (id) => {
 const checkAttachmentRequired = async (employeeData, body) => {
   const configurationWithPolicy = await LeaveManagementConfigurationModel.findOne({
     where: {
-      employeeTypeId: employeeData.employeeTypeId,
       subsidiaryId: employeeData.subsidiaryId,
-      gradeId: employeeData.gradeId,
     },
     include: [
       {
