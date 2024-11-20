@@ -281,4 +281,20 @@ const createFiscalYearLabel = (endDate, startDate) => {
   return `Year - ${new Date(endDate).getFullYear()} (${formatDates(new Date(startDate), 'dd-MMM-yyyy')} to ${formatDates(new Date(endDate), 'dd-MMM-yyyy')})`
 }
 
-module.exports = { handleNestedData, getRouteSlugs, getDdlItems, getAlarmTimesItems, customPaginate, paginationFacts, createDatetime, getPathStorageFromUrl, formatDates, getDateDiffInDays, addDaysInDate, check_range_exist, createFiscalYearLabel };
+/**
+ * 
+ * Create Label for Employee Shift Dropdown
+ * 
+ * @param {String} name 
+ * @param {Date} endDate 
+ * @param {Date} startDate 
+ * @returns 
+ */
+const createEmployeeShiftLabel = (name, endDate, startDate) => {
+  if(!endDate || !startDate){
+    return '';
+  }
+  return `${name} - (${formatDates(new Date(startDate), 'p')} to ${formatDates(new Date(endDate), 'p')})`
+}
+
+module.exports = { handleNestedData, getRouteSlugs, getDdlItems, getAlarmTimesItems, customPaginate, paginationFacts, createDatetime, getPathStorageFromUrl, formatDates, getDateDiffInDays, addDaysInDate, check_range_exist, createFiscalYearLabel, createEmployeeShiftLabel };

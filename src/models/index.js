@@ -152,5 +152,11 @@ module.exports.Employee_loan_request_detailModel=require("./operations/employee_
 module.exports.Attendance_ConfigurationModel = require("./operations/attendance_configuration/attendance_configuration.model")
 
 // Employee Shift Model
-module.exports.Employee_ShiftModel = require("./operations/employee_shift/employee_shift.model")
+module.exports.Employee_ShiftModel = require("./operations/employee_shift/employee_shift.model");
+
+//Employee Roster Model
+module.exports.EmployeeRosterModel = require('./operations/employee_roster/employee_roster.model');
+
+//Employee Roster Detail Model
+module.exports.EmployeeRosterDetailModel = require('./operations/employee_roster_detail/employee_roster_detail.model');
 module.exports.HolidaysModel= require("./operations/holidays/holidays.model")
