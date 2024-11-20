@@ -1,4 +1,4 @@
-const { AllocateLeavesModel, LeaveManagementConfigurationModel, LeaveTypePoliciesModel, LeaveTypeModel } = require("../../../models/index");
+const { AllocateLeavesModel, LeaveManagementConfigurationModel, LeaveTypePoliciesModel, LeaveTypeModel, FiscalSetupModel } = require("../../../models/index");
 const Sequelize = require('sequelize');
 const { POLICY_TYPE } = require("../../../models/operations/allocate_leaves/enum/allocate_leaves.enum");
 const { allocateLeaveBalances } = require("../employee_leave_balance/employee_leave_balance.service");
@@ -27,6 +27,12 @@ const allocateLeavesAttributes = [
 const createallocateLeaves = async (req) => {
   const { list, ...rest } = req.body;
 
+  const yearData = await FiscalSetupModel.findOne({ where: { Id: rest.yearId, isActive: true }, attributes: ['Id'] });
+
+  if(!yearData){
+    throw new ApiError(httpStatus.CONFLICT, 'Can only Edit or Update for current active year');
+  }
+
   const latestUpdatedAt = list.find(el => {
     return el.updatedAt && differenceInMinutes(
       new Date(),
@@ -34,10 +40,9 @@ const createallocateLeaves = async (req) => {
     ) <= 3
   })
 
-  if(latestUpdatedAt){
+  if (latestUpdatedAt) {
     throw new ApiError(httpStatus.CONFLICT, 'Allocating Leave balance is already in progress. Please update after some time.');
   }
-
 
   //This function is to check and throw error if allocated Count of any leave type exceeds it's maxAllowed Limit
   await checkLeaveTypeLimits(req.body);
@@ -147,9 +152,9 @@ const checkLeaveTypeLimits = async (body) => {
   })
 
   //Throw error only if limit exceeds.
-  if(leaveConfigData?.t_leave_type_policies?.length){
+  if (leaveConfigData?.t_leave_type_policies?.length) {
     let message = 'Max allowed of Leave Types are: ';
-    leaveConfigData.t_leave_type_policies.forEach((el)=> {
+    leaveConfigData.t_leave_type_policies.forEach((el) => {
       message += `Max ${el.t_leave_type.name} can be ${el.maxAllowed} `
     })
 
