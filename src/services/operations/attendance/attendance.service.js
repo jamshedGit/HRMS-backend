@@ -2,7 +2,7 @@ const httpStatus = require("http-status");
 const { AttendanceModel, EmployeeProfileModel } = require("../../../models/index");
 const ApiError = require("../../../utils/ApiError");
 const Sequelize = require('sequelize');
-const { paginationFacts, addDaysInDate, handleNestedData } = require("../../../utils/common");
+const { paginationFacts, handleNestedData, getDateDiffInDays, formatDates } = require("../../../utils/common");
 const pick = require("../../../utils/pick");
 const { startOfDay, endOfDay } = require("date-fns");
 
@@ -48,9 +48,15 @@ const createAttendance = async (req) => {
   if (oldRecord) {
     throw new ApiError(httpStatus.CONFLICT, 'Record Already Exists for this date')
   }
-  const employeeData = await EmployeeProfileModel.findByPk(body.employeeId, { attributes: ['employeeCode', 'subsidiaryId'] });
+  const employeeData = await EmployeeProfileModel.findByPk(body.employeeId, { attributes: ['employeeCode', 'subsidiaryId', 'dateOfJoining'] });
   if (!employeeData) {
     throw new ApiError(httpStatus.BAD_REQUEST, 'Employee Not Found')
+  }
+  if(employeeData.dateOfJoining){
+    const diffInDays = getDateDiffInDays(startOfDay(new Date(employeeData.dateOfJoining)), startOfDay(new Date(body.attDateIn)))
+    if(diffInDays < 1){
+      throw new ApiError(httpStatus.BAD_REQUEST, `Employee's Joining date is ${formatDates(employeeData.dateOfJoining)}. Cannot set attendance before that`)
+    }
   }
   const payload = {
     ...body,
@@ -114,7 +120,7 @@ const getAllattendance = async (req) => {
   //Get data according to filters
   const { count, rows } = await AttendanceModel.findAndCountAll({
     order: [
-      ['attDateIn', 'DESC']
+      ['attDateIn', 'ASC']
     ],
     where: {
       ...attendanceFilter,
@@ -130,13 +136,14 @@ const getAllattendance = async (req) => {
     ],
     attributes: [
       'employeeCode',
+      'attDateIn',
       [
         Sequelize.literal(`DATE_FORMAT(attDateIn, '%e-%b-%Y')`),
-        'attDateIn',
+        'formattedDateIn',
       ],
       [
         Sequelize.literal(`DATE_FORMAT(attDateOut, '%e-%b-%Y')`),
-        'attDateOut',
+        'formattedDateOut',
       ],
       'timeIn',
       'timeOut',
