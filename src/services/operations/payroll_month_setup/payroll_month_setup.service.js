@@ -45,7 +45,10 @@ const queryPayrollMonths = async (filter, options, searchQuery) => {
   
   searchQuery = searchQuery.toLowerCase();
   const queryFilters = [
-    { Name: Sequelize.where(Sequelize.fn('LOWER', Sequelize.col('startDate')), 'LIKE', '%' + searchQuery + '%') },
+    { startDate: Sequelize.where(Sequelize.fn('LOWER', Sequelize.col('startDate')), 'LIKE', '%' + searchQuery + '%') },
+    { endDate: Sequelize.where(Sequelize.fn('LOWER', Sequelize.col('endDate')), 'LIKE', '%' + searchQuery + '%') },
+    { month: Sequelize.where(Sequelize.fn('LOWER', Sequelize.col('month')), 'LIKE', '%' + searchQuery + '%') },
+    { year: Sequelize.where(Sequelize.fn('LOWER', Sequelize.col('year')), 'LIKE', '%' + searchQuery + '%') },
   ]
 
 
