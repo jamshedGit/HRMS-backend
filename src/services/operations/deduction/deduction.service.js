@@ -44,7 +44,8 @@ const queryDeductions = async (filter, options, searchQuery) => {
 
   searchQuery = searchQuery.toLowerCase();
   const queryFilters = [
-    { skill: Sequelize.where(Sequelize.fn('LOWER', Sequelize.col('skill')), 'LIKE', '%' + searchQuery + '%') },
+    { deductionCode: Sequelize.where(Sequelize.fn('LOWER', Sequelize.col('deductionCode')), 'LIKE', '%' + searchQuery + '%') },
+    { deductionName: Sequelize.where(Sequelize.fn('LOWER', Sequelize.col('deductionName')), 'LIKE', '%' + searchQuery + '%') },
   ]
 
 
@@ -58,6 +59,14 @@ const queryDeductions = async (filter, options, searchQuery) => {
     },
     offset: offset,
     limit: limit,
+    include: [
+      {
+        model: DeductionModel.SubsidiaryModel,
+        attributes: ["Id", ["name", "subsName"]],
+        as: "subsList"
+      }
+    ],
+    
   });
 
 
@@ -108,7 +117,10 @@ function filterByValue(array, string) {
     return array;
   }
   return array.filter(o => Object.keys(o).some(k => {
-    return o['deductionCode'].toLowerCase().includes(string.toLowerCase()) || o['deductionName'].toLowerCase().includes(string.toLowerCase())
+    return o['deductionCode'].toLowerCase().includes(string.toLowerCase()) 
+    || o['deductionName'].toLowerCase().includes(string.toLowerCase()) 
+    || o['subsidiary'].toLowerCase().includes(string.toLowerCase())
+    || o['account'].toLowerCase().includes(string.toLowerCase())
   }
   )
   );
