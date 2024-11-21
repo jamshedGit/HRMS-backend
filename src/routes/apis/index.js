@@ -64,6 +64,8 @@ const employee_loan_request=require('./operations/employee_loan_request/employee
 const attendance_configuration=require('./operations/attendance_configuration/attendance_configuration.route')
 const holidays=require('./operations/holidays/holidays.route')
 const employee_shift=require('./operations/employee_shift/employee_shift.route')
+const attendance=require('./operations/attendance/attendance.route')
+const employee_roster = require('./operations/employee_roster/employee_roster.route');
 
 const router = express.Router();
 
@@ -315,7 +317,14 @@ const defaultRoutes = [
     path: "/employee_shift",
     route: employee_shift
   },
-
+  {
+    path: "/attendance",
+    route: attendance
+  },
+  {
+    path: "/employee_roster",
+    route: employee_roster
+  },
 
 ];
 
