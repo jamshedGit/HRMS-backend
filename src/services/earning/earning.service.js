@@ -108,7 +108,8 @@ function filterByValue(array, string) {
     return array;
   }
   return array.filter(o => Object.keys(o).some(k => {
-    return o['earningCode'].toLowerCase().includes(string.toLowerCase()) || o['earningName'].toLowerCase().includes(string.toLowerCase())
+    return o['earningCode'].toLowerCase().includes(string.toLowerCase()) 
+    || o['earningName'].toLowerCase().includes(string.toLowerCase())
   }
   )
   );

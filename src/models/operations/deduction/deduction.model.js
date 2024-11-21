@@ -17,7 +17,10 @@ const DeductionModel = sequelize.define('t_employee_deduction', {
 	loan: { type: Sequelize.BOOLEAN, allowNull: true, defaultValue: true },
 	mappedDeduction : { type: Sequelize.STRING, allowNull: true, defaultValue: true },
 	account : { type: Sequelize.STRING, allowNull: true, defaultValue: true },
+	subsidiaryId : { type: Sequelize.NUMBER, allowNull: true, defaultValue: true },
+	companyId : { type: Sequelize.NUMBER, allowNull: true, defaultValue: true },
 	isActive: { type: Sequelize.BOOLEAN, allowNull: true, defaultValue: true },
+
 	createdBy: {
 		type: Sequelize.INTEGER,
 		allowNull: true,

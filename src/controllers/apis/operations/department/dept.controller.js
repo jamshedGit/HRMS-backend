@@ -47,7 +47,7 @@ const getAllDept = catchAsync(async (req, res) => {
   const options = pick(req.body, ['sortOrder', 'pageSize', 'pageNumber']);
   const searchQuery = req.body.filter.searchQuery ? req.body.filter.searchQuery : '';
   const result = await deptFormService.sp_GetAllDepartments(filter, options, searchQuery);
-  console.log("pppp",result);
+  console.log("pppp", result);
   res.send({
     code: HttpStatusCodes.OK,
     message: HttpResponseMessages.OK,
@@ -56,7 +56,7 @@ const getAllDept = catchAsync(async (req, res) => {
 });
 
 const getAllParentDept = catchAsync(async (req, res) => {
-   console.log("get parent dept");
+  console.log("get parent dept");
   // const obj = {};
   // const filter = obj;
   // // const options = pick(req.body, ["sortBy", "limit", "page"]);
@@ -69,7 +69,7 @@ const getAllParentDept = catchAsync(async (req, res) => {
   //   message: HttpResponseMessages.OK,
   //   data: result,
   // });
- // console.log("get Compensation_Beneftis");
+  // console.log("get Compensation_Beneftis");
   const obj = {};
   const filter = obj;
   // const options = pick(req.body, ["sortBy", "limit", "page"]);
@@ -99,13 +99,27 @@ const getDeptById = catchAsync(async (req, res) => {
 });
 
 const updateDept = catchAsync(async (req, res) => {
-  console.log("dept_Id", req.body.deptId, req.body, req.user.id);
-  const dept = await deptFormService.updateDeptById(req.body.deptId, req.body, req.user.id);
-  res.send({
-    code: HttpStatusCodes.OK,
-    message: HttpResponseMessages.OK,
-    data: dept,
-  });
+
+  try {
+
+    console.log("dept_Id", req.body.deptId, req.body, req.user.id);
+    const dept = await deptFormService.updateDeptById(req.body.deptId, req.body, req.user.id);
+    res.send({
+      code: HttpStatusCodes.OK,
+      message: HttpResponseMessages.OK,
+      data: dept,
+    });
+  }
+  catch (error) {
+
+    if (error.parent.errno === 1062) {
+      throw new ApiError(httpStatus.NOT_FOUND, "Duplicate entry not allowed!");
+    }
+    else {
+
+      throw error;
+    }
+  }
 });
 
 const deleteDept = catchAsync(async (req, res) => {

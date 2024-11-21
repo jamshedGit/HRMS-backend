@@ -10,6 +10,8 @@ const createDeductionValidation = {
         loan: Joi.boolean(),
         mappedDeduction: Joi.string(),
         account: Joi.any().optional(),
+        subsidiaryId: Joi.any().optional(),
+        companyId: Joi.any().optional(),
     }),
 };
 
