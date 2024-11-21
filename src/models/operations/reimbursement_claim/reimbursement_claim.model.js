@@ -59,7 +59,6 @@ const Reimbursement_claim = sequelize.define('t_reimbursement_claim', {
 	targetKey: 'Id',
 	as:"ReimbursementConfiguration"
   });
-  PayrollMonthModel
 
   Reimbursement_claim.belongsTo(PayrollMonthModel, {
 	foreignKey: 'pay_in_payroll_forId',
