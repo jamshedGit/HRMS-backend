@@ -135,9 +135,8 @@ const getRevisionHistoryByEmpId = catchAsync(async (req, res) => {
 });
 
 const GetLastInserted_ID_ByTableName = catchAsync(async (req, res) => {
-  console.log("GetLastInserted_ID_ByTableName")
-  console.log(req.body)
-  const Receipt = await settingService.GetLastInserted_ID_ByTableName(req.body.tableName,req.body.prefix);
+  
+  const Receipt = await settingService.GetLastInserted_ID_ByTableName(req.body.tableName,req.body.pkIdColumn,req.body.whereClause);
   if (!Receipt) {
     throw new ApiError(httpStatus.NOT_FOUND, "Receipt not found");
   }

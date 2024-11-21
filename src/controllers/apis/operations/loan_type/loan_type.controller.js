@@ -24,15 +24,15 @@ const createLoanType = catchAsync(async (req, res) => {
     });
 
   } catch (error) {
-   
+
     if (error.parent.errno === 1062) {
-     throw new ApiError(httpStatus.NOT_FOUND, "Duplicate entry not allowed!");
-   }
-   else {
-    
-     throw error;
-   }
- }
+      throw new ApiError(httpStatus.NOT_FOUND, "Duplicate entry not allowed!");
+    }
+    else {
+
+      throw error;
+    }
+  }
 });
 
 const getAllLoanType = catchAsync(async (req, res) => {
@@ -41,8 +41,8 @@ const getAllLoanType = catchAsync(async (req, res) => {
   const filter = obj;
   // const options = pick(req.body, ["sortBy", "limit", "page"]);
   const options = pick(req.body, ['sortOrder', 'pageSize', 'pageNumber']);
-  const searchQuery = req.body.filter.searchQuery? req.body.filter.searchQuery : '';
-  const result = await LoanTypeformService.LoanTypeService.queryLoanTypes(filter, options,searchQuery);
+  const searchQuery = req.body.filter.searchQuery ? req.body.filter.searchQuery : '';
+  const result = await LoanTypeformService.LoanTypeService.queryLoanTypes(filter, options, searchQuery);
   console.log(result);
   res.send({
     code: HttpStatusCodes.OK,
@@ -81,23 +81,49 @@ const getLoanTypeById = catchAsync(async (req, res) => {
 });
 
 const updateLoanType = catchAsync(async (req, res) => {
-  console.log(req.body);
-  const Receipt = await LoanTypeformService.LoanTypeService.updateLoanTypeById(req.body.Id, req.body, req.user.Id);
-  res.send({
-    code: HttpStatusCodes.OK,
-    message: HttpResponseMessages.OK,
-    data: Receipt,
-  });
+  try {
+
+    console.log(req.body);
+    const Receipt = await LoanTypeformService.LoanTypeService.updateLoanTypeById(req.body.Id, req.body, req.user.Id);
+    res.send({
+      code: HttpStatusCodes.OK,
+      message: HttpResponseMessages.OK,
+      data: Receipt,
+    });
+  } catch (error) {
+
+    if (error.parent.errno === 1062) {
+      throw new ApiError(httpStatus.NOT_FOUND, "Duplicate entry is not allowed!");
+    }
+    else {
+
+      throw error;
+    }
+  }
 });
 
 const deleteLoanType = catchAsync(async (req, res) => {
-  console.log("req.body.Id " ,req.body.Id)
-  const Receipt = await LoanTypeformService.LoanTypeService.deleteLoanTypeById(req.body.Id);
-  res.send({
-    code: HttpStatusCodes.OK,
-    message: HttpResponseMessages.OK,
-    data: Receipt,
-  });
+  try {
+
+
+    console.log("req.body.Id ", req.body.Id)
+    const Receipt = await LoanTypeformService.LoanTypeService.deleteLoanTypeById(req.body.Id);
+    res.send({
+      code: HttpStatusCodes.OK,
+      message: HttpResponseMessages.OK,
+      data: Receipt,
+    });
+  }
+  catch (error) {
+
+    if (error.parent.errno === 1451) {
+      throw new ApiError(httpStatus.NOT_FOUND, "Record in another used!");
+    }
+    else {
+
+      throw error;
+    }
+  }
 });
 
 

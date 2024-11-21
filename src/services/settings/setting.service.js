@@ -3,7 +3,8 @@ const { getDdlItems, getAlarmTimesItems, formatDates, createFiscalYearLabel } = 
 const { DDL_FIELD_NAMES } = require('../../utils/constants');
 const { getRoleById } = require('./role.service');
 const Sequelize = require('sequelize');
-const sequelize = require('../../config/db')
+const sequelize = require('../../config/db');
+const ApiError = require('../../utils/ApiError');
 const Op = Sequelize.Op;
 
 const getRolesMasterData = async (roleId) => {
@@ -140,8 +141,8 @@ const getRevisionHistoryByEmpId = async (employeeId) => {
 const getFormMenusMasterData = async (req, res) => {
   const FormMenusMasterData = getDdlItems(DDL_FIELD_NAMES.FormMenus, await FormModel.findAll({
     where: { isActive: true, parentFormID: req.body.Id || null },
-    attributes: ['formName', 'Id','formCode']
-  }),req.body.mergeLabel);
+    attributes: ['formName', 'Id', 'formCode']
+  }), req.body.mergeLabel);
 
   // if (FormMenusMasterData.length > 0) {
   //   FormMenusMasterData.unshift({ label: req.body.text || '--Select--', value: null, code: null, mergeLabel: "--Select--" })
@@ -239,18 +240,14 @@ const getCitiesMasterData = async (countryId) => {
 };
 
 
-
-
-
-
-
-const GetLastInserted_ID_ByTableName = async (tableName, prefix) => {
+const GetLastInserted_ID_ByTableName = async (p_TableName, pkIdColumnName, whereClause) => {
   try {
-    const results = await sequelize.query('CALL GetLastInsertedIdByTableName(:tableName,:prefix)', {
-      replacements: { tableName: tableName, prefix: prefix },
+    console.log("::results::", p_TableName, pkIdColumnName, whereClause);
+    const results = await sequelize.query('CALL usp_GenerateDynamicId(:p_TableName,:p_IdColumn,:p_WhereClause)', {
+      replacements: { p_TableName: p_TableName, p_IdColumn: pkIdColumnName, p_WhereClause: whereClause },
       type: Sequelize.QueryTypes.RAW // Use RAW type for executing stored procedures
     });
-
+    console.log("::dd::", results);
     return results;
   } catch (error) {
     throw new ApiError(httpStatus.INTERNAL_SERVER_ERROR, error);
