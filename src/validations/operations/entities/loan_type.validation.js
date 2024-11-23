@@ -6,7 +6,7 @@ const createFormValidation = {
     body: Joi.object().keys({
         code: Joi.string(),
         name: Joi.string(),
-        linkedAttendance: Joi.any().optional(),
+      //  linkedAttendance: Joi.any().optional(),
         subsidiaryId: Joi.any().optional(),
         companyId: Joi.any().optional(),
         accountId: Joi.any().optional(),

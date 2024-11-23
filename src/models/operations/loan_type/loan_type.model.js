@@ -13,7 +13,7 @@ const Model = sequelize.define('t_loan_type_setup', {
 	},
 	code : { type: Sequelize.STRING(6), allowNull: true, defaultValue: true },
 	name  : { type: Sequelize.STRING(50), allowNull: true, defaultValue: true },
-	linkedAttendance : { type: Sequelize.BOOLEAN, allowNull: true, defaultValue: true },
+	//linkedAttendance : { type: Sequelize.BOOLEAN, allowNull: true, defaultValue: true },
 	accountId : { type: Sequelize.INTEGER, allowNull: true, defaultValue: true },
 	subsidiaryId : { type: Sequelize.INTEGER, allowNull: true, defaultValue: true },
 	companyId : { type: Sequelize.INTEGER, allowNull: true, defaultValue: true },
