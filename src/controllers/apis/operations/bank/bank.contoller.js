@@ -22,16 +22,16 @@ const createBank = catchAsync(async (req, res) => {
       data: Bank
     });
 
-  }  catch (error) {
-   
+  } catch (error) {
+
     if (error.parent.errno === 1062) {
-     throw new ApiError(httpStatus.NOT_FOUND, "Duplicate entry not allowed!");
-   }
-   else {
-    
-     throw error;
-   }
- }
+      throw new ApiError(httpStatus.NOT_FOUND, "Duplicate entry not allowed!");
+    }
+    else {
+
+      throw error;
+    }
+  }
 });
 
 const getAllBanks = catchAsync(async (req, res) => {
@@ -40,8 +40,8 @@ const getAllBanks = catchAsync(async (req, res) => {
   const filter = obj;
   // const options = pick(req.body, ["sortBy", "limit", "page"]);
   const options = pick(req.body, ['sortOrder', 'pageSize', 'pageNumber']);
-  const searchQuery = req.body.filter.searchQuery? req.body.filter.searchQuery : '';
-  const result = await bankformService.bankFormService.queryBanks(filter, options,searchQuery);
+  const searchQuery = req.body.filter.searchQuery ? req.body.filter.searchQuery : '';
+  const result = await bankformService.bankFormService.queryBanks(filter, options, searchQuery);
   console.log(result);
   res.send({
     code: HttpStatusCodes.OK,
@@ -51,8 +51,7 @@ const getAllBanks = catchAsync(async (req, res) => {
 });
 
 const getBankById = catchAsync(async (req, res) => {
-  console.log("bank Controller getbankId")
-  console.log(req.body)
+
   const Receipt = await bankformService.bankFormService.getBankById(req.body.Id);
   if (!Receipt) {
     throw new ApiError(httpStatus.NOT_FOUND, "Receipt not found");
@@ -65,17 +64,31 @@ const getBankById = catchAsync(async (req, res) => {
 });
 
 const updateBank = catchAsync(async (req, res) => {
-  console.log(req.body);
-  const Receipt = await bankformService.bankFormService.updateBankById(req.body.Id, req.body, req.user.Id);
-  res.send({
-    code: HttpStatusCodes.OK,
-    message: HttpResponseMessages.OK,
-    data: Receipt,
-  });
+
+  try {
+
+    const bank = await bankformService.bankFormService.updateBankById(req.body.Id, req.body, req.user.Id);
+    
+    res.send({
+      code: HttpStatusCodes.OK,
+      message: HttpResponseMessages.OK,
+      data: bank,
+    });
+
+  } catch (error) {
+    console.log("bank error",error)
+    if (error.parent.errno === 1062) {
+      throw new ApiError(httpStatus.NOT_FOUND, "Duplicate entry not allowed!");
+    }
+    else {
+
+      throw error;
+    }
+  }
 });
 
 const deleteBank = catchAsync(async (req, res) => {
-  console.log("req.body.Id " ,req.body.Id)
+  console.log("req.body.Id ", req.body.Id)
   const Receipt = await bankformService.bankFormService.deleteBankById(req.body.Id);
   res.send({
     code: HttpStatusCodes.OK,
