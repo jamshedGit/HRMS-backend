@@ -100,16 +100,28 @@ const getBankById = async (id) => {
  * @returns {Promise<ReceiptModel>}
  */
 const updateBankById = async (Id, updateBody, updatedBy) => {
+  try {
 
-  const Item = await getBankById(Id);
-  if (!Item) {
-    throw new ApiError(httpStatus.NOT_FOUND, "record not found");
+
+    const Item = await getBankById(Id);
+    if (!Item) {
+      throw new ApiError(httpStatus.NOT_FOUND, "record not found");
+    }
+    console.log("::tt:::::",updateBody)
+    updateBody.updatedBy = updatedBy;
+    delete updateBody.id;
+    Object.assign(Item, updateBody);
+    await Item.save();
+  } catch (error) {
+    console.log("bank error:::",error)
+    if (error.errno === 1062) {
+      throw new ApiError(httpStatus.NOT_FOUND, "Duplicate entry not allowed!");
+    }
+    else {
+
+      throw error;
+    }
   }
-
-  updateBody.updatedBy = updatedBy;
-  delete updateBody.id;
-  Object.assign(Item, updateBody);
-  await Item.save();
   return;
 };
 

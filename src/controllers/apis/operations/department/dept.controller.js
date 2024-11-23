@@ -102,7 +102,7 @@ const updateDept = catchAsync(async (req, res) => {
 
   try {
 
-    console.log("dept_Id", req.body.deptId, req.body, req.user.id);
+   
     const dept = await deptFormService.updateDeptById(req.body.deptId, req.body, req.user.id);
     res.send({
       code: HttpStatusCodes.OK,
@@ -123,13 +123,27 @@ const updateDept = catchAsync(async (req, res) => {
 });
 
 const deleteDept = catchAsync(async (req, res) => {
-  console.log("req.body.Id ", req.body)
-  const dept = await deptFormService.deleteDeptById(req.body.Id);
-  res.send({
-    code: HttpStatusCodes.OK,
-    message: HttpResponseMessages.OK,
-    data: dept,
-  });
+  try {
+
+
+    console.log("req.body.Id ", req.body)
+    const dept = await deptFormService.deleteDeptById(req.body.Id);
+    res.send({
+      code: HttpStatusCodes.OK,
+      message: HttpResponseMessages.OK,
+      data: dept,
+    });
+
+  } catch (error) {
+
+    if (error.parent.errno === 1451) {
+      throw new ApiError(httpStatus.NOT_FOUND, "Record is in another used!");
+    }
+    else {
+
+      throw error;
+    }
+  }
 });
 
 
