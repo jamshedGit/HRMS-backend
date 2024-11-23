@@ -263,7 +263,7 @@ const getPayrollMonth = async () => {
   ];
   
   const result = await PayrollMonthModel.findAndCountAll({
-    where:{isActive:true}
+    // where:{isActive:true}
   });
 
   // Sort the rows by year in descending order
@@ -272,7 +272,9 @@ const getPayrollMonth = async () => {
   // Map the results to the desired format
   const formattedResult = result.rows.map(row => ({
     value: row.Id, // Assuming 'id' is the field for the unique identifier
-    label: `${monthNames[row.month - 1]} ${row.year}` // Convert month number to name
+    label: `${monthNames[row.month - 1]} ${row.year}`, // Convert month number to name
+    isActive:row.isActive
+ 
   }));
 
   return  formattedResult
