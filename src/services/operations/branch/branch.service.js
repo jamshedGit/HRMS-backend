@@ -52,7 +52,8 @@ const queryBranch = async (filter, options, searchQuery) => {
     // { isActive: sequelize.where }
     // { Id: Sequelize.where(Sequelize.fn('LOWER', Sequelize.col('Id')), 'LIKE', '%' + searchQuery + '%') },
      { Name: Sequelize.where(Sequelize.fn('LOWER', Sequelize.col('bank.Name')), 'LIKE', '%' + searchQuery + '%') },
-     { Name: Sequelize.where(Sequelize.fn('LOWER', Sequelize.col('branchCode')), 'LIKE', '%' + searchQuery + '%') },
+     { branchCode: Sequelize.where(Sequelize.fn('LOWER', Sequelize.col('branchCode')), 'LIKE', '%' + searchQuery + '%') },
+    //  { Name: Sequelize.where(Sequelize.fn('LOWER', Sequelize.col('name')), 'LIKE', '%' + searchQuery + '%') },
      
     // { bankName: Sequelize.where(Sequelize.fn('LOWER', Sequelize.col('bankName')), 'LIKE', '%' + searchQuery + '%') },
 

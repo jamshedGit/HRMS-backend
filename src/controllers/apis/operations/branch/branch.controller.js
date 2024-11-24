@@ -72,6 +72,10 @@ const getBranchById = catchAsync(async (req, res) => {
 });
 
 const updateBranch = catchAsync(async (req, res) => {
+
+  try {
+    
+  
   console.log(req.body);
   const Receipt = await branchformService.branchFormService.updateBranchById(req.body.Id, req.body, req.user.Id);
   res.send({
@@ -79,6 +83,17 @@ const updateBranch = catchAsync(async (req, res) => {
     message: HttpResponseMessages.OK,
     data: Receipt,
   });
+
+} catch (error) {
+   
+    if (error.parent.errno === 1062) {
+     throw new ApiError(httpStatus.NOT_FOUND, "Duplicate entry not allowed!");
+   }
+   else {
+    
+     throw error;
+   }
+ }
 });
 
 const deleteBranch = catchAsync(async (req, res) => {
