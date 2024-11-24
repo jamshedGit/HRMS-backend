@@ -11,7 +11,7 @@ const branch = sequelize.define('t_bank_branch', {
 		primaryKey:true
 	},
 	 Name: { type: Sequelize.STRING, allowNull:true },
-	 bankId: { type: Sequelize.INTEGER, allowNull:true },
+	 BankId: { type: Sequelize.INTEGER, allowNull:true },
 	 branchCode: { type: Sequelize.STRING, allowNull:true },
 	 countryId: { type: Sequelize.INTEGER, allowNull:true },
 	 cityId: { type: Sequelize.INTEGER, allowNull:true },
