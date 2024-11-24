@@ -139,20 +139,21 @@ const createAttendanceConfiguration = async (req) => {
    */
   const updateAttendanceConfigurationById = async (body, updatedBy) => {
     console.log(":ss1", body);
-    let oldRecord = await getAttConfigData({ subsidiaryId: body.subsidiaryId });
-    if (oldRecord && oldRecord.Id != body.Id) {
-      throw new ApiError(httpStatus.FORBIDDEN, `subsidiary already in use ${body.subs.subsName}. Please use another subsidiary`);
-    }
-    else {
-      oldRecord = await getAttendanceConfigurationById(body.Id)
-    }
+    // let oldRecord = await getAttConfigData({ subsidiaryId: body.subsidiaryId });
+    // if (oldRecord && oldRecord.Id != body.Id) {
+    //   throw new ApiError(httpStatus.FORBIDDEN, `subsidiary already in use ${body.subs.subsName}. Please use another subsidiary`);
+    // }
+    // else {
+    //   oldRecord = await getAttendanceConfigurationById(body.Id)
+    // }
+    const oldRecord = await getAttendanceConfigurationById(body.Id)
     body.updatedBy = updatedBy;
 
     Object.assign(oldRecord, body);
     const updatedData = await oldRecord.save();
     console.log(":ss:", updatedData);
-    const data = await getAttendanceConfigurationById(updatedData.Id)
-    return data;
+   // const data = await getAttendanceConfigurationById(updatedData.Id)
+    return updatedData;
   };
 
   /**
