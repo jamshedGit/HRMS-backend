@@ -176,7 +176,6 @@ const queryreimbursement_claim = async (
 //       row.PayInPayrollForIdYear=`${monthNames[month - 1]}-${year}`
 //       return row
 //     });
-// console.log("row111",rows2)
 //     return paginationFacts(count, limit, options.pageNumber, rows2);
 //   } else {
 //     return paginationFacts(count, limit, options.pageNumber, rows2 = []);
