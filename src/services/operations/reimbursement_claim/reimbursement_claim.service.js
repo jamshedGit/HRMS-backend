@@ -84,7 +84,7 @@ const queryreimbursement_claim = async (
           },
           {
             model: EmployeeProfileModel,
-            attributes: ["firstName"],
+            attributes: ["firstName","dateofJoining"],
             as: "Employee",
           },
           {
@@ -199,6 +199,11 @@ const getreimbursement_claimById = async (id) => {
         model: FormModel,
         attributes: ["formName", "formCode"],
         as: "ReimbursementType",
+      },
+      {
+        model: PayrollMonthModel,
+        attributes: ["month","year"],
+        as: "PayInPayrollForId",
       },
   
     ],
