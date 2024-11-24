@@ -16,7 +16,8 @@ const EarningModel = sequelize.define('t_employee_earning', {
 	linkedAttendance : { type: Sequelize.BOOLEAN, allowNull: true, defaultValue: true },
 	isTaxable: { type: Sequelize.BOOLEAN, allowNull: true, defaultValue: true },
 	mappedAllowance : { type: Sequelize.STRING, allowNull: true, defaultValue: true },
-	account : { type: Sequelize.STRING, allowNull: true, defaultValue: true },
+	account : { type: Sequelize.INTEGER, allowNull: true, defaultValue: true },
+	subsidiaryId : { type: Sequelize.INTEGER, allowNull: true, defaultValue: true },
 	isActive: { type: Sequelize.BOOLEAN, allowNull: true, defaultValue: true },
 	createdBy: {
 		type: Sequelize.INTEGER,

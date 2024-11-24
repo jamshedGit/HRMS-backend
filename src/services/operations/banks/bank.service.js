@@ -1,6 +1,6 @@
 const httpStatus = require("http-status");
 const axios = require("axios")
-const  BankModel  = require("../../../models/index");
+const BankModel = require("../../../models/index");
 const ApiError = require("../../../utils/ApiError");
 const sequelize = require("../../../config/db");
 const Sequelize = require('sequelize');
@@ -16,14 +16,16 @@ const Op = Sequelize.Op;
  * @returns {Promise<Bank>}
  */
 const createBank = async (req, BankBody) => {
-    console.log("Bank Body", BankBody)
+  console.log("Bank Body", BankBody)
   // BankBody.slug = BankBody.name.replace(/ /g, "-").toLowerCase();
   console.log(req.user.id);
   BankBody.createdBy = req.user.id;
-  console.log(BankBody,"body");
+  console.log(BankBody, "body");
   const addedBankObj = await BankModel.BankModel.create(BankBody);
   //authSMSSend(addedBankObj.dataValues);  // Quick send message at the time of donation
-  return addedBankObj;
+  const fetchRecord = await getBankById(addedBankObj.Id);
+  console.log("fetchRecord", fetchRecord)
+  return fetchRecord;
 };
 
 
@@ -38,15 +40,15 @@ const createBank = async (req, BankBody) => {
  * @returns {Promise<QueryResult>}
  */
 const queryBanks = async (filter, options, searchQuery) => {
-  
+
   let limit = options.pageSize;
   let offset = 0 + (options.pageNumber - 1) * limit;
-  
+
   searchQuery = searchQuery.toLowerCase();
   const queryFilters = [
-    { Name: Sequelize.where(Sequelize.fn('LOWER', Sequelize.col('Name')), 'LIKE', '%' + searchQuery + '%') },
+    { subsidiary: Sequelize.where(Sequelize.fn('LOWER', Sequelize.col('subs.name')), 'LIKE', '%' + searchQuery + '%') },
+    { Name: Sequelize.where(Sequelize.fn('LOWER', Sequelize.col('t_bank.Name')), 'LIKE', '%' + searchQuery + '%') },
   ]
-
 
   const { count, rows } = await BankModel.BankModel.findAndCountAll({
     order: [
@@ -58,11 +60,18 @@ const queryBanks = async (filter, options, searchQuery) => {
     },
     offset: offset,
     limit: limit,
+    include: [
+      {
+        model: BankModel.SubsidiaryModel,
+        attributes: ["Id", ["name", "subsName"]],
+        as: "subs"
+      }
+    ],
   });
 
 
   return paginationFacts(count, limit, options.pageNumber, rows);
-  
+
 };
 
 /**
@@ -71,7 +80,15 @@ const queryBanks = async (filter, options, searchQuery) => {
  * @returns {Promise<ReceiptModel>}
  */
 const getBankById = async (id) => {
-  return BankModel.BankModel.findByPk(id);
+  return BankModel.BankModel.findByPk(id, {
+    include: [
+      {
+        model: BankModel.SubsidiaryModel,
+        attributes: ["Id", ["name", "subsName"]],
+        as: "subs"
+      }
+    ],
+  });
 };
 
 
@@ -83,18 +100,29 @@ const getBankById = async (id) => {
  * @returns {Promise<ReceiptModel>}
  */
 const updateBankById = async (Id, updateBody, updatedBy) => {
+  try {
 
-  const Item = await getBankById(Id);
-  if (!Item) {
-    throw new ApiError(httpStatus.NOT_FOUND, "record not found");
+
+    const Item = await getBankById(Id);
+    if (!Item) {
+      throw new ApiError(httpStatus.NOT_FOUND, "record not found");
+    }
+    console.log("::tt:::::",updateBody)
+    updateBody.updatedBy = updatedBy;
+    delete updateBody.id;
+    Object.assign(Item, updateBody);
+    await Item.save();
+  } catch (error) {
+    console.log("bank error:::",error)
+    if (error.errno === 1062) {
+      throw new ApiError(httpStatus.NOT_FOUND, "Duplicate entry not allowed!");
+    }
+    else {
+
+      throw error;
+    }
   }
-  //console.log("Update Receipt Id" , item);
-  // updateBody.slug = updateBody.name.replace(/ /g, "-").toLowerCase()
-  updateBody.updatedBy = updatedBy;
-  delete updateBody.id;
-  Object.assign(Item, updateBody);
-  await Item.save();
-  return  ;
+  return;
 };
 
 /**
@@ -102,7 +130,7 @@ const updateBankById = async (Id, updateBody, updatedBy) => {
  * @param {ObjectId} Id
  * @returns {Promise<ReceiptModel>}
  */
-  const deleteBankById = async (Id) => {
+const deleteBankById = async (Id) => {
 
   const Item = await getBankById(Id);
   if (!Item) {
