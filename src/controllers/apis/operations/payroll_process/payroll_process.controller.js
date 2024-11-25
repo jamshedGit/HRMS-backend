@@ -14,7 +14,6 @@ const createPayroll_Process = catchAsync(async (req, res) => {
 
   try {
 
-    console.log("createPayroll_Process1")
     const Payroll_Process = await Payroll_ProcessService.createPayroll_Process(req, req.body);
 
     if (Payroll_Process?.status && Payroll_Process.status === "error") {
@@ -48,8 +47,9 @@ const getAllPayroll_Process= catchAsync(async (req, res) => {
   const obj = {};
   const filter = obj;
   // const options = pick(req.body, ["sortBy", "limit", "page"]);
-  const options = pick(req.body, ['sortOrder', 'pageSize', 'pageNumber']);
-  const searchQuery = req.body.filter.searchQuery? req.body.filter.searchQuery : '';
+  const options = pick(req.body.queryParams, ['sortOrder', 'pageSize', 'pageNumber']);
+
+  const searchQuery = req.body.queryParams.filter.searchQuery ? req.body.queryParams.filter.searchQuery : '';
 
   const result = await Payroll_ProcessService.queryPayroll_Process(filter, options,searchQuery);
 
@@ -92,7 +92,7 @@ const updatePayroll_Process = catchAsync(async (req, res) => {
       
    res.status(httpStatus.CREATED).send({
     code: HttpStatusCodes.CREATED,
-    message: HttpResponseMessages.CREATED,
+    message: HttpResponseMessages.UPDATED,
     data: Payroll_Process
   });
 }

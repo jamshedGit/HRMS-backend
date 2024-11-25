@@ -13,7 +13,7 @@ const Op = Sequelize.Op;
 
 const createPayroll_Process = async (req, payroll_processBody) => {
     try {
-    console.log("createPayroll_Process1")
+ 
 
       const subsidiaryExists = await Payroll_ProcessModel.findOne({
         where: {
@@ -56,6 +56,7 @@ const createPayroll_Process = async (req, payroll_processBody) => {
  * @returns {Promise<QueryResult>}
  */
 const queryPayroll_Process = async (filter, options, searchQuery) => {
+ 
   let limit = options.pageSize;
   let offset = 0 + (options.pageNumber - 1) * limit;
 
@@ -141,60 +142,42 @@ const getPayroll_ProcessById = async (id) => {
  * @returns {Promise<ReceiptModel>}
  */
 
-const updatePayroll_ProcessById = async (Id, updateBody, updatedBy) => {
-  const Item = await Payroll_ProcessModel.findOne({
-    where: { Id: Id },
-  });
 
+
+
+const updatePayroll_ProcessById = async (
+  Id,
+  updateBody,
+  updatedBy
+) => {
+
+  const Item = await getPayroll_ProcessById(Id);
   if (!Item) {
     throw new ApiError(httpStatus.NOT_FOUND, "Record not found");
   }
+  const subsidiaryExists = await Payroll_ProcessModel.findOne({
+    where: {
+      subsidiaryId: updateBody.subsidiaryId,
+      payroll_groupId: updateBody.payroll_groupId,
+      Id: { [Op.ne]: Id}
+    },
+  });
 
-  const normalizeDate = (date) => {
-    const newDate = new Date(Date.UTC(date.getFullYear(), date.getMonth(), date.getDate()));
-    newDate.setUTCHours(0, 0, 0, 0); // Normalize to midnight UTC
-    return newDate;
-  };
-  
-  // Example of adding one day (24 hours) to the date
-  const addOneDay = (date) => {
-    const newDate = new Date(date);
-    newDate.setUTCDate(newDate.getUTCDate()); // Add one day (UTC date)
-    return newDate;
-  };
-
-
-
-
-  const newStartDate = addOneDay(normalizeDate(new Date(updateBody.from_date)));
-  const newEndTDate = addOneDay(normalizeDate(new Date(updateBody.to_date)));
-
-
-  const isExist=await Payroll_ProcessModel.findOne({
-    where:{subsidiaryId:updateBody.subsidiaryId,
-      from_date:newStartDate,
-    Id: { [Op.ne]: Id} ,// Exclude the current record using its id
-    }
-
-  })
-
-  if(isExist){
-    throw new ApiError(httpStatus.BAD_REQUEST, "This holiday already exist in current year");
-
+  if (subsidiaryExists) {
+    return {
+      message: "Subsidiary & payroll group already exist",
+      status: "error",
+    };
   }
 
-
-  updateBody.from_date=newStartDate;
-  updateBody.to_date=newEndTDate;
-
-
-    updateBody.updatedBy = updatedBy;
-    delete updateBody.id; // Optionally keep this if your model has a primary key
-
-    Object.assign(Item, updateBody);
-    await Item.save();
-    return Item;
   
+  
+  updateBody.updatedBy = updatedBy;
+  delete updateBody.id;
+  Object.assign(Item, updateBody);
+  await Item.save();
+  return  Item;
+
 };
 
 /**
