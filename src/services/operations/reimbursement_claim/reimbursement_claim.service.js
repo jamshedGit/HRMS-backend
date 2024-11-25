@@ -84,7 +84,7 @@ const queryreimbursement_claim = async (
           },
           {
             model: EmployeeProfileModel,
-            attributes: ["firstName"],
+            attributes: ["firstName","dateofJoining"],
             as: "Employee",
           },
           {
@@ -92,6 +92,12 @@ const queryreimbursement_claim = async (
             attributes: ["subsidiaryId","payroll_groupId"],
             as: "ReimbursementConfiguration",
           },
+          {
+            model: PayrollMonthModel,
+            attributes: ["month","year"],
+            as: "PayInPayrollForId",
+          },
+       
        
     
     ],
@@ -113,6 +119,71 @@ const queryreimbursement_claim = async (
   
 };
 
+
+// const queryreimbursement_claim = async (
+//   filter,
+//   options,
+//   searchQuery,
+//   employeeId
+// ) => {
+//   let limit = options.pageSize;
+//   let offset = 0 + (options.pageNumber - 1) * limit;
+
+//   // Fetch the data with the specified models
+//   let { count, rows } = await Reimbursement_claimModel.findAndCountAll({
+//     order: [["createdAt", "DESC"]],
+//     where: {
+//       employeeId
+//     },
+//     offset: offset,
+//     limit: limit,
+//     include: [
+//       {
+//         model: FormModel,
+//         attributes: ["formName", "formCode"],
+//         as: "ReimbursementType",
+//       },
+//       {
+//         model: EmployeeProfileModel,
+//         attributes: ["firstName"],
+//         as: "Employee",
+//       },
+//       {
+//         model: Reimbursement_configurationModel,
+//         attributes: ["subsidiaryId", "payroll_groupId"],
+//         as: "ReimbursementConfiguration",
+//       },
+//       {
+//         model: PayrollMonthModel,
+//         attributes: ["month", "year"],
+//         as: "PayInPayrollForId",
+//       },
+//     ],
+//   });
+ 
+
+//   // Check if data is present and format the month-year for each row
+//   if (count && rows) {
+//     // Mapping of month numbers to abbreviations
+//     const monthNames = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+
+//     // Iterate over the rows and add the formatted month-year to each entry
+//     let rows2 = rows.map(row => {
+//       // Get the corresponding month and year from the related model
+//       row.PayInPayrollForIdYear=null
+//       const month = row.PayInPayrollForId ? row.PayInPayrollForId.month : null;
+//       const year = row.PayInPayrollForId ? row.PayInPayrollForId.year : null;
+//       row.PayInPayrollForIdYear=`${monthNames[month - 1]}-${year}`
+//       return row
+//     });
+//     return paginationFacts(count, limit, options.pageNumber, rows2);
+//   } else {
+//     return paginationFacts(count, limit, options.pageNumber, rows2 = []);
+//   }
+// };
+
+
+
 /**
  * Get Item by id
  * @param {ObjectId} id
@@ -128,6 +199,11 @@ const getreimbursement_claimById = async (id) => {
         model: FormModel,
         attributes: ["formName", "formCode"],
         as: "ReimbursementType",
+      },
+      {
+        model: PayrollMonthModel,
+        attributes: ["month","year"],
+        as: "PayInPayrollForId",
       },
   
     ],
@@ -192,7 +268,7 @@ const getPayrollMonth = async () => {
   ];
   
   const result = await PayrollMonthModel.findAndCountAll({
-    where: { isActive:true },
+    // where:{isActive:true}
   });
 
   // Sort the rows by year in descending order
@@ -201,7 +277,9 @@ const getPayrollMonth = async () => {
   // Map the results to the desired format
   const formattedResult = result.rows.map(row => ({
     value: row.Id, // Assuming 'id' is the field for the unique identifier
-    label: `${monthNames[row.month - 1]} ${row.year}` // Convert month number to name
+    label: `${monthNames[row.month - 1]} ${row.year}`, // Convert month number to name
+    isActive:row.isActive
+ 
   }));
 
   return  formattedResult

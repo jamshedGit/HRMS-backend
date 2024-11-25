@@ -18,12 +18,11 @@ const Op = Sequelize.Op;
 const createDept = async (req, DeptBody) => {
   console.log("Dept Body", DeptBody)
   // DeptBody.slug = DeptBody.name.replace(/ /g, "-").toLowerCase();
-  
+
   DeptBody.createdBy = req.user.deptId;
   //DeptBody.parentDept = 1;
 
-   if(DeptBody.parentDept == '')
-      {DeptBody.parentDept = null}
+  if (DeptBody.parentDept == '') { DeptBody.parentDept = null }
   console.log(DeptBody, "body");
   const addedDeptObj = await DeptModel.DeptModel.create(DeptBody);
   //authSMSSend(addedDeptObj.dataValues);  // Quick send message at the time of donation
@@ -42,12 +41,10 @@ const createDept = async (req, DeptBody) => {
  * @returns {Promise<QueryResult>}
  */
 const queryDept = async (filter, options, searchQuery) => {
-  console.log("get search query", searchQuery);
 
-  console.log("options query dept", options);
   let limit = options.pageSize;
   let offset = 0 + (options.pageNumber - 1) * limit;
-  console.log("dept offset ", offset)
+
   searchQuery = searchQuery.toLowerCase();
   const queryFilters = [
 
@@ -75,9 +72,7 @@ const queryDept = async (filter, options, searchQuery) => {
 };
 
 const queryParentDept = async (filter, options, searchQuery) => {
-  console.log("get search query", searchQuery);
 
-  console.log("options query dept", options);
   let limit = options.pageSize;
   let offset = 0 + (options.pageNumber - 1) * limit;
   console.log("dept offset ", offset)
@@ -125,18 +120,30 @@ const getDeptById = async (id) => {
  */
 const updateDeptById = async (deptId, updateBody, updatedBy) => {
   //console.log("item 12")
+  try {
 
-  const Item = await getDeptById(deptId);
-  console.log("dept item", Item)
-  if (!Item) {
-    throw new ApiError(httpStatus.NOT_FOUND, "record not found");
+
+    const Item = await getDeptById(deptId);
+    console.log("dept item", Item)
+    if (!Item) {
+      throw new ApiError(httpStatus.NOT_FOUND, "record not found");
+    }
+
+    updateBody.updatedBy = updatedBy;
+    delete updateBody.deptId;
+    Object.assign(Item, updateBody);
+    console.log("updateBody", updateBody)
+    await Item.save();
+  } catch (error) {
+    console.log("dept error:::", error)
+    if (error.errno === 1062) {
+      throw new ApiError(httpStatus.NOT_FOUND, "Duplicate entry not allowed!");
+    }
+    else {
+
+      throw error;
+    }
   }
-
-  updateBody.updatedBy = updatedBy;
-  delete updateBody.deptId;
-  Object.assign(Item, updateBody);
-  console.log("updateBody", updateBody)
-  await Item.save();
   return;
 };
 
@@ -159,9 +166,9 @@ const deleteDeptById = async (Id) => {
 
 const sp_GetAllDepartments = async (filter, options, searchQuery) => {
   try {
-    console.log("mggg::",searchQuery)
+    console.log("mggg::", searchQuery)
     const results = await sequelize.query('CALL usp_GetAllDepartments()', {
-     
+
       type: Sequelize.QueryTypes.RAW // Use RAW type for executing stored procedures
     });
 
@@ -169,10 +176,10 @@ const sp_GetAllDepartments = async (filter, options, searchQuery) => {
     let offset = 0 + (options.pageNumber - 1) * limit;
     searchQuery = searchQuery;
     let searchlist = filterByValue(results, searchQuery);
-   
+
     let count = searchlist.length;
     const rows = searchlist.slice(offset, offset + limit)
-
+console.log("dept rows",results)
     return paginationFacts(count, limit, options.pageNumber, rows); // 
   } catch (error) {
     throw new ApiError(httpStatus.INTERNAL_SERVER_ERROR, error);
@@ -185,7 +192,9 @@ function filterByValue(array, string) {
     return array;
   }
   return array.filter(o => Object.keys(o).some(k => {
-    return o['department'].toLowerCase().includes(string.toLowerCase()) || o['deptCode'].toLowerCase().includes(string.toLowerCase())
+    return o['Department'].toLowerCase().includes(string.toLowerCase()) ||
+     o['deptCode'].toLowerCase().includes(string.toLowerCase())
+    || o['ParentDeptName'] == null ? o['Department'].toLowerCase().includes(string.toLowerCase()) :  o['ParentDeptName'].toLowerCase().includes(string.toLowerCase())
   }
   )
   );

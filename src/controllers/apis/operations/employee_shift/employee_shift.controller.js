@@ -91,6 +91,7 @@ const getAllEmployeeShift = catchAsync(async (req, res) => {
  * @returns res
  */
 const deleteEmployeeShift = catchAsync(async (req, res) => {
+  console.log("delete shift",req.params.id)
   const EmployeeShiftData = await employee_shift.deleteEmployeeShiftById(req.params.id);
   res.send({
     code: HttpStatusCodes.OK,

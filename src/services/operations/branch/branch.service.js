@@ -16,17 +16,14 @@ const Op = Sequelize.Op;
  * @returns {Promise<Bank>}
  */
 const createBranch = async (req, BranchBody) => {
-  console.log("Branch Body", BranchBody)
-  // BranchBody.slug = BranchBody.name.replace(/ /g, "-").toLowerCase();
-  console.log(req.user.id);
+ 
   BranchBody.createdBy = req.user.id;
-  // BranchBody.bankName = BranchBody.Name;
+  
   if(BranchBody.accOpeningDate == '')
   {
-    console.log("world",new Date());
     BranchBody.accOpeningDate = null
   }
-  console.log(BranchBody, "body");
+  
   const addedBranchObj = await BranchModel.BranchModel.create(BranchBody);
   //authSMSSend(addedBankObj.dataValues);  // Quick send message at the time of donation
   return addedBranchObj;
@@ -55,7 +52,8 @@ const queryBranch = async (filter, options, searchQuery) => {
     // { isActive: sequelize.where }
     // { Id: Sequelize.where(Sequelize.fn('LOWER', Sequelize.col('Id')), 'LIKE', '%' + searchQuery + '%') },
      { Name: Sequelize.where(Sequelize.fn('LOWER', Sequelize.col('bank.Name')), 'LIKE', '%' + searchQuery + '%') },
-     { Name: Sequelize.where(Sequelize.fn('LOWER', Sequelize.col('branchCode')), 'LIKE', '%' + searchQuery + '%') },
+     { branchCode: Sequelize.where(Sequelize.fn('LOWER', Sequelize.col('branchCode')), 'LIKE', '%' + searchQuery + '%') },
+    //  { Name: Sequelize.where(Sequelize.fn('LOWER', Sequelize.col('name')), 'LIKE', '%' + searchQuery + '%') },
      
     // { bankName: Sequelize.where(Sequelize.fn('LOWER', Sequelize.col('bankName')), 'LIKE', '%' + searchQuery + '%') },
 

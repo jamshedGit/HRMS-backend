@@ -148,10 +148,19 @@ module.exports.LeaveEncashmentModel = require('./operations/leave_encashment/lea
 module.exports.Employee_loan_requestModel=require("./operations/employee_loan_request/employee_loan_request.model")
 module.exports.Employee_loan_request_detailModel=require("./operations/employee_loan_request/employee_loan_request_detail.model")
 
-//Attendance Configuration
+//Attendance Configuration Model
 module.exports.Attendance_ConfigurationModel = require("./operations/attendance_configuration/attendance_configuration.model")
+//Attendance Model
+module.exports.AttendanceModel = require("./operations/attendance/attendance.model")
 
 // Employee Shift Model
 module.exports.Employee_ShiftModel = require("./operations/employee_shift/employee_shift.model")
-module.exports.HolidaysModel= require("./operations/holidays/holidays.model")
+
 module.exports.Payroll_ProcessModel= require("./operations/payroll_process/payroll_process.model")
+
+//Employee Roster Model
+module.exports.EmployeeRosterModel = require('./operations/employee_roster/employee_roster.model');
+
+//Employee Roster Detail Model
+module.exports.EmployeeRosterDetailModel = require('./operations/employee_roster_detail/employee_roster_detail.model');
+module.exports.HolidaysModel= require("./operations/holidays/holidays.model")

@@ -44,10 +44,9 @@ const queryLoanTypes = async (filter, options, searchQuery) => {
 
   searchQuery = searchQuery.toLowerCase();
   const queryFilters = [
-    { skill: Sequelize.where(Sequelize.fn('LOWER', Sequelize.col('name')), 'LIKE', '%' + searchQuery + '%') },
+    { name: Sequelize.where(Sequelize.fn('LOWER', Sequelize.col('subsList.name')), 'LIKE', '%' + searchQuery + '%') },
+    { code: Sequelize.where(Sequelize.fn('LOWER', Sequelize.col('code')), 'LIKE', '%' + searchQuery + '%') },
   ]
-
-
   const { count, rows } = await LoanTypeModel.LoanTypeModel.findAndCountAll({
     order: [
       ['createdAt', 'DESC']
@@ -58,6 +57,26 @@ const queryLoanTypes = async (filter, options, searchQuery) => {
     },
     offset: offset,
     limit: limit,
+    include: [
+      {
+        model: LoanTypeModel.SubsidiaryModel,
+        attributes: ["Id", ["name", "subsName"]],
+        as: "subsList"
+      },
+      {
+        model: LoanTypeModel.FormModel,
+        attributes: ["formName", "formCode"],
+        as: "LoanTypeAccount",
+      },
+    
+    ],
+    // include: [
+    //   {
+    //     model: LoanTypeModel.FormModel,
+    //     attributes: ["formName", "formCode"],
+    //     as: "LoanTypeAccount",
+    //   },
+    // ],
   });
 
 
