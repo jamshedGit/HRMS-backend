@@ -143,7 +143,7 @@ const getAllRegisteredLeavesForPdf = async (req) => {
 
   //If no filter is present then send back response with no data
   if (!Object.keys(employeeFilter).length && !filter.from) {
-    throw new ApiError(httpStatus.FORBIDDEN);
+    throw new ApiError(httpStatus.BAD_REQUEST);
   }
 
   //Get data according to filters
