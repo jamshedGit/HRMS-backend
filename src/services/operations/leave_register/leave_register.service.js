@@ -4,6 +4,8 @@ const { paginationFacts, handleNestedData, formatDates } = require("../../../uti
 const pick = require("../../../utils/pick");
 const { startOfDay, endOfDay } = require("date-fns");
 const generatePdf = require("../../../utils/pdf");
+const ApiError = require("../../../utils/ApiError");
+const httpStatus = require("http-status");
 
 const Op = Sequelize.Op;
 
@@ -141,7 +143,7 @@ const getAllRegisteredLeavesForPdf = async (req) => {
 
   //If no filter is present then send back response with no data
   if (!Object.keys(employeeFilter).length && !filter.from) {
-    return [];
+    throw new ApiError(httpStatus.FORBIDDEN);
   }
 
   //Get data according to filters
