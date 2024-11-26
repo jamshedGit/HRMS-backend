@@ -9,7 +9,7 @@ const {
 const { HttpStatusCodes } = require("../../../utils/constants");
 
 const Op = Sequelize.Op;
-
+const sequelize = require("../../../config/db");
 
 const createPayroll_Process = async (req, payroll_processBody) => {
     try {
@@ -35,7 +35,16 @@ const createPayroll_Process = async (req, payroll_processBody) => {
  
       const addedPayroll_Process = await Payroll_ProcessModel.create(payroll_processBody);
 
-
+       await sequelize.query(
+        'CALL SP_PayrollProcess(:p_SubsidiaryId, :p_PayrollGroupId, :p_MonthId)', {
+          replacements: { 
+            p_SubsidiaryId: payroll_processBody.subsidiaryId || 'null',
+            p_PayrollGroupId: payroll_processBody.payroll_groupId || 'null',
+            p_MonthId: payroll_processBody.payroll_monthId || 'null'
+          },
+          type: Sequelize.QueryTypes.RAW // Use RAW type for executing stored procedures
+        });
+      
       return await getPayroll_ProcessById(addedPayroll_Process.Id );
       // return "Done"
   
