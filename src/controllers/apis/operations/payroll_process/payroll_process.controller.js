@@ -2,7 +2,7 @@ const httpStatus = require("http-status");
 const pick = require("../../../../utils/pick");
 const ApiError = require("../../../../utils/ApiError");
 const catchAsync = require("../../../../utils/catchAsync");
-const {Payroll_ProcessService} = require("../../../../services/index");
+const { Payroll_ProcessService } = require("../../../../services/index");
 
 
 const {
@@ -20,29 +20,29 @@ const createPayroll_Process = catchAsync(async (req, res) => {
 
       res.status(HttpStatusCodes.INTERNAL_SERVER_ERROR).send({
         code: HttpStatusCodes.INTERNAL_SERVER_ERROR,
-        message:Payroll_Process.message,
+        message: Payroll_Process.message,
         error: Payroll_Process.error || 'An unexpected error occurred',
       });
-      
-  
+
+
     }
-    else{
-  
-      
-     res.status(httpStatus.CREATED).send({
-      code: HttpStatusCodes.CREATED,
-      message:Payroll_Process.message,
-      data: Payroll_Process
-    });
-  }
+    else {
+
+
+      res.status(httpStatus.CREATED).send({
+        code: HttpStatusCodes.CREATED,
+        message: Payroll_Process.message,
+        data: Payroll_Process
+      });
+    }
 
   } catch (error) {
-    throw error     
+    throw error
   }
 });
 
 
-const getAllPayroll_Process= catchAsync(async (req, res) => {
+const getAllPayroll_Process = catchAsync(async (req, res) => {
 
   const obj = {};
   const filter = obj;
@@ -51,7 +51,7 @@ const getAllPayroll_Process= catchAsync(async (req, res) => {
 
   const searchQuery = req.body.queryParams.filter.searchQuery ? req.body.queryParams.filter.searchQuery : '';
 
-  const result = await Payroll_ProcessService.queryPayroll_Process(filter, options,searchQuery);
+  const result = await Payroll_ProcessService.queryPayroll_Process(filter, options, searchQuery);
 
   res.send({
     code: HttpStatusCodes.OK,
@@ -76,28 +76,28 @@ const getPayroll_ProcessById = catchAsync(async (req, res) => {
 const updatePayroll_Process = catchAsync(async (req, res) => {
 
   const Payroll_Process = await Payroll_ProcessService.updatePayroll_ProcessById(req.body.Id, req.body, req.user.Id);
-  
-  
-  if(Payroll_Process.status=="error"){
+
+
+  if (Payroll_Process.status == "error") {
 
     res.status(HttpStatusCodes.INTERNAL_SERVER_ERROR).send({
       code: HttpStatusCodes.INTERNAL_SERVER_ERROR,
-      message:Payroll_Process.message,
+      message: Payroll_Process.message,
       error: Payroll_Process.error || 'An unexpected error occurred',
     });
-    
+
 
   }
-  else{
-      
-   res.status(httpStatus.CREATED).send({
-    code: HttpStatusCodes.CREATED,
-    message: HttpResponseMessages.UPDATED,
-    data: Payroll_Process
-  });
-}
-  
-  
+  else {
+
+    res.status(httpStatus.CREATED).send({
+      code: HttpStatusCodes.CREATED,
+      message: HttpResponseMessages.UPDATED,
+      data: Payroll_Process
+    });
+  }
+
+
   // res.send({
   //   code: HttpStatusCodes.OK,
   //   message: HttpResponseMessages.OK,
@@ -115,13 +115,27 @@ const deletePayroll_Process = catchAsync(async (req, res) => {
   });
 });
 
+const payroll_group_detail =catchAsync(async (req, res) => {
+    console.log("subsidiaryId, payroll_groupId", subsidiaryId, payroll_groupId)
+    const Receipt = await Payroll_ProcessService.payroll_group_detail(req.body.subsidiaryId, req.body.payroll_groupId);
+    if (!Receipt) {
+      throw new ApiError(httpStatus.NOT_FOUND, "Payroll group detail not found");
+    }
+    res.send({
+      code: HttpStatusCodes.OK,
+      message: HttpResponseMessages.OK,
+      data: Receipt,
+    });
+  });
+
 
 
 module.exports = {
-    createPayroll_Process,
-    getAllPayroll_Process,
+  createPayroll_Process,
+  getAllPayroll_Process,
   getPayroll_ProcessById,
   updatePayroll_Process,
   deletePayroll_Process,
- 
+  payroll_group_detail,
+
 };

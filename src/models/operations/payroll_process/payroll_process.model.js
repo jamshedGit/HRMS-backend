@@ -26,10 +26,12 @@ const Payroll_ProcessModel = sequelize.define('t_payroll_process', {
         allowNull: true,
     },
     createdAt: { type: Sequelize.DATE, allowNull: true },
-    updatedAt: { type: Sequelize.DATE, allowNull: true },
+    updatedAt: { type: Sequelize.DATE, allowNull: true, defaultValue: null },
 
-});
 
+}, {
+    timestamps: false  // Disable automatic timestamps
+  });
 
 Payroll_ProcessModel.belongsTo(SubsidiaryModel, {
     foreignKey: 'subsidiaryId',

@@ -1,5 +1,5 @@
 const httpStatus = require("http-status");
-const { FormModel,SubsidiaryModel,PayrollMonthModel,Payroll_ProcessModel } = require("../../../models/index");
+const { FormModel, SubsidiaryModel, PayrollMonthModel, Payroll_ProcessModel, EmployeeProfileModel, EmployeeSalaryModel } = require("../../../models/index");
 
 const ApiError = require("../../../utils/ApiError");
 const Sequelize = require("sequelize");
@@ -12,49 +12,56 @@ const Op = Sequelize.Op;
 const sequelize = require("../../../config/db");
 
 const createPayroll_Process = async (req, payroll_processBody) => {
-    try {
- 
+  try {
 
-      const subsidiaryExists = await Payroll_ProcessModel.findOne({
-        where: {
-          subsidiaryId: payroll_processBody.subsidiaryId,
-          payroll_groupId: payroll_processBody.payroll_groupId,
-        },
-      });
-  
-      if (subsidiaryExists) {
-        return {
-          message: "Subsidiary & payroll group already exist",
-          status: "error",
-        };
-      }
-  
-      // Set createdBy field
-      payroll_processBody.createdBy = req.user.id;
-  
- 
-      const addedPayroll_Process = await Payroll_ProcessModel.create(payroll_processBody);
+    await payroll_group_detail(payroll_processBody.subsidiaryId, payroll_processBody.payroll_groupId);
+    const subsidiaryExists = await Payroll_ProcessModel.findOne({
+      where: {
+        subsidiaryId: payroll_processBody.subsidiaryId,
+        payroll_groupId: payroll_processBody.payroll_groupId,
+        payroll_monthId: payroll_processBody.payroll_monthId,
+      },
+    });
 
-       await sequelize.query(
-        'CALL SP_PayrollProcess(:p_SubsidiaryId, :p_PayrollGroupId, :p_MonthId)', {
-          replacements: { 
-            p_SubsidiaryId: payroll_processBody.subsidiaryId || 'null',
-            p_PayrollGroupId: payroll_processBody.payroll_groupId || 'null',
-            p_MonthId: payroll_processBody.payroll_monthId || 'null'
-          },
-          type: Sequelize.QueryTypes.RAW // Use RAW type for executing stored procedures
-        });
-      
-      return await getPayroll_ProcessById(addedPayroll_Process.Id );
-      // return "Done"
-  
-    } catch (error) {
-      
-      throw error; // Rethrow or handle the error as needed
+    if (subsidiaryExists) {
+      return {
+        message: "Record already exist.",
+        status: "error",
+      };
     }
-  };
-  
-  
+
+    // Set createdBy field
+    payroll_processBody.createdBy = req.user.id;
+    let addedPayroll_Process = await Payroll_ProcessModel.create(payroll_processBody);
+    addedPayroll_Process.createdAt = new Date();
+    await addedPayroll_Process.save();
+
+    let result = await sequelize.query(
+      'CALL SP_PayrollProcess(:p_SubsidiaryId, :p_PayrollGroupId, :p_MonthId)', {
+      replacements: {
+        p_SubsidiaryId: payroll_processBody.subsidiaryId || 'null',
+        p_PayrollGroupId: payroll_processBody.payroll_groupId || 'null',
+        p_MonthId: payroll_processBody.payroll_monthId || 'null'
+      },
+      type: Sequelize.QueryTypes.RAW // Use RAW type for executing stored procedures
+    });
+
+    if (result) {
+      addedPayroll_Process.updatedAt = new Date();
+      addedPayroll_Process.completed = true;
+      await addedPayroll_Process.save();
+    }
+
+    return await getPayroll_ProcessById(addedPayroll_Process.Id);
+    // return "Done"
+
+  } catch (error) {
+
+    throw error; // Rethrow or handle the error as needed
+  }
+};
+
+
 /**
  * Query for Items
  * @param {Object} filter -  Mongo filter
@@ -65,7 +72,7 @@ const createPayroll_Process = async (req, payroll_processBody) => {
  * @returns {Promise<QueryResult>}
  */
 const queryPayroll_Process = async (filter, options, searchQuery) => {
- 
+
   let limit = options.pageSize;
   let offset = 0 + (options.pageNumber - 1) * limit;
 
@@ -84,7 +91,7 @@ const queryPayroll_Process = async (filter, options, searchQuery) => {
     order: [["createdAt", "DESC"]],
     order: [
       [Sequelize.col("Subsidiary.name"), "ASC"],   // Order by Subsidiary name
-     
+
     ],
     where: {
       [Op.or]: queryFilters,
@@ -168,7 +175,7 @@ const updatePayroll_ProcessById = async (
     where: {
       subsidiaryId: updateBody.subsidiaryId,
       payroll_groupId: updateBody.payroll_groupId,
-      Id: { [Op.ne]: Id}
+      Id: { [Op.ne]: Id }
     },
   });
 
@@ -179,13 +186,13 @@ const updatePayroll_ProcessById = async (
     };
   }
 
-  
-  
+
+
   updateBody.updatedBy = updatedBy;
   delete updateBody.id;
   Object.assign(Item, updateBody);
   await Item.save();
-  return  Item;
+  return Item;
 
 };
 
@@ -206,10 +213,55 @@ const deletePayroll_ProcessById = async (Id) => {
   return Item;
 };
 
+const payroll_group_detail = async (subsidiaryId, payroll_groupId) => {
+  // Step 1: Get employees based on the provided subsidiaryId and payroll_groupId
+  console.log("subsidiaryId, payroll_groupId",subsidiaryId, payroll_groupId)
+  const employees = await EmployeeProfileModel.findAndCountAll({
+    where: {
+      ...(subsidiaryId && { subsidiaryId: subsidiaryId }),
+      ...(payroll_groupId && { payrollGroupId: payroll_groupId }),
+    },
+  });
+
+
+  // Check if employees are found
+  if (employees.count === 0) {
+    throw new Error('Employee not found');
+  }
+
+  // Step 2: Find all employees whose salary setup has not been created
+  const employeesWithoutSalarySetup = await EmployeeSalaryModel.findAll({
+    where: {
+      employeeId: {
+        [Op.in]: employees.rows.map((emp) => emp.Id), // Assuming `id` is the employee's unique identifier
+      },
+    },
+  });
+
+  // Step 3: Get the count of employees whose salary setup is not created
+  const employeesWithNoSalarySetupCount = employees.rows.filter((emp) => {
+    // Check if this employee is NOT in the EmployeeSalaryModel
+    console.log("emp111", emp)
+    return !employeesWithoutSalarySetup.some((salary) => salary.employeeId === emp.Id);
+  }).length;
+
+  data = {
+    total_employees: employees.rows.length,
+    slary_setup_not_created: employeesWithNoSalarySetupCount
+
+  }
+
+  return data
+
+};
+
+
 module.exports = {
   createPayroll_Process,
   getPayroll_ProcessById,
   updatePayroll_ProcessById,
   deletePayroll_ProcessById,
   queryPayroll_Process,
+  payroll_group_detail,
+  
 };
