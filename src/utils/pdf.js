@@ -24,7 +24,7 @@ async function generatePdf(fileName, data) {
 
     // Return the PDF as a buffer
     return new Promise((resolve) => {
-      pdf.generatePdf(file, { })
+      pdf.generatePdf(file, { preferCSSPageSize: true, printBackground: true})
         .then((pdfBuffer) => resolve(pdfBuffer))
         .catch((error) => reject(error));
     });

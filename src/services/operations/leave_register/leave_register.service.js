@@ -107,7 +107,8 @@ const getAllRegisteredLeaves = async (req) => {
  */
 const getAllRegisteredLeavesForPdf = async (req) => {
   const filter = req?.body || {};
-  const labels = filter?.labels || {}
+  const labels = filter?.labels || {};
+  labels.currentUser = req.user?.email || '';
 
   //Prepare Employee Table Filters if any
   const employeeFilter = {};
