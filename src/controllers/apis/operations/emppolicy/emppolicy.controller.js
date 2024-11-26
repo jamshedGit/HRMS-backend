@@ -69,6 +69,22 @@ const getEmpPolicyById = catchAsync(async (req, res) => {
   });
 });
 
+
+
+const getEmpPolicyBySubsidiaryId = catchAsync(async (req, res) => {
+  console.log("EmpPolicy Controller getbankId",req.body.subsidiaryId)
+ 
+  const Receipt = await EmpPolicyformService.EmpPolicyServicePage.usp_GetEmpPolicyBySubsidiaryId(req.body.subsidiaryId);
+  if (!Receipt) {
+    throw new ApiError(httpStatus.NOT_FOUND, "EmpPolicy not found");
+  }
+  res.send({
+    code: HttpStatusCodes.OK,
+    message: HttpResponseMessages.OK,
+    data: Receipt,
+  });
+});
+
 const updateEmpPolicy = catchAsync(async (req, res) => {
   console.log(req.body);
   const Receipt = await EmpPolicyformService.EmpPolicyServicePage.updateEmpPolicyById(req.body.Id, req.body, req.user.Id);
@@ -95,5 +111,6 @@ module.exports = {
   getAllEmpPolicy,
   getEmpPolicyById,
   updateEmpPolicy,
-  deleteEmpPolicy
+  deleteEmpPolicy,
+  getEmpPolicyBySubsidiaryId
 };
