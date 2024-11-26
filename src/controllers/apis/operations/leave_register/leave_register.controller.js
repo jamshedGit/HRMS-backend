@@ -21,6 +21,23 @@ const getAllRegisteredLeaves = catchAsync(async (req, res) => {
   });
 });
 
+/**
+ * 
+ * Get All Registered Leave Application for Pdf
+ * 
+ * @param {Object} req 
+ * @returns res
+ */
+const getAllRegisteredLeavesPdfData = catchAsync(async (req, res) => {
+  const data = await LeaveRegisterServicePage.getAllRegisteredLeavesForPdf(req);
+  res.set({
+    "Content-Type": "application/pdf",
+    "Content-Disposition": 'attachment; filename="kamil_test.pdf"',
+  });
+  res.end(data);
+});
+
 module.exports = {
   getAllRegisteredLeaves,
+  getAllRegisteredLeavesPdfData
 };

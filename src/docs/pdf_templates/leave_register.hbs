@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <title>Attendance Sheet</title>
+  <style>
+    table {
+      width: 100%;
+      border-collapse: collapse;
+    }
+
+    table,
+    th,
+    td {
+      border: 1px solid black;
+    }
+
+    th,
+    td {
+      padding: 8px;
+      text-align: left;
+    }
+
+    th {
+      background-color: grey;
+      color: black;
+    }
+
+    .no-data {
+      text-align: center;
+      padding: 10px;
+    }
+  </style>
+</head>
+
+<body>
+  <h1>Leave Availed Report</h1>
+  {{#if filters.subsidiaryName}}
+  <p><b>Subsidiary:</b> {{filters.subsidiaryName}}</p>
+  {{/if}}
+  {{#if filters.departmentLabel}}
+  <p><b>Deparment:</b> {{filters.departmentLabel}}</p>
+  {{/if}}
+  {{#if filters.reportToLabel}}
+  <p><b>Report To:</b> {{filters.reportToLabel}}</p>
+  {{/if}}
+  {{#if filters.gradeLabel}}
+  <p><b>Grade:</b> {{filters.gradeLabel}}</p>
+  {{/if}}
+  {{#if filters.designationLabel}}
+  <p><b>Designation:</b> {{filters.designationLabel}}</p>
+  {{/if}}
+  {{#if filters.locationLabel}}
+  <p><b>Location:</b> {{filters.locationLabel}}</p>
+  {{/if}}
+  {{#if filters.attendanceTypeLabel}}
+  <p><b>Attendance Type:</b> {{filters.attendanceTypeLabel}}</p>
+  {{/if}}
+  {{#if filters.employeeLabel}}
+  <p><b>Employee:</b> {{filters.employeeLabel}}</p>
+  {{/if}}
+  {{#if filters.fromLabel }}
+  <p><b>Leave Date Falling Between:</b> {{filters.fromLabel}} - {{filters.toLabel}}</p>
+  {{/if}}
+
+  <p><b>Print Date:</b> {{currentDate}}</p>
+  <table>
+    <thead>
+      <tr>
+        <th><b>Emp. Code</b></th>
+        <th><b>Employee Name</b></th>
+        <th><b>Leave Type</b></th>
+        <th><b>Date From</b></th>
+        <th><b>Date To</b></th>
+        <th><b>Leave Days</b></th>
+        <th><b>Remarks</b></th>
+        <th><b>Attachment</b></th>
+      </tr>
+    </thead>
+    <tbody>
+      {{#if leaves.length}}
+      {{#each leaves}}
+      <tr>
+        <td>{{employeeCode}}</td>
+        <td>{{fullName}}</td>
+        <td>{{name}}</td>
+        <td>{{from}}</td>
+        <td>{{to}}</td>
+        <td>{{days}}</td>
+        <td>{{remarks}}</td>
+        <td>{{fileStatus}}</td>
+      </tr>
+      {{/each}}
+      {{else}}
+      <tr>
+        <td colspan="8" class="no-data">No data found</td>
+      </tr>
+      {{/if}}
+    </tbody>
+  </table>
+</body>
+
+</html>

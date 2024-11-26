@@ -7,5 +7,6 @@ const itemValidation = require("../../../../validations/operations/entities/leav
 const router = express.Router();
 
 router.route("/read-all-registered-leaves").post(auth(), validate(itemValidation.getAllItem), form_controller.getAllRegisteredLeaves);
+router.route("/read-all-registered-leaves-pdf-data").post(auth(), validate(itemValidation.getItemForPdf), form_controller.getAllRegisteredLeavesPdfData);
 
 module.exports = router;
