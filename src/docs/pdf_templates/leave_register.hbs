@@ -12,7 +12,7 @@
       line-height: 1.6;
     }
 
-    h1 {
+    h3 {
       text-align: left;
       color: #444;
     }
@@ -28,10 +28,12 @@
       flex: 1 1 calc(50% - 20px);
       /* Two columns per row */
       box-sizing: border-box;
+      font-size: 10px;
     }
 
     .filter-item p {
       margin: 5px 0;
+      font-size: 12px;
     }
 
     table {
@@ -43,9 +45,10 @@
 
     th,
     td {
-      border: 1px solid #ddd;
+      border: 1px solid #cf1515;
       padding: 12px;
       text-align: left;
+      font-size: 12px;
     }
 
     th {
@@ -53,6 +56,7 @@
       color: black;
       font-weight: bold;
       text-transform: uppercase;
+      font-size: 10px;
     }
 
     tr:nth-child(even) {
@@ -81,62 +85,66 @@
 </head>
 
 <body>
-  <h1>Leave Availed Report</h1>
+  <h3>Leave Availed Report</h3>
   <hr>
   <div class="filters">
-    {{#if filters.subsidiaryLabel}}
-    <div class="filter-item">
-      <p><b>Subsidiary:</b> {{filters.subsidiaryLabel}}</p>
+    <div class="left-filters">
+      {{#if filters.subsidiaryLabel}}
+      <div class="filter-item">
+        <p><b>Subsidiary:</b> {{filters.subsidiaryLabel}}</p>
+      </div>
+      {{/if}}
+      {{#if filters.departmentLabel}}
+      <div class="filter-item">
+        <p><b>Department:</b> {{filters.departmentLabel}}</p>
+      </div>
+      {{/if}}
+      {{#if filters.reportToLabel}}
+      <div class="filter-item">
+        <p><b>Report To:</b> {{filters.reportToLabel}}</p>
+      </div>
+      {{/if}}
+      {{#if filters.gradeLabel}}
+      <div class="filter-item">
+        <p><b>Grade:</b> {{filters.gradeLabel}}</p>
+      </div>
+      {{/if}}
+      {{#if filters.designationLabel}}
+      <div class="filter-item">
+        <p><b>Designation:</b> {{filters.designationLabel}}</p>
+      </div>
+      {{/if}}
+      {{#if filters.locationLabel}}
+      <div class="filter-item">
+        <p><b>Location:</b> {{filters.locationLabel}}</p>
+      </div>
+      {{/if}}
+      {{#if filters.attendanceTypeLabel}}
+      <div class="filter-item">
+        <p><b>Attendance Type:</b> {{filters.attendanceTypeLabel}}</p>
+      </div>
+      {{/if}}
+      {{#if filters.employeeLabel}}
+      <div class="filter-item">
+        <p><b>Employee:</b> {{filters.employeeLabel}}</p>
+      </div>
+      {{/if}}
+      {{#if filters.fromLabel}}
+      <div class="filter-item">
+        <p><b>Leave Date Falling Between:</b> {{filters.fromLabel}} - {{filters.toLabel}}</p>
+      </div>
+      {{/if}}
     </div>
-    {{/if}}
-    {{#if filters.departmentLabel}}
-    <div class="filter-item">
-      <p><b>Department:</b> {{filters.departmentLabel}}</p>
+    <div class="right-filters">
+      <div class="filter-item">
+        <p><b>Print Date:</b> {{currentDate}}</p>
+      </div>
+      {{#if filters.currentUser}}
+      <div class="filter-item">
+        <p><b>User ID:</b> {{filters.currentUser}}</p>
+      </div>
+      {{/if}}
     </div>
-    {{/if}}
-    {{#if filters.reportToLabel}}
-    <div class="filter-item">
-      <p><b>Report To:</b> {{filters.reportToLabel}}</p>
-    </div>
-    {{/if}}
-    {{#if filters.gradeLabel}}
-    <div class="filter-item">
-      <p><b>Grade:</b> {{filters.gradeLabel}}</p>
-    </div>
-    {{/if}}
-    {{#if filters.designationLabel}}
-    <div class="filter-item">
-      <p><b>Designation:</b> {{filters.designationLabel}}</p>
-    </div>
-    {{/if}}
-    {{#if filters.locationLabel}}
-    <div class="filter-item">
-      <p><b>Location:</b> {{filters.locationLabel}}</p>
-    </div>
-    {{/if}}
-    {{#if filters.attendanceTypeLabel}}
-    <div class="filter-item">
-      <p><b>Attendance Type:</b> {{filters.attendanceTypeLabel}}</p>
-    </div>
-    {{/if}}
-    {{#if filters.employeeLabel}}
-    <div class="filter-item">
-      <p><b>Employee:</b> {{filters.employeeLabel}}</p>
-    </div>
-    {{/if}}
-    {{#if filters.fromLabel }}
-    <div class="filter-item">
-      <p><b>Leave Date Falling Between:</b> {{filters.fromLabel}} - {{filters.toLabel}}</p>
-    </div>
-    {{/if}}
-    <div class="filter-item">
-      <p><b>Print Date:</b> {{currentDate}}</p>
-    </div>
-    {{#if filters.currentUser }}
-    <div class="filter-item">
-      <p><b>User ID:</b> {{filters.currentUser}}</p>
-    </div>
-    {{/if}}
   </div>
   <hr>
   <table>
