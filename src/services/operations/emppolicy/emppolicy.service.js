@@ -81,6 +81,29 @@ const getEmpPolicyById = async (id) => {
   return EmpPolicyModel.EmployeePolicyModel.findByPk(id);
 };
 
+
+const usp_GetEmpPolicyBySubsidiaryId = async (subsidiaryId) => {
+  try {
+    console.log(":ddd:",subsidiaryId)
+    const results = await sequelize.query('CALL usp_GetEmpPolicyBySubsidiaryId(:p_subsidiaryId)', {
+      replacements: { p_subsidiaryId: subsidiaryId || null},
+      type: Sequelize.QueryTypes.RAW // Use RAW type for executing stored procedures
+    });
+    // let limit = options.pageSize;
+    // let offset = 0 + (options.pageNumber - 1) * limit;
+    // searchQuery = searchQuery.toLowerCase();
+    // let searchlist = filterByValue(results, searchQuery);
+    // console.log("searchlist", searchlist)
+    // let count = searchlist.length;
+    // const rows = searchlist.slice(offset, offset + limit)
+
+    return results // paginationFacts(count, limit, options.pageNumber, rows); // 
+  } catch (error) {
+    throw new ApiError(httpStatus.INTERNAL_SERVER_ERROR, error);
+  }
+};
+
+
 /**
  * Update Item by id
  * @param {ObjectId} ReceiptId
@@ -126,5 +149,6 @@ module.exports = {
   queryEmpPolicy,
   getEmpPolicyById,
   updateEmpPolicyById,
-  deleteEmpPolicyById
+  deleteEmpPolicyById,
+  usp_GetEmpPolicyBySubsidiaryId
 };
