@@ -13,6 +13,7 @@ const FiscalSetupModel = sequelize.define('t_fiscal_setup', {
 	
 	startDate : { type: Sequelize.DATE, allowNull: true },
     endDate : { type: Sequelize.DATE, allowNull: true },
+	subsidiaryId : { type: Sequelize.INTEGER, allowNull: true },
 	isActive: { type: Sequelize.BOOLEAN, allowNull: true, defaultValue: true },
 	createdBy: {
 		type: Sequelize.INTEGER,

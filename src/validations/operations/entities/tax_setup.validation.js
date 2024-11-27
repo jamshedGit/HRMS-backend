@@ -7,6 +7,7 @@ const createItem = {
     id: Joi.disallow(),
     startDate: Joi.date().required(),
     endDate: Joi.date().required(),
+    subsidiaryId: Joi.number().required(),
     // location: Joi.string().required(),
     // slug: Joi.string().required(),
     // createdBy: Joi.string().required(),

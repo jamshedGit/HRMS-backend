@@ -11,7 +11,7 @@ const createItem = {
     shortFormat : Joi.number().required(),
     startDate: Joi.date().required(),
     endDate: Joi.date().required(),
-   
+    subsidiaryId: Joi.number().required(),
   }),
 };
 
