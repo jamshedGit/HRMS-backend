@@ -29,8 +29,8 @@ const createEmp_profile = catchAsync(async (req, res) => {
     console.log("insert Emp_profile")
     console.log("req body", req.body);
     req.body.Id = req.body.Id;
-   
-   // req.body.profile_image=req.file.originalname
+
+    // req.body.profile_image=req.file.originalname
     delete req.body.Id;
     const Bank = await Emp_profileformService.EmpProfileServicePage.createEmp_profile(req, req.body);
 
@@ -70,7 +70,7 @@ const getAllContactInfo = catchAsync(async (req, res) => {
   const options = pick(req.body, ['sortOrder', 'pageSize', 'pageNumber']);
   //const searchQuery = req.body.filter.searchQuery ? req.body.filter.searchQuery : '';
   const result = await Emp_profileformService.EmpProfileServicePage.queryContactInfo();
-  console.log("result contact",result);
+  console.log("result contact", result);
   res.send({
     code: HttpStatusCodes.OK,
     message: HttpResponseMessages.OK,
@@ -96,20 +96,20 @@ const getContactInfoByEmployeeId = catchAsync(async (req, res) => {
   console.log("get contact by empId")
   console.log(req.body)
   const list = await Emp_profileformService.EmpProfileServicePage.getContactInfoByEmployeeId(req.body.Id);
-  console.log("mylist",list)
+  console.log("mylist", list)
   if (!list) {
     throw new ApiError(httpStatus.NOT_FOUND, "Emp_profile not found");
   }
   res.send({
     code: HttpStatusCodes.OK,
     message: HttpResponseMessages.OK,
-    data:list,
+    data: list,
   });
 });
 
 const updateEmp_profile = catchAsync(async (req, res) => {
- // req.body.profile_image = req.file.filename
-  console.log("update emp",req.body);
+  // req.body.profile_image = req.file.filename
+  console.log("update emp", req.body);
   const Receipt = await Emp_profileformService.EmpProfileServicePage.updateEmp_profileById(req.body.Id, req.body, req.user.Id);
   res.send({
     code: HttpStatusCodes.OK,
@@ -120,48 +120,54 @@ const updateEmp_profile = catchAsync(async (req, res) => {
 
 const SP_getContactDetailByEmployeeId = catchAsync(async (req, res) => {
   // req.body.profile_image = req.file.filename
-   console.log("contact emp",req.body);
-   const Receipt = await Emp_profileformService.EmpProfileServicePage.SP_getContactDetailByEmployeeId(req.body.Id);
-   res.send({
-     code: HttpStatusCodes.OK,
-     message: HttpResponseMessages.OK,
-     data: Receipt,
-   });
- });
- 
-
-
-const updateContactById = catchAsync(async (req, res) => {
-  // req.body.profile_image = req.file.filename
-   console.log("updateZZZ",req.body);
-   const Receipt = await Emp_profileformService.EmpProfileServicePage.updateContactById(req.body.Id, req.body, req.user.Id);
-   res.send({
-     code: HttpStatusCodes.OK,
-     message: HttpResponseMessages.OK,
-     data: Receipt,
-   });
- });
- 
-
- const usp_GetAllEmployeeProfileDetails = catchAsync(async (req, res) => {
-   console.log("get profile",req.body);
-   const objResult = await Emp_profileformService.EmpProfileServicePage.usp_GetAllEmployeeProfileDetails(req.body.employeeId);
-   res.send({
-     code: HttpStatusCodes.OK,
-     message: HttpResponseMessages.OK,
-     data: objResult,
-   });
- });
- 
-
-const deleteEmp_profile = catchAsync(async (req, res) => {
-  console.log("req.body.Id ", req.body.Id)
-  const Receipt = await Emp_profileformService.EmpProfileServicePage.deleteEmp_profileById(req.body.Id);
+  console.log("contact emp", req.body);
+  const Receipt = await Emp_profileformService.EmpProfileServicePage.SP_getContactDetailByEmployeeId(req.body.Id);
   res.send({
     code: HttpStatusCodes.OK,
     message: HttpResponseMessages.OK,
     data: Receipt,
   });
+});
+
+
+
+const updateContactById = catchAsync(async (req, res) => {
+  // req.body.profile_image = req.file.filename
+  console.log("updateZZZ", req.body);
+  const Receipt = await Emp_profileformService.EmpProfileServicePage.updateContactById(req.body.Id, req.body, req.user.Id);
+  res.send({
+    code: HttpStatusCodes.OK,
+    message: HttpResponseMessages.OK,
+    data: Receipt,
+  });
+});
+
+
+const usp_GetAllEmployeeProfileDetails = catchAsync(async (req, res) => {
+  console.log("get profile", req.body);
+  const objResult = await Emp_profileformService.EmpProfileServicePage.usp_GetAllEmployeeProfileDetails(req.body.employeeId);
+  res.send({
+    code: HttpStatusCodes.OK,
+    message: HttpResponseMessages.OK,
+    data: objResult,
+  });
+});
+
+
+const deleteEmp_profile = catchAsync(async (req, res) => {
+  try {
+    console.log("req.body.Id ", req.body.Id)
+    const Receipt = await Emp_profileformService.EmpProfileServicePage.deleteEmp_profileById(req.body.Id);
+    res.send({
+      code: HttpStatusCodes.OK,
+      message: HttpResponseMessages.OK,
+      data: Receipt,
+    });
+
+  } catch (error) {
+    console.log("del error",error)
+    throw new ApiError(httpStatus.NOT_FOUND,"Could not delete record because in another used!");
+  }
 });
 
 const getProfileView = catchAsync(async (req, res) => {
