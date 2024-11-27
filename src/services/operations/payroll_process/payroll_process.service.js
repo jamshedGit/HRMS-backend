@@ -12,9 +12,10 @@ const Op = Sequelize.Op;
 const sequelize = require("../../../config/db");
 
 const createPayroll_Process = async (req, payroll_processBody) => {
+  console.log("payroll_processBody111",payroll_processBody)
   try {
 
-    await payroll_group_detail(payroll_processBody.subsidiaryId, payroll_processBody.payroll_groupId);
+    // await payroll_group_detail(payroll_processBody.subsidiaryId, payroll_processBody.payroll_groupId);
     const subsidiaryExists = await Payroll_ProcessModel.findOne({
       where: {
         subsidiaryId: payroll_processBody.subsidiaryId,
@@ -23,20 +24,49 @@ const createPayroll_Process = async (req, payroll_processBody) => {
       },
     });
 
+    console.log("subsidiaryExists111",subsidiaryExists.dataValues.Id)
+    let addedPayroll_Process;
+    let result;
+
     if (subsidiaryExists) {
-      return {
-        message: "Record already exist.",
-        status: "error",
-      };
+      // return {
+      //   message: "Record already exist.",
+      //   status: "error",
+      // };
+     payroll_processBody.Id=subsidiaryExists.dataValues.Id ;
+     addedPayroll_Process = await Payroll_ProcessModel.update(payroll_processBody, {
+      where: { id:subsidiaryExists.dataValues.Id } // Or whatever unique field you're using
+    });
+
+    //procedure
+
+
+      // result = await sequelize.query(
+      //   'CALL SP_PayrollProcess(:p_SubsidiaryId, :p_PayrollGroupId, :p_MonthId)', {
+      //   replacements: {
+      //     p_SubsidiaryId: payroll_processBody.subsidiaryId || 'null',
+      //     p_PayrollGroupId: payroll_processBody.payroll_groupId || 'null',
+      //     p_MonthId: payroll_processBody.payroll_monthId || 'null'
+      //   },
+      //   type: Sequelize.QueryTypes.RAW // Use RAW type for executing stored procedures
+      // });
+  
+      // if (result) {
+      //   addedPayroll_Process.updatedAt = new Date();
+      //   addedPayroll_Process.completed = true;
+      //   await addedPayroll_Process.save();
+      // }
+  
+      return await getPayroll_ProcessById(addedPayroll_Process.Id);
     }
 
     // Set createdBy field
     payroll_processBody.createdBy = req.user.id;
-    let addedPayroll_Process = await Payroll_ProcessModel.create(payroll_processBody);
+    addedPayroll_Process = await Payroll_ProcessModel.create(payroll_processBody);
     addedPayroll_Process.createdAt = new Date();
     await addedPayroll_Process.save();
 
-    let result = await sequelize.query(
+     result = await sequelize.query(
       'CALL SP_PayrollProcess(:p_SubsidiaryId, :p_PayrollGroupId, :p_MonthId)', {
       replacements: {
         p_SubsidiaryId: payroll_processBody.subsidiaryId || 'null',
@@ -215,7 +245,6 @@ const deletePayroll_ProcessById = async (Id) => {
 
 const payroll_group_detail = async (subsidiaryId, payroll_groupId) => {
   // Step 1: Get employees based on the provided subsidiaryId and payroll_groupId
-  console.log("subsidiaryId, payroll_groupId",subsidiaryId, payroll_groupId)
   const employees = await EmployeeProfileModel.findAndCountAll({
     where: {
       ...(subsidiaryId && { subsidiaryId: subsidiaryId }),
@@ -226,7 +255,12 @@ const payroll_group_detail = async (subsidiaryId, payroll_groupId) => {
 
   // Check if employees are found
   if (employees.count === 0) {
-    throw new Error('Employee not found');
+    data = {
+      total_employees:0,
+      slary_setup_not_created: 0
+  
+    }
+    return data
   }
 
   // Step 2: Find all employees whose salary setup has not been created
@@ -241,7 +275,7 @@ const payroll_group_detail = async (subsidiaryId, payroll_groupId) => {
   // Step 3: Get the count of employees whose salary setup is not created
   const employeesWithNoSalarySetupCount = employees.rows.filter((emp) => {
     // Check if this employee is NOT in the EmployeeSalaryModel
-    console.log("emp111", emp)
+    // console.log("emp111", emp)
     return !employeesWithoutSalarySetup.some((salary) => salary.employeeId === emp.Id);
   }).length;
 
@@ -263,5 +297,5 @@ module.exports = {
   deletePayroll_ProcessById,
   queryPayroll_Process,
   payroll_group_detail,
-  
+
 };

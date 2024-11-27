@@ -14,5 +14,5 @@ router.route("/delete-payroll-process").patch(auth(),payroll_processController.d
 // router.route("/donation-report").post(auth(),validate(receiptValidation.getDonationReceiptByBookNo),receiptController.getDonationReceiptReport);
 
 router.route("/create-payroll-process").post(auth(), payroll_processController.createPayroll_Process);
-router.route("/read-all-payroll-group-detail").get(payroll_processController.payroll_group_detail)
+router.route("/read-all-payroll-group-detail").post(payroll_processController.payroll_group_detail)
 module.exports = router;
