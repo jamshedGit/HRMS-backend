@@ -84,7 +84,7 @@ const updateEmployeeSalary = catchAsync(async (req, res) => {
 });
 
 const deleteEmployeeSalary = catchAsync(async (req, res) => {
-  console.log("req.body.Id " ,req.body.Id)
+  console.log("delete req.body.Id " ,req.body.Id)
   const response = await EmployeeSalarySetupServicePage.EmployeeSalarySetupServicePage.deleteEmployeeSalaryById(req.body.Id);
   res.send({
     code: HttpStatusCodes.OK,
