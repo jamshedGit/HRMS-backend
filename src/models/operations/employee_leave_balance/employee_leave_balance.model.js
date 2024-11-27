@@ -65,7 +65,7 @@ employeeLeaveBalanceModel.belongsTo(EmployeeProfileModel, {
     foreignKey: 'employeeId',
     targetKey: 'Id',  // Assuming 'Id' is the primary key in EmployeeProfileModel table
     onDelete: 'RESTRICT',
-    onUpdate: 'RESTRICT',
+    onUpdate: 'CASCADE',
 });
 
 // Association with LeaveTypeModel model (employeeId is a foreign key)
@@ -73,7 +73,7 @@ employeeLeaveBalanceModel.belongsTo(LeaveTypeModel, {
     foreignKey: 'leaveType',
     targetKey: 'Id',  // Assuming 'Id' is the primary key in LeaveTypeModel table
     onDelete: 'RESTRICT',
-    onUpdate: 'RESTRICT',
+    onUpdate: 'CASCADE',
 });
 
 // Association with FiscalSetupModel model (yearId is a foreign key)
@@ -81,7 +81,7 @@ employeeLeaveBalanceModel.belongsTo(FiscalSetupModel, {
     foreignKey: 'yearId',
     targetKey: 'Id',  // Assuming 'Id' is the primary key in FiscalSetupModel table
     onDelete: 'RESTRICT',
-    onUpdate: 'RESTRICT',
+    onUpdate: 'CASCADE',
 });
 
 

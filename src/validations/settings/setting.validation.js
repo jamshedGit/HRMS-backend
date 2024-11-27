@@ -59,6 +59,14 @@ const getAllLeaveType = {
   }),
 }
 
+const getAllLeaveTypeBySubsidiary = {
+  query: Joi.disallow(),
+  params: Joi.disallow(),
+  body: Joi.object().keys({
+    subsidiaryId: Joi.optional(),
+  }),
+}
+
 const getAllSubsidiaries = {
   query: Joi.disallow(),
   params: Joi.disallow(),
@@ -205,5 +213,6 @@ module.exports = {
   getAllEmployees,
   getEmpSalaryRevisionByEmpId,
   getAllLeaveType,
-  getAllSubsidiaries
+  getAllSubsidiaries,
+  getAllLeaveTypeBySubsidiary
 };

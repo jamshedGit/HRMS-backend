@@ -195,6 +195,18 @@ const getLeaveTypesData = async (employeeId) => {
   return LeaveTypeData
 };
 
+const getLeaveTypesDataBySubsidiary = async (subsidiaryId) => {
+  let LeaveTypeData = [];
+  if (subsidiaryId) {
+    LeaveTypeData = getDdlItems(DDL_FIELD_NAMES.LeaveType, await LeaveTypeModel.findAll({
+      where: {subsidiaryId: subsidiaryId},
+      attributes: ['name', 'Id']
+    }));
+  }
+  LeaveTypeData.unshift({ label: '--Select--', value: null })
+  return LeaveTypeData
+};
+
 /**
  * 
  * Leave Type Dropdown Data
@@ -355,5 +367,6 @@ module.exports = {
   getAllSubsidiaryData,
   getAllFiscalYearData,
   getEncashmentLeaveTypeData,
-  getAllEmployeeShift
+  getAllEmployeeShift,
+  getLeaveTypesDataBySubsidiary
 };
