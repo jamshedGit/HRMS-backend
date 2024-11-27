@@ -16,6 +16,7 @@ const PayrollMonthModel = sequelize.define('t_payroll_month_Setup', {
     shortFormat : { type: Sequelize.INTEGER, allowNull: true },
 	startDate : { type: Sequelize.DATE, allowNull: true },
     endDate : { type: Sequelize.DATE, allowNull: true },
+	subsidiaryId : { type: Sequelize.INTEGER, allowNull: true },
 	isActive: { type: Sequelize.BOOLEAN, allowNull: true, defaultValue: true },
 	createdBy: {
 		type: Sequelize.INTEGER,
