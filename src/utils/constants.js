@@ -45,6 +45,7 @@ const DDL_FIELD_NAMES = {
   BankName:{
     labelField: 'Name',
     valueField: 'Id',
+    subsidiaryId:"subsidiaryId"
   },
   BranchName:{
     labelField: 'Name',

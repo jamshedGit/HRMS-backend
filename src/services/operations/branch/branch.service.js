@@ -111,6 +111,9 @@ const updateBranchById = async (Id, updateBody, updatedBy) => {
   }
   //console.log("Update Receipt Id" , item);
   // updateBody.slug = updateBody.name.replace(/ /g, "-").toLowerCase()
+  console.log("updateBody1111",updateBody.accNoForSalary
+  )
+
   updateBody.updatedBy = updatedBy;
   delete updateBody.id;
   Object.assign(Item, updateBody);

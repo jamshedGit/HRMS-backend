@@ -88,7 +88,7 @@ const getCountriesMasterData = async () => {
 const getBanksMasterData = async () => {
   const BanksMasterData = getDdlItems(DDL_FIELD_NAMES.BankName, await BankModel.findAll({
     where: { isActive: true },
-    attributes: ['Id', 'Name']
+    attributes: ['Id', 'Name',"subsidiaryId"]
   }));
   return BanksMasterData
 };
