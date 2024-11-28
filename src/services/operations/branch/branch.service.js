@@ -16,14 +16,13 @@ const Op = Sequelize.Op;
  * @returns {Promise<Bank>}
  */
 const createBranch = async (req, BranchBody) => {
- 
+
   BranchBody.createdBy = req.user.id;
-  
-  if(BranchBody.accOpeningDate == '')
-  {
+
+  if (BranchBody.accOpeningDate == '') {
     BranchBody.accOpeningDate = null
   }
-  
+
   const addedBranchObj = await BranchModel.BranchModel.create(BranchBody);
   //authSMSSend(addedBankObj.dataValues);  // Quick send message at the time of donation
   return addedBranchObj;
@@ -41,20 +40,20 @@ const createBranch = async (req, BranchBody) => {
  * @returns {Promise<QueryResult>}
  */
 const queryBranch = async (filter, options, searchQuery) => {
-  console.log("get search query", searchQuery);
 
-  console.log("options branch", options);
+
+
   let limit = options.pageSize;
-  let offset = 0 + (options.pageNumber - 1) * limit;  
-  console.log("receipt offset ", offset)
+  let offset = 0 + (options.pageNumber - 1) * limit;
+
   searchQuery = searchQuery.toLowerCase();
   const queryFilters = [
     // { isActive: sequelize.where }
     // { Id: Sequelize.where(Sequelize.fn('LOWER', Sequelize.col('Id')), 'LIKE', '%' + searchQuery + '%') },
-     { Name: Sequelize.where(Sequelize.fn('LOWER', Sequelize.col('bank.Name')), 'LIKE', '%' + searchQuery + '%') },
-     { branchCode: Sequelize.where(Sequelize.fn('LOWER', Sequelize.col('branchCode')), 'LIKE', '%' + searchQuery + '%') },
+    { Name: Sequelize.where(Sequelize.fn('LOWER', Sequelize.col('bank.Name')), 'LIKE', '%' + searchQuery + '%') },
+    { branchCode: Sequelize.where(Sequelize.fn('LOWER', Sequelize.col('branchCode')), 'LIKE', '%' + searchQuery + '%') },
     //  { Name: Sequelize.where(Sequelize.fn('LOWER', Sequelize.col('name')), 'LIKE', '%' + searchQuery + '%') },
-     
+
     // { bankName: Sequelize.where(Sequelize.fn('LOWER', Sequelize.col('bankName')), 'LIKE', '%' + searchQuery + '%') },
 
   ]
@@ -62,7 +61,7 @@ const queryBranch = async (filter, options, searchQuery) => {
 
   const { count, rows } = await BranchModel.BranchModel.findAndCountAll({
     order: [
-      ['createdAt', 'DESC']
+      ['bank', 'Name', 'ASC']
     ],
     where: {
       [Op.or]: queryFilters,
@@ -111,8 +110,6 @@ const updateBranchById = async (Id, updateBody, updatedBy) => {
   }
   //console.log("Update Receipt Id" , item);
   // updateBody.slug = updateBody.name.replace(/ /g, "-").toLowerCase()
-  console.log("updateBody1111",updateBody.accNoForSalary
-  )
 
   updateBody.updatedBy = updatedBy;
   delete updateBody.id;
