@@ -8,10 +8,10 @@ const createItem = {
     month: Joi.number().required(),
     year : Joi.number().required(),
     month_days : Joi.number().required(),
-    shortFormat : Joi.number().required(),
+    shortFormat : Joi.string().required(),
     startDate: Joi.date().required(),
     endDate: Joi.date().required(),
-    subsidiaryId: Joi.number().required(),
+    subsidiaryId: Joi.any().required(),
   }),
 };
 
