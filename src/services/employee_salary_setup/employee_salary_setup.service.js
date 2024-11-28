@@ -156,10 +156,10 @@ const updateEmployeeSalaryById = async (Id, updateBody, updatedBy) => {
  * @returns {Promise<ReceiptModel>}
  */
 const deleteEmployeeSalaryById = async (Id) => {
-  console.log("delete tran", Id);
+  
   //const Item = await getEmployeeSalaryById(Id);
   let Item = await EmployeeSalaryModel.EmployeeSalaryModel.findOne({ employeeId: Id });
-  console.log("sttt",Item)
+  
   if (!Item) {
     throw new ApiError(httpStatus.NOT_FOUND, "Item not found");
   }
