@@ -50,6 +50,7 @@ const queryDept = async (filter, options, searchQuery) => {
 
     { deptName: Sequelize.where(Sequelize.fn('LOWER', Sequelize.col('deptName')), 'LIKE', '%' + searchQuery + '%') },
     { deptCode: Sequelize.where(Sequelize.fn('LOWER', Sequelize.col('deptCode')), 'LIKE', '%' + searchQuery + '%') },
+    
 
   ]
 
@@ -75,11 +76,12 @@ const queryParentDept = async (filter, options, searchQuery) => {
 
   let limit = options.pageSize;
   let offset = 0 + (options.pageNumber - 1) * limit;
-  console.log("dept offset ", offset)
+
   searchQuery = searchQuery.toLowerCase();
   const queryFilters = [
 
     { parentDept: Sequelize.where(Sequelize.fn('LOWER', Sequelize.col('parentDept')), '=', '%' + null + '%') },
+    
 
   ]
 
@@ -166,7 +168,6 @@ const deleteDeptById = async (Id) => {
 
 const sp_GetAllDepartments = async (filter, options, searchQuery) => {
   try {
-    console.log("mggg::", searchQuery)
     const results = await sequelize.query('CALL usp_GetAllDepartments()', {
 
       type: Sequelize.QueryTypes.RAW // Use RAW type for executing stored procedures
@@ -179,7 +180,6 @@ const sp_GetAllDepartments = async (filter, options, searchQuery) => {
 
     let count = searchlist.length;
     const rows = searchlist.slice(offset, offset + limit)
-console.log("dept rows",results)
     return paginationFacts(count, limit, options.pageNumber, rows); // 
   } catch (error) {
     throw new ApiError(httpStatus.INTERNAL_SERVER_ERROR, error);
@@ -195,10 +195,11 @@ function filterByValue(array, string) {
     return o['Department'].toLowerCase().includes(string.toLowerCase()) ||
      o['deptCode'].toLowerCase().includes(string.toLowerCase())
     || o['ParentDeptName'] == null ? o['Department'].toLowerCase().includes(string.toLowerCase()) :  o['ParentDeptName'].toLowerCase().includes(string.toLowerCase())
+    
   }
   )
   );
-}
+} 
 
 
 

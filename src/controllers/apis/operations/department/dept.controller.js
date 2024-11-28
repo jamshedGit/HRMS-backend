@@ -47,7 +47,7 @@ const getAllDept = catchAsync(async (req, res) => {
   const options = pick(req.body, ['sortOrder', 'pageSize', 'pageNumber']);
   const searchQuery = req.body.filter.searchQuery ? req.body.filter.searchQuery : '';
   const result = await deptFormService.sp_GetAllDepartments(filter, options, searchQuery);
-  console.log("pppp", result);
+
   res.send({
     code: HttpStatusCodes.OK,
     message: HttpResponseMessages.OK,

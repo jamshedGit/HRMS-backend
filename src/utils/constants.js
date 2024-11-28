@@ -54,6 +54,7 @@ const DDL_FIELD_NAMES = {
   DeptName:{
     labelField: 'deptName',
     valueField: 'deptId',
+    subsidiaryId:"subsidiaryId"
   },
   EmployeesKeys:{
     labelField: 'firstName',
