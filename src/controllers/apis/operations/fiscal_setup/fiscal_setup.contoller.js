@@ -76,13 +76,18 @@ const update_FiscalSetup = catchAsync(async (req, res) => {
 });
 
 const delete_FiscalSetup = catchAsync(async (req, res) => {
-
+  try {
+    
+  
   const Receipt = await FiscalSetupServicePage.FiscalSetupServicePage.deleteFiscalSetupById(req.body.Id);
   res.send({
     code: HttpStatusCodes.OK,
     message: HttpResponseMessages.OK,
     data: Receipt,
   });
+} catch (error) {
+  throw new ApiError(httpStatus.NOT_FOUND, "Record is in another used!");
+}
 });
 
 

@@ -13,7 +13,7 @@ const {
 const createPayrollMonth = catchAsync(async (req, res) => {
   // console.log("reqested User", req.user.id);
   try {
-   
+
     const PayrollMonth = await PayrollMonthServicePage.PayrollMonthServicePage.createPayrollMonth(req, req.body);
 
     res.status(httpStatus.CREATED).send({
@@ -22,27 +22,27 @@ const createPayrollMonth = catchAsync(async (req, res) => {
       data: PayrollMonth
     });
 
-  }  catch (error) {
-   
+  } catch (error) {
+
     if (error.parent.errno === 1062) {
-     throw new ApiError(httpStatus.NOT_FOUND, "Duplicate entry not allowed!");
-   }
-   else {
-    
-     throw error;
-   }
- }
+      throw new ApiError(httpStatus.NOT_FOUND, "Duplicate entry not allowed!");
+    }
+    else {
+
+      throw error;
+    }
+  }
 });
 
 const getAllPayrollMonth = catchAsync(async (req, res) => {
- 
+
   const obj = {};
   const filter = obj;
   // const options = pick(req.body, ["sortBy", "limit", "page"]);
   const options = pick(req.body, ['sortOrder', 'pageSize', 'pageNumber']);
-  const searchQuery = req.body.filter.searchQuery? req.body.filter.searchQuery : '';
-  const result = await PayrollMonthServicePage.PayrollMonthServicePage.queryPayrollMonths(filter, options,searchQuery);
-  console.log("resp2",result);
+  const searchQuery = req.body.filter.searchQuery ? req.body.filter.searchQuery : '';
+  const result = await PayrollMonthServicePage.PayrollMonthServicePage.queryPayrollMonths(filter, options, searchQuery);
+  console.log("resp2", result);
   res.send({
     code: HttpStatusCodes.OK,
     message: HttpResponseMessages.OK,
@@ -52,9 +52,9 @@ const getAllPayrollMonth = catchAsync(async (req, res) => {
 
 
 const SP_GetActivePreviousPayrollMonth = catchAsync(async (req, res) => {
-  
-  console.log("active payroll month",req.body)
-  const obj = await PayrollMonthServicePage.PayrollMonthServicePage.SP_GetActivePreviousPayrollMonth(req.body.employeeId);
+
+  console.log("active payroll month", req.body)
+  const obj = await PayrollMonthServicePage.PayrollMonthServicePage.SP_GetActivePreviousPayrollMonth(req.body.subsidiaryId);
   if (!obj) {
     throw new ApiError(httpStatus.NOT_FOUND, "obj not found");
   }
@@ -92,13 +92,16 @@ const updatePayrollMonth = catchAsync(async (req, res) => {
 });
 
 const deletePayrollMonth = catchAsync(async (req, res) => {
-  console.log("req.body.Id " ,req.body.Id)
-  const Receipt = await PayrollMonthServicePage.PayrollMonthServicePage.deletePayrollMonthById(req.body.Id);
-  res.send({
-    code: HttpStatusCodes.OK,
-    message: HttpResponseMessages.OK,
-    data: Receipt,
-  });
+  try {
+    const Receipt = await PayrollMonthServicePage.PayrollMonthServicePage.deletePayrollMonthById(req.body.Id);
+    res.send({
+      code: HttpStatusCodes.OK,
+      message: HttpResponseMessages.OK,
+      data: Receipt,
+    });
+  } catch (error) {
+    throw new ApiError(httpStatus.NOT_FOUND, "Record is in another used!");
+  }
 });
 
 

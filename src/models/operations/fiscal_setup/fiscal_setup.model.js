@@ -1,5 +1,5 @@
 const Sequelize = require('sequelize');
-const { ResourceModel } = require('../..');
+const { ResourceModel, SubsidiaryModel } = require('../..');
 
 //import Database connection configurations.
 const sequelize = require('../../../config/db')
@@ -27,5 +27,13 @@ const FiscalSetupModel = sequelize.define('t_fiscal_setup', {
 	updatedAt: { type: Sequelize.DATE, allowNull: true },
 
 });
+
+FiscalSetupModel.belongsTo(SubsidiaryModel, {
+	foreignKey: 'subsidiaryId',
+	as: "subs",
+	targetKey: 'Id',  // Assuming 'Id' is the primary key in FormModel table
+	
+});
+
 
 module.exports = FiscalSetupModel;
