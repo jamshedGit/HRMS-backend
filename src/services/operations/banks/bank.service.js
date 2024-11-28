@@ -16,15 +16,11 @@ const Op = Sequelize.Op;
  * @returns {Promise<Bank>}
  */
 const createBank = async (req, BankBody) => {
-  console.log("Bank Body", BankBody)
-  // BankBody.slug = BankBody.name.replace(/ /g, "-").toLowerCase();
-  console.log(req.user.id);
+
   BankBody.createdBy = req.user.id;
-  console.log(BankBody, "body");
   const addedBankObj = await BankModel.BankModel.create(BankBody);
   //authSMSSend(addedBankObj.dataValues);  // Quick send message at the time of donation
   const fetchRecord = await getBankById(addedBankObj.Id);
-  console.log("fetchRecord", fetchRecord)
   return fetchRecord;
 };
 
@@ -46,7 +42,7 @@ const queryBanks = async (filter, options, searchQuery) => {
 
   searchQuery = searchQuery.toLowerCase();
   const queryFilters = [
-    { subsidiary: Sequelize.where(Sequelize.fn('LOWER', Sequelize.col('subs.name')), 'LIKE', '%' + searchQuery + '%') },
+    { name: Sequelize.where(Sequelize.fn('LOWER', Sequelize.col('subs.name')), 'LIKE', '%' + searchQuery + '%') },
     { Name: Sequelize.where(Sequelize.fn('LOWER', Sequelize.col('t_bank.Name')), 'LIKE', '%' + searchQuery + '%') },
   ]
 
@@ -107,13 +103,13 @@ const updateBankById = async (Id, updateBody, updatedBy) => {
     if (!Item) {
       throw new ApiError(httpStatus.NOT_FOUND, "record not found");
     }
-    console.log("::tt:::::",updateBody)
+
     updateBody.updatedBy = updatedBy;
     delete updateBody.id;
     Object.assign(Item, updateBody);
     await Item.save();
   } catch (error) {
-    console.log("bank error:::",error)
+  
     if (error.errno === 1062) {
       throw new ApiError(httpStatus.NOT_FOUND, "Duplicate entry not allowed!");
     }

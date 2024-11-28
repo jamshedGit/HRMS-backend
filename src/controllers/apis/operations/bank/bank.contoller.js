@@ -88,14 +88,29 @@ const updateBank = catchAsync(async (req, res) => {
 });
 
 const deleteBank = catchAsync(async (req, res) => {
-  console.log("req.body.Id ", req.body.Id)
+  try {
+
   const Receipt = await bankformService.bankFormService.deleteBankById(req.body.Id);
   res.send({
     code: HttpStatusCodes.OK,
     message: HttpResponseMessages.OK,
     data: Receipt,
   });
+
+}catch (error) {
+
+    if (error.parent.errno === 1451) {
+      throw new ApiError(httpStatus.NOT_FOUND, "The record is associated with other data");
+    }
+    else {
+
+      throw error;
+    }
+  }
 });
+
+
+
 
 
 module.exports = {
