@@ -7,7 +7,7 @@ const employeeSalaryValidation = require("../../../../validations/operations/ent
 
 const router = express.Router();
 
-router.route("/read-employee-salary").post(auth(), validate(employeeSalaryValidation.createEmployeeSalarySetupValidation1), empSalController.getEmployeeSalaryById);
+router.route("/read-employee-salary").post(auth(), validate(employeeSalaryValidation.createEmployeeSalarySetupValidation1), empSalController.SP_getAllEmployeeSalaryInfoByEmpId);
 router.route("/read-all-employee-salary").post(auth(), empSalController.getAllEmployeeSalary);
 // router.route("/read-all-deduction-transaction").post(auth(), earningTranController.getAllEarningTran);
 router.route("/read-all-emp-earning_byId").post( empSalController.SP_getAllEmployeeSalaryInfoByEmpId);

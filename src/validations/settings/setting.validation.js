@@ -42,7 +42,8 @@ const getFormMenuMasterData = {
   body: Joi.object().keys({
     Id: Joi.number().integer(),
     tableName: Joi.string(),
-    prefix:Joi.string(),
+    pkIdColumn:Joi.string(),
+    whereClause:Joi.string(),
     text: Joi.optional(),
     mergeLabel:Joi.optional(),
   }),

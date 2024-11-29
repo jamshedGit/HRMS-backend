@@ -4,19 +4,16 @@ const createEarningValidation = {
     query: Joi.disallow(),
     params: Joi.disallow(),
     body: Joi.object().keys({
-        
-        
         earningCode: Joi.string(), 
         earningName: Joi.string(),
         linkedAttendance: Joi.boolean(),
         isTaxable: Joi.boolean(),
-        mappedAllowance: Joi.string(),
+        mappedAllowance: Joi.any().optional(),
         account: Joi.any().optional(),
-        
+        subsidiaryId: Joi.any().optional(),
+        companyId: Joi.any().optional(),
     }),
 };
-
-
 
 module.exports = {
     createEarningValidation,

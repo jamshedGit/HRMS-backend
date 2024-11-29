@@ -10,7 +10,7 @@ const createDept = {
     deptCode: Joi.string().required(),
     parentDept: Joi.any().optional(),
     budgetStrength:Joi.number().required(),
-    subsidiary:Joi.number().required(),
+    subsidiaryId:Joi.any().optional(),
     chkParent:Joi.any().optional(),
     // location: Joi.string().required(),
     // slug: Joi.string().required(),
