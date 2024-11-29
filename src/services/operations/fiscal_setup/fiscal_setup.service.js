@@ -48,6 +48,7 @@ const queryFiscalSetups = async (filter, options, searchQuery) => {
   const queryFilters = [
     { startDate: Sequelize.where(Sequelize.fn('LOWER', Sequelize.col('startDate')), 'LIKE', '%' + searchQuery + '%') },
     { endDate: Sequelize.where(Sequelize.fn('LOWER', Sequelize.col('endDate')), 'LIKE', '%' + searchQuery + '%') },
+    { name: Sequelize.where(Sequelize.fn('LOWER', Sequelize.col('subs.name')), 'LIKE', '%' + searchQuery + '%') },
   ]
 
   const { count, rows } = await FiscalSetupModel.FiscalSetupModel.findAndCountAll({
@@ -60,6 +61,13 @@ const queryFiscalSetups = async (filter, options, searchQuery) => {
     },
     offset: offset,
     limit: limit,
+    include: [
+      {
+        model: FiscalSetupModel.SubsidiaryModel,
+        attributes: ["Id", ["name", "subsName"]],
+        as: "subs"
+      }
+    ],
   });
 
 

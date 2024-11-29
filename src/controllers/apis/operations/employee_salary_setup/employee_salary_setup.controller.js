@@ -45,10 +45,10 @@ const getAllEmployeeSalary = catchAsync(async (req, res) => {
 
 
 const SP_getAllEmployeeSalaryInfoByEmpId = catchAsync(async (req, res) => {
-  console.log("EmployeeSalary EmpId")
-  console.log(req.body)
+  console.log("bodyemp",req.body)
   const response = await EmployeeSalarySetupServicePage.EmployeeSalarySetupServicePage.SP_getAllEmployeeSalaryInfoByEmpId(req.body.id,req.body.transactionType);
- 
+  console.log("EmployeeSalary",response)
+
   if (!response) {
     throw new ApiError(httpStatus.NOT_FOUND, "response not found");
   }
@@ -84,7 +84,7 @@ const updateEmployeeSalary = catchAsync(async (req, res) => {
 });
 
 const deleteEmployeeSalary = catchAsync(async (req, res) => {
-  console.log("req.body.Id " ,req.body.Id)
+  console.log("delete req.body.Id " ,req.body.Id)
   const response = await EmployeeSalarySetupServicePage.EmployeeSalarySetupServicePage.deleteEmployeeSalaryById(req.body.Id);
   res.send({
     code: HttpStatusCodes.OK,
