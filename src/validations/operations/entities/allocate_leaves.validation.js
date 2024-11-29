@@ -15,8 +15,8 @@ const createItem = {
         Id: Joi.number().optional(),
         leaveType: Joi.number().required(),
         leaveCount: Joi.number().required(),
-        policyType: Joi.number().required(),
-        maxCount: Joi.number().required(),
+        policyType: Joi.number().optional().allow(''),
+        maxCount: Joi.number().optional().allow(''),
         updatedAt: Joi.any().optional()
       })
     ).min(1).required(),

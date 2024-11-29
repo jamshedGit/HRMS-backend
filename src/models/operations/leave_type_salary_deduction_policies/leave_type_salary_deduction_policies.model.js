@@ -77,7 +77,7 @@ LeaveTypeSalaryDeductionPoliciesModel.init(
 LeaveTypeSalaryDeductionPoliciesModel.belongsTo(LeaveTypeModel, {
   foreignKey: 'leaveType',
   targetKey: 'Id',  // Assuming 'Id' is the primary key in LeaveTypeModel table
-  onDelete: 'CASCADE',
+  onDelete: 'RESTRICT',
   onUpdate: 'CASCADE',
 });
 
@@ -85,14 +85,14 @@ LeaveTypeSalaryDeductionPoliciesModel.belongsTo(LeaveTypeModel, {
 LeaveTypeSalaryDeductionPoliciesModel.belongsTo(FormModel, {
   foreignKey: 'leaveStatus',
   targetKey: 'Id',  // Assuming 'Id' is the primary key in FormModel table
-  onDelete: 'CASCADE',
+  onDelete: 'RESTRICT',
   onUpdate: 'CASCADE',
 });
 
 LeaveManagementConfigurationModel.hasMany(LeaveTypeSalaryDeductionPoliciesModel, { foreignKey: 'leaveManagementConfigId' });
 LeaveTypeSalaryDeductionPoliciesModel.belongsTo(LeaveManagementConfigurationModel, {
   foreignKey: 'leaveManagementConfigId',
-  onDelete: 'CASCADE',
+  onDelete: 'RESTRICT',
   onUpdate: 'CASCADE',
 });
 
