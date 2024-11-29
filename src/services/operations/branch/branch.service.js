@@ -88,7 +88,7 @@ const queryBranch = async (filter, options, searchQuery) => {
  * @returns {Promise<ReceiptModel>}
  */
 const getBranchById = async (id) => {
-  //console.log("read receipt by id " + id)
+  
   return BranchModel.BranchModel.findByPk(id);
 };
 
@@ -101,14 +101,13 @@ const getBranchById = async (id) => {
  * @returns {Promise<ReceiptModel>}
  */
 const updateBranchById = async (Id, updateBody, updatedBy) => {
-  //console.log("item 12")
+
 
   const Item = await getBranchById(Id);
-  //console.log(item)
+
   if (!Item) {
     throw new ApiError(httpStatus.NOT_FOUND, "record not found");
   }
-  //console.log("Update Receipt Id" , item);
   // updateBody.slug = updateBody.name.replace(/ /g, "-").toLowerCase()
 
   updateBody.updatedBy = updatedBy;

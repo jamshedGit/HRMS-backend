@@ -324,12 +324,12 @@ const getCitiesMasterData = async (countryId) => {
 
 const GetLastInserted_ID_ByTableName = async (p_TableName, pkIdColumnName, whereClause) => {
   try {
-    console.log("::results::", p_TableName, pkIdColumnName, whereClause);
+
     const results = await sequelize.query('CALL usp_GenerateDynamicId(:p_TableName,:p_IdColumn,:p_WhereClause)', {
       replacements: { p_TableName: p_TableName, p_IdColumn: pkIdColumnName, p_WhereClause: whereClause },
       type: Sequelize.QueryTypes.RAW // Use RAW type for executing stored procedures
     });
-    console.log("::dd::", results);
+
     return results;
   } catch (error) {
     throw new ApiError(httpStatus.INTERNAL_SERVER_ERROR, error);

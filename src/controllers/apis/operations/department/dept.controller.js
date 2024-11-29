@@ -8,15 +8,14 @@ const catchAsync = require("../../../../utils/catchAsync");
 const {
   HttpStatusCodes,
   HttpResponseMessages,
+  DDL_FIELD_NAMES,
 } = require("../../../../utils/constants");
 const { deptFormService } = require("../../../../services");
 
 const createDept = catchAsync(async (req, res) => {
-  // console.log("reqested User", req.user.id);
+
   try {
 
-    console.log("insert department")
-    console.log("req body", req.body);
 
     req.body.createdBY = req.user.id;
     const Bank = await deptFormService.createDept(req, req.body);
@@ -40,7 +39,7 @@ const createDept = catchAsync(async (req, res) => {
 });
 
 const getAllDept = catchAsync(async (req, res) => {
-  console.log("get dept");
+
   const obj = {};
   const filter = obj;
   // const options = pick(req.body, ["sortBy", "limit", "page"]);
@@ -56,27 +55,27 @@ const getAllDept = catchAsync(async (req, res) => {
 });
 
 const getAllParentDept = catchAsync(async (req, res) => {
-  console.log("get parent dept");
+
   // const obj = {};
   // const filter = obj;
   // // const options = pick(req.body, ["sortBy", "limit", "page"]);
   // const options = pick(req.body, ['sortOrder', 'pageSize', 'pageNumber']);
   // const searchQuery = req.body.filter.searchQuery ? req.body.filter.searchQuery : '';
   // const result = await deptFormService.queryDept(filter, options, searchQuery);
-  // console.log(result);
+
   // res.send({
   //   code: HttpStatusCodes.OK,
   //   message: HttpResponseMessages.OK,
   //   data: result,
   // });
-  // console.log("get Compensation_Beneftis");
+
   const obj = {};
   const filter = obj;
   // const options = pick(req.body, ["sortBy", "limit", "page"]);
   const options = pick(req.body, ['sortOrder', 'pageSize', 'pageNumber']);
   const searchQuery = req.body.filter.searchQuery ? req.body.filter.searchQuery : '';
   const result = await deptFormService.sp_GetAllDepartments(filter, options, searchQuery);
-  console.log(result);
+
   res.send({
     code: HttpStatusCodes.OK,
     message: HttpResponseMessages.OK,
@@ -85,8 +84,7 @@ const getAllParentDept = catchAsync(async (req, res) => {
 });
 
 const getDeptById = catchAsync(async (req, res) => {
-  console.log("dept Controller department Id", req.body)
-  console.log(req.body)
+ 
   const dept = await deptFormService.getDeptById(req.body.deptId);
   if (!dept) {
     throw new ApiError(httpStatus.NOT_FOUND, "Branch not found");
@@ -125,8 +123,6 @@ const updateDept = catchAsync(async (req, res) => {
 const deleteDept = catchAsync(async (req, res) => {
   try {
 
-
-    console.log("req.body.Id ", req.body)
     const dept = await deptFormService.deleteDeptById(req.body.Id);
     res.send({
       code: HttpStatusCodes.OK,
@@ -137,7 +133,7 @@ const deleteDept = catchAsync(async (req, res) => {
   } catch (error) {
 
     if (error.parent.errno === 1451) {
-      throw new ApiError(httpStatus.NOT_FOUND, "Record is in another used!");
+      throw new ApiError(httpStatus.NOT_FOUND,HttpResponseMessages.ASSOCIATED_RECORD);
     }
     else {
 

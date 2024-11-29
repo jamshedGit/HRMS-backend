@@ -16,14 +16,14 @@ const Op = Sequelize.Op;
  * @returns {Promise<Bank>}
  */
 const createDept = async (req, DeptBody) => {
-  console.log("Dept Body", DeptBody)
+ 
   // DeptBody.slug = DeptBody.name.replace(/ /g, "-").toLowerCase();
 
   DeptBody.createdBy = req.user.deptId;
   //DeptBody.parentDept = 1;
 
   if (DeptBody.parentDept == '') { DeptBody.parentDept = null }
-  console.log(DeptBody, "body");
+
   const addedDeptObj = await DeptModel.DeptModel.create(DeptBody);
   //authSMSSend(addedDeptObj.dataValues);  // Quick send message at the time of donation
   return addedDeptObj;
@@ -108,7 +108,6 @@ const queryParentDept = async (filter, options, searchQuery) => {
  * @returns {Promise<ReceiptModel>}
  */
 const getDeptById = async (id) => {
-  console.log("read dept by id " + id)
   return DeptModel.DeptModel.findByPk(id);
 };
 
@@ -121,12 +120,12 @@ const getDeptById = async (id) => {
  * @returns {Promise<ReceiptModel>}
  */
 const updateDeptById = async (deptId, updateBody, updatedBy) => {
-  //console.log("item 12")
+ 
   try {
 
 
     const Item = await getDeptById(deptId);
-    console.log("dept item", Item)
+
     if (!Item) {
       throw new ApiError(httpStatus.NOT_FOUND, "record not found");
     }
@@ -134,10 +133,10 @@ const updateDeptById = async (deptId, updateBody, updatedBy) => {
     updateBody.updatedBy = updatedBy;
     delete updateBody.deptId;
     Object.assign(Item, updateBody);
-    console.log("updateBody", updateBody)
+
     await Item.save();
   } catch (error) {
-    console.log("dept error:::", error)
+  
     if (error.errno === 1062) {
       throw new ApiError(httpStatus.NOT_FOUND, "Duplicate entry not allowed!");
     }
@@ -155,7 +154,6 @@ const updateDeptById = async (deptId, updateBody, updatedBy) => {
  * @returns {Promise<ReceiptModel>}
  */
 const deleteDeptById = async (Id) => {
-  console.log("delete step 1", Id)
   const Item = await getDeptById(Id);
   if (!Item) {
     throw new ApiError(httpStatus.NOT_FOUND, "Item not found");
