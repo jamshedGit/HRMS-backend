@@ -154,7 +154,9 @@ module.exports.Attendance_ConfigurationModel = require("./operations/attendance_
 module.exports.AttendanceModel = require("./operations/attendance/attendance.model")
 
 // Employee Shift Model
-module.exports.Employee_ShiftModel = require("./operations/employee_shift/employee_shift.model");
+module.exports.Employee_ShiftModel = require("./operations/employee_shift/employee_shift.model")
+
+module.exports.Payroll_ProcessModel= require("./operations/payroll_process/payroll_process.model")
 
 //Employee Roster Model
 module.exports.EmployeeRosterModel = require('./operations/employee_roster/employee_roster.model');
