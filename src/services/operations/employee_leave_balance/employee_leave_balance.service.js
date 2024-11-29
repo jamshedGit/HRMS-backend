@@ -2,8 +2,7 @@ const httpStatus = require("http-status");
 const { AllocateLeavesModel, EmployeeProfileModel, LeaveApplicationModel, LeaveApplicationDetailModel, FiscalSetupModel, EmployeeLeaveBalanceModel, LeaveTypeModel, LeaveEncashmentModel } = require("../../../models/index");
 const ApiError = require("../../../utils/ApiError");
 const Sequelize = require('sequelize');
-const { paginationFacts, createFiscalYearLabel } = require("../../../utils/common");
-const pick = require("../../../utils/pick");
+const { createFiscalYearLabel } = require("../../../utils/common");
 const { POLICY_TYPE } = require("../../../models/operations/allocate_leaves/enum/allocate_leaves.enum");
 
 const Op = Sequelize.Op;
@@ -95,7 +94,7 @@ const allocateLeaveBalances = async (data) => {
 
   if (employeeData?.length) {
     data.list.forEach(async (al) => {
-      employeeData.forEach(async (emp) => {
+      employeeData.forEach(async (emp, index) => {
         //Initialize values for Leave balance Record
         const init = { ...initialValues };
 
@@ -121,21 +120,25 @@ const allocateLeaveBalances = async (data) => {
               }
               //If leaves are encashed then they will be added to encashed key in the old balance record and a record of their encashment is created in Leave Encashment table
               else if (POLICY_TYPE[allocationPolicy.policyType] == POLICY_TYPE[2]) {
-                oldBalance.encashmentCount += oldBalance.remainingCount > allocationPolicy.maxCount ? allocationPolicy.maxCount : oldBalance.remainingCount;
-                oldBalance.remainingCount -= oldBalance.encashmentCount;
+                const oldEncashmentCount = oldBalance.encashmentCount;
+                const maxCount = allocationPolicy.maxCount - oldEncashmentCount;
+                if (maxCount > 0) {
+                  oldBalance.encashmentCount += oldBalance.remainingCount > maxCount ? maxCount : oldBalance.remainingCount;
+                  oldBalance.remainingCount -= oldBalance.encashmentCount - oldEncashmentCount;
 
-                await oldBalance.save()
+                  await oldBalance.save()
+                  const payload = {
+                    subsidiaryId: data.subsidiaryId,
+                    employeeId: emp.Id,
+                    leaveType: al.leaveType,
+                    yearId: oldYearData.Id,
+                    days: oldBalance.encashmentCount - oldEncashmentCount,
+                    reason: 'Leave Balance Encashment on year end',
+                  }
 
-                const payload = {
-                  subsidiaryId: data.subsidiaryId,
-                  employeeId: emp.Id,
-                  leaveType: al.leaveType,
-                  yearId: oldYearData.Id,
-                  days: oldBalance.encashmentCount,
-                  reason: 'Leave Balance Encashment on year end',
+                  await LeaveEncashmentModel.create(payload);
                 }
 
-                await LeaveEncashmentModel.create(payload);
               }
             }
           }

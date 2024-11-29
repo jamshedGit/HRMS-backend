@@ -7,10 +7,11 @@ const emppolicyValidation = require("../../../../validations/operations/entities
 
 const router = express.Router();
 
- router.route("/read-policy").post(auth(), validate(itemValidation.getReceipt), empPolicyController.getEmpPolicyById);
+router.route("/read-policy").post(auth(), validate(itemValidation.getReceipt), empPolicyController.getEmpPolicyById);
 router.route("/read-all-policy").post(auth(), empPolicyController.getAllEmpPolicy);
 router.route("/create-policy").post(auth(), validate(emppolicyValidation.createEmpPolicyValidation), empPolicyController.createEmpPolicy);
- router.route("/update-policy").put(auth(), validate(itemValidation.updateReceipt), empPolicyController.updateEmpPolicy);
- router.route("/delete-policy").patch(auth(), validate(itemValidation.deleteReceipt), empPolicyController.deleteEmpPolicy);
+router.route("/update-policy").put(auth(), validate(itemValidation.updateReceipt), empPolicyController.updateEmpPolicy);
+router.route("/delete-policy").patch(auth(), validate(itemValidation.deleteReceipt), empPolicyController.deleteEmpPolicy);
+router.route("/read-policy-by-subsidiaryId").post(validate(itemValidation.getReceipt), empPolicyController.getEmpPolicyBySubsidiaryId);
 
 module.exports = router;

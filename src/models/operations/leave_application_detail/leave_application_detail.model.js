@@ -38,7 +38,7 @@ LeaveApplicationModel.hasMany(leaveApplicationDetailModel, { foreignKey: 'applic
 leaveApplicationDetailModel.belongsTo(LeaveApplicationModel, {
 	foreignKey: 'applicationId',
 	targetKey: 'Id',  // Assuming 'Id' is the primary key in leaveApplicationModel table
-	onDelete: 'CASCADE',
+	onDelete: 'RESTRICT',
 	onUpdate: 'CASCADE',
 });
 

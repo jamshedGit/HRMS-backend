@@ -65,13 +65,11 @@ const queryEmployeeSalarys = async (filter, options, searchQuery) => {
 
 };
 
-
-
-const SP_getAllEmployeeSalaryInfo = async (filter, options, searchQuery,empId,transactionType) => {
+const SP_getAllEmployeeSalaryInfo = async (filter, options, searchQuery, empId, transactionType) => {
   try {
-    console.log("transactionType",transactionType)
+    console.log("transactionType::::1", transactionType)
     const results = await sequelize.query('CALL usp_GetAllActiveEmployeeSalaries(:id,:transactionType)', {
-      replacements: { id: empId || 'null',transactionType: transactionType  },
+      replacements: { id: empId || 'null', transactionType: transactionType },
       type: Sequelize.QueryTypes.RAW // Use RAW type for executing stored procedures
     });
 
@@ -90,11 +88,11 @@ const SP_getAllEmployeeSalaryInfo = async (filter, options, searchQuery,empId,tr
 };
 
 
-const SP_getAllEmployeeSalaryInfoByEmpId = async (empId,transactionType) => {
+const SP_getAllEmployeeSalaryInfoByEmpId = async (empId, transactionType) => {
   try {
-    console.log("EmployeeSalary empID",empId);
+
     const results = await sequelize.query('CALL usp_GetAllActiveEmployeeSalaries(:id,:transactionType)', {
-      replacements: { id: empId || 'null',transactionType: transactionType  },
+      replacements: { id: empId || 'null', transactionType: transactionType },
       type: Sequelize.QueryTypes.RAW // Use RAW type for executing stored procedures
     });
 
@@ -124,7 +122,7 @@ function filterByValue(array, string) {
  * @returns {Promise<ReceiptModel>}
  */
 const getEmployeeSalaryById = async (id) => {
-  console.log("employee_salary_service1", id)
+
   return EmployeeSalaryModel.EmployeeSalaryModel.findByPk(id);
 };
 
@@ -138,7 +136,7 @@ const getEmployeeSalaryById = async (id) => {
  */
 const updateEmployeeSalaryById = async (Id, updateBody, updatedBy) => {
 
-  console.log("zzz", updateBody);
+
   const Item = await getEmployeeSalaryById(Id);
   if (!Item) {
     throw new ApiError(httpStatus.NOT_FOUND, "record not found");
@@ -158,8 +156,10 @@ const updateEmployeeSalaryById = async (Id, updateBody, updatedBy) => {
  * @returns {Promise<ReceiptModel>}
  */
 const deleteEmployeeSalaryById = async (Id) => {
-  console.log("delete tran",Id);
-  const Item = await getEmployeeSalaryById(Id);
+  
+  //const Item = await getEmployeeSalaryById(Id);
+  let Item = await EmployeeSalaryModel.EmployeeSalaryModel.findOne({ employeeId: Id });
+  
   if (!Item) {
     throw new ApiError(httpStatus.NOT_FOUND, "Item not found");
   }

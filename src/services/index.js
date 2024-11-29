@@ -63,3 +63,4 @@ module.exports.employee_shift=require("./operations/employee_shift/employee_shif
 module.exports.Payroll_ProcessService=require("./operations/payroll_process/payroll_process.service")
 module.exports.AttendanceServicePage=require("./operations/attendance/attendance.service")
 module.exports.EmployeeRosterServicePage = require('./operations/employee_roster/employee_roster.service')
+module.exports.LeaveRegisterServicePage = require('./operations/leave_register/leave_register.service')

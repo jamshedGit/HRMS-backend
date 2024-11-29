@@ -46,7 +46,9 @@ const queryTaxSetups = async (filter, options, searchQuery) => {
   
   searchQuery = searchQuery.toLowerCase();
   const queryFilters = [
-    { Name: Sequelize.where(Sequelize.fn('LOWER', Sequelize.col('startDate')), 'LIKE', '%' + searchQuery + '%') },
+    { startDate: Sequelize.where(Sequelize.fn('LOWER', Sequelize.col('startDate')), 'LIKE', '%' + searchQuery + '%') },
+    { name: Sequelize.where(Sequelize.fn('LOWER', Sequelize.col('subs.name')), 'LIKE', '%' + searchQuery + '%') },
+    // { Subsidiary: Sequelize.where(Sequelize.fn('LOWER', Sequelize.col('subsName')), 'LIKE', '%' + searchQuery + '%') },
   ]
 
 
@@ -60,6 +62,13 @@ const queryTaxSetups = async (filter, options, searchQuery) => {
     },
     offset: offset,
     limit: limit,
+    include: [
+      {
+        model: TaxSetupModel.SubsidiaryModel,
+        attributes: ["Id", ["name", "subsName"]],
+        as: "subs"
+      }
+    ],
   });
 
 

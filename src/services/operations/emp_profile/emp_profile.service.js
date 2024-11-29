@@ -21,18 +21,18 @@ const createEmp_profile = async (req, Emp_profileBody) => {
   console.log("create_body", Emp_profileBody)
   const addedEmp_profileObj = await Emp_profileModel.EmployeeProfileModel.create(Emp_profileBody);
 
-// For Adding EmployeeId During Creation Record
+  // For Adding EmployeeId During Creation Record
   for (let i = 0; i < Emp_profileBody.contactList.length; i++) {
     Emp_profileBody.contactList[i].employeeId = addedEmp_profileObj.dataValues.Id;
   }
 
 
-// For Adding EmployeeId During Creation Record
+  // For Adding EmployeeId During Creation Record
   for (let i = 0; i < Emp_profileBody.workExperienceList.length; i++) {
     Emp_profileBody.workExperienceList[i].employeeId = addedEmp_profileObj.dataValues.Id;
   }
 
-// For Adding EmployeeId During Creation Record
+  // For Adding EmployeeId During Creation Record
   for (let i = 0; i < Emp_profileBody.academicList.length; i++) {
     Emp_profileBody.academicList[i].employeeId = addedEmp_profileObj.dataValues.Id;
   }
@@ -43,13 +43,13 @@ const createEmp_profile = async (req, Emp_profileBody) => {
     Emp_profileBody.skillsList[i].employeeId = addedEmp_profileObj.dataValues.Id;
   }
 
-   // For Adding EmployeeId During Creation Record
-   for (let i = 0; i < Emp_profileBody.incidentList.length; i++) {
+  // For Adding EmployeeId During Creation Record
+  for (let i = 0; i < Emp_profileBody.incidentList.length; i++) {
     Emp_profileBody.incidentList[i].employeeId = addedEmp_profileObj.dataValues.Id;
   }
 
 
- 
+
   await BUlkInsertEmployeeDetails(Emp_profileBody, addedEmp_profileObj.dataValues.Id);
 
   return addedEmp_profileObj;
@@ -168,7 +168,7 @@ const getEmp_profileById = async (id) => {
     type: Sequelize.QueryTypes.RAW // Use RAW type for executing stored procedures
   });
 
-  console.log("::13::",results);
+  console.log("::13::", results);
 
   return results[0]
 };
@@ -204,9 +204,9 @@ const getContactInfoByEmployeeId = async (id) => {
  * @returns {Promise<ReceiptModel>}
  */
 const updateEmp_profileById = async (Id, updateBody, updatedBy) => {
-  console.log("::ddd::",Id);
+  console.log("::ddd::", Id);
   const Item = await getEmp_profileById(Id);
-  console.log("::Item",Item)
+  console.log("::Item", Item)
   if (!Item) {
     throw new ApiError(httpStatus.NOT_FOUND, "record not found");
   }
@@ -280,13 +280,21 @@ const updateContactById = async (Id, updateBody, updatedBy) => {
  * @returns {Promise<ReceiptModel>}
  */
 const deleteEmp_profileById = async (Id) => {
+  try {
 
-  const Item = await getEmp_profileById(Id);
-  if (!Item) {
-    throw new ApiError(httpStatus.NOT_FOUND, "Item not found");
+
+    const Item = await Emp_profileModel.EmployeeProfileModel.findOne({ employeeId: Id })
+    console.log("Item:::Emp", Item)
+    if (!Item) {
+      throw new ApiError(httpStatus.NOT_FOUND, "Item not found");
+    }
+    await Item.destroy();
+  } catch (error) {
+
+    throw new ApiError(httpStatus.NOT_FOUND,error);
   }
-  await Item.destroy();
   return Item;
+
 };
 
 

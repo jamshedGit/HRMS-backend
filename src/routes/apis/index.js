@@ -67,6 +67,7 @@ const employee_shift=require('./operations/employee_shift/employee_shift.route')
 const payroll_process=require('./operations/payroll_process/payroll_process.route')
 const attendance=require('./operations/attendance/attendance.route')
 const employee_roster = require('./operations/employee_roster/employee_roster.route');
+const leave_register = require('./operations/leave_register/leave_register.route');
 
 const router = express.Router();
 
@@ -330,6 +331,10 @@ const defaultRoutes = [
   {
     path: "/employee_roster",
     route: employee_roster
+  },
+  {
+    path: "/leave_register",
+    route: leave_register
   },
 
 ];
