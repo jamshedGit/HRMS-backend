@@ -116,7 +116,7 @@ const deletePayroll_Process = catchAsync(async (req, res) => {
 });
 
 const payroll_group_detail = catchAsync(async (req, res) => {
-    console.log("hit", req.body)
+    
     const Receipt = await Payroll_ProcessService.payroll_group_detail(req.body.subsidiaryId, req.body.payroll_groupId);
     if (!Receipt) {
       throw new ApiError(httpStatus.NOT_FOUND, "Payroll group detail not found");

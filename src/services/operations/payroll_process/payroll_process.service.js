@@ -56,7 +56,7 @@ const createPayroll_Process = async (req, payroll_processBody) => {
       });
 
       if (result) {
-        console.log("result11100")
+  
         addedPayroll_Process.updatedAt = new Date();
         addedPayroll_Process.completed = true;
         await addedPayroll_Process.save();
@@ -70,7 +70,7 @@ const createPayroll_Process = async (req, payroll_processBody) => {
     addedPayroll_Process = await Payroll_ProcessModel.create(payroll_processBody);
     addedPayroll_Process.createdAt = new Date();
     await addedPayroll_Process.save();
-    console.log("result000")
+   
     result = await sequelize.query(
       'CALL SP_PayrollProcess(:p_SubsidiaryId, :p_PayrollGroupId, :p_MonthId)', {
       replacements: {
@@ -113,7 +113,7 @@ const createPayroll_Process = async (req, payroll_processBody) => {
 
 //     if (subsidiaryExists) {
 //       // If the record exists, update it
-//       console.log("Record already exists, updating...");
+
 //       payroll_processBody.Id = subsidiaryExists.dataValues.Id;  // Ensure the ID is set correctly
 
 //       // Removing `id` from payroll_processBody before updating (since `id` might be redundant)
@@ -128,7 +128,7 @@ const createPayroll_Process = async (req, payroll_processBody) => {
 
 //     } else {
 //       // If the record doesn't exist, create a new one
-//       console.log("Record does not exist, creating...");
+//    
 //       payroll_processBody.createdBy = req.user.id; // Assign createdBy field
 
 //       // Create a new payroll process
@@ -331,7 +331,7 @@ const payroll_group_detail = async (subsidiaryId, payroll_groupId) => {
   // Step 3: Get the count of employees whose salary setup is not created
   const employeesWithNoSalarySetupCount = employees.rows.filter((emp) => {
     // Check if this employee is NOT in the EmployeeSalaryModel
-    // console.log("emp111", emp)
+
     return !employeesWithoutSalarySetup.some((salary) => salary.employeeId === emp.Id);
   }).length;
 
