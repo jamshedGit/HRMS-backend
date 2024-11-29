@@ -12,7 +12,7 @@ const Op = Sequelize.Op;
 const sequelize = require("../../../config/db");
 
 const createPayroll_Process = async (req, payroll_processBody) => {
-  console.log("payroll_processBody111",payroll_processBody)
+
   try {
 
     // await payroll_group_detail(payroll_processBody.subsidiaryId, payroll_processBody.payroll_groupId);
@@ -24,39 +24,44 @@ const createPayroll_Process = async (req, payroll_processBody) => {
       },
     });
 
-    console.log("subsidiaryExists111",subsidiaryExists.dataValues.Id)
+
     let addedPayroll_Process;
     let result;
-
+  
     if (subsidiaryExists) {
       // return {
       //   message: "Record already exist.",
       //   status: "error",
       // };
-     payroll_processBody.Id=subsidiaryExists.dataValues.Id ;
-     addedPayroll_Process = await Payroll_ProcessModel.update(payroll_processBody, {
-      where: { id:subsidiaryExists.dataValues.Id } // Or whatever unique field you're using
-    });
+      payroll_processBody.Id = subsidiaryExists.dataValues.Id;  // Ensure the ID is set correctly
 
-    //procedure
+      // Removing `id` from payroll_processBody before updating (since `id` might be redundant)
+      delete payroll_processBody.Id;
+
+      // Assign the updated data to the existing record and save
+      Object.assign(subsidiaryExists, payroll_processBody);
+      addedPayroll_Process = await subsidiaryExists.save();
+
+      //procedure
 
 
-      // result = await sequelize.query(
-      //   'CALL SP_PayrollProcess(:p_SubsidiaryId, :p_PayrollGroupId, :p_MonthId)', {
-      //   replacements: {
-      //     p_SubsidiaryId: payroll_processBody.subsidiaryId || 'null',
-      //     p_PayrollGroupId: payroll_processBody.payroll_groupId || 'null',
-      //     p_MonthId: payroll_processBody.payroll_monthId || 'null'
-      //   },
-      //   type: Sequelize.QueryTypes.RAW // Use RAW type for executing stored procedures
-      // });
-  
-      // if (result) {
-      //   addedPayroll_Process.updatedAt = new Date();
-      //   addedPayroll_Process.completed = true;
-      //   await addedPayroll_Process.save();
-      // }
-  
+      result = await sequelize.query(
+        'CALL SP_PayrollProcess(:p_SubsidiaryId, :p_PayrollGroupId, :p_MonthId)', {
+        replacements: {
+          p_SubsidiaryId: payroll_processBody.subsidiaryId || 'null',
+          p_PayrollGroupId: payroll_processBody.payroll_groupId || 'null',
+          p_MonthId: payroll_processBody.payroll_monthId || 'null'
+        },
+        type: Sequelize.QueryTypes.RAW // Use RAW type for executing stored procedures
+      });
+
+      if (result) {
+        console.log("result11100")
+        addedPayroll_Process.updatedAt = new Date();
+        addedPayroll_Process.completed = true;
+        await addedPayroll_Process.save();
+      }
+
       return await getPayroll_ProcessById(addedPayroll_Process.Id);
     }
 
@@ -65,8 +70,8 @@ const createPayroll_Process = async (req, payroll_processBody) => {
     addedPayroll_Process = await Payroll_ProcessModel.create(payroll_processBody);
     addedPayroll_Process.createdAt = new Date();
     await addedPayroll_Process.save();
-
-     result = await sequelize.query(
+    console.log("result000")
+    result = await sequelize.query(
       'CALL SP_PayrollProcess(:p_SubsidiaryId, :p_PayrollGroupId, :p_MonthId)', {
       replacements: {
         p_SubsidiaryId: payroll_processBody.subsidiaryId || 'null',
@@ -77,7 +82,8 @@ const createPayroll_Process = async (req, payroll_processBody) => {
     });
 
     if (result) {
-      addedPayroll_Process.updatedAt = new Date();
+
+      addedPayroll_Process.u,pdatedAt = new Date();
       addedPayroll_Process.completed = true;
       await addedPayroll_Process.save();
     }
@@ -90,6 +96,56 @@ const createPayroll_Process = async (req, payroll_processBody) => {
     throw error; // Rethrow or handle the error as needed
   }
 };
+
+
+// const createPayroll_Process = async (req, payroll_processBody) => {
+//   try {
+//     // Step 1: Check if the payroll process already exists
+//     const subsidiaryExists = await Payroll_ProcessModel.findOne({
+//       where: {
+//         subsidiaryId: payroll_processBody.subsidiaryId,
+//         payroll_groupId: payroll_processBody.payroll_groupId,
+//         payroll_monthId: payroll_processBody.payroll_monthId,
+//       },
+//     });
+
+//     let addedPayroll_Process;
+
+//     if (subsidiaryExists) {
+//       // If the record exists, update it
+//       console.log("Record already exists, updating...");
+//       payroll_processBody.Id = subsidiaryExists.dataValues.Id;  // Ensure the ID is set correctly
+
+//       // Removing `id` from payroll_processBody before updating (since `id` might be redundant)
+//       delete payroll_processBody.Id;
+
+//       // Assign the updated data to the existing record and save
+//       Object.assign(subsidiaryExists, payroll_processBody);
+//       addedPayroll_Process = await subsidiaryExists.save();
+
+//       // Return the updated record by calling the relevant function
+//       return await getPayroll_ProcessById(addedPayroll_Process.Id);
+
+//     } else {
+//       // If the record doesn't exist, create a new one
+//       console.log("Record does not exist, creating...");
+//       payroll_processBody.createdBy = req.user.id; // Assign createdBy field
+
+//       // Create a new payroll process
+//       addedPayroll_Process = await Payroll_ProcessModel.create(payroll_processBody);
+
+//       // Save the new record
+//       await addedPayroll_Process.save();
+
+//       // Return the created record by calling the relevant function
+//       return await getPayroll_ProcessById(addedPayroll_Process.Id);
+//     }
+
+//   } catch (error) {
+//     console.error("Error in createPayroll_Process:", error);
+//     throw error; // Rethrow or handle the error as needed
+//   }
+// };
 
 
 /**
@@ -256,9 +312,9 @@ const payroll_group_detail = async (subsidiaryId, payroll_groupId) => {
   // Check if employees are found
   if (employees.count === 0) {
     data = {
-      total_employees:0,
+      total_employees: 0,
       slary_setup_not_created: 0
-  
+
     }
     return data
   }
