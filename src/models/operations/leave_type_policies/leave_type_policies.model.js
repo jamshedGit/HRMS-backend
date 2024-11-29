@@ -79,7 +79,7 @@ LeaveTypePoliciesModel.init(
 LeaveTypePoliciesModel.belongsTo(LeaveTypeModel, {
   foreignKey: 'leaveType',
   targetKey: 'Id',  // Assuming 'Id' is the primary key in LeaveType table
-  onDelete: 'CASCADE',
+  onDelete: 'RESTRICT',
   onUpdate: 'CASCADE',
 });
 
@@ -88,7 +88,7 @@ LeaveTypePoliciesModel.belongsTo(FormModel, {
   foreignKey: 'gender',
   targetKey: 'Id', // Assuming 'Id' is the primary key in FormMenu table
   as: 'genderDetail',
-  onDelete: 'CASCADE',
+  onDelete: 'RESTRICT',
   onUpdate: 'CASCADE',
 });
 
@@ -97,7 +97,7 @@ LeaveTypePoliciesModel.belongsTo(FormModel, {
   foreignKey: 'maritalStatus',
   targetKey: 'Id',  // Assuming 'Id' is the primary key in FormMenu table
   as: 'maritalDetail',
-  onDelete: 'CASCADE',
+  onDelete: 'RESTRICT',
   onUpdate: 'CASCADE',
 });
 
@@ -105,7 +105,7 @@ LeaveTypePoliciesModel.belongsTo(FormModel, {
 LeaveManagementConfigurationModel.hasMany(LeaveTypePoliciesModel, { foreignKey: 'leaveManagementConfigId' });
 LeaveTypePoliciesModel.belongsTo(LeaveManagementConfigurationModel, {
   foreignKey: 'leaveManagementConfigId', 
-  onDelete: 'CASCADE',
+  onDelete: 'RESTRICT',
   onUpdate: 'CASCADE',
 });
 

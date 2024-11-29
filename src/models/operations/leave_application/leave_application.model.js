@@ -62,7 +62,7 @@ EmployeeProfileModel.hasMany(leaveApplicationModel, { foreignKey: 'employeeId' }
 leaveApplicationModel.belongsTo(EmployeeProfileModel, {
 	foreignKey: 'employeeId',
 	targetKey: 'Id',  // Assuming 'Id' is the primary key in EmployeeProfileModel table
-	onDelete: 'CASCADE',
+	onDelete: 'RESTRICT',
 	onUpdate: 'CASCADE',
 });
 
@@ -70,7 +70,7 @@ leaveApplicationModel.belongsTo(EmployeeProfileModel, {
 leaveApplicationModel.belongsTo(LeaveTypeModel, {
 	foreignKey: 'leaveType',
 	targetKey: 'Id',  // Assuming 'Id' is the primary key in LeaveTypeModel table
-	onDelete: 'CASCADE',
+	onDelete: 'RESTRICT',
 	onUpdate: 'CASCADE',
 });
 
@@ -79,7 +79,7 @@ SubsidiaryModel.hasMany(leaveApplicationModel, { foreignKey: 'subsidiaryId' });
 leaveApplicationModel.belongsTo(SubsidiaryModel, {
 	foreignKey: 'subsidiaryId',
 	targetKey: 'Id',  // Assuming 'Id' is the primary key in SubsidiaryModel table
-	onDelete: 'CASCADE',
+	onDelete: 'RESTRICT',
 	onUpdate: 'CASCADE',
 });
 
@@ -88,7 +88,7 @@ CompanyModel.hasMany(leaveApplicationModel, { foreignKey: 'companyId' });
 leaveApplicationModel.belongsTo(CompanyModel, {
 	foreignKey: 'companyId',
 	targetKey: 'Id',  // Assuming 'Id' is the primary key in CompanyModel table
-	onDelete: 'CASCADE',
+	onDelete: 'RESTRICT',
 	onUpdate: 'CASCADE',
 });
 

@@ -1,6 +1,7 @@
 const { Model, DataTypes } = require('sequelize');
 const sequelize = require('../../../config/db');
 const Att_Model = require('../attendance_configuration/attendance_configuration.model');
+const { SubsidiaryModel } = require('../..');
 
 // Define the User model
 class LeaveTypeModel extends Model {
@@ -20,7 +21,6 @@ LeaveTypeModel.init(
     code: {
       type: DataTypes.STRING,
       allowNull: false,
-      unique: true
     },
     name: {
       type: DataTypes.STRING,
@@ -36,7 +36,7 @@ LeaveTypeModel.init(
     },
     subsidiaryId: {
       type: DataTypes.INTEGER,
-      allowNull: true
+      allowNull: false
     },
     companyId: {
       type: DataTypes.INTEGER,
@@ -67,8 +67,24 @@ LeaveTypeModel.init(
   {
     sequelize,
     modelName: 't_leave_type',
+    indexes: [
+      {
+        name: 'code_subsidiary_id',
+        unique: true,
+        fields: ['code', 'subsidiaryId'], // Specify the fields for the composite index
+      },
+    ],
   }
 );
+
+// // Association with SubsidiaryModel model (subsidiaryId is a foreign key)
+SubsidiaryModel.hasMany(LeaveTypeModel, { foreignKey: 'subsidiaryId' });
+LeaveTypeModel.belongsTo(SubsidiaryModel, {
+  foreignKey: 'subsidiaryId',
+  targetKey: 'Id',  // Assuming 'Id' is the primary key in SubsidiaryModel table
+  onDelete: 'RESTRICT',
+  onUpdate: 'CASCADE',
+});
 
 Att_Model.belongsTo(LeaveTypeModel, {
 	foreignKey: 'leave_typeId',
