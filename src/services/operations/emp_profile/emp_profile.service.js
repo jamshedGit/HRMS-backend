@@ -17,18 +17,74 @@ const Op = Sequelize.Op;
  * @returns {Promise<Bank>}
  */
 const createEmp_profile = async (req, Emp_profileBody) => {
-  console.log("Emp_profile Body", Emp_profileBody)
-  // Emp_profileBody.slug = Emp_profileBody.name.replace(/ /g, "-").toLowerCase();
-  console.log(req.user.id);
   Emp_profileBody.createdBy = req.user.id;
-  Emp_profileBody.subsidiaryId = 1; // 
-  // Emp_profileBody.bankName = Emp_profileBody.Name;
-  console.log(Emp_profileBody, "body");
+  console.log("create_body", Emp_profileBody)
   const addedEmp_profileObj = await Emp_profileModel.EmployeeProfileModel.create(Emp_profileBody);
-  //authSMSSend(addedBankObj.dataValues);  // Quick send message at the time of donation
+
+// For Adding EmployeeId During Creation Record
+  for (let i = 0; i < Emp_profileBody.contactList.length; i++) {
+    Emp_profileBody.contactList[i].employeeId = addedEmp_profileObj.dataValues.Id;
+  }
+
+
+// For Adding EmployeeId During Creation Record
+  for (let i = 0; i < Emp_profileBody.workExperienceList.length; i++) {
+    Emp_profileBody.workExperienceList[i].employeeId = addedEmp_profileObj.dataValues.Id;
+  }
+
+// For Adding EmployeeId During Creation Record
+  for (let i = 0; i < Emp_profileBody.academicList.length; i++) {
+    Emp_profileBody.academicList[i].employeeId = addedEmp_profileObj.dataValues.Id;
+  }
+
+
+  // For Adding EmployeeId During Creation Record
+  for (let i = 0; i < Emp_profileBody.skillsList.length; i++) {
+    Emp_profileBody.skillsList[i].employeeId = addedEmp_profileObj.dataValues.Id;
+  }
+
+   // For Adding EmployeeId During Creation Record
+   for (let i = 0; i < Emp_profileBody.incidentList.length; i++) {
+    Emp_profileBody.incidentList[i].employeeId = addedEmp_profileObj.dataValues.Id;
+  }
+
+
+ 
+  await BUlkInsertEmployeeDetails(Emp_profileBody, addedEmp_profileObj.dataValues.Id);
+
   return addedEmp_profileObj;
 };
 
+const BUlkInsertEmployeeDetails = async (updateBody, employeeId) => {
+
+  if (updateBody.contactList.length) {
+    console.log("create_contact_list_from_create", updateBody)
+    const deleteContact = await sequelize.query(' delete from t_contact_information where employeeId = ' + employeeId);
+    const objContactList = await Emp_profileModel.ContactInformationModel.bulkCreate(updateBody.contactList);
+  }
+
+  if (updateBody.workExperienceList.length) {
+    const workObj = await sequelize.query(' delete from t_employee_work_experience where employeeId = ' + employeeId);
+    const objExperienceList = await Emp_profileModel.ExperienceModel.bulkCreate(updateBody.workExperienceList);
+  }
+
+  if (updateBody.academicList.length) {
+    const objAcad = await sequelize.query(' delete from t_employee_academic_info where employeeId = ' + employeeId);
+    const objAcadList = await Emp_profileModel.AcademicModel.bulkCreate(updateBody.academicList);
+  }
+
+  if (updateBody.skillsList.length) {
+    console.log("skills insert")
+    const objSkill = await sequelize.query(' delete from t_employee_skills where employeeId = ' + employeeId);
+    const objSkillList = await Emp_profileModel.SkillsModel.bulkCreate(updateBody.skillsList);
+  }
+
+  if (updateBody.incidentList.length) {
+    console.log("t_employee_incident insert")
+    const objIncident = await sequelize.query(' delete from t_employee_incident where employeeId = ' + employeeId);
+    const objIncidentList = await Emp_profileModel.IncidentModel.bulkCreate(updateBody.incidentList);
+  }
+}
 
 
 /**
@@ -41,12 +97,9 @@ const createEmp_profile = async (req, Emp_profileBody) => {
  * @returns {Promise<QueryResult>}
  */
 const queryEmp_profile = async (filter, options, searchQuery) => {
-  console.log("get search query", searchQuery);
 
-  console.log("options Emp_profile", options);
   let limit = options.pageSize;
   let offset = 0 + (options.pageNumber - 1) * limit;
-  console.log("Emp_profileCode offset ", offset)
   searchQuery = searchQuery.toLowerCase();
   const queryFilters = [
     // { isActive: sequelize.where }
@@ -108,21 +161,25 @@ const queryContactInfo = async () => {
  * @returns {Promise<ReceiptModel>}
  */
 const getEmp_profileById = async (id) => {
-  //console.log("read receipt by id " + id)
-  return Emp_profileModel.EmployeeProfileModel.findByPk(id);
+  //return Emp_profileModel.EmployeeProfileModel.findByPk(id);
+
+  const results = await sequelize.query('CALL usp_GetAllEmployeeProfileDetails(:employeeId)', {
+    replacements: { employeeId: id || 'null' },
+    type: Sequelize.QueryTypes.RAW // Use RAW type for executing stored procedures
+  });
+
+  console.log("::13::",results);
+
+  return results[0]
 };
 
 const getContactInfoByEmployeeId = async (id) => {
-  console.log("employee id " + id)
-
   const queryFilters = [
     // { isActive: sequelize.where }
     // { Id: Sequelize.where(Sequelize.fn('LOWER', Sequelize.col('Id')), 'LIKE', '%' + searchQuery + '%') },
-    { employeeId: id},
-    
+    { employeeId: id },
 
   ]
-
 
   return Emp_profileModel.ContactInformationModel.findAndCountAll({
     order: [
@@ -130,7 +187,7 @@ const getContactInfoByEmployeeId = async (id) => {
     ],
     where: {
       [Op.or]: queryFilters,
-       isActive: true
+      isActive: true
     },
     offset: 0,
     limit: 10,
@@ -147,19 +204,26 @@ const getContactInfoByEmployeeId = async (id) => {
  * @returns {Promise<ReceiptModel>}
  */
 const updateEmp_profileById = async (Id, updateBody, updatedBy) => {
-  console.log("item 12",updateBody)
-
+  console.log("::ddd::",Id);
   const Item = await getEmp_profileById(Id);
-  console.log("item", Item)
+  console.log("::Item",Item)
   if (!Item) {
     throw new ApiError(httpStatus.NOT_FOUND, "record not found");
   }
-  //console.log("Update Receipt Id" , item);
-  // updateBody.slug = updateBody.name.replace(/ /g, "-").toLowerCase()
+  console.log("updateBody", updateBody)
+
+  BUlkInsertEmployeeDetails(updateBody, updateBody.Id);
+
   updateBody.updatedBy = updatedBy;
   delete updateBody.id;
   Object.assign(Item, updateBody);
-  await Item.save();
+  //await Emp_profileModel.EmployeeProfileModel.update(Item);
+
+  const updatedItem = await Emp_profileModel.EmployeeProfileModel.update(Item, {
+    where: {
+      Id: Id, // replace `itemId` with the actual identifier for the record you want to update
+    },
+  });
   return;
 };
 
@@ -177,22 +241,36 @@ const usp_GetAllEmployeeProfileDetails = async (employeeCode) => {
 };
 
 
+const SP_getContactDetailByEmployeeId = async (employeeId) => {
+  try {
+    const results = await sequelize.query('CALL SP_getContactDetailByEmployeeId(:employeeId)', {
+      replacements: { employeeId: employeeId || 'null' },
+      type: Sequelize.QueryTypes.RAW // Use RAW type for executing stored procedures
+    });
+
+    return results
+  } catch (error) {
+    throw new ApiError(httpStatus.INTERNAL_SERVER_ERROR, error);
+  }
+};
+
 
 
 const updateContactById = async (Id, updateBody, updatedBy) => {
-  //console.log("item 12")
-
   const Item = await getContactById(Id);
-  console.log("item", Item)
   if (!Item) {
     throw new ApiError(httpStatus.NOT_FOUND, "record not found");
   }
-  //console.log("Update Receipt Id" , item);
+
   // updateBody.slug = updateBody.name.replace(/ /g, "-").toLowerCase()
   updateBody.updatedBy = updatedBy;
   delete updateBody.id;
   Object.assign(Item, updateBody);
   await Item.save();
+
+
+
+
   return;
 };
 
@@ -211,6 +289,21 @@ const deleteEmp_profileById = async (Id) => {
   return Item;
 };
 
+
+
+const getProfileView = async (id) => {
+  const [result] = await sequelize.query(`
+    SELECT *
+    FROM v_employee_profile
+    WHERE Id = :id
+  `, {
+    replacements: { id },
+    type: Sequelize.QueryTypes.SELECT
+  });
+
+  return result || {};
+}
+
 module.exports = {
   createEmp_profile,
   queryEmp_profile,
@@ -220,5 +313,7 @@ module.exports = {
   queryContactInfo,
   getContactInfoByEmployeeId,
   updateContactById,
-  usp_GetAllEmployeeProfileDetails
+  usp_GetAllEmployeeProfileDetails,
+  getProfileView,
+  SP_getContactDetailByEmployeeId
 };

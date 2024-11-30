@@ -15,3 +15,5 @@ coverage
 yarn.lock
 package-lock.json
 
+uploads/
+.env

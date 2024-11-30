@@ -8,6 +8,7 @@ const {
   emailService,
 } = require("../../services");
 const { HttpStatusCodes, HttpResponseMessages } = require("../../utils/constants");
+const { token } = require('morgan');
 
 const register = catchAsync(async (req, res) => {
   const user = await userService.createUser(req.body);
@@ -62,6 +63,7 @@ const logout = catchAsync(async (req, res) => {
 
 const refreshTokens = catchAsync(async (req, res) => {
   const tokens = await authService.refreshAuth(req.body.refreshToken);
+
   // res.send({ access: tokens.access.token, refresh: tokens.refresh.token });
   res.send({
     code: HttpStatusCodes.CREATED,

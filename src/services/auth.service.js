@@ -16,6 +16,8 @@ const { HttpStatusCodes, HttpResponseMessages } = require('../utils/constants');
  */
 const loginUserWithEmailAndPassword = async (email, password) => {
   const user = await userService.getUserByEmail(email);  
+
+  console.log("user obj", user);
   // if (!user || !(await user.isPasswordMatch(password))) {
     // console.log("authService",user);
   // if (!user || !(await user.validPassword(password))) {
@@ -45,10 +47,9 @@ const logout = async (refreshToken) => {
  */
 const refreshAuth = async (refreshToken) => {
   try {
+    console.log("refresh_token",refreshToken,refreshAuth)
     const refreshTokenDoc = await tokenService.verifyToken(refreshToken, tokenTypes.REFRESH);
-    // console.log("refreshTokenDoc",refreshTokenDoc);
-    // console.log("userId",refreshTokenDoc.dataValues.userId);
-    // const user = await userService.getUserById(refreshTokenDoc.user);
+   
     const user = await userService.getUserById(1);
 
     // console.log(user);

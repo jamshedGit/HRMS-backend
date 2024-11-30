@@ -32,7 +32,6 @@ const getAllEmployeeSalary = catchAsync(async (req, res) => {
   console.log("get EmployeeSalarys");
   const obj = {};
   const filter = obj;
-  // const options = pick(req.body, ["sortBy", "limit", "page"]);
   const options = pick(req.body, ['sortOrder', 'pageSize', 'pageNumber']);
   const searchQuery = req.body.filter.searchQuery? req.body.filter.searchQuery : '';
   const result = await EmployeeSalarySetupServicePage.EmployeeSalarySetupServicePage.SP_getAllEmployeeSalaryInfo(filter, options,searchQuery,req.body.id,req.body.transactionType);

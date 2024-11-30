@@ -6,7 +6,7 @@ const bcrypt = require('bcryptjs');
 // Import sequelize object,
 // Database connection pool managed by Sequelize.
 const sequelize = require('../config/db')
-const { RoleModel, CenterModel, CityModel, CountryModel, SubCenterModel } = require('./index');
+const { RoleModel, CityModel, CountryModel } = require('./index');
 
 // Define method takes two arguments
 // 1st - name of table
@@ -48,19 +48,6 @@ user.belongsTo(RoleModel, {
 	onUpdate: 'CASCADE',
 });
 
-user.belongsTo(CenterModel, {
-	as: 'center',
-	foreignKey: 'centerId',
-	onDelete: 'CASCADE',
-	onUpdate: 'CASCADE',
-});
-
-user.belongsTo(SubCenterModel, {
-	as: 'subcenter',
-	foreignKey: 'subCenterId',
-	onDelete: 'CASCADE',
-	onUpdate: 'CASCADE',
-});
 
 user.belongsTo(CountryModel, {
 	as: 'country',
