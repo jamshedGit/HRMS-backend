@@ -48,6 +48,12 @@ Loan_management_configuration.belongsTo(FormModel.FormModel, {
 	as:"Account"
   });
 
+  Loan_management_configuration.belongsTo(FormModel.FormModel, {
+	foreignKey: 'emp_loan_account',
+	targetKey: 'Id',
+	as:"EmpLoanAccount"
+  });
+
 
 
 

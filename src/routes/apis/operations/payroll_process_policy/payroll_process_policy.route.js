@@ -6,10 +6,10 @@ const itemValidation = require("../../../../validations/operations/entities/payr
 
 const router = express.Router();
 
-router.route("/read-fiscal-setup").post(auth(), validate(itemValidation.createItem), form_controller.get_Payroll_Process_PolicyById);
-router.route("/read-all-fiscal-setup").post(auth(), form_controller.getAll_Payroll_Process_Policy);
-router.route("/create-fiscal-setup").post(auth(), validate(itemValidation.createItem), form_controller.create_Payroll_Process_Policy);
-router.route("/update-fiscal-setup").put(auth(), validate(itemValidation.updateReceipt), form_controller.update_Payroll_Process_Policy);
-router.route("/delete-fiscal-setup").patch(auth(),validate(itemValidation.deleteReceipt),form_controller.delete_Payroll_Process_Policy);
+router.route("/read-payroll-process-policy").post(auth(), form_controller.get_Payroll_Process_PolicyById);
+router.route("/read-all-payroll-process-policy").post(auth(), form_controller.getAll_Payroll_Process_Policy);
+router.route("/create-payroll-process-policy").post(auth(), validate(itemValidation.createItem), form_controller.create_Payroll_Process_Policy);
+router.route("/update-payroll-process-policy").put(auth(), validate(itemValidation.updateReceipt), form_controller.update_Payroll_Process_Policy);
+router.route("/delete-payroll-process-policy").patch(auth(),validate(itemValidation.deleteReceipt),form_controller.delete_Payroll_Process_Policy);
 // router.route("/donation-report").post(auth(),validate(receiptValidation.getDonationReceiptByBookNo),receiptController.getDonationReceiptReport);
 module.exports = router;
