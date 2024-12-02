@@ -16,11 +16,11 @@ const Op = Sequelize.Op;
  * @returns {Promise<Deduction>}
  */
 const createDeduction = async (req, DeductionBody) => {
-  console.log("Deduction Body", DeductionBody)
+  
   // DeductionBody.slug = DeductionBody.name.replace(/ /g, "-").toLowerCase();
-  console.log(req.user.id);
+
   DeductionBody.createdBy = req.user.id;
-  console.log(DeductionBody, "body");
+
   const addedDeductionObj = await DeductionModel.DeductionModel.create(DeductionBody);
   //authSMSSend(addedDeductionObj.dataValues);  // Quick send message at the time of donation
   return addedDeductionObj;

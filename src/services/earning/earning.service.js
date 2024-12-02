@@ -65,9 +65,9 @@ const queryEarnings = async (filter, options, searchQuery) => {
 
 };
 
-const SP_getAllEarningInfo = async (filter, options, searchQuery,empId) => {
+const SP_getAllEarningInfo = async (filter, options, searchQuery, empId) => {
   try {
-    console.log("earning empId",empId)
+    console.log("earning empId", empId)
     const results = await sequelize.query('CALL usp_GetAllEmpEarnings(:employeeId)', {
       replacements: { employeeId: empId || 'null' },
       type: Sequelize.QueryTypes.RAW // Use RAW type for executing stored procedures
@@ -77,7 +77,7 @@ const SP_getAllEarningInfo = async (filter, options, searchQuery,empId) => {
     let offset = 0 + (options.pageNumber - 1) * limit;
     searchQuery = searchQuery.toLowerCase();
     let searchlist = filterByValue(results, searchQuery);
-    console.log("searchlist", searchlist)
+
     let count = searchlist.length;
     const rows = searchlist.slice(offset, offset + limit)
 
@@ -90,7 +90,7 @@ const SP_getAllEarningInfo = async (filter, options, searchQuery,empId) => {
 
 const SP_getAllEarningInfoByEmpId = async (empId) => {
   try {
-    console.log("Earning empID",empId);
+
     const results = await sequelize.query('CALL usp_GetAllEmployeeEarningDetails(:employeeId)', {
       replacements: { employeeId: empId || 'null' },
       type: Sequelize.QueryTypes.RAW // Use RAW type for executing stored procedures
@@ -108,8 +108,16 @@ function filterByValue(array, string) {
     return array;
   }
   return array.filter(o => Object.keys(o).some(k => {
-    return o['earningCode'].toLowerCase().includes(string.toLowerCase()) 
-    || o['earningName'].toLowerCase().includes(string.toLowerCase())
+    return o['subsidiary'].toLowerCase().includes(string.toLowerCase())
+      || o['earningCode'].toLowerCase().includes(string.toLowerCase())
+      || o['earningName'].toLowerCase().includes(string.toLowerCase())
+
+
+      || o['account'].toLowerCase().includes(string.toLowerCase());
+
+
+
+
   }
   )
   );
