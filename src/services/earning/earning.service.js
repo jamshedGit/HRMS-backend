@@ -145,7 +145,7 @@ const getEarningById = async (id) => {
  */
 const updateEarningById = async (Id, updateBody, updatedBy) => {
 
-  console.log("zzz", updateBody);
+
   const Item = await getEarningById(Id);
   if (!Item) {
     throw new ApiError(httpStatus.NOT_FOUND, "record not found");
