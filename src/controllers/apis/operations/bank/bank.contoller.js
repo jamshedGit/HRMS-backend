@@ -24,7 +24,7 @@ const createBank = catchAsync(async (req, res) => {
 
   } catch (error) {
 
-    if (error.parent.errno === 1062) {
+    if (error?.parent?.errno === 1062) {
       throw new ApiError(httpStatus.NOT_FOUND, "Duplicate entry not allowed!");
     }
     else {
@@ -77,7 +77,7 @@ const updateBank = catchAsync(async (req, res) => {
 
   } catch (error) {
    
-    if (error.parent.errno === 1062) {
+    if (error?.parent?.errno === 1062) {
       throw new ApiError(httpStatus.NOT_FOUND, "Duplicate entry not allowed!");
     }
     else {
@@ -99,7 +99,7 @@ const deleteBank = catchAsync(async (req, res) => {
 
 }catch (error) {
 
-    if (error.parent.errno === 1451) {
+    if (error?.parent?.errno === 1451) {
       throw new ApiError(httpStatus.NOT_FOUND, HttpResponseMessages.ASSOCIATED_RECORD);
     }
     else {

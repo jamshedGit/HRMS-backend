@@ -18,6 +18,7 @@ const Op = Sequelize.Op;
 const createBank = async (req, BankBody) => {
 
   BankBody.createdBy = req.user.id;
+  BankBody.Name=BankBody.Name.trimStart();
   const addedBankObj = await BankModel.BankModel.create(BankBody);
   //authSMSSend(addedBankObj.dataValues);  // Quick send message at the time of donation
   const fetchRecord = await getBankById(addedBankObj.Id);
@@ -47,8 +48,13 @@ const queryBanks = async (filter, options, searchQuery) => {
   ]
 
   const { count, rows } = await BankModel.BankModel.findAndCountAll({
+    // order: [
+    //   ['createdAt', 'DESC']
+    // ],
+
     order: [
-      ['createdAt', 'DESC']
+      [Sequelize.col("subs.name"), "ASC"],   // Order by Subsidiary name
+     
     ],
     where: {
       [Op.or]: queryFilters,
@@ -105,12 +111,13 @@ const updateBankById = async (Id, updateBody, updatedBy) => {
     }
 
     updateBody.updatedBy = updatedBy;
+    updateBody.Name=updateBody.Name.trimStart();
     delete updateBody.id;
     Object.assign(Item, updateBody);
     await Item.save();
   } catch (error) {
   
-    if (error.errno === 1062) {
+    if (error?.errno === 1062) {
       throw new ApiError(httpStatus.NOT_FOUND, "Duplicate entry not allowed!");
     }
     else {

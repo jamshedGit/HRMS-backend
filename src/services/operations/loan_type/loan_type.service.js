@@ -16,11 +16,12 @@ const Op = Sequelize.Op;
  * @returns {Promise<LoanType>}
  */
 const createLoanType = async (req, LoanTypeBody) => {
-  console.log("LoanType Body", LoanTypeBody)
+  
   // LoanTypeBody.slug = LoanTypeBody.name.replace(/ /g, "-").toLowerCase();
-  console.log(req.user.id);
+
   LoanTypeBody.createdBy = req.user.id;
-  console.log(LoanTypeBody, "body");
+  LoanTypeBody.name=LoanTypeBody.name.trimStart();
+  
   const addedLoanTypeObj = await LoanTypeModel.LoanTypeModel.create(LoanTypeBody);
   //authSMSSend(addedLoanTypeObj.dataValues);  // Quick send message at the time of donation
   return addedLoanTypeObj;
@@ -46,10 +47,14 @@ const queryLoanTypes = async (filter, options, searchQuery) => {
   const queryFilters = [
     { name: Sequelize.where(Sequelize.fn('LOWER', Sequelize.col('subsList.name')), 'LIKE', '%' + searchQuery + '%') },
     { code: Sequelize.where(Sequelize.fn('LOWER', Sequelize.col('code')), 'LIKE', '%' + searchQuery + '%') },
+    { loanName: Sequelize.where(Sequelize.fn('LOWER', Sequelize.col('t_loan_type_setup.name')), 'LIKE', '%' + searchQuery + '%') },
+    { accountName: Sequelize.where(Sequelize.fn('LOWER', Sequelize.col('LoanTypeAccount.formCode')), 'LIKE', '%' + searchQuery + '%') },
+    { accountCode: Sequelize.where(Sequelize.fn('LOWER', Sequelize.col('LoanTypeAccount.formName')), 'LIKE', '%' + searchQuery + '%') },
   ]
   const { count, rows } = await LoanTypeModel.LoanTypeModel.findAndCountAll({
     order: [
-      ['createdAt', 'DESC']
+      [Sequelize.col("subsList.name"), "ASC"],   // Order by Subsidiary name
+     
     ],
     where: {
       [Op.or]: queryFilters,
@@ -86,17 +91,18 @@ const queryLoanTypes = async (filter, options, searchQuery) => {
 
 const SP_getAllLoanTypeInfo = async (filter, options, searchQuery,empId) => {
   try {
-    console.log("LoanType section")
+
     const results = await sequelize.query('CALL usp_GetAllLoanTypesByEmpId(:employeeId)', {
       replacements: { employeeId: empId || 'null' },
       type: Sequelize.QueryTypes.RAW // Use RAW type for executing stored procedures
     });
+  
 
     let limit = options.pageSize;
     let offset = 0 + (options.pageNumber - 1) * limit;
     searchQuery = searchQuery.toLowerCase();
     let searchlist = filterByValue(results, searchQuery);
-    console.log("searchlist", searchlist)
+   
     let count = searchlist.length;
     const rows = searchlist.slice(offset, offset + limit)
     
@@ -109,7 +115,7 @@ const SP_getAllLoanTypeInfo = async (filter, options, searchQuery,empId) => {
 
 const SP_getAllLoanTypeInfoByEmpId = async (empId) => {
   try {
-    console.log("LoanType empID",empId);
+ 
     const results = await sequelize.query('CALL usp_GetAllLoanTypesByEmpId(:employeeId)', {
       replacements: { employeeId: empId || 'null' },
       type: Sequelize.QueryTypes.RAW // Use RAW type for executing stored procedures
@@ -141,7 +147,7 @@ function filterByValue(array, string) {
  * @returns {Promise<ReceiptModel>}
  */
 const getLoanTypeById = async (id) => {
-  console.log("getLoanTypeById", id)
+
   return LoanTypeModel.LoanTypeModel.findByPk(id);
 };
 
@@ -155,7 +161,7 @@ const getLoanTypeById = async (id) => {
  */
 const updateLoanTypeById = async (Id, updateBody, updatedBy) => {
 
-  console.log("zzz", updateBody);
+  
   const Item = await getLoanTypeById(Id);
   if (!Item) {
     throw new ApiError(httpStatus.NOT_FOUND, "record not found");
@@ -163,6 +169,7 @@ const updateLoanTypeById = async (Id, updateBody, updatedBy) => {
   //console.log("Update Receipt Id" , item);
   // updateBody.slug = updateBody.name.replace(/ /g, "-").toLowerCase()
   updateBody.updatedBy = updatedBy;
+  updateBody.name=updateBody.name.trimStart();
   delete updateBody.id;
   Object.assign(Item, updateBody);
   await Item.save();

@@ -57,8 +57,9 @@ const queryDept = async (filter, options, searchQuery) => {
 
   const { count, rows } = await DeptModel.DeptModel.findAndCountAll({
     order: [
-      ['createdAt', 'DESC']
+      ['createdAt', 'ASC']
     ],
+
     where: {
       [Op.or]: queryFilters,
       // isActive: true

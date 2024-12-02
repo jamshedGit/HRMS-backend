@@ -16,11 +16,11 @@ const Op = Sequelize.Op;
  * @returns {Promise<Earning>}
  */
 const createEarning = async (req, EarningBody) => {
-  console.log("Earning Body", EarningBody)
+ 
   // EarningBody.slug = EarningBody.name.replace(/ /g, "-").toLowerCase();
-  console.log(req.user.id);
+ 
   EarningBody.createdBy = req.user.id;
-  console.log(EarningBody, "body");
+  EarningBody.earningName=EarningBody.earningName.trimStart();
   const addedEarningObj = await EarningModel.EarningModel.create(EarningBody);
   //authSMSSend(addedEarningObj.dataValues);  // Quick send message at the time of donation
   return addedEarningObj;
@@ -131,7 +131,7 @@ function filterByValue(array, string) {
  * @returns {Promise<ReceiptModel>}
  */
 const getEarningById = async (id) => {
-  console.log("getEarningById", id)
+
   return EarningModel.EarningModel.findByPk(id);
 };
 
@@ -153,6 +153,7 @@ const updateEarningById = async (Id, updateBody, updatedBy) => {
   //console.log("Update Receipt Id" , item);
   // updateBody.slug = updateBody.name.replace(/ /g, "-").toLowerCase()
   updateBody.updatedBy = updatedBy;
+  updateBody.earningName=updateBody.earningName.trimStart();
   delete updateBody.id;
   Object.assign(Item, updateBody);
   await Item.save();
