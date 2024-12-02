@@ -8,7 +8,7 @@ const createDeductionValidation = {
         deductionName: Joi.string(),
         linkedAttendance: Joi.boolean(),
         loan: Joi.boolean(),
-        mappedDeduction: Joi.string(),
+        // mappedDeduction: Joi.string(),
         account: Joi.any().optional(),
         subsidiaryId: Joi.any().optional(),
         companyId: Joi.any().optional(),
