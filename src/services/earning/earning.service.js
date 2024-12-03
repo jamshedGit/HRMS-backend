@@ -67,7 +67,7 @@ const queryEarnings = async (filter, options, searchQuery) => {
 
 const SP_getAllEarningInfo = async (filter, options, searchQuery, empId) => {
   try {
-    console.log("earning empId", empId)
+ 
     const results = await sequelize.query('CALL usp_GetAllEmpEarnings(:employeeId)', {
       replacements: { employeeId: empId || 'null' },
       type: Sequelize.QueryTypes.RAW // Use RAW type for executing stored procedures
@@ -150,7 +150,7 @@ const updateEarningById = async (Id, updateBody, updatedBy) => {
   if (!Item) {
     throw new ApiError(httpStatus.NOT_FOUND, "record not found");
   }
-  //console.log("Update Receipt Id" , item);
+  
   // updateBody.slug = updateBody.name.replace(/ /g, "-").toLowerCase()
   updateBody.updatedBy = updatedBy;
   updateBody.earningName=updateBody.earningName.trimStart();
