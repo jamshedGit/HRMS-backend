@@ -9,6 +9,6 @@ const router = express.Router();
 router.route("/read-branch").post(auth(), validate(itemValidation.getReceipt), branchController.getBranchById);
 router.route("/read-all-branch").post(auth(), branchController.getAllBranch);
 router.route("/create-branch").post(auth(), validate(bankValidation.createBranchValidation), branchController.createBranch);
-router.route("/update-branch").put(auth(), validate(itemValidation.updateReceipt), branchController.updateBranch);
+router.route("/update-branch").put(auth(), validate(bankValidation.updateBranchValidation), branchController.updateBranch);
 router.route("/delete-branch").patch(auth(),validate(itemValidation.deleteReceipt),branchController.deleteBranch);
 module.exports = router;
