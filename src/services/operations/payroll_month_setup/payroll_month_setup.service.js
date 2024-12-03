@@ -17,10 +17,10 @@ const Op = Sequelize.Op;
  */
 const createPayrollMonth = async (req, PayrollMonthBody) => {
    
-  console.log(req.user.id);
+  console.log("PayrollMonthBody",PayrollMonthBody);
   PayrollMonthBody.createdBy = req.user.id;
  
-  const resp = await sequelize.query(' update t_payroll_month_Setup set isActive = 0');
+  const resp = await sequelize.query(' update t_payroll_month_Setup set isActive = 0 where subsidiaryId =  ' + PayrollMonthBody.subsidiaryId);
 
   const addedPayrollMonthObj = await PayrollMonthModel.PayrollMonthModel.create(PayrollMonthBody);
   //authSMSSend(addedPayrollMonthObj.dataValues);  // Quick send message at the time of donation
@@ -49,6 +49,7 @@ const queryPayrollMonths = async (filter, options, searchQuery) => {
     { endDate: Sequelize.where(Sequelize.fn('LOWER', Sequelize.col('endDate')), 'LIKE', '%' + searchQuery + '%') },
     { month: Sequelize.where(Sequelize.fn('LOWER', Sequelize.col('month')), 'LIKE', '%' + searchQuery + '%') },
     { year: Sequelize.where(Sequelize.fn('LOWER', Sequelize.col('year')), 'LIKE', '%' + searchQuery + '%') },
+    { name: Sequelize.where(Sequelize.fn('LOWER', Sequelize.col('subs.name')), 'LIKE', '%' + searchQuery + '%') },
   ]
 
 
@@ -62,6 +63,13 @@ const queryPayrollMonths = async (filter, options, searchQuery) => {
     },
     offset: offset,
     limit: limit,
+    include: [
+      {
+        model: PayrollMonthModel.SubsidiaryModel,
+        attributes: ["Id", ["name", "subsName"]],
+        as: "subs"
+      }
+    ],
   });
 
 
@@ -70,12 +78,15 @@ const queryPayrollMonths = async (filter, options, searchQuery) => {
 };
 
 
-const SP_GetActivePreviousPayrollMonth = async (employeeId) => {
+const SP_GetActivePreviousPayrollMonth = async (p_subsidiaryId) => {
   try {
-    console.log("EmployeeTransfer empID", employeeId);
-    const results = await sequelize.query('CALL usp_GetActivePreviousPayrollMonth()', {
+    console.log("EmployeeTransfer p_subsidiaryId", p_subsidiaryId);
+    const results = await sequelize.query('CALL usp_GetActivePreviousPayrollMonth(:p_subsidiaryId)', {
+      replacements: { p_subsidiaryId: p_subsidiaryId || 'null' },
       type: Sequelize.QueryTypes.RAW // Use RAW type for executing stored procedures
     });
+
+    console.log("tsubs:::",results)
 
     return results;
   } catch (error) {

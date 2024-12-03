@@ -45,7 +45,7 @@ allocateLeavesModel.belongsTo(SubsidiaryModel, {
 	foreignKey: 'subsidiaryId',
 	targetKey: 'Id',  // Assuming 'Id' is the primary key in SubsidiaryModel table
 	onDelete: 'RESTRICT',
-	onUpdate: 'RESTRICT',
+	onUpdate: 'CASCADE',
 });
 
 // Association with CompanyModel model (companyId is a foreign key)
@@ -54,7 +54,7 @@ allocateLeavesModel.belongsTo(CompanyModel, {
 	foreignKey: 'companyId',
 	targetKey: 'Id',  // Assuming 'Id' is the primary key in CompanyModel table
 	onDelete: 'RESTRICT',
-	onUpdate: 'RESTRICT',
+	onUpdate: 'CASCADE',
 });
 
 // Association with FiscalSetupModel model (yearId is a foreign key)
@@ -62,7 +62,7 @@ allocateLeavesModel.belongsTo(FiscalSetupModel, {
 	foreignKey: 'yearId',
 	targetKey: 'Id',  // Assuming 'Id' is the primary key in FiscalSetupModel table
 	onDelete: 'RESTRICT',
-	onUpdate: 'RESTRICT',
+	onUpdate: 'CASCADE',
 });
 
 // Association with LeaveTypeModel model (employeeId is a foreign key)
@@ -70,7 +70,7 @@ allocateLeavesModel.belongsTo(LeaveTypeModel, {
 	foreignKey: 'leaveType',
 	targetKey: 'Id',  // Assuming 'Id' is the primary key in LeaveTypeModel table
 	onDelete: 'RESTRICT',
-	onUpdate: 'RESTRICT',
+	onUpdate: 'CASCADE',
 });
 
 // Association with FormModel model (cycleTypeId is a foreign key)
@@ -79,7 +79,7 @@ allocateLeavesModel.belongsTo(FormModel, {
 	targetKey: 'Id',  // Assuming 'Id' is the primary key in LeaveType table
 	as: 'cycleType',
 	onDelete: 'RESTRICT',
-	onUpdate: 'RESTRICT',
+	onUpdate: 'CASCADE',
 });
 
 

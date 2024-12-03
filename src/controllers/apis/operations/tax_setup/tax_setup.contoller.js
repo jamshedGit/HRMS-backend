@@ -24,16 +24,16 @@ const createTaxSetup = catchAsync(async (req, res) => {
       data: TaxSetup
     });
 
-  }  catch (error) {
-   
+  } catch (error) {
+
     if (error.parent.errno === 1062) {
-     throw new ApiError(httpStatus.NOT_FOUND, "Duplicate entry not allowed!");
-   }
-   else {
-    
-     throw error;
-   }
- }
+      throw new ApiError(httpStatus.NOT_FOUND, "Duplicate entry not allowed!");
+    }
+    else {
+
+      throw error;
+    }
+  }
 });
 
 const getAllTaxSetup = catchAsync(async (req, res) => {
@@ -42,9 +42,9 @@ const getAllTaxSetup = catchAsync(async (req, res) => {
   const filter = obj;
   // const options = pick(req.body, ["sortBy", "limit", "page"]);
   const options = pick(req.body, ['sortOrder', 'pageSize', 'pageNumber']);
-  const searchQuery = req.body.filter.searchQuery? req.body.filter.searchQuery : '';
-  const result = await TaxSetupServicePage.TaxSetupServicePage.queryTaxSetups(filter, options,searchQuery);
-  console.log("resp2",result);
+  const searchQuery = req.body.filter.searchQuery ? req.body.filter.searchQuery : '';
+  const result = await TaxSetupServicePage.TaxSetupServicePage.queryTaxSetups(filter, options, searchQuery);
+  console.log("resp2", result);
   res.send({
     code: HttpStatusCodes.OK,
     message: HttpResponseMessages.OK,
@@ -77,13 +77,20 @@ const updateTaxSetup = catchAsync(async (req, res) => {
 });
 
 const deleteTaxSetup = catchAsync(async (req, res) => {
-  console.log("req.body.Id " ,req.body.Id)
-  const Receipt = await TaxSetupServicePage.TaxSetupServicePage.deleteTaxSetupById(req.body.Id);
-  res.send({
-    code: HttpStatusCodes.OK,
-    message: HttpResponseMessages.OK,
-    data: Receipt,
-  });
+  try {
+
+
+    console.log("req.body.Id ", req.body.Id)
+    const Receipt = await TaxSetupServicePage.TaxSetupServicePage.deleteTaxSetupById(req.body.Id);
+    res.send({
+      code: HttpStatusCodes.OK,
+      message: HttpResponseMessages.OK,
+      data: Receipt,
+    });
+  } catch (error) {
+    throw new ApiError(httpStatus.NOT_FOUND, "Record is in another used!");
+  }
+
 });
 
 

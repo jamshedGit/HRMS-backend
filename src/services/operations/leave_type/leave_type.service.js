@@ -1,5 +1,5 @@
 const httpStatus = require("http-status");
-const { LeaveTypeModel } = require("../../../models/index");
+const { LeaveTypeModel, SubsidiaryModel } = require("../../../models/index");
 const ApiError = require("../../../utils/ApiError");
 const Sequelize = require('sequelize');
 const { paginationFacts } = require("../../../utils/common");
@@ -26,21 +26,24 @@ const leaveTypeAttributes = [
  */
 const createLeaveType = async (req) => {
   if (FORBIDDEN_CODES.includes(req.body.code)) {
-    throw new ApiError(httpStatus.FORBIDDEN, `This code is forbidden ${req.body.code}. Please use another code`);
+    throw new ApiError(httpStatus.FORBIDDEN, `This code is forbidden ${req.body.code}. Please use another code.`);
   }
-  const oldRecord = await getLeaveData({ code: req.body.code })
+  const oldRecord = await getLeaveData({ code: req.body.code, subsidiaryId: req.body.subsidiaryId })
   if (oldRecord) {
-    throw new ApiError(httpStatus.FORBIDDEN, `Code already in use ${req.body.code}. Please use another code`);
+    throw new ApiError(httpStatus.FORBIDDEN, `Code already in use ${req.body.code} for this Subsidiary.`);
   }
   const payload = {
     ...req.body,
     createdBy: req.user.id,
-    companyId: 1,
-    subsidiaryId: 1,
     typeName: LEAVE_TYPE[req.body.type]
   };
   const createdData = await LeaveTypeModel.create(payload);
-  const data = await getLeaveTypeById(createdData.Id, leaveTypeAttributes);
+  const data = await getLeaveTypeById(createdData.Id, leaveTypeAttributes, [
+    {
+      model: SubsidiaryModel,
+      attributes: ['name']
+    }
+  ]);
   return data;
 };
 
@@ -58,7 +61,8 @@ const getAllLeaveType = async (req) => {
   const limit = options.pageSize;
   const offset = 0 + (options.pageNumber - 1) * limit;
   const queryFilters = [
-    { Name: Sequelize.where(Sequelize.fn('LOWER', Sequelize.col('name')), 'LIKE', '%' + searchQuery + '%') },
+    { Name: Sequelize.where(Sequelize.fn('LOWER', Sequelize.col('t_leave_type.name')), 'LIKE', '%' + searchQuery + '%') },
+    { Name: Sequelize.where(Sequelize.fn('LOWER', Sequelize.col('t_subsidiary.name')), 'LIKE', '%' + searchQuery + '%') },
   ]
 
   const { count, rows } = await LeaveTypeModel.findAndCountAll({
@@ -69,6 +73,12 @@ const getAllLeaveType = async (req) => {
       [Op.or]: queryFilters,
       // isActive: true
     },
+    include: [
+      {
+        model: SubsidiaryModel,
+        attributes: ['name']
+      }
+    ],
     attributes: leaveTypeAttributes,
     offset: offset,
     limit: limit,
@@ -85,7 +95,7 @@ const getAllLeaveType = async (req) => {
  * @param {Number} id 
  * @returns 
  */
-const getLeaveTypeById = async (id, options = null) => {
+const getLeaveTypeById = async (id, options = null, include = []) => {
   return LeaveTypeModel.findByPk(id, {
     attributes: options || [
       'typeName',
@@ -94,7 +104,9 @@ const getLeaveTypeById = async (id, options = null) => {
       'name',
       'Id',
       'isActive',
+      'subsidiaryId'
     ],
+    include: include
   });
 };
 
@@ -131,11 +143,11 @@ const getLeaveData = async (filters, attributes = null, include = null) => {
  */
 const updateLeaveTypeById = async (body, updatedBy) => {
   if (FORBIDDEN_CODES.includes(body.code)) {
-    throw new ApiError(httpStatus.FORBIDDEN, `This code is forbidden ${body.code}. Please use another code`);
+    throw new ApiError(httpStatus.FORBIDDEN, `This code is forbidden ${body.code}. Please use another code.`);
   }
-  let oldRecord = await getLeaveData({ code: body.code });
+  let oldRecord = await getLeaveData({ code: body.code, subsidiaryId: body.subsidiaryId });
   if (oldRecord && oldRecord.Id != body.Id) {
-    throw new ApiError(httpStatus.FORBIDDEN, `Code already in use ${body.code}. Please use another code`);
+    throw new ApiError(httpStatus.FORBIDDEN, `Code already in use ${body.code} for this Subsidiary.`);
   }
   else {
     oldRecord = await getLeaveTypeById(body.Id)
@@ -144,7 +156,12 @@ const updateLeaveTypeById = async (body, updatedBy) => {
   body.typeName = LEAVE_TYPE[body.type];
   Object.assign(oldRecord, body);
   const updatedData = await oldRecord.save();
-  const data = await getLeaveTypeById(updatedData.Id, leaveTypeAttributes)
+  const data = await getLeaveTypeById(updatedData.Id, leaveTypeAttributes, [
+    {
+      model: SubsidiaryModel,
+      attributes: ['name']
+    }
+  ])
   return data;
 };
 
@@ -170,8 +187,8 @@ const deleteLeaveTypeById = async (id) => {
  * @returns 
  */
 const getDropdownData = () => {
-  return Object.keys(LEAVE_TYPE).map((type)=> {
-    return {label: LEAVE_TYPE[type], value: Number(type)}
+  return Object.keys(LEAVE_TYPE).map((type) => {
+    return { label: LEAVE_TYPE[type], value: Number(type) }
   })
 }
 
