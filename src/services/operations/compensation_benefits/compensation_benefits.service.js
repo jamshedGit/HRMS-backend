@@ -198,7 +198,7 @@ function filterByValue(array, string) {
     return array;
   }
   return array.filter(o => Object.keys(o).some(k => {
-    return o['earningName'].toLowerCase().includes(string.toLowerCase()) || o['deductionName'].toLowerCase().includes(string.toLowerCase())
+    return o['subsidiary']?.toLowerCase()?.includes(string?.toLowerCase()) || o['employeeType']?.toLowerCase()?.includes(string?.toLowerCase())
   }
   )
   );
