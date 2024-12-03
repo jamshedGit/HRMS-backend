@@ -16,14 +16,14 @@ const Op = Sequelize.Op;
  * @returns {Promise<Bank>}
  */
 const createDept = async (req, DeptBody) => {
-  console.log("Dept Body", DeptBody)
+ 
   // DeptBody.slug = DeptBody.name.replace(/ /g, "-").toLowerCase();
 
   DeptBody.createdBy = req.user.deptId;
   //DeptBody.parentDept = 1;
 
   if (DeptBody.parentDept == '') { DeptBody.parentDept = null }
-  console.log(DeptBody, "body");
+
   const addedDeptObj = await DeptModel.DeptModel.create(DeptBody);
   //authSMSSend(addedDeptObj.dataValues);  // Quick send message at the time of donation
   return addedDeptObj;
@@ -50,14 +50,16 @@ const queryDept = async (filter, options, searchQuery) => {
 
     { deptName: Sequelize.where(Sequelize.fn('LOWER', Sequelize.col('deptName')), 'LIKE', '%' + searchQuery + '%') },
     { deptCode: Sequelize.where(Sequelize.fn('LOWER', Sequelize.col('deptCode')), 'LIKE', '%' + searchQuery + '%') },
+    
 
   ]
 
 
   const { count, rows } = await DeptModel.DeptModel.findAndCountAll({
     order: [
-      ['createdAt', 'DESC']
+      ['createdAt', 'ASC']
     ],
+
     where: {
       [Op.or]: queryFilters,
       // isActive: true
@@ -75,11 +77,12 @@ const queryParentDept = async (filter, options, searchQuery) => {
 
   let limit = options.pageSize;
   let offset = 0 + (options.pageNumber - 1) * limit;
-  console.log("dept offset ", offset)
+
   searchQuery = searchQuery.toLowerCase();
   const queryFilters = [
 
     { parentDept: Sequelize.where(Sequelize.fn('LOWER', Sequelize.col('parentDept')), '=', '%' + null + '%') },
+    
 
   ]
 
@@ -106,7 +109,6 @@ const queryParentDept = async (filter, options, searchQuery) => {
  * @returns {Promise<ReceiptModel>}
  */
 const getDeptById = async (id) => {
-  console.log("read dept by id " + id)
   return DeptModel.DeptModel.findByPk(id);
 };
 
@@ -119,12 +121,12 @@ const getDeptById = async (id) => {
  * @returns {Promise<ReceiptModel>}
  */
 const updateDeptById = async (deptId, updateBody, updatedBy) => {
-  //console.log("item 12")
+ 
   try {
 
 
     const Item = await getDeptById(deptId);
-    console.log("dept item", Item)
+
     if (!Item) {
       throw new ApiError(httpStatus.NOT_FOUND, "record not found");
     }
@@ -132,10 +134,10 @@ const updateDeptById = async (deptId, updateBody, updatedBy) => {
     updateBody.updatedBy = updatedBy;
     delete updateBody.deptId;
     Object.assign(Item, updateBody);
-    console.log("updateBody", updateBody)
+
     await Item.save();
   } catch (error) {
-    console.log("dept error:::", error)
+  
     if (error.errno === 1062) {
       throw new ApiError(httpStatus.NOT_FOUND, "Duplicate entry not allowed!");
     }
@@ -153,7 +155,6 @@ const updateDeptById = async (deptId, updateBody, updatedBy) => {
  * @returns {Promise<ReceiptModel>}
  */
 const deleteDeptById = async (Id) => {
-  console.log("delete step 1", Id)
   const Item = await getDeptById(Id);
   if (!Item) {
     throw new ApiError(httpStatus.NOT_FOUND, "Item not found");
@@ -166,7 +167,6 @@ const deleteDeptById = async (Id) => {
 
 const sp_GetAllDepartments = async (filter, options, searchQuery) => {
   try {
-    console.log("mggg::", searchQuery)
     const results = await sequelize.query('CALL usp_GetAllDepartments()', {
 
       type: Sequelize.QueryTypes.RAW // Use RAW type for executing stored procedures
@@ -179,7 +179,6 @@ const sp_GetAllDepartments = async (filter, options, searchQuery) => {
 
     let count = searchlist.length;
     const rows = searchlist.slice(offset, offset + limit)
-console.log("dept rows",results)
     return paginationFacts(count, limit, options.pageNumber, rows); // 
   } catch (error) {
     throw new ApiError(httpStatus.INTERNAL_SERVER_ERROR, error);
@@ -195,10 +194,11 @@ function filterByValue(array, string) {
     return o['Department'].toLowerCase().includes(string.toLowerCase()) ||
      o['deptCode'].toLowerCase().includes(string.toLowerCase())
     || o['ParentDeptName'] == null ? o['Department'].toLowerCase().includes(string.toLowerCase()) :  o['ParentDeptName'].toLowerCase().includes(string.toLowerCase())
+    
   }
   )
   );
-}
+} 
 
 
 

@@ -16,11 +16,11 @@ const Op = Sequelize.Op;
  * @returns {Promise<Earning>}
  */
 const createEarning = async (req, EarningBody) => {
-  console.log("Earning Body", EarningBody)
+ 
   // EarningBody.slug = EarningBody.name.replace(/ /g, "-").toLowerCase();
-  console.log(req.user.id);
+ 
   EarningBody.createdBy = req.user.id;
-  console.log(EarningBody, "body");
+  EarningBody.earningName=EarningBody.earningName.trimStart();
   const addedEarningObj = await EarningModel.EarningModel.create(EarningBody);
   //authSMSSend(addedEarningObj.dataValues);  // Quick send message at the time of donation
   return addedEarningObj;
@@ -65,9 +65,9 @@ const queryEarnings = async (filter, options, searchQuery) => {
 
 };
 
-const SP_getAllEarningInfo = async (filter, options, searchQuery,empId) => {
+const SP_getAllEarningInfo = async (filter, options, searchQuery, empId) => {
   try {
-    console.log("earning empId",empId)
+ 
     const results = await sequelize.query('CALL usp_GetAllEmpEarnings(:employeeId)', {
       replacements: { employeeId: empId || 'null' },
       type: Sequelize.QueryTypes.RAW // Use RAW type for executing stored procedures
@@ -77,7 +77,7 @@ const SP_getAllEarningInfo = async (filter, options, searchQuery,empId) => {
     let offset = 0 + (options.pageNumber - 1) * limit;
     searchQuery = searchQuery.toLowerCase();
     let searchlist = filterByValue(results, searchQuery);
-    console.log("searchlist", searchlist)
+
     let count = searchlist.length;
     const rows = searchlist.slice(offset, offset + limit)
 
@@ -90,7 +90,7 @@ const SP_getAllEarningInfo = async (filter, options, searchQuery,empId) => {
 
 const SP_getAllEarningInfoByEmpId = async (empId) => {
   try {
-    console.log("Earning empID",empId);
+
     const results = await sequelize.query('CALL usp_GetAllEmployeeEarningDetails(:employeeId)', {
       replacements: { employeeId: empId || 'null' },
       type: Sequelize.QueryTypes.RAW // Use RAW type for executing stored procedures
@@ -108,8 +108,16 @@ function filterByValue(array, string) {
     return array;
   }
   return array.filter(o => Object.keys(o).some(k => {
-    return o['earningCode'].toLowerCase().includes(string.toLowerCase()) 
-    || o['earningName'].toLowerCase().includes(string.toLowerCase())
+    return o['subsidiary'].toLowerCase().includes(string.toLowerCase())
+      || o['earningCode'].toLowerCase().includes(string.toLowerCase())
+      || o['earningName'].toLowerCase().includes(string.toLowerCase())
+
+
+      || o['account'].toLowerCase().includes(string.toLowerCase());
+
+
+
+
   }
   )
   );
@@ -123,7 +131,7 @@ function filterByValue(array, string) {
  * @returns {Promise<ReceiptModel>}
  */
 const getEarningById = async (id) => {
-  console.log("getEarningById", id)
+
   return EarningModel.EarningModel.findByPk(id);
 };
 
@@ -137,14 +145,15 @@ const getEarningById = async (id) => {
  */
 const updateEarningById = async (Id, updateBody, updatedBy) => {
 
-  console.log("zzz", updateBody);
+
   const Item = await getEarningById(Id);
   if (!Item) {
     throw new ApiError(httpStatus.NOT_FOUND, "record not found");
   }
-  //console.log("Update Receipt Id" , item);
+  
   // updateBody.slug = updateBody.name.replace(/ /g, "-").toLowerCase()
   updateBody.updatedBy = updatedBy;
+  updateBody.earningName=updateBody.earningName.trimStart();
   delete updateBody.id;
   Object.assign(Item, updateBody);
   await Item.save();

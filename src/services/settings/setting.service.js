@@ -88,7 +88,7 @@ const getCountriesMasterData = async () => {
 const getBanksMasterData = async () => {
   const BanksMasterData = getDdlItems(DDL_FIELD_NAMES.BankName, await BankModel.findAll({
     where: { isActive: true },
-    attributes: ['Id', 'Name']
+    attributes: ['Id', 'Name',"subsidiaryId"]
   }));
   return BanksMasterData
 };
@@ -115,7 +115,7 @@ const getEmployeesMasterData = async () => {
 const getDeptMasterData = async () => {
   const DeptMasterData = getDdlItems(DDL_FIELD_NAMES.DeptName, await DeptModel.findAll({
     where: { isActive: true },
-    attributes: ['deptId', 'deptName']
+    attributes: ['deptId', 'deptName','subsidiaryId']
   }));
   return DeptMasterData
 };
@@ -336,12 +336,12 @@ const getCitiesMasterData = async (countryId) => {
 
 const GetLastInserted_ID_ByTableName = async (p_TableName, pkIdColumnName, whereClause) => {
   try {
-    console.log("::results::", p_TableName, pkIdColumnName, whereClause);
+
     const results = await sequelize.query('CALL usp_GenerateDynamicId(:p_TableName,:p_IdColumn,:p_WhereClause)', {
       replacements: { p_TableName: p_TableName, p_IdColumn: pkIdColumnName, p_WhereClause: whereClause },
       type: Sequelize.QueryTypes.RAW // Use RAW type for executing stored procedures
     });
-    console.log("::dd::", results);
+
     return results;
   } catch (error) {
     throw new ApiError(httpStatus.INTERNAL_SERVER_ERROR, error);

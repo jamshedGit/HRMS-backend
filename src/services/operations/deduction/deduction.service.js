@@ -16,11 +16,11 @@ const Op = Sequelize.Op;
  * @returns {Promise<Deduction>}
  */
 const createDeduction = async (req, DeductionBody) => {
-  console.log("Deduction Body", DeductionBody)
+  
   // DeductionBody.slug = DeductionBody.name.replace(/ /g, "-").toLowerCase();
-  console.log(req.user.id);
+
   DeductionBody.createdBy = req.user.id;
-  console.log(DeductionBody, "body");
+
   const addedDeductionObj = await DeductionModel.DeductionModel.create(DeductionBody);
   //authSMSSend(addedDeductionObj.dataValues);  // Quick send message at the time of donation
   return addedDeductionObj;
@@ -76,7 +76,7 @@ const queryDeductions = async (filter, options, searchQuery) => {
 
 const SP_getAllDeductionInfo = async (filter, options, searchQuery,empId) => {
   try {
-    console.log("deduction section")
+   
     const results = await sequelize.query('CALL usp_GetAllDeductionsByEmpId(:employeeId)', {
       replacements: { employeeId: empId || 'null' },
       type: Sequelize.QueryTypes.RAW // Use RAW type for executing stored procedures
@@ -86,7 +86,7 @@ const SP_getAllDeductionInfo = async (filter, options, searchQuery,empId) => {
     let offset = 0 + (options.pageNumber - 1) * limit;
     searchQuery = searchQuery.toLowerCase();
     let searchlist = filterByValue(results, searchQuery);
-    console.log("searchlist", searchlist)
+   
     let count = searchlist.length;
     const rows = searchlist.slice(offset, offset + limit)
     
@@ -99,7 +99,7 @@ const SP_getAllDeductionInfo = async (filter, options, searchQuery,empId) => {
 
 const SP_getAllDeductionInfoByEmpId = async (empId) => {
   try {
-    console.log("Deduction empID",empId);
+
     const results = await sequelize.query('CALL usp_GetAllDeductionsByEmpId(:employeeId)', {
       replacements: { employeeId: empId || 'null' },
       type: Sequelize.QueryTypes.RAW // Use RAW type for executing stored procedures
@@ -134,7 +134,6 @@ function filterByValue(array, string) {
  * @returns {Promise<ReceiptModel>}
  */
 const getDeductionById = async (id) => {
-  console.log("getDeductionById", id)
   return DeductionModel.DeductionModel.findByPk(id);
 };
 
@@ -148,13 +147,14 @@ const getDeductionById = async (id) => {
  */
 const updateDeductionById = async (Id, updateBody, updatedBy) => {
 
-  console.log("zzz", updateBody);
+
   const Item = await getDeductionById(Id);
   if (!Item) {
     throw new ApiError(httpStatus.NOT_FOUND, "record not found");
   }
-  //console.log("Update Receipt Id" , item);
+
   // updateBody.slug = updateBody.name.replace(/ /g, "-").toLowerCase()
+
   updateBody.updatedBy = updatedBy;
   delete updateBody.id;
   Object.assign(Item, updateBody);

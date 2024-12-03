@@ -11,7 +11,7 @@ const {
 } = require("../../../../utils/constants");
 
 const createBank = catchAsync(async (req, res) => {
-  // console.log("reqested User", req.user.id);
+
   try {
 
     const Bank = await bankformService.bankFormService.createBank(req, req.body);
@@ -24,7 +24,7 @@ const createBank = catchAsync(async (req, res) => {
 
   } catch (error) {
 
-    if (error.parent.errno === 1062) {
+    if (error?.parent?.errno === 1062) {
       throw new ApiError(httpStatus.NOT_FOUND, "Duplicate entry not allowed!");
     }
     else {
@@ -35,14 +35,14 @@ const createBank = catchAsync(async (req, res) => {
 });
 
 const getAllBanks = catchAsync(async (req, res) => {
-  console.log("get banks");
+
   const obj = {};
   const filter = obj;
   // const options = pick(req.body, ["sortBy", "limit", "page"]);
   const options = pick(req.body, ['sortOrder', 'pageSize', 'pageNumber']);
   const searchQuery = req.body.filter.searchQuery ? req.body.filter.searchQuery : '';
   const result = await bankformService.bankFormService.queryBanks(filter, options, searchQuery);
-  console.log(result);
+ 
   res.send({
     code: HttpStatusCodes.OK,
     message: HttpResponseMessages.OK,
@@ -76,8 +76,8 @@ const updateBank = catchAsync(async (req, res) => {
     });
 
   } catch (error) {
-    console.log("bank error",error)
-    if (error.parent.errno === 1062) {
+   
+    if (error?.parent?.errno === 1062) {
       throw new ApiError(httpStatus.NOT_FOUND, "Duplicate entry not allowed!");
     }
     else {
@@ -88,14 +88,29 @@ const updateBank = catchAsync(async (req, res) => {
 });
 
 const deleteBank = catchAsync(async (req, res) => {
-  console.log("req.body.Id ", req.body.Id)
+  try {
+
   const Receipt = await bankformService.bankFormService.deleteBankById(req.body.Id);
   res.send({
     code: HttpStatusCodes.OK,
     message: HttpResponseMessages.OK,
     data: Receipt,
   });
+
+}catch (error) {
+
+    if (error?.parent?.errno === 1451) {
+      throw new ApiError(httpStatus.NOT_FOUND, HttpResponseMessages.ASSOCIATED_RECORD);
+    }
+    else {
+
+      throw error;
+    }
+  }
 });
+
+
+
 
 
 module.exports = {
