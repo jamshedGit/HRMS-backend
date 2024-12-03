@@ -6,7 +6,7 @@ const createDept = {
   params: Joi.disallow(),
   body: Joi.object().keys({
     deptId: Joi.disallow(),
-    deptName: Joi.string().required(),
+    deptName: Joi.string().trim().required(),
     deptCode: Joi.string().required(),
     parentDept: Joi.any().optional(),
     budgetStrength:Joi.number().required(),
