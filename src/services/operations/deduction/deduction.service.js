@@ -99,7 +99,7 @@ const SP_getAllDeductionInfo = async (filter, options, searchQuery,empId) => {
 
 const SP_getAllDeductionInfoByEmpId = async (empId) => {
   try {
-    console.log("Deduction empID",empId);
+
     const results = await sequelize.query('CALL usp_GetAllDeductionsByEmpId(:employeeId)', {
       replacements: { employeeId: empId || 'null' },
       type: Sequelize.QueryTypes.RAW // Use RAW type for executing stored procedures
@@ -134,7 +134,6 @@ function filterByValue(array, string) {
  * @returns {Promise<ReceiptModel>}
  */
 const getDeductionById = async (id) => {
-  
   return DeductionModel.DeductionModel.findByPk(id);
 };
 
@@ -153,7 +152,7 @@ const updateDeductionById = async (Id, updateBody, updatedBy) => {
   if (!Item) {
     throw new ApiError(httpStatus.NOT_FOUND, "record not found");
   }
-  //console.log("Update Receipt Id" , item);
+
   // updateBody.slug = updateBody.name.replace(/ /g, "-").toLowerCase()
 
   updateBody.updatedBy = updatedBy;

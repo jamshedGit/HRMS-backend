@@ -11,7 +11,7 @@ const {
 } = require("../../../../utils/constants");
 
 const createDeduction = catchAsync(async (req, res) => {
-  // console.log("reqested User", req.user.id);
+  
   try {
 
     const Deduction = await DeductionformService.DeductionServicePage.createDeduction(req, req.body);
@@ -51,8 +51,8 @@ const getAllDeduction = catchAsync(async (req, res) => {
 
 
 const SP_getAllDeductionInfoByEmpId = catchAsync(async (req, res) => {
-  console.log("Deduction Controller getDeductionId")
-  console.log(req.body)
+
+
   const Receipt = await DeductionformService.DeductionServicePage.SP_getAllDeductionInfoByEmpId(req.body.Id);
   if (!Receipt) {
     throw new ApiError(httpStatus.NOT_FOUND, "Receipt not found");
@@ -65,8 +65,7 @@ const SP_getAllDeductionInfoByEmpId = catchAsync(async (req, res) => {
 });
 
 const getDeductionById = catchAsync(async (req, res) => {
-  console.log("Deduction Controller getDeductionId")
-  console.log(req.body)
+
   const Receipt = await DeductionformService.DeductionServicePage.getDeductionById(req.body.Id);
   if (!Receipt) {
     throw new ApiError(httpStatus.NOT_FOUND, "Receipt not found");

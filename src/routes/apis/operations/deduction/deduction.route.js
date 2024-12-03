@@ -7,7 +7,7 @@ const deductionValidation = require("../../../../validations/operations/entities
 
 const router = express.Router();
 
-router.route("/read-deduction").post(auth(), validate(deductionValidation.createDeductionValidation1), deductionController.getDeductionById);
+router.route("/read-deduction").post(auth(), validate(deductionValidation.createDeductionValidation), deductionController.getDeductionById);
 router.route("/read-all-deduction").post(auth(), deductionController.getAllDeduction);
 router.route("/read-all-deduction_by_employeeId").post( deductionController.SP_getAllDeductionInfoByEmpId);
 router.route("/create-deduction").post(auth(), validate(deductionValidation.createDeductionValidation), deductionController.createDeduction);
