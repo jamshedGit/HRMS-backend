@@ -1,5 +1,5 @@
 const httpStatus = require("http-status");
-const {EmployeeProfileModel} = require("../../../models/index");
+const {EmployeeProfileModel,DeptModel, DesignationModel} = require("../../../models/index");
 const { FormModel,SubsidiaryModel } = require("../../../models/index");
 
 const ApiError = require("../../../utils/ApiError");
@@ -7,6 +7,7 @@ const Sequelize = require("sequelize");
 const {
   paginationFacts,
   check_range_exist,
+  formatDates,
   // update_range_exist,
 } = require("../../../utils/common");
 const { HttpStatusCodes } = require("../../../utils/constants");
@@ -91,10 +92,35 @@ const queryemployee_profile = async (
     },
     offset: offset,
     limit: limit,
+    include: [
+      {
+        model: DeptModel,  // Assuming you have a DepartmentModel
+        as: 'department',  // Alias to refer to the department relation
+        attributes: ['deptId', 'deptName'],  // Specify the fields you want from the department table
+      },
+      {
+        model: FormModel,  // Assuming you have a DepartmentModel
+        as: 'designation',  // Alias to refer to the department relation
+        attributes: ['Id', 'formName'],  // Specify the fields you want from the department table
+      },
+    ],
   });
 
 
-  return paginationFacts(count, limit, options.pageNumber, rows);
+const updatedRows = rows.map(row => {
+
+
+  const formattedDateOfJoining = row?.dataValues?.dateOfJoining != 'undefined' ? formatDates(row?.dataValues?.dateOfJoining) : null;
+
+  const fullName = `${row.dataValues.firstName} ${row.dataValues.middleName ? row.dataValues.middleName + ' ' : ''}${row.dataValues.lastName}`;
+  return {
+    ...row.dataValues,
+    fullName: fullName.trim(), // Trim any extra spaces if middleName is empty
+    dateOfJoining: formattedDateOfJoining,
+  };
+});
+
+  return paginationFacts(count, limit, options.pageNumber, updatedRows);
 
 };
 
