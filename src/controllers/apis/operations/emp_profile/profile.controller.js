@@ -120,8 +120,19 @@ const getContactInfoByEmployeeId = catchAsync(async (req, res) => {
 
 const updateEmp_profile = catchAsync(async (req, res) => {
   // req.body.profile_image = req.file.filename
-  console.log("update emp", req.body);
+  console.log("update emp1111", req.body);
   const Receipt = await Emp_profileformService.EmpProfileServicePage.updateEmp_profileById(req.body.Id, req.body, req.user.Id);
+
+  if(Receipt?.status=="error"){
+
+    res.status(HttpStatusCodes?.INTERNAL_SERVER_ERROR).send({
+      code: HttpStatusCodes?.INTERNAL_SERVER_ERROR,
+      message:Receipt?.message,
+      error: Receipt?.error || 'An unexpected error occurred',
+    });
+    
+
+  }
   res.send({
     code: HttpStatusCodes.OK,
     message: HttpResponseMessages.OK,

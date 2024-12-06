@@ -96,7 +96,7 @@ console.log("hit111")
 };
 
 const BUlkInsertEmployeeDetails = async (updateBody, employeeId) => {
-
+console.log("updateBody.contactList.length",updateBody.contactList.length)
   if (updateBody.contactList.length) {
     console.log("create_contact_list_from_create", updateBody)
     const deleteContact = await sequelize.query(' delete from t_contact_information where employeeId = ' + employeeId);
@@ -272,14 +272,47 @@ const getContactInfoByEmployeeId = async (id) => {
  * @returns {Promise<ReceiptModel>}
  */
 const updateEmp_profileById = async (Id, updateBody, updatedBy) => {
-
+  console.log("updateBody.contactList.length0")
   const Item = await getEmp_profileById(Id);
   console.log("::Item", Item)
   if (!Item) {
     throw new ApiError(httpStatus.NOT_FOUND, "record not found");
   }
+  const checkDateOverlap = (startDate1, endDate1, startDate2, endDate2) => {
+    return startDate1 <= endDate2 && endDate1 >= startDate2;
+  };
+  // Now we will check for date overlaps in workExperienceList
+  const overlapErrors = [];
+  const workExperienceList = updateBody?.workExperienceList;
 
+  // Loop through each experience to check for overlap
+  for (let i = 0; i < workExperienceList?.length; i++) {
+    let currentExperience = workExperienceList[i];
+    let currentStartDate = new Date(currentExperience.startDate);
+    let currentEndDate = new Date(currentExperience.endDate);
 
+    // Compare current experience with all other experiences for overlap
+    for (let j = 0; j < workExperienceList.length; j++) {
+      if (i !== j) { // Avoid comparing the same entry with itself
+        let otherExperience = workExperienceList[j];
+        let otherStartDate = new Date(otherExperience.startDate);
+        let otherEndDate = new Date(otherExperience.endDate);
+
+        // Check for overlap
+        if (checkDateOverlap(currentStartDate, currentEndDate, otherStartDate, otherEndDate)) {
+          overlapErrors.push(`Date overlap detected between experience at index ${i} and ${j}`);
+        }
+      }
+    }
+  }
+
+  // If overlaps are detected, return error response
+  if (overlapErrors.length > 0) {
+    console.log("There are date overlaps in the work experience list.1")
+    let result={"message":'There are date overlaps in the work experience...',"status":"error"}
+      return result;
+  }
+console.log("updateBody.contactList.length1")
   BUlkInsertEmployeeDetails(updateBody, updateBody.Id);
 
   updateBody.updatedBy = updatedBy;
