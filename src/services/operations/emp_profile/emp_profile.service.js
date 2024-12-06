@@ -50,8 +50,8 @@ const createEmp_profile = async (req, Emp_profileBody) => {
   // If overlaps are detected, return error response
   if (overlapErrors.length > 0) {
     console.log("There are date overlaps in the work experience list.1")
-    let result={"message":'There are date overlaps in the work experience.',"status":"error"}
-      return result;
+    let result = { "message": 'There are date overlaps in the work experience.', "status": "error" }
+    return result;
   }
   const addedEmp_profileObj = await Emp_profileModel.EmployeeProfileModel.create(Emp_profileBody);
 
@@ -63,10 +63,10 @@ const createEmp_profile = async (req, Emp_profileBody) => {
 
   // For Adding EmployeeId During Creation Record
   for (let i = 0; i < Emp_profileBody.workExperienceList.length; i++) {
-    console.log("Emp_profileBody.workExperienceList[i]",Emp_profileBody.workExperienceList[i])
+    console.log("Emp_profileBody.workExperienceList[i]", Emp_profileBody.workExperienceList[i])
     Emp_profileBody.workExperienceList[i].employeeId = addedEmp_profileObj.dataValues.Id;
   }
-  
+
 
 
 
@@ -89,14 +89,14 @@ const createEmp_profile = async (req, Emp_profileBody) => {
   }
 
 
-console.log("hit111")
+  console.log("hit111")
   await BUlkInsertEmployeeDetails(Emp_profileBody, addedEmp_profileObj.dataValues.Id);
 
   return addedEmp_profileObj;
 };
 
 const BUlkInsertEmployeeDetails = async (updateBody, employeeId) => {
-console.log("updateBody.contactList.length",updateBody.contactList.length)
+  console.log("updateBody.contactList.length", updateBody.contactList.length)
   if (updateBody.contactList.length) {
     console.log("create_contact_list_from_create", updateBody)
     const deleteContact = await sequelize.query(' delete from t_contact_information where employeeId = ' + employeeId);
@@ -309,10 +309,10 @@ const updateEmp_profileById = async (Id, updateBody, updatedBy) => {
   // If overlaps are detected, return error response
   if (overlapErrors.length > 0) {
     console.log("There are date overlaps in the work experience list.1")
-    let result={"message":'There are date overlaps in the work experience...',"status":"error"}
-      return result;
+    let result = { "message": 'There are date overlaps in the work experience...', "status": "error" }
+    return result;
   }
-console.log("updateBody.contactList.length1")
+  console.log("updateBody.contactList.length1")
   BUlkInsertEmployeeDetails(updateBody, updateBody.Id);
 
   updateBody.updatedBy = updatedBy;
