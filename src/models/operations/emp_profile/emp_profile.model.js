@@ -1,5 +1,5 @@
 const Sequelize = require('sequelize');
-const { ResourceModel } = require('../..');
+const { ResourceModel, DeptModel, FormModel } = require('../..');
 
 //import Database connection configurations.
 const sequelize = require('../../../config/db')
@@ -86,6 +86,26 @@ const DesigModel = sequelize.define('t_employee_profile', {
 	
 });
 
+DesigModel.belongsTo(DeptModel, {
+	foreignKey: 'departmentId',
+	targetKey: 'deptId',
+	as:"department"
+  });
+    
+  
+  DesigModel.belongsTo(FormModel, {
+	foreignKey: 'designationId',
+	targetKey: 'Id',
+	as:"designation"
+  });
+    
+  DesigModel.belongsTo(FormModel, {
+	foreignKey: 'employeeTypeId',
+	targetKey: 'Id',
+	as:"employeeType"
+  });
+    
 
+  
 
 module.exports = DesigModel;
