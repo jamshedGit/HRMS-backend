@@ -49,7 +49,7 @@ const createEmp_profile = async (req, Emp_profileBody) => {
 
   // If overlaps are detected, return error response
   if (overlapErrors.length > 0) {
-    console.log("There are date overlaps in the work experience list.1")
+
     let result = { "message": 'There are date overlaps in the work experience.', "status": "error" }
     return result;
   }
@@ -63,7 +63,7 @@ const createEmp_profile = async (req, Emp_profileBody) => {
 
   // For Adding EmployeeId During Creation Record
   for (let i = 0; i < Emp_profileBody.workExperienceList.length; i++) {
-    console.log("Emp_profileBody.workExperienceList[i]", Emp_profileBody.workExperienceList[i])
+
     Emp_profileBody.workExperienceList[i].employeeId = addedEmp_profileObj.dataValues.Id;
   }
 
@@ -89,39 +89,44 @@ const createEmp_profile = async (req, Emp_profileBody) => {
   }
 
 
-  console.log("hit111")
+
   await BUlkInsertEmployeeDetails(Emp_profileBody, addedEmp_profileObj.dataValues.Id);
 
   return addedEmp_profileObj;
 };
 
 const BUlkInsertEmployeeDetails = async (updateBody, employeeId) => {
-  console.log("updateBody.contactList.length", updateBody.contactList.length)
-  if (updateBody.contactList.length) {
-    console.log("create_contact_list_from_create", updateBody)
+
+  
+
     const deleteContact = await sequelize.query(' delete from t_contact_information where employeeId = ' + employeeId);
+    if (updateBody?.contactList?.length) {
     const objContactList = await Emp_profileModel.ContactInformationModel.bulkCreate(updateBody.contactList);
   }
 
-  if (updateBody.workExperienceList.length) {
+ 
     const workObj = await sequelize.query(' delete from t_employee_work_experience where employeeId = ' + employeeId);
+    if (updateBody?.workExperienceList?.length) {
     const objExperienceList = await Emp_profileModel.ExperienceModel.bulkCreate(updateBody.workExperienceList);
   }
 
-  if (updateBody.academicList.length) {
+
     const objAcad = await sequelize.query(' delete from t_employee_academic_info where employeeId = ' + employeeId);
+    if (updateBody?.academicList?.length) {
     const objAcadList = await Emp_profileModel.AcademicModel.bulkCreate(updateBody.academicList);
   }
 
-  if (updateBody.skillsList.length) {
-    console.log("skills insert")
+
+   
     const objSkill = await sequelize.query(' delete from t_employee_skills where employeeId = ' + employeeId);
+    if (updateBody?.skillsList?.length) {
     const objSkillList = await Emp_profileModel.SkillsModel.bulkCreate(updateBody.skillsList);
   }
 
-  if (updateBody.incidentList.length) {
-    console.log("t_employee_incident insert")
+ 
+
     const objIncident = await sequelize.query(' delete from t_employee_incident where employeeId = ' + employeeId);
+    if (updateBody?.incidentList?.length) {
     const objIncidentList = await Emp_profileModel.IncidentModel.bulkCreate(updateBody.incidentList);
   }
 }
@@ -236,7 +241,7 @@ const getEmp_profileById = async (id) => {
     type: Sequelize.QueryTypes.RAW // Use RAW type for executing stored procedures
   });
 
-  console.log("::13::", results);
+ 
 
   return results[0]
 };
@@ -272,9 +277,9 @@ const getContactInfoByEmployeeId = async (id) => {
  * @returns {Promise<ReceiptModel>}
  */
 const updateEmp_profileById = async (Id, updateBody, updatedBy) => {
-  console.log("updateBody.contactList.length0")
+ 
   const Item = await getEmp_profileById(Id);
-  console.log("::Item", Item)
+
   if (!Item) {
     throw new ApiError(httpStatus.NOT_FOUND, "record not found");
   }
@@ -307,12 +312,12 @@ const updateEmp_profileById = async (Id, updateBody, updatedBy) => {
   }
 
   // If overlaps are detected, return error response
-  if (overlapErrors.length > 0) {
-    console.log("There are date overlaps in the work experience list.1")
+  if (overlapErrors?.length > 0) {
+
     let result = { "message": 'There are date overlaps in the work experience...', "status": "error" }
     return result;
   }
-  console.log("updateBody.contactList.length1")
+
   BUlkInsertEmployeeDetails(updateBody, updateBody.Id);
 
   updateBody.updatedBy = updatedBy;
@@ -385,14 +390,14 @@ const deleteEmp_profileById = async (Id) => {
 
 
     const Item = await Emp_profileModel.EmployeeProfileModel.findOne({ employeeId: Id })
-    console.log("Item:::Emp", Item)
+  
     if (!Item) {
-      throw new ApiError(httpStatus.NOT_FOUND, "Item not found");
+      throw new ApiError(httpStatus?.NOT_FOUND, "Item not found");
     }
     await Item.destroy();
   } catch (error) {
 
-    throw new ApiError(httpStatus.NOT_FOUND, error);
+    throw new ApiError(httpStatus?.NOT_FOUND, error);
   }
   return Item;
 
