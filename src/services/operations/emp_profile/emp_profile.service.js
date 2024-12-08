@@ -46,25 +46,30 @@ const createEmp_profile = async (req, Emp_profileBody) => {
       }
     }
   }
-
+  let addedEmp_profileObj ;
   // If overlaps are detected, return error response
   if (overlapErrors.length > 0) {
 
     let result = { "message": 'There are date overlaps in the work experience.', "status": "error" }
     return result;
   }
-  const addedEmp_profileObj = await Emp_profileModel.EmployeeProfileModel.create(Emp_profileBody);
+
+  else{
+  
+  addedEmp_profileObj = await Emp_profileModel.EmployeeProfileModel.create(Emp_profileBody);
+  }
+
 
   // For Adding EmployeeId During Creation Record
   for (let i = 0; i < Emp_profileBody.contactList.length; i++) {
-    Emp_profileBody.contactList[i].employeeId = addedEmp_profileObj.dataValues.Id;
+    Emp_profileBody.contactList[i].employeeId = addedEmp_profileObj?.dataValues.Id;
   }
 
 
   // For Adding EmployeeId During Creation Record
   for (let i = 0; i < Emp_profileBody.workExperienceList.length; i++) {
 
-    Emp_profileBody.workExperienceList[i].employeeId = addedEmp_profileObj.dataValues.Id;
+    Emp_profileBody.workExperienceList[i].employeeId = addedEmp_profileObj?.dataValues.Id;
   }
 
 
@@ -73,24 +78,24 @@ const createEmp_profile = async (req, Emp_profileBody) => {
   // For Adding EmployeeId During Creation Record
   for (let i = 0; i < Emp_profileBody.academicList.length; i++) {
 
-    Emp_profileBody.academicList[i].employeeId = addedEmp_profileObj.dataValues.Id;
+    Emp_profileBody.academicList[i].employeeId = addedEmp_profileObj?.dataValues.Id;
   }
 
 
   // For Adding EmployeeId During Creation Record
   for (let i = 0; i < Emp_profileBody.skillsList.length; i++) {
 
-    Emp_profileBody.skillsList[i].employeeId = addedEmp_profileObj.dataValues.Id;
+    Emp_profileBody.skillsList[i].employeeId = addedEmp_profileObj?.dataValues.Id;
   }
 
   // For Adding EmployeeId During Creation Record
   for (let i = 0; i < Emp_profileBody.incidentList.length; i++) {
-    Emp_profileBody.incidentList[i].employeeId = addedEmp_profileObj.dataValues.Id;
+    Emp_profileBody.incidentList[i].employeeId = addedEmp_profileObj?.dataValues.Id;
   }
 
 
 
-  await BUlkInsertEmployeeDetails(Emp_profileBody, addedEmp_profileObj.dataValues.Id);
+  await BUlkInsertEmployeeDetails(Emp_profileBody, addedEmp_profileObj?.dataValues.Id);
 
   return addedEmp_profileObj;
 };
