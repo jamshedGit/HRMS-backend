@@ -16,13 +16,8 @@ const Op = Sequelize.Op;
  * @returns {Promise<EmployeeSalary>}
  */
 const createEmployeeSalary = async (req, EmployeeSalaryBody) => {
-  console.log("EmployeeSalary Body", EmployeeSalaryBody)
-  // EmployeeSalaryBody.slug = EmployeeSalaryBody.name.replace(/ /g, "-").toLowerCase();
-  console.log(req.user.id);
   EmployeeSalaryBody.createdBy = req.user.id;
-  console.log(EmployeeSalaryBody, "body");
   const addedEmployeeSalaryObj = await EmployeeSalaryModel.EmployeeSalaryModel.create(EmployeeSalaryBody);
-  //authSMSSend(addedEmployeeSalaryObj.dataValues);  // Quick send message at the time of donation
   return addedEmployeeSalaryObj;
 };
 
@@ -67,7 +62,6 @@ const queryEmployeeSalarys = async (filter, options, searchQuery) => {
 
 const SP_getAllEmployeeSalaryInfo = async (filter, options, searchQuery, empId, transactionType) => {
   try {
-    console.log("transactionType::::1", transactionType)
     const results = await sequelize.query('CALL usp_GetAllActiveEmployeeSalaries(:id,:transactionType)', {
       replacements: { id: empId || 'null', transactionType: transactionType },
       type: Sequelize.QueryTypes.RAW // Use RAW type for executing stored procedures
@@ -77,7 +71,6 @@ const SP_getAllEmployeeSalaryInfo = async (filter, options, searchQuery, empId, 
     let offset = 0 + (options.pageNumber - 1) * limit;
     searchQuery = searchQuery.toLowerCase();
     let searchlist = filterByValue(results, searchQuery);
-    console.log("searchlist", searchlist)
     let count = searchlist.length;
     const rows = searchlist.slice(offset, offset + limit)
 
@@ -122,7 +115,6 @@ function filterByValue(array, string) {
  * @returns {Promise<ReceiptModel>}
  */
 const getEmployeeSalaryById = async (id) => {
-
   return EmployeeSalaryModel.EmployeeSalaryModel.findByPk(id);
 };
 
@@ -135,14 +127,10 @@ const getEmployeeSalaryById = async (id) => {
  * @returns {Promise<ReceiptModel>}
  */
 const updateEmployeeSalaryById = async (Id, updateBody, updatedBy) => {
-
-
   const Item = await getEmployeeSalaryById(Id);
   if (!Item) {
     throw new ApiError(httpStatus.NOT_FOUND, "record not found");
   }
-  //console.log("Update Receipt Id" , item);
-  // updateBody.slug = updateBody.name.replace(/ /g, "-").toLowerCase()
   updateBody.updatedBy = updatedBy;
   delete updateBody.id;
   Object.assign(Item, updateBody);
@@ -156,7 +144,6 @@ const updateEmployeeSalaryById = async (Id, updateBody, updatedBy) => {
  * @returns {Promise<ReceiptModel>}
  */
 const deleteEmployeeSalaryById = async (Id) => {
-  
   //const Item = await getEmployeeSalaryById(Id);
   let Item = await EmployeeSalaryModel.EmployeeSalaryModel.findOne({ employeeId: Id });
   

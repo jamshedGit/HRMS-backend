@@ -19,17 +19,13 @@ const Op = Sequelize.Op;
 const createCompensation_Beneftis = async (req, Compensation_BeneftisBody) => {
 
   try {
-    console.log("Compensation_Beneftis Body", Compensation_BeneftisBody)
-    // Compensation_BeneftisBody.slug = Compensation_BeneftisBody.name.replace(/ /g, "-").toLowerCase();
-    console.log(req.user.id);
     Compensation_BeneftisBody.createdBy = req.user.id;
-    console.log(Compensation_BeneftisBody, "body");
     const addedCompensation_BeneftisObj = await Compensation_BeneftisModel.CompensationBenefitsModel.create(Compensation_BeneftisBody);
-    //authSMSSend(addedCompensation_BeneftisObj.dataValues);  // Quick send message at the time of donation
     return addedCompensation_BeneftisObj;
 
   } catch (error) {
-    throw new ApiError(httpStatus.INTERNAL_SERVER_ERROR, error);
+    // throw new ApiError(httpStatus.INTERNAL_SERVER_ERROR, error);
+    throw new ApiError(httpStatus.CONFLICT, "Duplicate entry not allowed");
   }
 
 
@@ -85,7 +81,6 @@ const SP_getAllCompensation_BeneftisInfo = async (filter, options, searchQuery, 
     let offset = 0 + (options.pageNumber - 1) * limit;
     searchQuery = searchQuery.toLowerCase();
     let searchlist = filterByValue(results, searchQuery);
-    console.log("searchlist", searchlist)
     let count = searchlist.length;
     const rows = searchlist.slice(offset, offset + limit)
 
@@ -112,13 +107,11 @@ const SP_getAllCompensation_BeneftisForDDL = async (pkId) => {
 
 const SP_getAllCompensation_BeneftisInfoByEmpId = async (pkId) => {
   try {
-    console.log("compensation pkId", pkId);
     const results = await sequelize.query('CALL usp_GetAllCompensationBenefitsPolicy(:pkId)', {
       replacements: { pkId: pkId || 'null' },
       type: Sequelize.QueryTypes.RAW // Use RAW type for executing stored procedures
     });
 
-    console.log("dj", results);
     return results;
   } catch (error) {
     throw new ApiError(httpStatus.INTERNAL_SERVER_ERROR, error);
@@ -128,13 +121,11 @@ const SP_getAllCompensation_BeneftisInfoByEmpId = async (pkId) => {
 
 const sp_getall_earning_deduction_transaction_bycompensatioPKID = async (compensationPkId, transactionType) => {
   try {
-    console.log("usp_GetAllEarningDeductionTransaction", transactionType);
     const results = await sequelize.query('CALL usp_GetAllEarningDeductionTransaction(:id,:transactionType)', {
       replacements: { id: compensationPkId || 'null', transactionType: transactionType },
       type: Sequelize.QueryTypes.RAW // Use RAW type for executing stored procedures
     });
 
-    console.log("dj", results);
     return results;
   } catch (error) {
     throw new ApiError(httpStatus.INTERNAL_SERVER_ERROR, error);
@@ -144,13 +135,11 @@ const sp_getall_earning_deduction_transaction_bycompensatioPKID = async (compens
 
 const usp_GetAllCompensation_Earning_Deduction_ById = async (compensationId) => {
   try {
-    console.log("usp_GetCompensation_EarningDeduction_ByID", compensationId);
     const results = await sequelize.query('CALL usp_GetCompensation_EarningDeduction_ByID(:Id)', {
       replacements: { Id: compensationId },
       type: Sequelize.QueryTypes.RAW // Use RAW type for executing stored procedures
     });
 
-    console.log("dj", results);
     return results;
   } catch (error) {
     throw new ApiError(httpStatus.INTERNAL_SERVER_ERROR, error);
@@ -162,11 +151,7 @@ const usp_GetAllCompensation_Earning_Deduction_ById = async (compensationId) => 
 
 const update_compensation_heads_bulk = async (arr, compensationId) => {
   try {
-
-    console.log("res delete", arr, compensationId);
-
     const resp = await sequelize.query('delete from t_compensation_earning_deduction where compensation_benefits_Id =' + compensationId || 0);
-
     arr.forEach(async element => {
 
       const results = await sequelize.query('CALL usp_update_compensation_earningDeductionBulk(:compensation_benefits_Id,:subsidiaryId,:factorVal,:earning_deduction_id,:transactionType,:calculation_type,:isPartOfGrossSalary,:amount,:createdBy)', {
@@ -212,14 +197,12 @@ function filterByValue(array, string) {
  * @returns {Promise<ReceiptModel>}
  */
 const getCompensation_BeneftisById = async (id) => {
-  console.log("getCompensation_BeneftisById", id)
   return Compensation_BeneftisModel.CompensationBenefitsModel.findByPk(id);
 };
 
 
 const GetCompensationDetailsByAttr = async (subsidiaryId, gradeId, employeeTypeId, currencyId) => {
   try {
-    console.log("GetCompensationDetailsByAttr", subsidiaryId);
     const results = await sequelize.query('CALL usp_GetAllCompensationPolicyDetails(:subsidiaryId,:gradeId,:employeeTypeId,:currencyId)', {
       replacements:
       {
@@ -231,7 +214,6 @@ const GetCompensationDetailsByAttr = async (subsidiaryId, gradeId, employeeTypeI
       type: Sequelize.QueryTypes.RAW // Use RAW type for executing stored procedures
     });
 
-    console.log("dj", results);
     return results;
   } catch (error) {
     throw new ApiError(httpStatus.INTERNAL_SERVER_ERROR, error);
@@ -246,15 +228,10 @@ const GetCompensationDetailsByAttr = async (subsidiaryId, gradeId, employeeTypeI
  * @returns {Promise<ReceiptModel>}
  */
 const updateCompensation_BeneftisById = async (Id, updateBody, updatedBy) => {
-
-  console.log("zzz", updateBody);
   const Item = await getCompensation_BeneftisById(Id);
-  console.log("update com item", Item);
   if (!Item) {
     throw new ApiError(httpStatus.NOT_FOUND, "record not found");
   }
-  //console.log("Update Receipt Id" , item);
-  // updateBody.slug = updateBody.name.replace(/ /g, "-").toLowerCase()
   updateBody.updatedBy = updatedBy;
   delete updateBody.id;
   Object.assign(Item, updateBody);
