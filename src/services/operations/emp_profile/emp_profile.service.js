@@ -4,7 +4,7 @@ const Emp_profileModel = require("../../../models/index");
 const ApiError = require("../../../utils/ApiError");
 const sequelize = require("../../../config/db");
 const Sequelize = require('sequelize');
-const { paginationFacts } = require("../../../utils/common");
+const { paginationFacts, formatDates } = require("../../../utils/common");
 const https = require('https');
 const { XMLParser, XMLBuilder, XMLValidator } = require("fast-xml-parser");
 const fns = require('date-fns');
@@ -18,70 +18,120 @@ const Op = Sequelize.Op;
  */
 const createEmp_profile = async (req, Emp_profileBody) => {
   Emp_profileBody.createdBy = req.user.id;
-  console.log("create_body", Emp_profileBody)
-  const addedEmp_profileObj = await Emp_profileModel.EmployeeProfileModel.create(Emp_profileBody);
+
+  const checkDateOverlap = (startDate1, endDate1, startDate2, endDate2) => {
+    return startDate1 <= endDate2 && endDate1 >= startDate2;
+  };
+  // Now we will check for date overlaps in workExperienceList
+  const overlapErrors = [];
+  const workExperienceList = Emp_profileBody.workExperienceList;
+
+  // Loop through each experience to check for overlap
+  for (let i = 0; i < workExperienceList.length; i++) {
+    let currentExperience = workExperienceList[i];
+    let currentStartDate = new Date(currentExperience.startDate);
+    let currentEndDate = new Date(currentExperience.endDate);
+
+    // Compare current experience with all other experiences for overlap
+    for (let j = 0; j < workExperienceList.length; j++) {
+      if (i !== j) { // Avoid comparing the same entry with itself
+        let otherExperience = workExperienceList[j];
+        let otherStartDate = new Date(otherExperience.startDate);
+        let otherEndDate = new Date(otherExperience.endDate);
+
+        // Check for overlap
+        if (checkDateOverlap(currentStartDate, currentEndDate, otherStartDate, otherEndDate)) {
+          overlapErrors.push(`Date overlap detected between experience at index ${i} and ${j}`);
+        }
+      }
+    }
+  }
+  let addedEmp_profileObj ;
+  // If overlaps are detected, return error response
+  if (overlapErrors.length > 0) {
+
+    let result = { "message": 'There are date overlaps in the work experience.', "status": "error" }
+    return result;
+  }
+
+  else{
+  
+  addedEmp_profileObj = await Emp_profileModel.EmployeeProfileModel.create(Emp_profileBody);
+  }
+
 
   // For Adding EmployeeId During Creation Record
   for (let i = 0; i < Emp_profileBody.contactList.length; i++) {
-    Emp_profileBody.contactList[i].employeeId = addedEmp_profileObj.dataValues.Id;
+    Emp_profileBody.contactList[i].employeeId = addedEmp_profileObj?.dataValues.Id;
   }
 
 
   // For Adding EmployeeId During Creation Record
   for (let i = 0; i < Emp_profileBody.workExperienceList.length; i++) {
-    Emp_profileBody.workExperienceList[i].employeeId = addedEmp_profileObj.dataValues.Id;
+
+    Emp_profileBody.workExperienceList[i].employeeId = addedEmp_profileObj?.dataValues.Id;
   }
+
+
+
 
   // For Adding EmployeeId During Creation Record
   for (let i = 0; i < Emp_profileBody.academicList.length; i++) {
-    Emp_profileBody.academicList[i].employeeId = addedEmp_profileObj.dataValues.Id;
+
+    Emp_profileBody.academicList[i].employeeId = addedEmp_profileObj?.dataValues.Id;
   }
 
 
   // For Adding EmployeeId During Creation Record
   for (let i = 0; i < Emp_profileBody.skillsList.length; i++) {
-    Emp_profileBody.skillsList[i].employeeId = addedEmp_profileObj.dataValues.Id;
+
+    Emp_profileBody.skillsList[i].employeeId = addedEmp_profileObj?.dataValues.Id;
   }
 
   // For Adding EmployeeId During Creation Record
   for (let i = 0; i < Emp_profileBody.incidentList.length; i++) {
-    Emp_profileBody.incidentList[i].employeeId = addedEmp_profileObj.dataValues.Id;
+    Emp_profileBody.incidentList[i].employeeId = addedEmp_profileObj?.dataValues.Id;
   }
 
 
 
-  await BUlkInsertEmployeeDetails(Emp_profileBody, addedEmp_profileObj.dataValues.Id);
+  await BUlkInsertEmployeeDetails(Emp_profileBody, addedEmp_profileObj?.dataValues.Id);
 
   return addedEmp_profileObj;
 };
 
 const BUlkInsertEmployeeDetails = async (updateBody, employeeId) => {
 
-  if (updateBody.contactList.length) {
-    console.log("create_contact_list_from_create", updateBody)
+  
+
     const deleteContact = await sequelize.query(' delete from t_contact_information where employeeId = ' + employeeId);
+    if (updateBody?.contactList?.length) {
     const objContactList = await Emp_profileModel.ContactInformationModel.bulkCreate(updateBody.contactList);
   }
 
-  if (updateBody.workExperienceList.length) {
+ 
     const workObj = await sequelize.query(' delete from t_employee_work_experience where employeeId = ' + employeeId);
+    if (updateBody?.workExperienceList?.length) {
     const objExperienceList = await Emp_profileModel.ExperienceModel.bulkCreate(updateBody.workExperienceList);
   }
 
-  if (updateBody.academicList.length) {
+
     const objAcad = await sequelize.query(' delete from t_employee_academic_info where employeeId = ' + employeeId);
+    if (updateBody?.academicList?.length) {
     const objAcadList = await Emp_profileModel.AcademicModel.bulkCreate(updateBody.academicList);
   }
 
-  if (updateBody.skillsList.length) {
-    console.log("skills insert")
+
+   
     const objSkill = await sequelize.query(' delete from t_employee_skills where employeeId = ' + employeeId);
+    if (updateBody?.skillsList?.length) {
     const objSkillList = await Emp_profileModel.SkillsModel.bulkCreate(updateBody.skillsList);
   }
 
-  if (updateBody.incidentList.length) {
-    console.log("t_employee_incident insert")
+ 
+
     const objIncident = await sequelize.query(' delete from t_employee_incident where employeeId = ' + employeeId);
+    if (updateBody?.incidentList?.length) {
     const objIncidentList = await Emp_profileModel.IncidentModel.bulkCreate(updateBody.incidentList);
   }
 }
@@ -119,10 +169,38 @@ const queryEmp_profile = async (filter, options, searchQuery) => {
     },
     offset: offset,
     limit: limit,
+    include: [
+      {
+        model: Emp_profileModel.DeptModel,  // Assuming you have a DepartmentModel
+        as: 'department',  // Alias to refer to the department relation
+        attributes: ['deptId', 'deptName'],  // Specify the fields you want from the department table
+      },
+      {
+        model: Emp_profileModel.FormModel,  // Assuming you have a DepartmentModel
+        as: 'designation',  // Alias to refer to the department relation
+        attributes: ['Id', 'formName'],  // Specify the fields you want from the department table
+      },
+      {
+        model: Emp_profileModel.FormModel,  // Assuming you have a DepartmentModel
+        as: 'employeeType',  // Alias to refer to the department relation
+        attributes: ['Id', 'formName'],  // Specify the fields you want from the department table
+      },
+    ],
   });
 
+  const updatedRows = rows.map(row => {
 
-  return paginationFacts(count, limit, options.pageNumber, rows);
+
+    const formattedDateOfJoining = row?.dataValues?.dateOfJoining != 'undefined' ? formatDates(row?.dataValues?.dateOfJoining) : null;
+
+    const fullName = `${row.dataValues.firstName} ${row.dataValues.middleName ? row.dataValues.middleName + ' ' : ''}${row.dataValues.lastName}`;
+    return {
+      ...row.dataValues,
+      fullName: fullName.trim(), // Trim any extra spaces if middleName is empty
+      dateOfJoining: formattedDateOfJoining,
+    };
+  });
+  return paginationFacts(count, limit, options.pageNumber, updatedRows);
   // return Items;
 };
 
@@ -168,7 +246,7 @@ const getEmp_profileById = async (id) => {
     type: Sequelize.QueryTypes.RAW // Use RAW type for executing stored procedures
   });
 
-  console.log("::13::", results);
+ 
 
   return results[0]
 };
@@ -204,13 +282,46 @@ const getContactInfoByEmployeeId = async (id) => {
  * @returns {Promise<ReceiptModel>}
  */
 const updateEmp_profileById = async (Id, updateBody, updatedBy) => {
-  console.log("::ddd::", Id);
+ 
   const Item = await getEmp_profileById(Id);
-  console.log("::Item", Item)
+
   if (!Item) {
     throw new ApiError(httpStatus.NOT_FOUND, "record not found");
   }
-  console.log("updateBody", updateBody)
+  const checkDateOverlap = (startDate1, endDate1, startDate2, endDate2) => {
+    return startDate1 <= endDate2 && endDate1 >= startDate2;
+  };
+  // Now we will check for date overlaps in workExperienceList
+  const overlapErrors = [];
+  const workExperienceList = updateBody?.workExperienceList;
+
+  // Loop through each experience to check for overlap
+  for (let i = 0; i < workExperienceList?.length; i++) {
+    let currentExperience = workExperienceList[i];
+    let currentStartDate = new Date(currentExperience.startDate);
+    let currentEndDate = new Date(currentExperience.endDate);
+
+    // Compare current experience with all other experiences for overlap
+    for (let j = 0; j < workExperienceList.length; j++) {
+      if (i !== j) { // Avoid comparing the same entry with itself
+        let otherExperience = workExperienceList[j];
+        let otherStartDate = new Date(otherExperience.startDate);
+        let otherEndDate = new Date(otherExperience.endDate);
+
+        // Check for overlap
+        if (checkDateOverlap(currentStartDate, currentEndDate, otherStartDate, otherEndDate)) {
+          overlapErrors.push(`Date overlap detected between experience at index ${i} and ${j}`);
+        }
+      }
+    }
+  }
+
+  // If overlaps are detected, return error response
+  if (overlapErrors?.length > 0) {
+
+    let result = { "message": 'There are date overlaps in the work experience...', "status": "error" }
+    return result;
+  }
 
   BUlkInsertEmployeeDetails(updateBody, updateBody.Id);
 
@@ -284,14 +395,14 @@ const deleteEmp_profileById = async (Id) => {
 
 
     const Item = await Emp_profileModel.EmployeeProfileModel.findOne({ employeeId: Id })
-    console.log("Item:::Emp", Item)
+  
     if (!Item) {
-      throw new ApiError(httpStatus.NOT_FOUND, "Item not found");
+      throw new ApiError(httpStatus?.NOT_FOUND, "Item not found");
     }
     await Item.destroy();
   } catch (error) {
 
-    throw new ApiError(httpStatus.NOT_FOUND,error);
+    throw new ApiError(httpStatus?.NOT_FOUND, error);
   }
   return Item;
 
