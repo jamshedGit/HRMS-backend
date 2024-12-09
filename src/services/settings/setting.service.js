@@ -272,7 +272,7 @@ const getEncashmentLeaveTypeData = async (employeeId, yearId) => {
 const getAllSubsidiaryData = async () => {
   const subsidiaryData = getDdlItems(DDL_FIELD_NAMES.Subsidiary, await SubsidiaryModel.findAll({
     where: { isActive: true },
-    attributes: ['name', 'Id']
+    attributes: ['name', 'Id','currencyId']
   }));
   return subsidiaryData
 };

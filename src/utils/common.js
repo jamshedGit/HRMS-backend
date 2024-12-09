@@ -22,7 +22,7 @@ const getRouteSlugs = (req) => {
 };
 
 const getDdlItems = (
-  columns = { labelField: "", valueField: "", codeField: "",mergeLabel:"",subsidiaryId:"" },
+  columns = { labelField: "", valueField: "", codeField: "",mergeLabel:"",subsidiaryId:"",currencyId:"" },
   data = [],
   mergeLabel=false,
   parentId = null
@@ -36,6 +36,7 @@ const getDdlItems = (
     value: i[columns.valueField],
     code: i[columns.codeField],
     subsidiaryId:i[columns.subsidiaryId],
+    currencyId:i[columns?.currencyId],
 
 
    
