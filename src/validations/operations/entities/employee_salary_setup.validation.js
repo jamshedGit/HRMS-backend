@@ -36,6 +36,10 @@ const createEmployeeSalarySetupValidation = {
         company_bankId: Joi.any().optional(),
         company_branchId: Joi.any().optional(),
         company_from_accNo: Joi.any().optional(),
+        overtime_working_day: Joi.any().optional(),
+        overtime_off_day: Joi.any().optional(),
+        overtime_holiday: Joi.any().optional(),
+        overtime_holiday: Joi.any().optional(),
     }),
 };
 

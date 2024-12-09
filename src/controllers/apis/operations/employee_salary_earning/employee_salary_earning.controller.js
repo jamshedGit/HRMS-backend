@@ -11,11 +11,8 @@ const {
 } = require("../../../../utils/constants");
 
 const createEmployeeSalary = catchAsync(async (req, res) => {
-  // console.log("reqested User", req.user.id);
   try {
 
-    console.log("insert EmployeeSalary")
-    console.log(req.body);
     const EmployeeSalary = await Employee_Salary_Earning_Deduction_formService.EmployeeSalaryEarningDeductionServicePage.createEmployeeSalary(req, req.body);
     res.status(httpStatus.CREATED).send({
       code: HttpStatusCodes.CREATED,
@@ -29,14 +26,12 @@ const createEmployeeSalary = catchAsync(async (req, res) => {
 });
 
 const getAllEmployeeSalary = catchAsync(async (req, res) => {
-  console.log("get EmployeeSalarys");
   const obj = {};
   const filter = obj;
   // const options = pick(req.body, ["sortBy", "limit", "page"]);
   const options = pick(req.body, ['sortOrder', 'pageSize', 'pageNumber']);
   const searchQuery = req.body.filter.searchQuery? req.body.filter.searchQuery : '';
   const result = await Employee_Salary_Earning_Deduction_formService.EmployeeSalaryEarningDeductionServicePage.SP_getAllEmployeeSalaryInfo(filter, options,searchQuery,req.body.id,req.body.transactionType);
-  console.log(result);
   res.send({
     code: HttpStatusCodes.OK,
     message: HttpResponseMessages.OK,
@@ -47,7 +42,6 @@ const getAllEmployeeSalary = catchAsync(async (req, res) => {
 const SP_getAllEmployeeSalaryInfoForDDL = catchAsync(async (req, res) => {
  
   const result = await Employee_Salary_Earning_Deduction_formService.EmployeeSalaryEarningDeductionServicePage.SP_getAllEmployeeSalaryInfoForDDL(req.body.employeeId);
-  console.log(result);  
   res.send({
     code: HttpStatusCodes.OK,
     message: HttpResponseMessages.OK,
@@ -57,8 +51,6 @@ const SP_getAllEmployeeSalaryInfoForDDL = catchAsync(async (req, res) => {
 
 
 const usp_GetAllSalary_Earning_DeductionByEmpId = catchAsync(async (req, res) => {
-  console.log("EmployeeSalary 123 EmpId")
-  console.log(req.body)
   const response = await Employee_Salary_Earning_Deduction_formService.EmployeeSalaryEarningDeductionServicePage.usp_GetAllSalary_Earning_DeductionByEmpId(req.body.id,req.body.basicSalary);
   
   if (!response) {
@@ -74,7 +66,6 @@ const usp_GetAllSalary_Earning_DeductionByEmpId = catchAsync(async (req, res) =>
 // For Use Employee Revision OnChange By GradeId and EmployeeTypeId
 const usp_GetAllCompensationByGradeAndEmployeeType = catchAsync(async (req, res) => {
   
-  console.log("tell",req.body)
   const response = await Employee_Salary_Earning_Deduction_formService.EmployeeSalaryEarningDeductionServicePage.usp_GetAllCompensationByGradeAndEmployeeType(req.body.gradeId,req.body.employeeTypeId);
   
   if (!response) {
@@ -89,9 +80,7 @@ const usp_GetAllCompensationByGradeAndEmployeeType = catchAsync(async (req, res)
 
 
 const usp_UpdateSalaryEarningDeductionBulk = catchAsync(async (req, res) => {
- console.log("bulk",req.body);
   const response = await Employee_Salary_Earning_Deduction_formService.EmployeeSalaryEarningDeductionServicePage.usp_Update_Salary_Earning_Deduction_Bulk(req.body.data.emp_ed_Obj,req.body.data.employeeId);
-  console.log("doll",response);
   if (!response) {
     throw new ApiError(httpStatus.NOT_FOUND, "response not found");
   }
@@ -103,8 +92,6 @@ const usp_UpdateSalaryEarningDeductionBulk = catchAsync(async (req, res) => {
 });
 
 const getEmployeeSalaryById = catchAsync(async (req, res) => {
-  console.log("EmployeeSalaryformService Controller getEmployeeSalaryId")
-  console.log(req.body)
   const response = await Employee_Salary_Earning_Deduction_formService.EmployeeSalaryEarningDeductionServicePage.getEmployeeSalaryById(req.body.Id);
   if (!response) {
     throw new ApiError(httpStatus.NOT_FOUND, "response not found");
@@ -117,7 +104,6 @@ const getEmployeeSalaryById = catchAsync(async (req, res) => {
 });
 
 const updateEmployeeSalary = catchAsync(async (req, res) => {
-  console.log(req.body);
   const response = await Employee_Salary_Earning_Deduction_formService.EmployeeSalaryEarningDeductionServicePage.updateEmployeeSalaryById(req.body.Id, req.body, req.user.Id);
   res.send({
     code: HttpStatusCodes.OK,
@@ -127,7 +113,6 @@ const updateEmployeeSalary = catchAsync(async (req, res) => {
 });
 
 const deleteEmployeeSalary = catchAsync(async (req, res) => {
-  console.log("req.body.Id " ,req.body.Id)
   const response = await Employee_Salary_Earning_Deduction_formService.EmployeeSalaryEarningDeductionServicePage.deleteEmployeeSalaryById(req.body.Id);
   res.send({
     code: HttpStatusCodes.OK,
