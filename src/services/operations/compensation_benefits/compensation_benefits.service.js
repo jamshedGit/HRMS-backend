@@ -150,8 +150,6 @@ const usp_GetAllCompensation_Earning_Deduction_ById = async (compensationId) => 
 
 
 const update_compensation_heads_bulk = async (arr, compensationId) => {
-  console.log(':::::::::arr:::::::::::',arr);
-  
   try {
     const resp = await sequelize.query('delete from t_compensation_earning_deduction where compensation_benefits_Id =' + compensationId || 0);
     arr.forEach(async element => {
