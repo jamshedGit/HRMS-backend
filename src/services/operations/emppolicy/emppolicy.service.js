@@ -1,6 +1,6 @@
 const httpStatus = require("http-status");
 const axios = require("axios")
-const EmpPolicyModel = require("../../../models/index");
+const EmpPolicyModel= require("../../../models/index");
 const ApiError = require("../../../utils/ApiError");
 const sequelize = require("../../../config/db");
 const Sequelize = require('sequelize');
@@ -37,40 +37,92 @@ const createEmpPolicy = async (req, EmpPolicyBody) => {
  * @param {number} [options.page] - Current page (default = 1)
  * @returns {Promise<QueryResult>}
  */
-const queryEmpPolicy = async (filter, options, searchQuery) => {
-  console.log("get search query", searchQuery);
+// const queryEmpPolicy = async (filter, options, searchQuery) => {
+//   console.log("get search query", searchQuery);
 
-  console.log("options EmpPolicy", options);
+//   console.log("options EmpPolicy", options);
+//   let limit = options.pageSize;
+//   let offset = 0 + (options.pageNumber - 1) * limit;
+//   console.log("EmpPolicyCode offset ", offset)
+//   searchQuery = searchQuery.toLowerCase();
+//   const queryFilters = [
+//     // { isActive: sequelize.where }
+//     // { Id: Sequelize.where(Sequelize.fn('LOWER', Sequelize.col('Id')), 'LIKE', '%' + searchQuery + '%') },
+
+//     { code: Sequelize.where(Sequelize.fn('LOWER', Sequelize.col('code')), 'LIKE', '%' + searchQuery + '%') },
+
+//   ]
+
+
+//   const { count, rows } = await EmpPolicyModel.EmployeePolicyModel.findAndCountAll({
+//     order: [
+//       ['createdAt', 'DESC']
+//     ],
+//     where: {
+//       [Op.or]: queryFilters,
+//       // isActive: true
+//     },
+//     offset: offset,
+//     limit: limit,
+//     // include: [
+//     //   {
+//     //     model: EmpPolicyModel.SubsidiaryModel,
+//     //     attributes: ["Id","name"],
+//     //     as: "Subsidiary",
+//     //   },
+//     // ]
+//   });
+// console.log("data111", count, rows )
+
+//   return paginationFacts(count, limit, options.pageNumber, rows);
+//   // return Items;
+// };
+
+
+const queryEmpPolicy = async (filter, options, searchQuery) => {
+
   let limit = options.pageSize;
   let offset = 0 + (options.pageNumber - 1) * limit;
-  console.log("EmpPolicyCode offset ", offset)
+
   searchQuery = searchQuery.toLowerCase();
   const queryFilters = [
-    // { isActive: sequelize.where }
-    // { Id: Sequelize.where(Sequelize.fn('LOWER', Sequelize.col('Id')), 'LIKE', '%' + searchQuery + '%') },
-    { policyName: Sequelize.where(Sequelize.fn('LOWER', Sequelize.col('policyName')), 'LIKE', '%' + searchQuery + '%') },
-    { code: Sequelize.where(Sequelize.fn('LOWER', Sequelize.col('code')), 'LIKE', '%' + searchQuery + '%') },
-
+    { name: Sequelize.where(Sequelize.fn('LOWER', Sequelize.col('minimumAge')), 'LIKE', '%' + searchQuery + '%') },
+  
   ]
-
 
   const { count, rows } = await EmpPolicyModel.EmployeePolicyModel.findAndCountAll({
     order: [
       ['createdAt', 'DESC']
     ],
+
+    // order: [
+    //   [Sequelize.col("subs.name"), "ASC"],   // Order by Subsidiary name
+     
+    // ],
     where: {
       [Op.or]: queryFilters,
       // isActive: true
     },
     offset: offset,
     limit: limit,
+    include: [
+      {
+        model: EmpPolicyModel.SubsidiaryModel,
+        attributes: ["Id","name"],
+        as: "Subsidiary"
+      },
+      {
+        model: EmpPolicyModel.FormModel,
+        attributes: ["Id","formName","formCode"],
+        as: "Currency"
+      }
+    ],
   });
 
 
   return paginationFacts(count, limit, options.pageNumber, rows);
-  // return Items;
-};
 
+};
 /**
  * Get Item by id
  * @param {ObjectId} id
