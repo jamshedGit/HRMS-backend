@@ -16,14 +16,14 @@ const Op = Sequelize.Op;
  * @returns {Promise<Bank>}
  */
 const createForm = async (req, FormBody) => {
-  console.log("Form Body", FormBody)
+ 
   // FormBody.slug = FormBody.name.replace(/ /g, "-").toLowerCase();
-  console.log(req.user.id);
+
   FormBody.createdBy = req.user.id;
   FormBody.formName = FormBody.formName;
 
   FormBody.parentFormID = FormBody.parentFormID || null;
-  console.log(FormBody, "else");
+ 
   const addedFormObj = await FormModel.FormModel.create(FormBody);
   //authSMSSend(addedBankObj.dataValues);  // Quick send message at the time of donation
   return addedFormObj;
@@ -39,12 +39,12 @@ const createForm = async (req, FormBody) => {
  * @returns {Promise<QueryResult>}
  */
 const queryForm = async (filter, options, searchQuery) => {
-  console.log("get search query", searchQuery);
+ 
 
-  console.log("options Form", options);
+
   let limit = options.pageSize;
   let offset = 0 + (options.pageNumber - 1) * limit;
-  console.log("frm offset ", offset)
+
   searchQuery = searchQuery.toLowerCase();
   const queryFilters = [
     // { isActive: sequelize.where }
@@ -65,8 +65,8 @@ const queryForm = async (filter, options, searchQuery) => {
     limit: limit,
   });
 
-  console.log("counter", count)
-  console.log("rows", rows);
+
+
 
   return paginationFacts(count, limit, options.pageNumber, rows);
   // return Items;
@@ -78,7 +78,7 @@ const queryForm = async (filter, options, searchQuery) => {
  * @returns {Promise<ReceiptModel>}
  */
 const getFormById = async (id) => {
-  //console.log("read receipt by id " + id)
+
   return FormModel.FormModel.findByPk(id);
 };
 
@@ -89,14 +89,14 @@ const getFormById = async (id) => {
  * @returns {Promise<ReceiptModel>}
  */
 const updateFormById = async (Id, updateBody, updatedBy) => {
-  //console.log("item 12")
+
 
   const Item = await getFormById(Id);
-  //console.log(item)
+
   if (!Item) {
     throw new ApiError(httpStatus.NOT_FOUND, "record not found");
   }
-  //console.log("Update Receipt Id" , item);
+
   // updateBody.slug = updateBody.name.replace(/ /g, "-").toLowerCase()
   updateBody.updatedBy = updatedBy;
   delete updateBody.id;
@@ -112,7 +112,7 @@ const updateFormById = async (Id, updateBody, updatedBy) => {
  */
 const deleteFormById = async (Id) => {
 
-  console.log("delete form id",Id)
+
   const Item = await getFormById(Id);
   if (!Item) {
     throw new ApiError(httpStatus.NOT_FOUND, "Item not found");
@@ -137,18 +137,18 @@ const getAllParentChildForms = async (filter, options, searchQuery) => {
   try {
 
     const results = await sequelize.query('CALL sp_getAllParentChildeMenus()');
-    console.log(results, "res", searchQuery)
+
     let limit = options.pageSize;
     let offset = 0 + (options.pageNumber - 1) * limit;
     searchQuery = searchQuery.toLowerCase();
     let searchlist = filterByValue(results, searchQuery);
-    console.log("searchlist", searchlist)
+ 
     let count = searchlist.length;
     const rows = searchlist; //searchlist.slice(offset, offset + limit)
 
     return paginationFacts(count, limit, options.pageNumber, rows); // 
   } catch (error) {
-    console.log('::::::error::::::',error);
+    
     
     throw new ApiError(httpStatus.INTERNAL_SERVER_ERROR, "Error calling stored procedure");
   }
@@ -162,22 +162,22 @@ const getAllChildForms = async (id) => {
    // const results = await sequelize.query('exec usp_GetAllChildFormById(:param1)',{replacements:{ parentMenuId: 1 },transaction: param});
    
    const parentMenuId = id; // Example parameter value
-   console.log("parentId",id);
+
    const results = await sequelize.query('call usp_GetAllChildFormById(:parentMenuId)', {
      replacements: { parentMenuId },
      type: Sequelize.QueryTypes.RAW // Use RAW type for executing stored procedures
    });
    
-    console.log("totalList1",results)
+  
     let limit = 100; // options.pageSize;
     //let offset = 0 + (options.pageNumber - 1) * limit;
     
     //searchQuery = searchQuery.toLowerCase();
     //let searchlist = filterByValue(results, searchQuery);
-    //console.log("child list", searchlist)
+   
     let count = results.length;
     //const rows = searchlist.slice(offset, offset + limit)
-    console.log("test")
+  
     return paginationFacts(count, limit, parentMenuId, results); // 
   } catch (error) {
     throw new ApiError(httpStatus.INTERNAL_SERVER_ERROR, error);
