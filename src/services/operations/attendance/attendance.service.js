@@ -1,7 +1,8 @@
 const httpStatus = require("http-status");
-const { AttendanceModel, EmployeeProfileModel } = require("../../../models/index");
+const { AttendanceModel, EmployeeProfileModel, CompanyModel, SubsidiaryModel } = require("../../../models/index");
 const ApiError = require("../../../utils/ApiError");
 const Sequelize = require('sequelize');
+const sequelize = require("../../../config/db");
 const { paginationFacts, handleNestedData, getDateDiffInDays, formatDates } = require("../../../utils/common");
 const pick = require("../../../utils/pick");
 const { startOfDay, endOfDay } = require("date-fns");
@@ -48,24 +49,53 @@ const createAttendance = async (req) => {
   if (oldRecord) {
     throw new ApiError(httpStatus.CONFLICT, 'Record Already Exists for this date')
   }
-  const employeeData = await EmployeeProfileModel.findByPk(body.employeeId, { attributes: ['employeeCode', 'subsidiaryId', 'dateOfJoining'] });
+  const employeeData = await EmployeeProfileModel.findByPk(body.employeeId, { attributes: ['employeeCode', 'subsidiaryId', 'dateOfJoining', 'Id'] });
   if (!employeeData) {
     throw new ApiError(httpStatus.BAD_REQUEST, 'Employee Not Found')
   }
-  if(employeeData.dateOfJoining){
+  if (employeeData.dateOfJoining) {
     const diffInDays = getDateDiffInDays(startOfDay(new Date(employeeData.dateOfJoining)), startOfDay(new Date(body.attDateIn)))
-    if(diffInDays < 1){
+    if (diffInDays < 1) {
       throw new ApiError(httpStatus.BAD_REQUEST, `Employee's Joining date is ${formatDates(employeeData.dateOfJoining)}. Cannot set attendance before that`)
     }
   }
+  const subsidiaryData = await SubsidiaryModel.findByPk(employeeData.subsidiaryId, {
+    attributes: [],
+    include: [
+      {
+        model: CompanyModel,
+        attributes: ['Id']
+      }
+    ]
+  });
+
   const payload = {
     ...body,
+    attDateIn: formatDates(body.attDateIn, 'yyyy-MM-dd'),
+    attDateOut: formatDates(body.attDateOut, 'yyyy-MM-dd'),
     createdBy: req.user.id,
     subsidiaryId: employeeData.subsidiaryId,
     employeeCode: employeeData.employeeCode,
-    attDate: body.attDateIn
+    attDate: formatDates(body.attDateIn, 'yyyy-MM-dd'),
+    companyId: subsidiaryData?.t_company?.Id
   };
   const createdData = await AttendanceModel.create(payload);
+
+  try {
+    await sequelize.query('CALL SP_SmartlyProceedAttendance(:p_CompanyId ,:p_SubsidiaryId ,:p_M_EmpId ,:p_FromDate ,:p_ToDate,:p_isSpecial)', {
+      replacements: {
+        p_CompanyId: payload.companyId,
+        p_SubsidiaryId: payload.subsidiaryId,
+        p_M_EmpId: payload.employeeId,
+        p_FromDate: payload.attDateIn,
+        p_ToDate: payload.attDateOut,
+        p_isSpecial: 0,
+      },
+      type: Sequelize.QueryTypes.RAW // Use RAW type for executing stored procedures
+    });
+  } catch (error) {
+    throw new ApiError(httpStatus.INTERNAL_SERVER_ERROR, 'Some Error Occcured.')
+  }
   const data = await getAttendanceById(createdData.Id, attendanceAttributes)
   return data;
 };
@@ -224,9 +254,28 @@ const updateAttendanceById = async (body, updatedBy) => {
   }
   const oldRecord = await getattendanceData({ Id: body.Id })
   body.updatedBy = updatedBy;
-  body.attDate = body.attDateIn
+  body.attDateIn = formatDates(body.attDateIn, 'yyyy-MM-dd');
+  body.attDateOut = formatDates(body.attDateOut, 'yyyy-MM-dd');
+  body.attDate = body.attDateIn;
   Object.assign(oldRecord, body);
   const updatedData = await oldRecord.save({ fields: ['comments', 'attDate', 'attDateIn', 'attDateOut', 'timeIn', 'timeOut', 'updatedBy'] });
+
+  try {
+    await sequelize.query('CALL SP_SmartlyProceedAttendance(:p_CompanyId ,:p_SubsidiaryId ,:p_M_EmpId ,:p_FromDate ,:p_ToDate,:p_isSpecial)', {
+      replacements: {
+        p_CompanyId: oldRecord.companyId,
+        p_SubsidiaryId: oldRecord.subsidiaryId,
+        p_M_EmpId: body.employeeId,
+        p_FromDate: body.attDateIn,
+        p_ToDate: body.attDateOut,
+        p_isSpecial: 0,
+      },
+      type: Sequelize.QueryTypes.RAW // Use RAW type for executing stored procedures
+    });
+  } catch (error) {
+    throw new ApiError(httpStatus.INTERNAL_SERVER_ERROR, 'Some Error Occcured.')
+  }
+
   const data = await getAttendanceById(updatedData.Id, attendanceAttributes)
   return data;
 };
