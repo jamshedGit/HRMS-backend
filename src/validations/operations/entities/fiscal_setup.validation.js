@@ -4,7 +4,7 @@ const createItem = {
   query: Joi.disallow(),
   params: Joi.disallow(),
   body: Joi.object().keys({
-    id: Joi.disallow(),
+    Id: '',
     startDate: Joi.date().required(),
     endDate: Joi.date().required(),
     subsidiaryId: Joi.number().required(),
