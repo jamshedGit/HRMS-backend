@@ -16,11 +16,11 @@ const Op = Sequelize.Op;
  * @returns {Promise<Bank>}
  */
 const createEmpPolicy = async (req, EmpPolicyBody) => {
-  console.log("EmpPolicy Body", EmpPolicyBody)
+
   // EmpPolicyBody.slug = EmpPolicyBody.name.replace(/ /g, "-").toLowerCase();
-  console.log(req.user.id);
+
   EmpPolicyBody.createdBy = req.user.id;
-  console.log(EmpPolicyBody, "body");
+ 
   const addedEmpPolicyObj = await EmpPolicyModel.EmployeePolicyModel.create(EmpPolicyBody);
   //authSMSSend(addedBankObj.dataValues);  // Quick send message at the time of donation
   return addedEmpPolicyObj;
@@ -38,12 +38,12 @@ const createEmpPolicy = async (req, EmpPolicyBody) => {
  * @returns {Promise<QueryResult>}
  */
 // const queryEmpPolicy = async (filter, options, searchQuery) => {
-//   console.log("get search query", searchQuery);
 
-//   console.log("options EmpPolicy", options);
+
+
 //   let limit = options.pageSize;
 //   let offset = 0 + (options.pageNumber - 1) * limit;
-//   console.log("EmpPolicyCode offset ", offset)
+
 //   searchQuery = searchQuery.toLowerCase();
 //   const queryFilters = [
 //     // { isActive: sequelize.where }
@@ -72,7 +72,7 @@ const createEmpPolicy = async (req, EmpPolicyBody) => {
 //     //   },
 //     // ]
 //   });
-// console.log("data111", count, rows )
+
 
 //   return paginationFacts(count, limit, options.pageNumber, rows);
 //   // return Items;
@@ -129,14 +129,14 @@ const queryEmpPolicy = async (filter, options, searchQuery) => {
  * @returns {Promise<ReceiptModel>}
  */
 const getEmpPolicyById = async (id) => {
-  console.log("read policy by id " + id);
+
   return EmpPolicyModel.EmployeePolicyModel.findByPk(id);
 };
 
 
 const usp_GetEmpPolicyBySubsidiaryId = async (subsidiaryId) => {
   try {
-    console.log(":ddd:",subsidiaryId)
+ 
     const results = await sequelize.query('CALL usp_GetEmpPolicyBySubsidiaryId(:p_subsidiaryId)', {
       replacements: { p_subsidiaryId: subsidiaryId || null},
       type: Sequelize.QueryTypes.RAW // Use RAW type for executing stored procedures
@@ -145,7 +145,7 @@ const usp_GetEmpPolicyBySubsidiaryId = async (subsidiaryId) => {
     // let offset = 0 + (options.pageNumber - 1) * limit;
     // searchQuery = searchQuery.toLowerCase();
     // let searchlist = filterByValue(results, searchQuery);
-    // console.log("searchlist", searchlist)
+
     // let count = searchlist.length;
     // const rows = searchlist.slice(offset, offset + limit)
 
@@ -163,14 +163,14 @@ const usp_GetEmpPolicyBySubsidiaryId = async (subsidiaryId) => {
  * @returns {Promise<ReceiptModel>}
  */
 const updateEmpPolicyById = async (Id, updateBody, updatedBy) => {
-  //console.log("item 12")
+ 
 
   const Item = await getEmpPolicyById(Id);
-  //console.log(item)
+
   if (!Item) {
     throw new ApiError(httpStatus.NOT_FOUND, "record not found");
   }
-  //console.log("Update Receipt Id" , item);
+
   // updateBody.slug = updateBody.name.replace(/ /g, "-").toLowerCase()
   updateBody.updatedBy = updatedBy;
   delete updateBody.id;

@@ -11,11 +11,11 @@ const {
 } = require("../../../../utils/constants");
 
 const createEmpPolicy = catchAsync(async (req, res) => {
-  // console.log("reqested User", req.user.id);
+ 
   try {
 
-    console.log("insert EmpPolicy")
-    console.log("req body",req.body);
+  
+  
     req.body.Id = req.body.Id;
     
     delete req.body.Id;
@@ -40,14 +40,14 @@ const createEmpPolicy = catchAsync(async (req, res) => {
 });
 
 const getAllEmpPolicy = catchAsync(async (req, res) => {
-  console.log("get EmpPolicy");
+
   const obj = {};
   const filter = obj;
   // const options = pick(req.body, ["sortBy", "limit", "page"]);
   const options = pick(req.body, ['sortOrder', 'pageSize', 'pageNumber']);
   const searchQuery = req.body.filter.searchQuery? req.body.filter.searchQuery : '';
   const result = await EmpPolicyformService.EmpPolicyServicePage.queryEmpPolicy(filter, options,searchQuery);
-  console.log(result);
+
   res.send({
     code: HttpStatusCodes.OK,
     message: HttpResponseMessages.OK,
@@ -56,8 +56,8 @@ const getAllEmpPolicy = catchAsync(async (req, res) => {
 });
 
 const getEmpPolicyById = catchAsync(async (req, res) => {
-  console.log("EmpPolicy Controller getbankId")
-  console.log(req.body)
+
+
   const Receipt = await EmpPolicyformService.EmpPolicyServicePage.getEmpPolicyById(req.body.Id);
   if (!Receipt) {
     throw new ApiError(httpStatus.NOT_FOUND, "EmpPolicy not found");
@@ -72,7 +72,7 @@ const getEmpPolicyById = catchAsync(async (req, res) => {
 
 
 const getEmpPolicyBySubsidiaryId = catchAsync(async (req, res) => {
-  console.log("EmpPolicy Controller getbankId",req.body.subsidiaryId)
+
  
   const Receipt = await EmpPolicyformService.EmpPolicyServicePage.usp_GetEmpPolicyBySubsidiaryId(req.body.subsidiaryId);
   if (!Receipt) {
@@ -86,7 +86,7 @@ const getEmpPolicyBySubsidiaryId = catchAsync(async (req, res) => {
 });
 
 const updateEmpPolicy = catchAsync(async (req, res) => {
-  console.log(req.body);
+
   const Receipt = await EmpPolicyformService.EmpPolicyServicePage.updateEmpPolicyById(req.body.Id, req.body, req.user.Id);
   res.send({
     code: HttpStatusCodes.OK,
@@ -96,7 +96,7 @@ const updateEmpPolicy = catchAsync(async (req, res) => {
 });
 
 const deleteEmpPolicy = catchAsync(async (req, res) => {
-  console.log("req.body.Id " ,req.body.Id)
+ 
   const Receipt = await EmpPolicyformService.EmpPolicyServicePage.deleteEmpPolicyById(req.body.Id);
   res.send({
     code: HttpStatusCodes.OK,

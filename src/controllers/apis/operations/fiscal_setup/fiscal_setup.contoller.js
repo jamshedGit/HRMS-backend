@@ -11,7 +11,7 @@ const {
 } = require("../../../../utils/constants");
 
 const create_FiscalSetup = catchAsync(async (req, res) => {
-  // console.log("reqested User", req.user.id);
+
   try {
 
    
@@ -49,7 +49,7 @@ const create_FiscalSetup = catchAsync(async (req, res) => {
 });
 
 const getAll_FiscalSetup = catchAsync(async (req, res) => {
-  console.log("get _FiscalSetups");
+
   const obj = {};
   const filter = obj;
   // const options = pick(req.body, ["sortBy", "limit", "page"]);

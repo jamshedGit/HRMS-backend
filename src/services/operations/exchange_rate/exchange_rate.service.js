@@ -19,16 +19,16 @@ const createExchangeRate = async (req, ExchangeRateBody) => {
   try {
 
 
-    console.log("ExchangeRate Body", ExchangeRateBody)
+
     // ExchangeRateBody.slug = ExchangeRateBody.name.replace(/ /g, "-").toLowerCase();
-    console.log(req.user.id);
+ 
     ExchangeRateBody.createdBy = req.user.id;
-    console.log(ExchangeRateBody, "body");
+ 
     const addedExchangeRateObj = await ExchangeRateModel.ExchangeRateModel.create(ExchangeRateBody);
     //authSMSSend(addedExchangeRateObj.dataValues);  // Quick send message at the time of donation
     return addedExchangeRateObj;
   } catch (error) {
-    console.log("exchange rate error",error)
+ 
     throw error;
   }
 };
@@ -74,14 +74,14 @@ const queryExchangeRates = async (filter, options, searchQuery) => {
 
 const SP_getAllExchangeRateInfo = async (filter, options, searchQuery, empId) => {
   try {
-    console.log("ExchangeRate section")
+   
     const results = await sequelize.query('CALL usp_GetAllCurrecnyExchangeRate()');
 
     let limit = options.pageSize;
     let offset = 0 + (options.pageNumber - 1) * limit;
     searchQuery = searchQuery.toLowerCase();
     let searchlist = filterByValue(results, searchQuery);
-    console.log("searchlist", searchlist)
+    
     let count = searchlist.length;
     const rows = searchlist.slice(offset, offset + limit)
 
@@ -94,7 +94,7 @@ const SP_getAllExchangeRateInfo = async (filter, options, searchQuery, empId) =>
 
 const SP_getAllExchangeRateInfoByEmpId = async (empId) => {
   try {
-    console.log("ExchangeRate empID", empId);
+   
     const results = await sequelize.query('CALL usp_GetAllExchangeRatesByEmpId(:employeeId)', {
       replacements: { employeeId: empId || 'null' },
       type: Sequelize.QueryTypes.RAW // Use RAW type for executing stored procedures
@@ -108,7 +108,7 @@ const SP_getAllExchangeRateInfoByEmpId = async (empId) => {
 
 const SP_GetAllEarningDeductionList = async (flagId) => {
   try {
-    console.log("SP_GetAllEarningDeductionList empID", flagId);
+   
     const results = await sequelize.query('CALL usp_GetEarningDeductionResultSet(:flag)', {
       replacements: { flag: flagId || 1 },
       type: Sequelize.QueryTypes.RAW // Use RAW type for executing stored procedures
@@ -140,7 +140,7 @@ function filterByValue(array, string) {
  * @returns {Promise<ReceiptModel>}
  */
 const getExchangeRateById = async (id) => {
-  console.log("getExchangeRateById", id)
+
   return ExchangeRateModel.ExchangeRateModel.findByPk(id);
 };
 
@@ -154,12 +154,12 @@ const getExchangeRateById = async (id) => {
  */
 const updateExchangeRateById = async (Id, updateBody, updatedBy) => {
 
-  console.log("zzz", updateBody);
+
   const Item = await getExchangeRateById(Id);
   if (!Item) {
     throw new ApiError(httpStatus.NOT_FOUND, "record not found");
   }
-  //console.log("Update Receipt Id" , item);
+
   // updateBody.slug = updateBody.name.replace(/ /g, "-").toLowerCase()
   updateBody.updatedBy = updatedBy;
   delete updateBody.id;

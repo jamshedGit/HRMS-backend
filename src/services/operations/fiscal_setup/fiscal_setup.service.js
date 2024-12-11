@@ -18,7 +18,7 @@ const Op = Sequelize.Op;
 const createFiscalSetup = async (req, FiscalSetupBody) => {
 
   // FiscalSetupBody.slug = FiscalSetupBody.name.replace(/ /g, "-").toLowerCase();
-console.log("FiscalSetupBody111",FiscalSetupBody)
+
   FiscalSetupBody.createdBy = req.user.id;
   
   const existingRange = await check_range_exist(
@@ -42,7 +42,7 @@ console.log("FiscalSetupBody111",FiscalSetupBody)
   // const resp = await sequelize.query(' update t_tax_setup set isActive = 0');
 
   // If the subsidiary exists, proceed to update the t_tax_setup table
-  console.log("FiscalSetupBody?.subsidiaryId",FiscalSetupBody?.subsidiaryId)
+ 
   if (FiscalSetupBody?.subsidiaryId) {
     // Update the tax setup where subsidiaryId matches
     const [updatedRowsCount] = await FiscalSetupModel?.FiscalSetupModel.update(
@@ -76,7 +76,7 @@ console.log("FiscalSetupBody111",FiscalSetupBody)
  * @returns {Promise<QueryResult>}
  */
 const queryFiscalSetups = async (filter, options, searchQuery) => {
-   console.log("dds",searchQuery)
+
   let limit = options.pageSize;
   let offset = 0 + (options.pageNumber - 1) * limit;
   
@@ -129,12 +129,12 @@ const getFiscalSetupById = async (id) => {
  * @returns {Promise<ReceiptModel>}
  */
 const updateFiscalSetupById = async (Id, updateBody, updatedBy) => {
-  console.log("tool",Id, updateBody, updatedBy)
+
   const Item = await getFiscalSetupById(Id);
   if (!Item) {
     throw new ApiError(httpStatus.NOT_FOUND, "record not found");
   }
-  //console.log("Update Receipt Id" , item);
+ 
   // updateBody.slug = updateBody.name.replace(/ /g, "-").toLowerCase()
   updateBody.updatedBy = updatedBy;
   delete updateBody.id;
