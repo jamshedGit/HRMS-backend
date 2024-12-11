@@ -5,7 +5,7 @@ const createEmpPolicyValidation = {
     params: Joi.disallow(),
     body: Joi.object().keys({
         baseCurrencyPolicyId: Joi.number(),
-        subsdiaryId: Joi.number(),
+        subsidiaryId: Joi.number(),
         isEmployeeCodeGenerationAuto: Joi.boolean(),
         retirementAgeMale: Joi.number(),
         retirementAgeFemale: Joi.number(),
@@ -19,7 +19,6 @@ const createEmpPolicyValidation = {
         probationPolicyInMonth: Joi.number(),
         contractualPolicyInMonth: Joi.number(),
         currencyId: Joi.number(),
-        policyName: Joi.string(),
         code: Joi.string(),
         
         

@@ -4,7 +4,7 @@ const  FiscalSetupModel  = require("../../../models/index");
 const ApiError = require("../../../utils/ApiError");
 const sequelize = require("../../../config/db");
 const Sequelize = require('sequelize');
-const { paginationFacts } = require("../../../utils/common");
+const { paginationFacts, check_range_exist } = require("../../../utils/common");
 const https = require('https');
 const { XMLParser, XMLBuilder, XMLValidator } = require("fast-xml-parser");
 const fns = require('date-fns')
@@ -16,12 +16,48 @@ const Op = Sequelize.Op;
  * @returns {Promise<FiscalSetup>}
  */
 const createFiscalSetup = async (req, FiscalSetupBody) => {
-    console.log("FiscalSetup Body", FiscalSetupBody)
+
   // FiscalSetupBody.slug = FiscalSetupBody.name.replace(/ /g, "-").toLowerCase();
-  console.log(req.user.id);
+
   FiscalSetupBody.createdBy = req.user.id;
-  console.log(FiscalSetupBody,"body");
-  const resp = await sequelize.query(' update t_Fiscal_setup set isActive = 0');
+  
+  const existingRange = await check_range_exist(
+    FiscalSetupBody,
+    "FiscalSetupModel",
+    "startDate",
+    "endDate",
+    (fieldMappings = ["subsidiaryId"])
+  );
+
+  if (existingRange) {
+
+    let result = {
+      message: "Unable to Save: Fiscal setup overlaps with existing date.",
+      status: "error",
+    };
+    return result;
+
+  }
+
+  // const resp = await sequelize.query(' update t_tax_setup set isActive = 0');
+
+  // If the subsidiary exists, proceed to update the t_tax_setup table
+ 
+  if (FiscalSetupBody?.subsidiaryId) {
+    // Update the tax setup where subsidiaryId matches
+    const [updatedRowsCount] = await FiscalSetupModel?.FiscalSetupModel.update(
+      { isActive: 0 }, // Set isActive to 0
+      {
+        where: {
+          subsidiaryId: FiscalSetupBody?.subsidiaryId,  // Match subsidiaryId
+          isActive: 1                               // Ensure isActive is 1
+        }
+      }
+    );
+  }
+
+
+  // const resp = await sequelize.query(' update t_Fiscal_setup set isActive = 0');
 
   const addedFiscalSetupObj = await FiscalSetupModel.FiscalSetupModel.create(FiscalSetupBody);
   //authSMSSend(addedFiscalSetupObj.dataValues);  // Quick send message at the time of donation
@@ -40,7 +76,7 @@ const createFiscalSetup = async (req, FiscalSetupBody) => {
  * @returns {Promise<QueryResult>}
  */
 const queryFiscalSetups = async (filter, options, searchQuery) => {
-   console.log("dds",searchQuery)
+
   let limit = options.pageSize;
   let offset = 0 + (options.pageNumber - 1) * limit;
   
@@ -93,12 +129,12 @@ const getFiscalSetupById = async (id) => {
  * @returns {Promise<ReceiptModel>}
  */
 const updateFiscalSetupById = async (Id, updateBody, updatedBy) => {
-  console.log("tool",Id, updateBody, updatedBy)
+
   const Item = await getFiscalSetupById(Id);
   if (!Item) {
     throw new ApiError(httpStatus.NOT_FOUND, "record not found");
   }
-  //console.log("Update Receipt Id" , item);
+ 
   // updateBody.slug = updateBody.name.replace(/ /g, "-").toLowerCase()
   updateBody.updatedBy = updatedBy;
   delete updateBody.id;

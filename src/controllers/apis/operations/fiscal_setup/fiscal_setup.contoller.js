@@ -11,12 +11,24 @@ const {
 } = require("../../../../utils/constants");
 
 const create_FiscalSetup = catchAsync(async (req, res) => {
-  // console.log("reqested User", req.user.id);
+
   try {
 
-    console.log("insert _FiscalSetup")
-    console.log(req.body);
+   
+
     const FiscalSetup = await FiscalSetupServicePage.FiscalSetupServicePage.createFiscalSetup(req, req.body);
+
+    if(FiscalSetup?.status=="error"){
+
+      res.status(HttpStatusCodes?.INTERNAL_SERVER_ERROR).send({
+        code: HttpStatusCodes?.INTERNAL_SERVER_ERROR,
+        message:FiscalSetup?.message,
+        error: FiscalSetup?.error || 'An unexpected error occurred',
+      });
+      
+  
+    }
+
 
     res.status(httpStatus.CREATED).send({
       code: HttpStatusCodes.CREATED,
@@ -26,7 +38,7 @@ const create_FiscalSetup = catchAsync(async (req, res) => {
 
   } catch (error) {
 
-    if (error.parent.errno === 1062) {
+    if (error?.parent?.errno === 1062) {
       throw new ApiError(httpStatus.NOT_FOUND, "Duplicate entry not allowed!");
     }
     else {
@@ -37,7 +49,7 @@ const create_FiscalSetup = catchAsync(async (req, res) => {
 });
 
 const getAll_FiscalSetup = catchAsync(async (req, res) => {
-  console.log("get _FiscalSetups");
+
   const obj = {};
   const filter = obj;
   // const options = pick(req.body, ["sortBy", "limit", "page"]);

@@ -1,6 +1,6 @@
 const httpStatus = require("http-status");
 const axios = require("axios")
-const EmpPolicyModel = require("../../../models/index");
+const EmpPolicyModel= require("../../../models/index");
 const ApiError = require("../../../utils/ApiError");
 const sequelize = require("../../../config/db");
 const Sequelize = require('sequelize');
@@ -16,11 +16,11 @@ const Op = Sequelize.Op;
  * @returns {Promise<Bank>}
  */
 const createEmpPolicy = async (req, EmpPolicyBody) => {
-  console.log("EmpPolicy Body", EmpPolicyBody)
+
   // EmpPolicyBody.slug = EmpPolicyBody.name.replace(/ /g, "-").toLowerCase();
-  console.log(req.user.id);
+
   EmpPolicyBody.createdBy = req.user.id;
-  console.log(EmpPolicyBody, "body");
+ 
   const addedEmpPolicyObj = await EmpPolicyModel.EmployeePolicyModel.create(EmpPolicyBody);
   //authSMSSend(addedBankObj.dataValues);  // Quick send message at the time of donation
   return addedEmpPolicyObj;
@@ -37,54 +37,106 @@ const createEmpPolicy = async (req, EmpPolicyBody) => {
  * @param {number} [options.page] - Current page (default = 1)
  * @returns {Promise<QueryResult>}
  */
-const queryEmpPolicy = async (filter, options, searchQuery) => {
-  console.log("get search query", searchQuery);
+// const queryEmpPolicy = async (filter, options, searchQuery) => {
 
-  console.log("options EmpPolicy", options);
+
+
+//   let limit = options.pageSize;
+//   let offset = 0 + (options.pageNumber - 1) * limit;
+
+//   searchQuery = searchQuery.toLowerCase();
+//   const queryFilters = [
+//     // { isActive: sequelize.where }
+//     // { Id: Sequelize.where(Sequelize.fn('LOWER', Sequelize.col('Id')), 'LIKE', '%' + searchQuery + '%') },
+
+//     { code: Sequelize.where(Sequelize.fn('LOWER', Sequelize.col('code')), 'LIKE', '%' + searchQuery + '%') },
+
+//   ]
+
+
+//   const { count, rows } = await EmpPolicyModel.EmployeePolicyModel.findAndCountAll({
+//     order: [
+//       ['createdAt', 'DESC']
+//     ],
+//     where: {
+//       [Op.or]: queryFilters,
+//       // isActive: true
+//     },
+//     offset: offset,
+//     limit: limit,
+//     // include: [
+//     //   {
+//     //     model: EmpPolicyModel.SubsidiaryModel,
+//     //     attributes: ["Id","name"],
+//     //     as: "Subsidiary",
+//     //   },
+//     // ]
+//   });
+
+
+//   return paginationFacts(count, limit, options.pageNumber, rows);
+//   // return Items;
+// };
+
+
+const queryEmpPolicy = async (filter, options, searchQuery) => {
+
   let limit = options.pageSize;
   let offset = 0 + (options.pageNumber - 1) * limit;
-  console.log("EmpPolicyCode offset ", offset)
+
   searchQuery = searchQuery.toLowerCase();
   const queryFilters = [
-    // { isActive: sequelize.where }
-    // { Id: Sequelize.where(Sequelize.fn('LOWER', Sequelize.col('Id')), 'LIKE', '%' + searchQuery + '%') },
-    { policyName: Sequelize.where(Sequelize.fn('LOWER', Sequelize.col('policyName')), 'LIKE', '%' + searchQuery + '%') },
-    { code: Sequelize.where(Sequelize.fn('LOWER', Sequelize.col('code')), 'LIKE', '%' + searchQuery + '%') },
-
+    { name: Sequelize.where(Sequelize.fn('LOWER', Sequelize.col('minimumAge')), 'LIKE', '%' + searchQuery + '%') },
+  
   ]
-
 
   const { count, rows } = await EmpPolicyModel.EmployeePolicyModel.findAndCountAll({
     order: [
       ['createdAt', 'DESC']
     ],
+
+    // order: [
+    //   [Sequelize.col("subs.name"), "ASC"],   // Order by Subsidiary name
+     
+    // ],
     where: {
       [Op.or]: queryFilters,
       // isActive: true
     },
     offset: offset,
     limit: limit,
+    include: [
+      {
+        model: EmpPolicyModel.SubsidiaryModel,
+        attributes: ["Id","name"],
+        as: "Subsidiary"
+      },
+      {
+        model: EmpPolicyModel.FormModel,
+        attributes: ["Id","formName","formCode"],
+        as: "Currency"
+      }
+    ],
   });
 
 
   return paginationFacts(count, limit, options.pageNumber, rows);
-  // return Items;
-};
 
+};
 /**
  * Get Item by id
  * @param {ObjectId} id
  * @returns {Promise<ReceiptModel>}
  */
 const getEmpPolicyById = async (id) => {
-  console.log("read policy by id " + id);
+
   return EmpPolicyModel.EmployeePolicyModel.findByPk(id);
 };
 
 
 const usp_GetEmpPolicyBySubsidiaryId = async (subsidiaryId) => {
   try {
-    console.log(":ddd:",subsidiaryId)
+ 
     const results = await sequelize.query('CALL usp_GetEmpPolicyBySubsidiaryId(:p_subsidiaryId)', {
       replacements: { p_subsidiaryId: subsidiaryId || null},
       type: Sequelize.QueryTypes.RAW // Use RAW type for executing stored procedures
@@ -93,7 +145,7 @@ const usp_GetEmpPolicyBySubsidiaryId = async (subsidiaryId) => {
     // let offset = 0 + (options.pageNumber - 1) * limit;
     // searchQuery = searchQuery.toLowerCase();
     // let searchlist = filterByValue(results, searchQuery);
-    // console.log("searchlist", searchlist)
+
     // let count = searchlist.length;
     // const rows = searchlist.slice(offset, offset + limit)
 
@@ -111,14 +163,14 @@ const usp_GetEmpPolicyBySubsidiaryId = async (subsidiaryId) => {
  * @returns {Promise<ReceiptModel>}
  */
 const updateEmpPolicyById = async (Id, updateBody, updatedBy) => {
-  //console.log("item 12")
+ 
 
   const Item = await getEmpPolicyById(Id);
-  //console.log(item)
+
   if (!Item) {
     throw new ApiError(httpStatus.NOT_FOUND, "record not found");
   }
-  //console.log("Update Receipt Id" , item);
+
   // updateBody.slug = updateBody.name.replace(/ /g, "-").toLowerCase()
   updateBody.updatedBy = updatedBy;
   delete updateBody.id;

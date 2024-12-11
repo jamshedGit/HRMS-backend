@@ -11,12 +11,22 @@ const {
 } = require("../../../../utils/constants");
 
 const createTaxSetup = catchAsync(async (req, res) => {
-  // console.log("reqested User", req.user.id);
+  
   try {
 
-    console.log("insert TaxSetup")
-    console.log(req.body);
+
     const TaxSetup = await TaxSetupServicePage.TaxSetupServicePage.createTaxSetup(req, req.body);
+
+    if(TaxSetup?.status=="error"){
+
+      res.status(HttpStatusCodes?.INTERNAL_SERVER_ERROR).send({
+        code: HttpStatusCodes?.INTERNAL_SERVER_ERROR,
+        message:TaxSetup?.message,
+        error: TaxSetup?.error || 'An unexpected error occurred',
+      });
+      
+  
+    }
 
     res.status(httpStatus.CREATED).send({
       code: HttpStatusCodes.CREATED,
@@ -26,7 +36,7 @@ const createTaxSetup = catchAsync(async (req, res) => {
 
   } catch (error) {
 
-    if (error.parent.errno === 1062) {
+    if (error?.parent?.errno === 1062) {
       throw new ApiError(httpStatus.NOT_FOUND, "Duplicate entry not allowed!");
     }
     else {
@@ -37,14 +47,14 @@ const createTaxSetup = catchAsync(async (req, res) => {
 });
 
 const getAllTaxSetup = catchAsync(async (req, res) => {
-  console.log("get TaxSetups");
+
   const obj = {};
   const filter = obj;
   // const options = pick(req.body, ["sortBy", "limit", "page"]);
   const options = pick(req.body, ['sortOrder', 'pageSize', 'pageNumber']);
   const searchQuery = req.body.filter.searchQuery ? req.body.filter.searchQuery : '';
   const result = await TaxSetupServicePage.TaxSetupServicePage.queryTaxSetups(filter, options, searchQuery);
-  console.log("resp2", result);
+
   res.send({
     code: HttpStatusCodes.OK,
     message: HttpResponseMessages.OK,
@@ -53,8 +63,8 @@ const getAllTaxSetup = catchAsync(async (req, res) => {
 });
 
 const getTaxSetupById = catchAsync(async (req, res) => {
-  console.log("TaxSetup Controller getTaxSetupId")
-  console.log(req.body)
+ 
+
   const Receipt = await TaxSetupServicePage.TaxSetupServicePage.getTaxSetupById(req.body.Id);
   if (!Receipt) {
     throw new ApiError(httpStatus.NOT_FOUND, "Receipt not found");
@@ -67,7 +77,7 @@ const getTaxSetupById = catchAsync(async (req, res) => {
 });
 
 const updateTaxSetup = catchAsync(async (req, res) => {
-  console.log(req.body);
+
   const Receipt = await TaxSetupServicePage.TaxSetupServicePage.updateTaxSetupById(req.body.Id, req.body, req.user.Id);
   res.send({
     code: HttpStatusCodes.OK,
@@ -80,7 +90,7 @@ const deleteTaxSetup = catchAsync(async (req, res) => {
   try {
 
 
-    console.log("req.body.Id ", req.body.Id)
+
     const Receipt = await TaxSetupServicePage.TaxSetupServicePage.deleteTaxSetupById(req.body.Id);
     res.send({
       code: HttpStatusCodes.OK,

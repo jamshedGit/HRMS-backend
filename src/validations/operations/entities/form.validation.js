@@ -9,6 +9,7 @@ const createForm = {
         parentFormID: Joi.any().optional(),
         level: Joi.number(),
         Id: Joi.any().optional(),
+        isActive:Joi.boolean(),
     }),
 };
 

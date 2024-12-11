@@ -91,6 +91,7 @@ const {Tax_slabModel,Employee_loan_request_detailModel,Employee_loan_requestMode
 HolidaysModel,
 BranchModel,
 Payroll_ProcessModel,
+EmployeePolicyModel,
 } = require('./models');
 // Tax_slabModel.sync({ force: true }); 
 // Employee_loan_request_detailModel.sync({ force: true }); 
@@ -122,7 +123,7 @@ Payroll_ProcessModel,
 // and re-create it afterwards
 // sequelize.sync({force:true})
 // RoleModel.sync({force:true});
-
+// EmployeePolicyModel.sync({force:true});
 
 // send back a 404 error for any unknown api request
 app.use((req, res, next) => {

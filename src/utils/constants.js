@@ -75,6 +75,7 @@ const DDL_FIELD_NAMES = {
   Subsidiary:{
     labelField: 'name',
     valueField: 'Id',
+    currencyId:'currencyId'
   },
 
   SalaryRevisionKeys:{

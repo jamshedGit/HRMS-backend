@@ -2,7 +2,8 @@ const Sequelize = require('sequelize');
 const { ResourceModel } = require('../../..');
 
 //import Database connection configurations.
-const sequelize = require('../../../config/db')
+const sequelize = require('../../../config/db');
+const { SubsidiaryModel, FormModel } = require('../..');
 
 const ExchangeRateModel = sequelize.define('t_exchange_rate', {
 	Id: {
@@ -29,5 +30,11 @@ const ExchangeRateModel = sequelize.define('t_exchange_rate', {
 	updatedAt: { type: Sequelize.DATE, allowNull: true },
 
 });
+
+ExchangeRateModel.belongsTo(SubsidiaryModel, {
+	foreignKey: 'subsidiaryId',
+	targetKey: 'Id',
+		as:"Subsidiary"
+  });
 
 module.exports = ExchangeRateModel;
