@@ -1,10 +1,10 @@
 const httpStatus = require("http-status");
 const axios = require("axios")
-const  TaxSetupModel  = require("../../../models/index");
+const TaxSetupModel = require("../../../models/index");
 const ApiError = require("../../../utils/ApiError");
 const sequelize = require("../../../config/db");
 const Sequelize = require('sequelize');
-const { paginationFacts } = require("../../../utils/common");
+const { paginationFacts, check_range_exist } = require("../../../utils/common");
 const https = require('https');
 const { XMLParser, XMLBuilder, XMLValidator } = require("fast-xml-parser");
 const fns = require('date-fns')
@@ -16,12 +16,45 @@ const Op = Sequelize.Op;
  * @returns {Promise<TaxSetup>}
  */
 const createTaxSetup = async (req, TaxSetupBody) => {
-    console.log("TaxSetup Body", TaxSetupBody)
+
   // TaxSetupBody.slug = TaxSetupBody.name.replace(/ /g, "-").toLowerCase();
-  console.log(req.user.id);
+
   TaxSetupBody.createdBy = req.user.id;
-  console.log(TaxSetupBody,"body");
-  const resp = await sequelize.query(' update t_tax_setup set isActive = 0');
+
+
+  const existingRange = await check_range_exist(
+    TaxSetupBody,
+    "TaxSetupModel",
+    "startDate",
+    "endDate",
+    (fieldMappings = ["subsidiaryId"])
+  );
+
+  if (existingRange) {
+
+    let result = {
+      message: "Unable to Save: Tax setup overlaps with existing date.",
+      status: "error",
+    };
+    return result;
+
+  }
+
+  // const resp = await sequelize.query(' update t_tax_setup set isActive = 0');
+
+  // If the subsidiary exists, proceed to update the t_tax_setup table
+  if (TaxSetupBody?.subsidiaryId) {
+    // Update the tax setup where subsidiaryId matches
+    const [updatedRowsCount] = await TaxSetupModel.TaxSetupModel.update(
+      { isActive: 0 }, // Set isActive to 0
+      {
+        where: {
+          subsidiaryId: TaxSetupBody.subsidiaryId,  // Match subsidiaryId
+          isActive: 1                               // Ensure isActive is 1
+        }
+      }
+    );
+  }
 
   const addedTaxSetupObj = await TaxSetupModel.TaxSetupModel.create(TaxSetupBody);
   //authSMSSend(addedTaxSetupObj.dataValues);  // Quick send message at the time of donation
@@ -40,10 +73,10 @@ const createTaxSetup = async (req, TaxSetupBody) => {
  * @returns {Promise<QueryResult>}
  */
 const queryTaxSetups = async (filter, options, searchQuery) => {
-  
+
   let limit = options.pageSize;
   let offset = 0 + (options.pageNumber - 1) * limit;
-  
+
   searchQuery = searchQuery.toLowerCase();
   const queryFilters = [
     { startDate: Sequelize.where(Sequelize.fn('LOWER', Sequelize.col('startDate')), 'LIKE', '%' + searchQuery + '%') },
@@ -73,7 +106,7 @@ const queryTaxSetups = async (filter, options, searchQuery) => {
 
 
   return paginationFacts(count, limit, options.pageNumber, rows);
-  
+
 };
 
 /**
@@ -94,18 +127,18 @@ const getTaxSetupById = async (id) => {
  * @returns {Promise<ReceiptModel>}
  */
 const updateTaxSetupById = async (Id, updateBody, updatedBy) => {
-  console.log("tool",Id, updateBody, updatedBy)
+
   const Item = await getTaxSetupById(Id);
   if (!Item) {
     throw new ApiError(httpStatus.NOT_FOUND, "record not found");
   }
-  //console.log("Update Receipt Id" , item);
+
   // updateBody.slug = updateBody.name.replace(/ /g, "-").toLowerCase()
   updateBody.updatedBy = updatedBy;
   delete updateBody.id;
   Object.assign(Item, updateBody);
   await Item.save();
-  return  ;
+  return;
 };
 
 /**
@@ -113,7 +146,7 @@ const updateTaxSetupById = async (Id, updateBody, updatedBy) => {
  * @param {ObjectId} Id
  * @returns {Promise<ReceiptModel>}
  */
-  const deleteTaxSetupById = async (Id) => {
+const deleteTaxSetupById = async (Id) => {
 
   const Item = await getTaxSetupById(Id);
   if (!Item) {
