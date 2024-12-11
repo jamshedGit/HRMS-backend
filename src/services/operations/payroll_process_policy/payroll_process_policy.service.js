@@ -1,6 +1,6 @@
 const httpStatus = require("http-status");
 const axios = require("axios")
-const { PayrollPolicyModel, PayrollEmailRecipentModel, PayrollEOBIAllowancesModel, PayrollBankInfoPolicy, FormModel, PayrollSessiAllowanceModel } = require("../../../models/index");
+const { PayrollPolicyModel, PayrollEmailRecipentModel, PayrollEOBIAllowancesModel, PayrollBankInfoPolicy, FormModel, PayrollSessiAllowanceModel, SubsidiaryModel, CompanyModel } = require("../../../models/index");
 const ApiError = require("../../../utils/ApiError");
 const sequelize = require("../../../config/db");
 const Sequelize = require('sequelize');
@@ -16,10 +16,11 @@ const Op = Sequelize.Op;
  * @returns {Promise<PayrollPolicy>}
  */
 const createPayrollPolicy = async (req, payollBodyObj) => {
-  console.log("::gg::", payollBodyObj)
   payollBodyObj.createdBy = req.user.id;
 
-  const addedPayrollPolicyObj = await PayrollPolicyModel.create(payollBodyObj.body);
+  const subsidiaryData = await SubsidiaryModel.findByPk(payollBodyObj.body.subsidiaryId, { attributes: ['companyId'] })
+
+  const addedPayrollPolicyObj = await PayrollPolicyModel.create({ ...payollBodyObj.body, companyId: subsidiaryData?.companyId });
 
   const emailRecipentObj = []
   const listEOBIAllowancesObj = []
@@ -54,7 +55,6 @@ const createPayrollPolicy = async (req, payollBodyObj) => {
   const eobiAllowanceResp = await PayrollEOBIAllowancesModel.bulkCreate(listEOBIAllowancesObj);
 
   // SESSI Allowance
-
   payollBodyObj.sessiAllowanceList.forEach(element => {
     listSESSIAllowancesObj.push({
       subsidiaryId: payollBodyObj.body.subsidiaryId,
@@ -103,7 +103,7 @@ const queryPayrollPolicy = async (filter, options, searchQuery) => {
 
   searchQuery = searchQuery.toLowerCase();
   const queryFilters = [
-    { Name: Sequelize.where(Sequelize.fn('LOWER', Sequelize.col('subsidiaryId')), 'LIKE', '%' + searchQuery + '%') },
+    { Name: Sequelize.where(Sequelize.fn('LOWER', Sequelize.col('t_subsidiary.name')), 'LIKE', '%' + searchQuery + '%') },
   ]
 
 
@@ -115,11 +115,11 @@ const queryPayrollPolicy = async (filter, options, searchQuery) => {
       [Op.or]: queryFilters,
       // isActive: true
     },
+    include: [{ model: SubsidiaryModel, attributes: ['name'] }],
     offset: offset,
     limit: limit,
-    
+    attributes: ['Id', 'isActive']
   });
-
 
   return paginationFacts(count, limit, options.pageNumber, rows);
 
@@ -164,13 +164,12 @@ const getPayrollPolicyById = async (id) => {
  * @param {Object} updateBody
  * @returns {Promise<ReceiptModel>}
  */
-const updatePayrollPolicyById = async (Id, updateBody, updatedBy,payollBodyObj) => {
-  console.log("tool", Id, updateBody, updatedBy)
+const updatePayrollPolicyById = async (Id, updateBody, updatedBy, payollBodyObj) => {
   const Item = await getPayrollPolicyById(Id);
   if (!Item) {
     throw new ApiError(httpStatus.NOT_FOUND, "record not found");
   }
-  
+
   updateBody.updatedBy = updatedBy;
   delete updateBody.id;
   Object.assign(Item, updateBody);
@@ -179,13 +178,13 @@ const updatePayrollPolicyById = async (Id, updateBody, updatedBy,payollBodyObj) 
   const listEOBIAllowancesObj = []
   const listSESSIAllowancesObj = []
   const listBankInfoPayroll = []
-  const res_email = await sequelize.query(' delete from tran_email_recipents_setup where payrollConfigurationId = ' + Id );
-  const res_payroll = await sequelize.query(' delete from tran_payroll_policy_bank_info where payrollConfigurationId = ' + Id );
-  const eobi_allowance = await sequelize.query(' delete from tran_payroll_policy_eobiallowances where payrollConfigurationId = ' + Id );
-  const sessi_allowance = await sequelize.query(' delete from tran_payroll_policy_sessiallowance where payrollConfigurationId = ' + Id );
-  
-   /// For Insert Employee sending email ID's
-   payollBodyObj.emailRecipentList.forEach(element => {
+  const res_email = await sequelize.query(' delete from tran_email_recipents_setup where payrollConfigurationId = ' + Id);
+  const res_payroll = await sequelize.query(' delete from tran_payroll_policy_bank_info where payrollConfigurationId = ' + Id);
+  const eobi_allowance = await sequelize.query(' delete from tran_payroll_policy_eobiallowances where payrollConfigurationId = ' + Id);
+  const sessi_allowance = await sequelize.query(' delete from tran_payroll_policy_sessiallowance where payrollConfigurationId = ' + Id);
+
+  /// For Insert Employee sending email ID's
+  payollBodyObj.emailRecipentList.forEach(element => {
 
     emailRecipentObj.push({
       subsidiaryId: payollBodyObj.body.subsidiaryId,

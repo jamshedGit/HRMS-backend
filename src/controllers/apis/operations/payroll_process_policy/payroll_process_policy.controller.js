@@ -10,11 +10,7 @@ const {
 } = require("../../../../utils/constants");
 
 const create_Payroll_Process_Policy = catchAsync(async (req, res) => {
-  // console.log("reqested User", req.user.id);
   try {
-
-    console.log("::insert_payroll_policy::",req.body)
-    
     const _Payroll_Process_Policy = await PayrollProcessPolicy.PayrollProcessPolicy.createPayrollPolicy(req, req.body);
 
     res.status(httpStatus.CREATED).send({
@@ -22,28 +18,24 @@ const create_Payroll_Process_Policy = catchAsync(async (req, res) => {
       message: HttpResponseMessages.CREATED,
       data: _Payroll_Process_Policy
     });
-
   }  catch (error) {
    
     if (error.parent.errno === 1062) {
      throw new ApiError(httpStatus.NOT_FOUND, "Duplicate entry not allowed!");
    }
    else {
-    
      throw error;
    }
  }
 });
 
 const getAll_Payroll_Process_Policy = catchAsync(async (req, res) => {
-  console.log("get _Payroll_Process_Policys");
   const obj = {};
   const filter = obj;
   // const options = pick(req.body, ["sortBy", "limit", "page"]);
   const options = pick(req.body, ['sortOrder', 'pageSize', 'pageNumber']);
   const searchQuery = req.body.filter.searchQuery? req.body.filter.searchQuery : '';
   const result = await PayrollProcessPolicy.PayrollProcessPolicy.queryPayrollPolicy(filter, options,searchQuery);
-  console.log("resp2",result);
   res.send({
     code: HttpStatusCodes.OK,
     message: HttpResponseMessages.OK,
@@ -52,8 +44,6 @@ const getAll_Payroll_Process_Policy = catchAsync(async (req, res) => {
 });
 
 const get_Payroll_Process_PolicyById = catchAsync(async (req, res) => {
-  console.log("_Payroll_Process_Policy Controller get_Payroll_Process_PolicyId")
-  console.log(req.body)
   const Receipt = await PayrollProcessPolicy.PayrollProcessPolicy.getPayrollPolicyById(req.body.Id);
   if (!Receipt) {
     throw new ApiError(httpStatus.NOT_FOUND, "Receipt not found");
@@ -66,7 +56,6 @@ const get_Payroll_Process_PolicyById = catchAsync(async (req, res) => {
 });
 
 const update_Payroll_Process_Policy = catchAsync(async (req, res) => {
-  console.log("update_policy::",req.body);
   const Receipt = await PayrollProcessPolicy.PayrollProcessPolicy.updatePayrollPolicyById(req.body.body.Id, req.body.body, req.user.Id,req.body);
   res.send({
     code: HttpStatusCodes.OK,
@@ -76,7 +65,6 @@ const update_Payroll_Process_Policy = catchAsync(async (req, res) => {
 });
 
 const delete_Payroll_Process_Policy = catchAsync(async (req, res) => {
-  console.log("req.body.Id " ,req.body.Id)
   const Receipt = await PayrollProcessPolicy.PayrollProcessPolicy.deletePayrollPolicyById(req.body.Id);
   res.send({
     code: HttpStatusCodes.OK,

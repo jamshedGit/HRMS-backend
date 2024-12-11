@@ -11,12 +11,14 @@ const createItem = {
     employer_uniqueId : Joi.disallow(),
     payroll_approverId : Joi.disallow(),
     payroll_groupId : Joi.disallow(),
+    basicSalaryId : Joi.disallow(),
 
     //-- Email Sender ------------
     sender_emailId : Joi.disallow(),
     employee_email_recipentId : Joi.disallow(),
 
     //-- Accounting Impact ----
+    isEnableAccounting : Joi.disallow(),
     basic_pay_accountId : Joi.disallow(),
     payroll_payable_accountId : Joi.disallow(),
     isGroupEarningOnAccount : Joi.disallow(),
@@ -24,6 +26,7 @@ const createItem = {
     isAccrueGratuityOnPayroll : Joi.disallow(),
 
    // -- Tax Integration
+    isEnableTax : Joi.disallow(),
     payrollTax_DeductionTypeId : Joi.disallow(),
     arrearTaxDeductionId : Joi.disallow(),
     isTrackDeductionHistory : Joi.disallow(),
@@ -43,6 +46,7 @@ const createItem = {
     loanDeductionId : Joi.disallow(),
     //--  EOBI Configuration
     isEnableEOBI : Joi.disallow(),
+    eobi_basis : Joi.disallow(),
     eobi_deductionId : Joi.disallow(),
     eobi_earningId : Joi.disallow(),
     isIncludeBasic : Joi.disallow(),
@@ -51,6 +55,7 @@ const createItem = {
 
     // SESSI Configuration
     isEnableSESSI : Joi.disallow(),
+    sessi_basis : Joi.disallow(),
     sessi_deductionId : Joi.disallow(),
     sessi_earningId : Joi.disallow(),
     isIncludeBasic : Joi.disallow(),
