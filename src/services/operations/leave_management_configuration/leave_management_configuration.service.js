@@ -151,7 +151,7 @@ const getleaveManagementConfigurationByForEdit = async (body) => {
       [
         {
           model: LeaveTypePoliciesModel,
-          attributes: ['Id', 'leaveType', 'gender', 'minExp', 'maxAllowed', 'attachmentRequired', 'maritalStatus']
+          attributes: ['Id', 'leaveType', 'gender', 'minExp', 'maxAllowed', 'attachmentRequired', 'maritalStatus', 'entitledAt', 'encashable', 'encashableCount', 'carryForwardable', 'carryForwardableCount']
         },
         {
           model: LeaveTypeSalaryDeductionPoliciesModel,

@@ -1,4 +1,4 @@
-const { RoleModel, ResourceModel, CountryModel, CityModel, StatusTypeModel, BankModel, DeptModel, FormModel, EmployeeProfileModel, BranchModel, EmployeeSalaryRevisionModel, LeaveTypeModel, FiscalSetupModel, SubsidiaryModel, LeaveManagementConfigurationModel, LeaveTypePoliciesModel, AllocateLeavesModel, Employee_ShiftModel } = require('../../models');
+const { RoleModel, ResourceModel, CountryModel, CityModel, StatusTypeModel, BankModel, DeptModel, FormModel, EmployeeProfileModel, BranchModel, EmployeeSalaryRevisionModel, LeaveTypeModel, FiscalSetupModel, SubsidiaryModel, LeaveManagementConfigurationModel, LeaveTypePoliciesModel, AllocateLeavesModel, Employee_ShiftModel, LeaveTypeModelAccess } = require('../../models');
 const { getDdlItems, getAlarmTimesItems, formatDates, createFiscalYearLabel, createEmployeeShiftLabel } = require('../../utils/common');
 const { DDL_FIELD_NAMES } = require('../../utils/constants');
 const { getRoleById } = require('./role.service');
@@ -179,8 +179,10 @@ const getLeaveTypesData = async (employeeId) => {
 
       if (leaveConfigData?.t_leave_type_policies?.length) {
         LeaveTypeData = getDdlItems(DDL_FIELD_NAMES.LeaveType, await LeaveTypeModel.findAll({
-          where: { Id: leaveConfigData?.t_leave_type_policies.map((el) => el.leaveType) },
-          attributes: ['name', 'Id']
+          where: { Id: leaveConfigData?.t_leave_type_policies.map((el) => el.leaveType), subsidiaryId: {
+            [Op.like]: Sequelize.fn('CONCAT', '%', `${employeeWithLeaveConfig.subsidiaryId}`, '%')
+          } },
+          attributes: ['name', 'Id', 'type']
         }));
       }
 
@@ -199,8 +201,16 @@ const getLeaveTypesDataBySubsidiary = async (subsidiaryId) => {
   let LeaveTypeData = [];
   if (subsidiaryId) {
     LeaveTypeData = getDdlItems(DDL_FIELD_NAMES.LeaveType, await LeaveTypeModel.findAll({
-      where: {subsidiaryId: subsidiaryId},
-      attributes: ['name', 'Id']
+      // where: {subsidiaryId: subsidiaryId},
+      include: [
+        {
+          model: LeaveTypeModelAccess, 
+          where: { subsidiaryId: subsidiaryId },
+          required: true,
+          attributes: []
+        }
+      ],
+      attributes: ['name', 'Id', 'type']
     }));
   }
   LeaveTypeData.unshift({ label: '--Select--', value: null })

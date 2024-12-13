@@ -37,6 +37,7 @@ const getDdlItems = (
     code: i[columns.codeField],
     subsidiaryId:i[columns.subsidiaryId],
     currencyId:i[columns?.currencyId],
+    type: i[columns.typeField]
 
 
    

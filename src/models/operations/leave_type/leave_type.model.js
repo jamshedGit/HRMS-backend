@@ -18,6 +18,20 @@ LeaveTypeModel.init(
       autoIncrement: true,
       primaryKey: true
     },
+    subsidiaryId: {
+      type: DataTypes.JSON,
+      allowNull: true,
+      set(value) {
+        this.setDataValue('subsidiaryId', value.map((v) => Number(v)));
+      },
+      get() {
+        const storedValue = this.getDataValue('subsidiaryId');
+        if (storedValue && typeof storedValue == 'string') {
+          return JSON.parse(storedValue).map((v) => String(v));
+        }
+        return storedValue;
+      }
+    },
     code: {
       type: DataTypes.STRING,
       allowNull: false,
@@ -33,10 +47,6 @@ LeaveTypeModel.init(
     typeName: {
       type: DataTypes.STRING,
       allowNull: false,
-    },
-    subsidiaryId: {
-      type: DataTypes.INTEGER,
-      allowNull: false
     },
     companyId: {
       type: DataTypes.INTEGER,
@@ -77,23 +87,12 @@ LeaveTypeModel.init(
   }
 );
 
-// // Association with SubsidiaryModel model (subsidiaryId is a foreign key)
-SubsidiaryModel.hasMany(LeaveTypeModel, { foreignKey: 'subsidiaryId' });
-LeaveTypeModel.belongsTo(SubsidiaryModel, {
-  foreignKey: 'subsidiaryId',
-  targetKey: 'Id',  // Assuming 'Id' is the primary key in SubsidiaryModel table
+Att_Model.belongsTo(LeaveTypeModel, {
+  foreignKey: 'leave_typeId',
+  as: "leavetype",
+  targetKey: 'Id',  // Assuming 'Id' is the primary key in FormModel table
   onDelete: 'RESTRICT',
   onUpdate: 'CASCADE',
 });
-
-Att_Model.belongsTo(LeaveTypeModel, {
-	foreignKey: 'leave_typeId',
-  as: "leavetype",
-	targetKey: 'Id',  // Assuming 'Id' is the primary key in FormModel table
-	onDelete: 'RESTRICT',
-	onUpdate: 'CASCADE',
-});
-
-
 
 module.exports = LeaveTypeModel;

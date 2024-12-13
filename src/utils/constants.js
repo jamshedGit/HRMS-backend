@@ -70,6 +70,7 @@ const DDL_FIELD_NAMES = {
   LeaveType:{
     labelField: 'name',
     valueField: 'Id',
+    typeField: 'type'
   },
 
   Subsidiary:{
