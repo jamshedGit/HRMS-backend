@@ -1,8 +1,8 @@
 const httpStatus = require("http-status");
-const  Tax_slabModel  = require("../../../models/index");
+const { Tax_slabModel, TaxSetupModel, SubsidiaryModel } = require("../../../models/index");
 const ApiError = require("../../../utils/ApiError");
 const Sequelize = require('sequelize');
-const { paginationFacts } = require("../../../utils/common");
+const { paginationFacts, check_range_exist } = require("../../../utils/common");
 const { HttpStatusCodes } = require("../../../utils/constants");
 
 
@@ -14,45 +14,100 @@ const Op = Sequelize.Op;
  */
 // const createtax_slab = async (req, tax_slabBody) => {
 
+const get_all_taxYear_setup = async (req, res) => {
+  // const result = await TaxSetupModel.findAndCountAll({
+  //   order: [
+  //     ['createdAt', 'DESC'],
+  //   ],
+  //   where: {
+  //     isActive: true,
+  //   },
+  //   attributes: ['Id', 'subsidiaryId', 'subsidiary', 'isActive'],
+  //   // include: [
+  //   //   {
+  //   //     model: SubsidiaryModel,
+  //   //     attributes: ['Id', ['name', 'subsName']],
+  //   //     as: 'subsidiary', // Ensure alias does not conflict with 'subs'
+  //   //   },
+  //   // ],
+  // });
 
+  // Destructure and return
+  
+  const result = await TaxSetupModel.findAndCountAll({
+    order: [
+      ['createdAt', 'DESC'],
+    ],
+    where: {
+      isActive: true,
+    },
+    attributes: ['Id', 'subsidiaryId', 'isActive'],
+  
+  });
+  
+  // Destructure and return
+  return { count: result.count, rows: result.rows };
+  
+
+
+
+}
 
 const createtax_slab = async (req, tax_slabBody) => {
-    tax_slabBody.createdBy = req.user.id;
+  tax_slabBody.createdBy = req.user.id;
 
-    const { from_amount, to_amount } = tax_slabBody;
 
-    // Validate that from_amount is less than to_amount
-    if (from_amount >= to_amount) {
-     
-        let result={"message":'From Amount must be less than To Amount.',"status":"error"}
-        return result;
-        
+  const { from_amount, to_amount } = tax_slabBody;
 
-        
-    }
+  // Validate that from_amount is less than to_amount
+  if (from_amount >= to_amount) {
 
-    // Check for existing records that overlap with the new record
-    const existingSlab = await Tax_slabModel.Tax_slabModel.findOne({
-        where: {
-            [Op.or]: [
-                { from_amount: { [Op.between]: [from_amount, to_amount] } },
-                { to_amount: { [Op.between]: [from_amount, to_amount] } },
-                { from_amount: { [Op.lte]: from_amount }, to_amount: { [Op.gte]: to_amount } }
-            ]
-        }
-    });
+    let result = { "message": 'From Amount must be less than To Amount.', "status": "error" }
+    return result;
 
-    if (existingSlab) {
 
-      let result={"message":'Record already exist.',"status":"error"}
-      return result;
-        // return 'New tax slab overlaps with existing slabs. Cannot insert the record.';
-        // throw new ApiError(httpStatus.NOT_FOUND, "New tax slab overlaps with existing slabs. Cannot insert the record.");
-    }
 
-    const addedtax_slabObj = await Tax_slabModel.Tax_slabModel.create(tax_slabBody);
-   
-    return addedtax_slabObj;
+  }
+
+  // Check for existing records that overlap with the new record
+  // const existingSlab = await Tax_slabModel.Tax_slabModel.findOne({
+  //     where: {
+  //         [Op.or]: [
+  //             { from_amount: { [Op.between]: [from_amount, to_amount] } },
+  //             { to_amount: { [Op.between]: [from_amount, to_amount] } },
+  //             { from_amount: { [Op.lte]: from_amount }, to_amount: { [Op.gte]: to_amount } }
+  //         ]
+  //     }
+  // });
+
+  // const result = await TaxSetupModel.findOne({
+  //   where: {
+  //     subsidiaryId: tax_slabBody.subsidiaryId, // Add a comma here
+  //     isActive: true,
+  //   },
+  // });
+  
+  
+  const existingSlab = await check_range_exist(
+    tax_slabBody,
+    "Tax_slabModel",
+    "from_amount",
+    "to_amount",
+    (fieldMappings = ["subsidiaryId", "taxSetupId"])
+  );
+
+
+  if (existingSlab) {
+
+    let result = { "message": 'Record already exist.', "status": "error" }
+    return result;
+    // return 'New tax slab overlaps with existing slabs. Cannot insert the record.';
+    // throw new ApiError(httpStatus.NOT_FOUND, "New tax slab overlaps with existing slabs. Cannot insert the record.");
+  }
+
+  const addedtax_slabObj = await Tax_slabModel.create(tax_slabBody);
+
+  return addedtax_slabObj;
 };
 
 
@@ -67,17 +122,20 @@ const createtax_slab = async (req, tax_slabBody) => {
  * @returns {Promise<QueryResult>}
  */
 const querytax_slab = async (filter, options, searchQuery) => {
-  
+
   let limit = options.pageSize;
   let offset = 0 + (options.pageNumber - 1) * limit;
-  
+
   searchQuery = searchQuery.toLowerCase();
   const queryFilters = [
     { from_amount: Sequelize.where(Sequelize.fn('', Sequelize.col('from_amount')), 'LIKE', '%' + searchQuery + '%') },
+    {
+      '$subsidiary.name$': { [Sequelize.Op.like]: '%' + searchQuery + '%' }  
+    },
   ]
 
 
-  const { count, rows } = await Tax_slabModel.Tax_slabModel.findAndCountAll({
+  const { count, rows } = await Tax_slabModel.findAndCountAll({
     order: [
       ['from_amount', 'ASC']
     ],
@@ -87,11 +145,18 @@ const querytax_slab = async (filter, options, searchQuery) => {
     },
     offset: offset,
     limit: limit,
+    include: [
+      {
+        model: SubsidiaryModel,
+        attributes: ["name"],
+        as: "Subsidiary",
+      },
+    ]
   });
 
 
   return paginationFacts(count, limit, options.pageNumber, rows);
-  
+
 };
 
 /**
@@ -100,7 +165,7 @@ const querytax_slab = async (filter, options, searchQuery) => {
  * @returns {Promise<ReceiptModel>}
  */
 const gettax_slabById = async (id) => {
-  return Tax_slabModel.Tax_slabModel.findByPk(id);
+  return Tax_slabModel.findByPk(id);
 };
 
 
@@ -115,44 +180,44 @@ const gettax_slabById = async (id) => {
 
 
 const updatetax_slabById = async (Id, updateBody, updatedBy) => {
-    const Item = await gettax_slabById(Id);
-    if (!Item) {
-        throw new ApiError(httpStatus.NOT_FOUND, "Record not found");
-    }
+  const Item = await gettax_slabById(Id);
+  if (!Item) {
+    throw new ApiError(httpStatus.NOT_FOUND, "Record not found");
+  }
 
-    const { from_amount, to_amount } = updateBody;
+  const { from_amount, to_amount } = updateBody;
 
-    if (from_amount >= to_amount) {
+  if (from_amount >= to_amount) {
 
-      let result={"message":'From Amount must be less than To Amount',"status":"error"}
-        return result;
-    }
-
-
-    const overlappingSlab = await Tax_slabModel.Tax_slabModel.findOne({
-        where: {
-            id: { [Op.ne]: Id },
-          [Op.or]: [
-            { from_amount: { [Op.between]: [from_amount, to_amount] } },
-            { to_amount: { [Op.between]: [from_amount, to_amount] } },
-            { from_amount: { [Op.lte]: from_amount }, to_amount: { [Op.gte]: to_amount } }
-          ]
-        }
-      });
-
-    if (overlappingSlab) {
-
-    let result={"message":'Record already exist.',"status":"error"}
+    let result = { "message": 'From Amount must be less than To Amount', "status": "error" }
     return result;
+  }
+
+  const overlappingSlab = await Tax_slabModel.findOne({
+    where: {
+      id: { [Op.ne]: Id },
+      [Op.or]: [
+        { from_amount: { [Op.between]: [from_amount, to_amount] } },
+        { to_amount: { [Op.between]: [from_amount, to_amount] } },
+        { from_amount: { [Op.lte]: from_amount }, to_amount: { [Op.gte]: to_amount } }
+      ]
     }
+  });
 
-    updateBody.updatedBy = updatedBy;
-    delete updateBody.id;  // Optionally keep this if your model has a primary key
 
-    Object.assign(Item, updateBody);
-    await Item.save();
-    
-    return Item;  // Return the updated item
+  if (overlappingSlab) {
+
+    let result = { "message": 'Record already exist.', "status": "error" }
+    return result;
+  }
+
+  updateBody.updatedBy = updatedBy;
+  delete updateBody.id;  // Optionally keep this if your model has a primary key
+
+  Object.assign(Item, updateBody);
+  await Item.save();
+
+  return Item;  // Return the updated item
 };
 
 
@@ -161,7 +226,7 @@ const updatetax_slabById = async (Id, updateBody, updatedBy) => {
  * @param {ObjectId} Id
  * @returns {Promise<ReceiptModel>}
  */
-  const deletetax_slabById = async (Id) => {
+const deletetax_slabById = async (Id) => {
 
   const Item = await gettax_slabById(Id);
   if (!Item) {
@@ -178,5 +243,6 @@ module.exports = {
   querytax_slab,
   gettax_slabById,
   updatetax_slabById,
-  deletetax_slabById
+  deletetax_slabById,
+  get_all_taxYear_setup
 };

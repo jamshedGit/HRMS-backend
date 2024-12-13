@@ -10,6 +10,18 @@ const {
   HttpResponseMessages,
 } = require("../../../../utils/constants");
 
+const getAllTaxYearSetup = catchAsync(async (req, res) => {
+
+
+  const result = await tax_slabformService.tax_slabFormService.get_all_taxYear_setup(req, res);
+
+  res.send({
+    code: HttpStatusCodes.OK,
+    message: HttpResponseMessages.OK,
+    data: result,
+  });
+});
+
 const createtax_slab = catchAsync(async (req, res) => {
 
   try {
@@ -114,5 +126,6 @@ module.exports = {
   getAlltax_slabs,
   gettax_slabById,
   updatetax_slab,
-  deletetax_slab
+  deletetax_slab,
+  getAllTaxYearSetup,
 };
