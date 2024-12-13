@@ -51,14 +51,15 @@ const createtax_slab = catchAsync(async (req, res) => {
 });
 
 const getAlltax_slabs = catchAsync(async (req, res) => {
-
+console.log("req.body111",req.body)
   const obj = {};
   const filter = obj;
   // const options = pick(req.body, ["sortBy", "limit", "page"]);
   const options = pick(req.body, ['sortOrder', 'pageSize', 'pageNumber']);
   const searchQuery = req.body.filter.searchQuery? req.body.filter.searchQuery : '';
-
-  const result = await tax_slabformService.tax_slabFormService.querytax_slab(filter, options,searchQuery);
+  const subsidiaryId=req.body?.subsidiaryId
+ const  taxSetupId=req.body?.taxSetupId
+  const result = await tax_slabformService.tax_slabFormService.querytax_slab(filter, options,searchQuery, subsidiaryId, taxSetupId);
 
   res.send({
     code: HttpStatusCodes.OK,

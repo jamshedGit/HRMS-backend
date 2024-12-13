@@ -38,10 +38,10 @@ const get_all_taxYear_setup = async (req, res) => {
     order: [
       ['createdAt', 'DESC'],
     ],
-    where: {
-      isActive: true,
-    },
-    attributes: ['Id', 'subsidiaryId', 'isActive'],
+    // where: {
+    //   isActive: true,
+    // },
+    attributes: ['Id', 'subsidiaryId', 'isActive','startDate','endDate'],
   
   });
   
@@ -120,9 +120,54 @@ const createtax_slab = async (req, tax_slabBody) => {
  * @param {number} [options.limit] - Maximum number of results per page (default = 10)
  * @param {number} [options.page] - Current page (default = 1)
  * @returns {Promise<QueryResult>}
+ * 
+ * 
  */
-const querytax_slab = async (filter, options, searchQuery) => {
 
+
+
+//Original
+// const querytax_slab = async (filter, options, searchQuery) => {
+
+//   let limit = options.pageSize;
+//   let offset = 0 + (options.pageNumber - 1) * limit;
+
+//   searchQuery = searchQuery.toLowerCase();
+//   const queryFilters = [
+//     { from_amount: Sequelize.where(Sequelize.fn('', Sequelize.col('from_amount')), 'LIKE', '%' + searchQuery + '%') },
+//     {
+//       '$subsidiary.name$': { [Sequelize.Op.like]: '%' + searchQuery + '%' }  
+//     },
+//   ]
+
+
+//   const { count, rows } = await Tax_slabModel.findAndCountAll({
+//     order: [
+//       ['from_amount', 'ASC']
+//     ],
+//     where: {
+//       [Op.or]: queryFilters,
+//       // isActive: true
+//     },
+//     offset: offset,
+//     limit: limit,
+//     include: [
+//       {
+//         model: SubsidiaryModel,
+//         attributes: ["name"],
+//         as: "Subsidiary",
+//       },
+//     ]
+//   });
+
+
+//   return paginationFacts(count, limit, options.pageNumber, rows);
+
+// };
+
+
+const querytax_slab = async (filter, options, searchQuery, subsidiaryId,taxSetupId) => {
+console.log("subsidiaryId,taxSetupId", subsidiaryId,taxSetupId)
   let limit = options.pageSize;
   let offset = 0 + (options.pageNumber - 1) * limit;
 
@@ -141,7 +186,8 @@ const querytax_slab = async (filter, options, searchQuery) => {
     ],
     where: {
       [Op.or]: queryFilters,
-      // isActive: true
+       subsidiaryId, // Directly include the subsidiaryId filter here
+      taxSetupId, // Similarly, directly include the taxSetupId filter
     },
     offset: offset,
     limit: limit,
@@ -151,6 +197,11 @@ const querytax_slab = async (filter, options, searchQuery) => {
         attributes: ["name"],
         as: "Subsidiary",
       },
+      {
+        model: TaxSetupModel,
+        attributes: ["isActive"],
+        as: "TaxSetup",
+      },
     ]
   });
 
@@ -158,6 +209,8 @@ const querytax_slab = async (filter, options, searchQuery) => {
   return paginationFacts(count, limit, options.pageNumber, rows);
 
 };
+
+
 
 /**
  * Get Item by id
