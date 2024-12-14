@@ -2,7 +2,7 @@ const httpStatus = require("http-status");
 const { Tax_slabModel, TaxSetupModel, SubsidiaryModel } = require("../../../models/index");
 const ApiError = require("../../../utils/ApiError");
 const Sequelize = require('sequelize');
-const { paginationFacts, check_range_exist } = require("../../../utils/common");
+const { paginationFacts, check_range_exist, createTaxYearSetupLabel } = require("../../../utils/common");
 const { HttpStatusCodes } = require("../../../utils/constants");
 
 
@@ -15,38 +15,36 @@ const Op = Sequelize.Op;
 // const createtax_slab = async (req, tax_slabBody) => {
 
 const get_all_taxYear_setup = async (req, res) => {
+
   // const result = await TaxSetupModel.findAndCountAll({
   //   order: [
   //     ['createdAt', 'DESC'],
   //   ],
-  //   where: {
-  //     isActive: true,
-  //   },
-  //   attributes: ['Id', 'subsidiaryId', 'subsidiary', 'isActive'],
-  //   // include: [
-  //   //   {
-  //   //     model: SubsidiaryModel,
-  //   //     attributes: ['Id', ['name', 'subsName']],
-  //   //     as: 'subsidiary', // Ensure alias does not conflict with 'subs'
-  //   //   },
-  //   // ],
+  //   // where: {
+  //   //   isActive: true,
+  //   // },
+  //   attributes: ['Id', 'subsidiaryId', 'isActive','startDate','endDate'],
+  
   // });
-
-  // Destructure and return
   
-  const result = await TaxSetupModel.findAndCountAll({
-    order: [
-      ['createdAt', 'DESC'],
-    ],
-    // where: {
-    //   isActive: true,
-    // },
-    attributes: ['Id', 'subsidiaryId', 'isActive','startDate','endDate'],
-  
+  const result = []
+  const yearData = await TaxSetupModel.findAll({
+    attributes: ['Id','subsidiaryId', 'isActive','startDate', 'endDate',]
   });
-  
-  // Destructure and return
-  return { count: result.count, rows: result.rows };
+  if (yearData.length) {
+    yearData.forEach(element => {
+      if (element.startDate && element.endDate) {
+        result.push({
+          label: createTaxYearSetupLabel(element.endDate, element.startDate,element.isActive),
+          value: element.Id,
+          subsidiaryId:element.subsidiaryId,
+          isActive:element.isActive
+        })
+      }
+    });
+  }
+
+  return { count: result.count, rows: result};
   
 
 
@@ -64,9 +62,20 @@ const createtax_slab = async (req, tax_slabBody) => {
 
     let result = { "message": 'From Amount must be less than To Amount.', "status": "error" }
     return result;
+  }
 
+    const taxSetupExist = await TaxSetupModel.findOne({
+    where: {
+      id:tax_slabBody?.taxSetupId,
+      isActive: true,
+      subsidiaryId:tax_slabBody?.subsidiaryId
+    },
+    attributes: ['Id', 'subsidiaryId', 'isActive'],
 
-
+  });
+  if(!taxSetupExist){
+    let result = { "message": 'Incorrect tax setup.', "status": "error" }
+    return result;
   }
 
   // Check for existing records that overlap with the new record
@@ -87,6 +96,7 @@ const createtax_slab = async (req, tax_slabBody) => {
   //   },
   // });
   
+
   
   const existingSlab = await check_range_exist(
     tax_slabBody,
@@ -167,7 +177,7 @@ const createtax_slab = async (req, tax_slabBody) => {
 
 
 const querytax_slab = async (filter, options, searchQuery, subsidiaryId,taxSetupId) => {
-console.log("subsidiaryId,taxSetupId", subsidiaryId,taxSetupId)
+
   let limit = options.pageSize;
   let offset = 0 + (options.pageNumber - 1) * limit;
 
@@ -249,6 +259,8 @@ const updatetax_slabById = async (Id, updateBody, updatedBy) => {
   const overlappingSlab = await Tax_slabModel.findOne({
     where: {
       id: { [Op.ne]: Id },
+      subsidiaryId: updateBody.subsidiaryId,  // Add subsidiaryId condition
+      taxSetupId: updateBody.taxSetupId,
       [Op.or]: [
         { from_amount: { [Op.between]: [from_amount, to_amount] } },
         { to_amount: { [Op.between]: [from_amount, to_amount] } },

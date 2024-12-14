@@ -11,8 +11,8 @@ const Tax_slabModel = sequelize.define('t_tax_slab', {
 		primaryKey: true
 	},
 
-    from_amount: { type: Sequelize.STRING,allowNull: false },
-	to_amount: { type: Sequelize.INTEGER },
+    from_amount: { type: Sequelize.INTEGER,allowNull: false },
+	to_amount: { type: Sequelize.INTEGER ,allowNull: false },
 	percentage: { type: Sequelize.DECIMAL, allowNull: false },
     fixed_amount: { type: Sequelize.INTEGER, allowNull: false },
 	subsidiaryId: { type: Sequelize.INTEGER,allowNull: false,defaultValue: 1 },
