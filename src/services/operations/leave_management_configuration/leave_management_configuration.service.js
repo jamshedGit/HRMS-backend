@@ -1,5 +1,5 @@
 const httpStatus = require("http-status");
-const { LeaveManagementConfigurationModel, LeaveTypePoliciesModel, LeaveTypeSalaryDeductionPoliciesModel, FormModel, SubsidiaryModel } = require("../../../models/index");
+const { LeaveManagementConfigurationModel, LeaveTypePoliciesModel, LeaveTypeSalaryDeductionPoliciesModel, FormModel, SubsidiaryModel, LeaveTypeModel } = require("../../../models/index");
 const ApiError = require("../../../utils/ApiError");
 const Sequelize = require('sequelize');
 const { paginationFacts, handleNestedData } = require("../../../utils/common");
@@ -64,7 +64,7 @@ const leaveManagementConfigurationAttributes = [
  */
 const createleaveManagementConfiguration = async (req) => {
   const { leavetypePolicies, leaveTypeSalaryDeductionPolicies, ...payload } = req.body //Seperate Policies data from Leave Configuration data
-  const createdData = await LeaveManagementConfigurationModel.create({...payload, employeeTypeId: null, gradeId: null});  //Create Leave Configuration Data
+  const createdData = await LeaveManagementConfigurationModel.create({ ...payload, employeeTypeId: null, gradeId: null });  //Create Leave Configuration Data
   if (createdData) {  //If Leave Configuration is created then create the tables data
     const createdPolicyData = await LeaveTypePoliciesModel.bulkCreate(leavetypePolicies.map((el) => ({ ...el, leaveManagementConfigId: createdData.Id })))
     const createdSalaryDeductionData = await LeaveTypeSalaryDeductionPoliciesModel.bulkCreate(leaveTypeSalaryDeductionPolicies.map((el) => ({ ...el, leaveManagementConfigId: createdData.Id })))
@@ -145,28 +145,54 @@ const getleaveManagementConfigurationById = async (id, options = null) => {
  */
 const getleaveManagementConfigurationByForEdit = async (body) => {
   if (body) {
+    const tempData = await getleaveManagementConfigurationData({...body}, ['subsidiaryId', 'Id'])
+    if (!tempData) {
+      return null;  //If we don't get any data then return null
+    }
+    
     const data = await getleaveManagementConfigurationData(
-      { ...body },
+      { Id: tempData.Id },
       ['subsidiaryId', 'weekend', 'isSandwich', 'Id'],
       [
         {
           model: LeaveTypePoliciesModel,
-          attributes: ['Id', 'leaveType', 'gender', 'minExp', 'maxAllowed', 'attachmentRequired', 'maritalStatus', 'entitledAt', 'encashable', 'encashableCount', 'carryForwardable', 'carryForwardableCount']
+          attributes: ['Id', 'leaveType', 'gender', 'minExp', 'maxAllowed', 'attachmentRequired', 'maritalStatus', 'entitledAt', 'encashable', 'encashableCount', 'carryForwardable', 'carryForwardableCount'],
+          include: [{
+            model: LeaveTypeModel, 
+            where: {
+              subsidiaryId: {
+                [Op.like]: Sequelize.fn('CONCAT', '%', `${tempData.subsidiaryId}`, '%')
+              }
+            },
+            attributes: [],
+            required: true
+          }]
         },
         {
           model: LeaveTypeSalaryDeductionPoliciesModel,
-          attributes: ['Id', 'leaveType', 'minLeave', 'maxLeave', 'deduction', 'leaveStatus']
+          attributes: ['Id', 'leaveType', 'minLeave', 'maxLeave', 'deduction', 'leaveStatus'],
+          include: [{
+            model: LeaveTypeModel, 
+            where: {
+              subsidiaryId: {
+                [Op.like]: Sequelize.fn('CONCAT', '%', `${tempData.subsidiaryId}`, '%')
+              }
+            },
+            attributes: [],
+            required: true
+          }]
         }
       ]
     )
-    if(!data){
+
+    if (!data) {
       return null;  //If we don't get any data then return null
     }
-    const{t_leave_type_policies, t_leave_type_salary_deduction_policies, ...rest} = data.dataValues;  //Seperate Table values from the returned data and change their keys for frontend handling
+    const { t_leave_type_policies, t_leave_type_salary_deduction_policies, ...rest } = data.dataValues;  //Seperate Table values from the returned data and change their keys for frontend handling
     rest.leavetypePolicies = t_leave_type_policies || [];
     rest.leaveTypeSalaryDeductionPolicies = t_leave_type_salary_deduction_policies || [];
     rest.weekend = JSON.parse(rest.weekend || '[]');  //We get weekend data stringified from Db so we parse it before sending it to Frontend
-    
+
     return rest;  //return processed data
   }
 };
@@ -213,7 +239,7 @@ const updateleaveManagementConfigurationById = async (body, updatedBy) => {
   const { leavetypePolicies, leaveTypeSalaryDeductionPolicies, ...payload } = body  //Seperate Policies data from Leave Configuration data
   oldRecord = await getleaveManagementConfigurationById(payload.Id) // Get Old Data By Id
   body.updatedBy = updatedBy;
-  Object.assign(oldRecord, {...payload, employeeTypeId: null, gradeId: null});  //Update Old Data with New Data
+  Object.assign(oldRecord, { ...payload, employeeTypeId: null, gradeId: null });  //Update Old Data with New Data
   const updatedData = await oldRecord.save();
 
   //If Configuration data is updated then upsert Table data into Leave Type Policies and Leave Type Salary Deductions policies table
