@@ -80,13 +80,22 @@ const queryPayrollMonths = async (filter, options, searchQuery) => {
 
 const SP_GetActivePreviousPayrollMonth = async (p_subsidiaryId) => {
   try {
-    console.log("EmployeeTransfer p_subsidiaryId", p_subsidiaryId);
-    const results = await sequelize.query('CALL usp_GetActivePreviousPayrollMonth(:p_subsidiaryId)', {
-      replacements: { p_subsidiaryId: p_subsidiaryId || 'null' },
-      type: Sequelize.QueryTypes.RAW // Use RAW type for executing stored procedures
-    });
 
-    console.log("tsubs:::",results)
+    // const results = await sequelize.query('CALL usp_GetActivePreviousPayrollMonth(:p_subsidiaryId)', {
+    //   replacements: { p_subsidiaryId: p_subsidiaryId || 'null' },
+    //   type: Sequelize.QueryTypes.RAW // Use RAW type for executing stored procedures
+    // });
+    // select * from t_payroll_month_setup where isActive = 1 AND subsidiaryId=p_subsidiaryId
+
+   const results = await PayrollMonthModel.PayrollMonthModel.findAndCountAll({
+       where: {
+         subsidiaryId: p_subsidiaryId,
+         isActive:true
+       
+       },
+     });
+ 
+
 
     return results;
   } catch (error) {
