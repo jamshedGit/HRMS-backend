@@ -87,7 +87,7 @@ const SP_GetActivePreviousPayrollMonth = async (p_subsidiaryId) => {
     // });
     // select * from t_payroll_month_setup where isActive = 1 AND subsidiaryId=p_subsidiaryId
 
-   const results = await PayrollMonthModel.PayrollMonthModel.findAndCountAll({
+   const results = await PayrollMonthModel.PayrollMonthModel.findOne({
        where: {
          subsidiaryId: p_subsidiaryId,
          isActive:true
