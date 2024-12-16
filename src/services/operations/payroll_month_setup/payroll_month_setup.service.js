@@ -17,7 +17,7 @@ const Op = Sequelize.Op;
  */
 const createPayrollMonth = async (req, PayrollMonthBody) => {
    
-  console.log("PayrollMonthBody",PayrollMonthBody);
+
   PayrollMonthBody.createdBy = req.user.id;
  
   const resp = await sequelize.query(' update t_payroll_month_Setup set isActive = 0 where subsidiaryId =  ' + PayrollMonthBody.subsidiaryId);
@@ -119,12 +119,12 @@ const getPayrollMonthById = async (id) => {
  * @returns {Promise<ReceiptModel>}
  */
 const updatePayrollMonthById = async (Id, updateBody, updatedBy) => {
-  console.log("tool",Id, updateBody, updatedBy)
+
   const Item = await getPayrollMonthById(Id);
   if (!Item) {
     throw new ApiError(httpStatus.NOT_FOUND, "record not found");
   }
-  //console.log("Update Receipt Id" , item);
+
   // updateBody.slug = updateBody.name.replace(/ /g, "-").toLowerCase()
   updateBody.updatedBy = updatedBy;
   delete updateBody.id;
