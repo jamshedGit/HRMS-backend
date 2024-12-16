@@ -47,6 +47,7 @@ router.route('/read-all-subsidiaries').get(auth(), validate(settingValidation.ge
 router.route('/read-all-fiscal-year').get(auth(), validate(settingValidation.getAllSubsidiaries), settingController.getAllFiscalYears);
 router.route('/read-encashment-leave-types').post(auth(), validate(settingValidation.getAllLeaveType), settingController.getEncashmentLeaveType);
 router.route('/read-all-employee-shift').post(auth(), validate(settingValidation.getAllLeaveType), settingController.getAllEmployeeShift);
+router.route('/read-current-fiscal-year').post(auth(), validate(settingValidation.getAllLeaveTypeBySubsidiary), settingController.getCurrentFiscalYears);
 
 router.route('/get-max-tableId').post(validate(settingValidation.getFormMenuMasterData),  settingController.GetLastInserted_ID_ByTableName);
 

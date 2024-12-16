@@ -331,6 +331,20 @@ const getAllFiscalYearData = async () => {
   return result;
 };
 
+const getActiveFiscalYearData = async (subsidiaryId) => {
+  if (subsidiaryId) {
+    const data = await FiscalSetupModel.findOne({
+      where: { isActive: true, subsidiaryId: subsidiaryId },
+      attributes: ['startDate', 'endDate', 'Id']
+    });
+    if (!data) {
+      return null;
+    }
+    return { label: createFiscalYearLabel(data.endDate, data.startDate) }
+  }
+  return null;
+};
+
 
 const getCitiesMasterData = async (countryId) => {
   const filter = { isActive: true }
@@ -381,5 +395,6 @@ module.exports = {
   getAllFiscalYearData,
   getEncashmentLeaveTypeData,
   getAllEmployeeShift,
-  getLeaveTypesDataBySubsidiary
+  getLeaveTypesDataBySubsidiary,
+  getActiveFiscalYearData
 };

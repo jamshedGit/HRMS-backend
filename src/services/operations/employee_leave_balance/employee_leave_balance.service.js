@@ -1,9 +1,10 @@
 const httpStatus = require("http-status");
-const { AllocateLeavesModel, EmployeeProfileModel, LeaveApplicationModel, LeaveApplicationDetailModel, FiscalSetupModel, EmployeeLeaveBalanceModel, LeaveTypeModel, LeaveEncashmentModel } = require("../../../models/index");
+const { AllocateLeavesModel, EmployeeProfileModel, LeaveApplicationModel, LeaveApplicationDetailModel, FiscalSetupModel, EmployeeLeaveBalanceModel, LeaveTypeModel, LeaveEncashmentModel, LeaveTypePoliciesModel, LeaveManagementConfigurationModel } = require("../../../models/index");
 const ApiError = require("../../../utils/ApiError");
 const Sequelize = require('sequelize');
 const { createFiscalYearLabel } = require("../../../utils/common");
 const { POLICY_TYPE } = require("../../../models/operations/allocate_leaves/enum/allocate_leaves.enum");
+const { startOfDay } = require("date-fns");
 
 const Op = Sequelize.Op;
 
@@ -38,16 +39,33 @@ const initialValues = {
  * @returns 
  */
 const allocateLeaveBalances = async (data) => {
+
+  try {
     //Get Year start and end dates to get leaves of employee in between that year
-    const YearData = await FiscalSetupModel.findByPk(data.yearId, {
+    const YearData = await FiscalSetupModel.findOne({
+      where: { isActive: true, subsidiaryId: data.subsidiaryId },
       attributes: ['startDate', 'endDate', 'Id']
     });
+
+    const leaveTypePolicyData = await LeaveTypePoliciesModel.findAll({
+      include: [
+        {
+          model: LeaveManagementConfigurationModel,
+          where: {
+            subsidiaryId: data.subsidiaryId
+          },
+          attributes: [],
+          required: true
+        }
+      ]
+    })
 
 
     //Get Old Year data to get Old remaining leaves in case of carry forward
     const oldYearData = await FiscalSetupModel.findOne({
       where: {
-        isActive: false
+        isActive: false,
+        subsidiaryId: data.subsidiaryId
       },
       order: [['createdAt', 'DESC']],
       attributes: ['Id']
@@ -60,7 +78,7 @@ const allocateLeaveBalances = async (data) => {
     const employeeData = await EmployeeProfileModel.findAll({
       where: {
         subsidiaryId: data.subsidiaryId,
-        cycleTypeId: data.cycleTypeId
+        // dateOfJoining: startOfDay(new Date(YearData.startDate))
       },
       attributes: ['Id'],
       include: [
@@ -93,7 +111,7 @@ const allocateLeaveBalances = async (data) => {
     });
 
     if (employeeData?.length) {
-      for (const al of data.list) {
+      for (const al of leaveTypePolicyData) {
         for (const emp of employeeData) {
           //Initialize values for Leave balance Record
           const init = { ...initialValues };
@@ -101,32 +119,23 @@ const allocateLeaveBalances = async (data) => {
           //This is to check if there are any leaves remaining of last year of the same leave type that are to be carry forwarded or are to be encashed for old year
           if (emp.t_employee_leave_balances?.length) {
             const oldBalance = emp.t_employee_leave_balances.find(el => el.leaveType == al.leaveType);
+            const leavePolicy = leaveTypePolicyData.find(el => el.leaveType == al.leaveType)
 
             if (oldBalance) {
-              const allocationPolicy = await AllocateLeavesModel.findOne({
-                where: {
-                  subsidiaryId: data.subsidiaryId,
-                  cycleTypeId: data.cycleTypeId,
-                  yearId: oldYearData.Id,
-                  leaveType: al.leaveType,
-                },
-                attributes: ['policyType', 'maxCount']
-              })
-
-              if (allocationPolicy && oldBalance.remainingCount && allocationPolicy.maxCount) {
+              if (leavePolicy && oldBalance.remainingCount && leavePolicy.maxAllowed) {
                 //If Leaves are carry forwarded then they will be added to new year record
-                if (POLICY_TYPE[allocationPolicy.policyType] == POLICY_TYPE[1]) {
-                  init.carryForwardCount = oldBalance.remainingCount > allocationPolicy.maxCount ? allocationPolicy.maxCount : oldBalance.remainingCount;
+                if (leavePolicy.carryForwardable) {
+                  init.carryForwardCount = oldBalance.remainingCount > leavePolicy.carryForwardableCount ? leavePolicy.carryForwardableCount : oldBalance.remainingCount;
+                  oldBalance.remainingCount -= init.carryForwardCount
                 }
                 //If leaves are encashed then they will be added to encashed key in the old balance record and a record of their encashment is created in Leave Encashment table
-                else if (POLICY_TYPE[allocationPolicy.policyType] == POLICY_TYPE[2]) {
+                if (leavePolicy.encashable) {
                   const oldEncashmentCount = oldBalance.encashmentCount;
-                  const maxCount = allocationPolicy.maxCount - oldEncashmentCount;
+                  const maxCount = leavePolicy.encashableCount - oldEncashmentCount;
                   if (maxCount > 0) {
                     oldBalance.encashmentCount += oldBalance.remainingCount > maxCount ? maxCount : oldBalance.remainingCount;
                     oldBalance.remainingCount -= oldBalance.encashmentCount - oldEncashmentCount;
 
-                    await oldBalance.save()
                     const payload = {
                       subsidiaryId: data.subsidiaryId,
                       employeeId: emp.Id,
@@ -140,6 +149,7 @@ const allocateLeaveBalances = async (data) => {
                   }
 
                 }
+                await oldBalance.save()
               }
             }
           }
@@ -149,7 +159,7 @@ const allocateLeaveBalances = async (data) => {
             employeeId: emp.Id,
             leaveType: al.leaveType,
             yearId: YearData.Id,
-            allocatedCount: al.leaveCount
+            allocatedCount: al.maxAllowed
           });
 
           //Get the number of Availed Leaves of Employee. If no leave is availed then it will set 0
@@ -197,6 +207,10 @@ const allocateLeaveBalances = async (data) => {
         }
       }
     }
+  } catch (error) {
+    console.log(`'::init::'`, error);
+
+  }
 };
 
 /**
