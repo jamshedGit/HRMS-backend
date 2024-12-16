@@ -259,6 +259,7 @@ const getContactInfoByEmployeeId = async (id) => {
 
   ]
 
+  
   return Emp_profileModel.ContactInformationModel.findAndCountAll({
     order: [
       ['createdAt', 'DESC']
