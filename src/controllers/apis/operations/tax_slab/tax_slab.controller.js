@@ -10,6 +10,18 @@ const {
   HttpResponseMessages,
 } = require("../../../../utils/constants");
 
+const getAllTaxYearSetup = catchAsync(async (req, res) => {
+
+
+  const result = await tax_slabformService.tax_slabFormService.get_all_taxYear_setup(req, res);
+
+  res.send({
+    code: HttpStatusCodes.OK,
+    message: HttpResponseMessages.OK,
+    data: result,
+  });
+});
+
 const createtax_slab = catchAsync(async (req, res) => {
 
   try {
@@ -45,8 +57,9 @@ const getAlltax_slabs = catchAsync(async (req, res) => {
   // const options = pick(req.body, ["sortBy", "limit", "page"]);
   const options = pick(req.body, ['sortOrder', 'pageSize', 'pageNumber']);
   const searchQuery = req.body.filter.searchQuery? req.body.filter.searchQuery : '';
-
-  const result = await tax_slabformService.tax_slabFormService.querytax_slab(filter, options,searchQuery);
+  const subsidiaryId=req.body?.subsidiaryId
+ const  taxSetupId=req.body?.taxSetupId
+  const result = await tax_slabformService.tax_slabFormService.querytax_slab(filter, options,searchQuery, subsidiaryId, taxSetupId);
 
   res.send({
     code: HttpStatusCodes.OK,
@@ -114,5 +127,6 @@ module.exports = {
   getAlltax_slabs,
   gettax_slabById,
   updatetax_slab,
-  deletetax_slab
+  deletetax_slab,
+  getAllTaxYearSetup,
 };
