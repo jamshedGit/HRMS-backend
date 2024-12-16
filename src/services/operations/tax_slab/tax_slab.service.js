@@ -29,6 +29,10 @@ const get_all_taxYear_setup = async (req, res) => {
   
   const result = []
   const yearData = await TaxSetupModel.findAll({
+    order: [
+          ['startDate', 'ASC'],
+        ],
+      //   //
     attributes: ['Id','subsidiaryId', 'isActive','startDate', 'endDate',]
   });
   if (yearData.length) {
