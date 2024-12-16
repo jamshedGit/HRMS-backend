@@ -14,4 +14,9 @@ router.route("/delete-tax-slab").patch(auth(),tax_slabController.deletetax_slab)
 // router.route("/donation-report").post(auth(),validate(receiptValidation.getDonationReceiptByBookNo),receiptController.getDonationReceiptReport);
 
 router.route("/create-tax-slab").post(auth(), validate(tax_slabValidation.createTax_slabValidation),tax_slabController.createtax_slab);
+
+router.route("/read-all-tax-year-setup").get(auth(),tax_slabController.getAllTaxYearSetup);
+
 module.exports = router;
+
+
