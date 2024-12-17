@@ -130,11 +130,6 @@ const allocateLeaveBalances = async (data) => {
 
           if (oldBalance) {
             if (leavePolicy && oldBalance.remainingCount && leavePolicy.maxAllowed) {
-              //If Leaves are carry forwarded then they will be added to new year record
-              if (leavePolicy.carryForwardable) {
-                init.carryForwardCount = oldBalance.remainingCount > leavePolicy.carryForwardableCount ? leavePolicy.carryForwardableCount : oldBalance.remainingCount;
-                oldBalance.remainingCount -= init.carryForwardCount
-              }
               //If leaves are encashed then they will be added to encashed key in the old balance record and a record of their encashment is created in Leave Encashment table
               if (leavePolicy.encashable) {
                 const oldEncashmentCount = oldBalance.encashmentCount;
@@ -157,6 +152,13 @@ const allocateLeaveBalances = async (data) => {
                 }
 
               }
+              //If Leaves are carry forwarded then they will be added to new year record
+              if (leavePolicy.carryForwardable) {
+                init.carryForwardCount = oldBalance.remainingCount > leavePolicy.carryForwardableCount ? leavePolicy.carryForwardableCount : oldBalance.remainingCount;
+                oldBalance.remainingCount -= init.carryForwardCount
+              }
+
+              oldBalance.remainingCount = 0;
               await oldBalance.save()
             }
           }
