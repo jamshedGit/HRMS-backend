@@ -24,9 +24,9 @@ const createEmployeeShift = async (req) => {
     return addedEmployeeShiftObj;
   }
   catch (error) {
-    
+
     if (error.parent.errno === 1062) {
-   
+
       throw new ApiError(httpStatus.NOT_FOUND, "Duplicate entry not allowed!");
     }
     else {
@@ -56,14 +56,15 @@ const queryEmployeeShifts = async (req) => {
   const queryFilters = [
     { name: Sequelize.where(Sequelize.fn('LOWER', Sequelize.col('name')), 'LIKE', '%' + searchQuery + '%') },
   ]
-
+  
 
   const { count, rows } = await EmployeeShiftModel.Employee_ShiftModel.findAndCountAll({
+    where: {
+      [Op.and]: queryFilters // Apply the query filters
+    },
     order: [
-      ['createdAt', 'DESC']
+      ['createdAt', 'DESC'],
     ],
-
-
 
     offset: offset,
     limit: limit,
@@ -86,7 +87,7 @@ const getEmployeeShiftById = async (id) => {
 
 
     include: [
-     
+
       {
 
         model: EmployeeShiftModel.SubsidiaryModel,
@@ -95,7 +96,7 @@ const getEmployeeShiftById = async (id) => {
       }
     ],
   });
-  
+
   return a;
 };
 
@@ -129,13 +130,13 @@ const updateEmployeeShiftById = async (body, updatedBy) => {
   //   throw new ApiError(httpStatus.FORBIDDEN, `subsidiary already in use ${body.subs.subsName}. Please use another subsidiary`);
   // }
   // else {
-    oldRecord = await getEmployeeShiftById(body.Id)
+  oldRecord = await getEmployeeShiftById(body.Id)
   //}
   body.updatedBy = updatedBy;
 
   Object.assign(oldRecord, body);
   const updatedData = await oldRecord.save();
-  
+
   const data = await getEmployeeShiftById(updatedData.Id)
   return data;
 };
