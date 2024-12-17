@@ -297,7 +297,7 @@ const createEmployeeShiftLabel = (name, endDate, startDate) => {
   if(!endDate || !startDate){
     return '';
   }
-  return `${name} - (${formatDates(new Date(startDate), 'p')} to ${formatDates(new Date(endDate), 'p')})`
+  return `${name}`
 }
 
 /**
