@@ -13,6 +13,7 @@ let server;
 //     // seed();
 //   });
 // });
+
 server = app.listen(config.port, () => {
   logger.info(`Listening to port ${config.port}`);
   // server = app.listen(3000, '127.0.0.1', () => {

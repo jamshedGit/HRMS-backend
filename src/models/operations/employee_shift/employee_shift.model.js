@@ -31,6 +31,8 @@ const Model = sequelize.define('t_employee_shift', {
 	overTimeStart: { type: Sequelize.STRING(4), allowNull: true },
 	interShiftGap: { type: Sequelize.INTEGER, allowNull: true },
 	isIncludeInterShifGap: { type: Sequelize.BOOLEAN, allowNull: true },
+	markAbsent:  { type: Sequelize.STRING(4), allowNull: true },
+	markHalfDay:  { type: Sequelize.STRING(4), allowNull: true },
 	createdBy: {
 		type: Sequelize.INTEGER,
 		allowNull: true,

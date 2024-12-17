@@ -92,6 +92,7 @@ HolidaysModel,
 BranchModel,
 Payroll_ProcessModel,
 EmployeePolicyModel,
+Employee_ShiftModel,
 } = require('./models');
 // Tax_slabModel.sync({ force: true }); 
 // Employee_loan_request_detailModel.sync({ force: true }); 
@@ -124,6 +125,7 @@ EmployeePolicyModel,
 // sequelize.sync({force:true})
 // RoleModel.sync({force:true});
 // EmployeePolicyModel.sync({force:true});
+// Employee_ShiftModel.sync({alter:true});
 
 // send back a 404 error for any unknown api request
 app.use((req, res, next) => {
