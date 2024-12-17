@@ -9,7 +9,7 @@ const createItem = {
    
     subsidiaryId : Joi.number().required(),
     
-    companyId : Joi.number().required(),
+    companyId : Joi.any().optional(),
     name : Joi.string().required(),
     shiftCode : Joi.string().required(),
     shiftType : Joi.number().required(),
@@ -30,6 +30,8 @@ const createItem = {
     updatedAt : Joi.disallow(),
     createdAt : Joi.disallow(),
     subs: Joi.disallow(),
+    markAbsent:Joi.any().optional(),
+    markHalfDay:Joi.any().optional(),
   }),
 };
 
