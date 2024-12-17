@@ -1,5 +1,5 @@
 const httpStatus = require("http-status");
-const { EmployeeProfileModel, LeaveTypeModel, EmployeeLeaveBalanceModel, FiscalSetupModel, AllocateLeavesModel, LeaveEncashmentModel } = require("../../../models/index");
+const { EmployeeProfileModel, LeaveTypeModel, EmployeeLeaveBalanceModel, FiscalSetupModel, AllocateLeavesModel, LeaveEncashmentModel, LeaveManagementConfigurationModel, LeaveTypePoliciesModel } = require("../../../models/index");
 const ApiError = require("../../../utils/ApiError");
 const Sequelize = require('sequelize');
 const { paginationFacts, handleNestedData } = require("../../../utils/common");
@@ -88,17 +88,22 @@ const checkIsValid = async (employeeData, body)=> {
   if (!employeeData.t_employee_leave_balances?.length) {
     throw new ApiError(httpStatus.FORBIDDEN, `Remaining Leaves not enough`);
   }
-
   //Get Policy to check if the encashment is possible for this leave type
-  const policyData = await AllocateLeavesModel.findOne({
+  const policyData = await LeaveTypePoliciesModel.findOne({
     where: {
-      subsidiaryId: employeeData.subsidiaryId,
-      cycleTypeId: employeeData.cycleTypeId,
-      yearId: body.yearId,
       leaveType: body.leaveType,
-      policyType: 2
+      encashable: true
     },
-    attributes: ['maxCount']
+    attributes: ['maxAllowed'],
+    include:[
+      {
+        model: LeaveManagementConfigurationModel,
+        where: {
+          subsidiaryId: employeeData.subsidiaryId,
+        },
+        required: true
+      }
+    ]
   })
 
   //If there is no Encashment policy for this leave type
@@ -107,9 +112,9 @@ const checkIsValid = async (employeeData, body)=> {
   }
 
   //Check if the encashment leaves doesn't exceed the maximum number of leaves that can be encashed according to policy
-  const maxCountwithEnchashment = body.days + employeeData.t_employee_leave_balances[0].encashmentCount;
-  if (policyData.maxCount < maxCountwithEnchashment) {
-    throw new ApiError(httpStatus.FORBIDDEN, `Maximum ${policyData?.maxCount - employeeData.t_employee_leave_balances[0].encashmentCount} leaves can be encashed for this type`);
+  const maxAllowedwithEnchashment = body.days + employeeData.t_employee_leave_balances[0].encashmentCount;
+  if (policyData.maxAllowed < maxAllowedwithEnchashment) {
+    throw new ApiError(httpStatus.FORBIDDEN, `Maximum ${policyData?.maxAllowed - employeeData.t_employee_leave_balances[0].encashmentCount} leaves can be encashed for this type`);
   }
 }
 
