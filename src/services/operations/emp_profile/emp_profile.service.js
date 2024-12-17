@@ -17,6 +17,7 @@ const Op = Sequelize.Op;
  * @returns {Promise<Bank>}
  */
 const createEmp_profile = async (req, Emp_profileBody) => {
+  console.log("Emp_profileBody111",Emp_profileBody)
   Emp_profileBody.createdBy = req.user.id;
 
   const checkDateOverlap = (startDate1, endDate1, startDate2, endDate2) => {
