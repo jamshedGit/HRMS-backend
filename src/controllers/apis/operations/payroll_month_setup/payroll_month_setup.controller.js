@@ -11,7 +11,7 @@ const {
 } = require("../../../../utils/constants");
 
 const createPayrollMonth = catchAsync(async (req, res) => {
-  // console.log("reqested User", req.user.id);
+ 
   try {
 
     const PayrollMonth = await PayrollMonthServicePage.PayrollMonthServicePage.createPayrollMonth(req, req.body);
@@ -42,7 +42,7 @@ const getAllPayrollMonth = catchAsync(async (req, res) => {
   const options = pick(req.body, ['sortOrder', 'pageSize', 'pageNumber']);
   const searchQuery = req.body.filter.searchQuery ? req.body.filter.searchQuery : '';
   const result = await PayrollMonthServicePage.PayrollMonthServicePage.queryPayrollMonths(filter, options, searchQuery);
-  console.log("resp2", result);
+
   res.send({
     code: HttpStatusCodes.OK,
     message: HttpResponseMessages.OK,
@@ -53,7 +53,7 @@ const getAllPayrollMonth = catchAsync(async (req, res) => {
 
 const SP_GetActivePreviousPayrollMonth = catchAsync(async (req, res) => {
 
-  console.log("active payroll month", req.body)
+
   const obj = await PayrollMonthServicePage.PayrollMonthServicePage.SP_GetActivePreviousPayrollMonth(req.body.subsidiaryId);
   if (!obj) {
     throw new ApiError(httpStatus.NOT_FOUND, "obj not found");
@@ -68,8 +68,8 @@ const SP_GetActivePreviousPayrollMonth = catchAsync(async (req, res) => {
 
 
 const getPayrollMonthById = catchAsync(async (req, res) => {
-  console.log("PayrollMonth Controller getPayrollMonthId")
-  console.log(req.body)
+
+
   const Receipt = await PayrollMonthServicePage.PayrollMonthServicePage.getPayrollMonthById(req.body.Id);
   if (!Receipt) {
     throw new ApiError(httpStatus.NOT_FOUND, "Receipt not found");
@@ -82,7 +82,7 @@ const getPayrollMonthById = catchAsync(async (req, res) => {
 });
 
 const updatePayrollMonth = catchAsync(async (req, res) => {
-  console.log(req.body);
+
   const Receipt = await PayrollMonthServicePage.PayrollMonthServicePage.updatePayrollMonthById(req.body.Id, req.body, req.user.Id);
   res.send({
     code: HttpStatusCodes.OK,

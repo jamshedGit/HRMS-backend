@@ -7,9 +7,9 @@ const modelMapping = require("../models/index");
 const getRouteSlugs = (req) => {
   const route = req.originalUrl;
   const params = req.params;
-  console.log(route);
+ 
   let arr = route.split("/");
-  console.log(arr);
+  
   //If param is available then get the endpoints from the 2 parts before the params
   //else take last two parts as endpoints from url
   if (Object.keys(params).length) {
@@ -97,7 +97,7 @@ const createDatetime = (stringDate) => {
     // Format the date and time to the desired format
     const outputDateTime = momentObj.format("YYYY-MM-DD HH:mm:ss.SSSZ");
 
-    // console.log(outputDateTime); // Output: '2023-05-23 14:38:00.000+00'
+ 
     return outputDateTime;
   }
 
@@ -108,12 +108,12 @@ const getPathStorageFromUrl = (url) => {
   // url = "https://firebasestorage.googleapis.com/v0/b/eams-test-7f4a7.appspot.com/o/testing%2F1685006218395-5f0911c1-91c2-4153-bd83-d71f35c7e942-CRN.10?alt=media&token=6c7c1fde-4ce1-4941-bca6-a121b80d403c"
   const baseUrl =
     "https://firebasestorage.googleapis.com/v0/b/eams-test-7f4a7.appspot.com/o/";
-  console.log(url);
+  
   let imagePath = url.replace(baseUrl, "");
   const indexOfEndPath = imagePath.indexOf("?");
   imagePath = imagePath.substring(0, indexOfEndPath);
   imagePath = imagePath.replace("%2F", "/");
-  // console.log("imagePath", imagePath);
+
   return imagePath;
 };
 
@@ -178,7 +178,7 @@ const check_range_exist = async (
   fieldMappings = []
 ) => {
   // Validate that max is greater than min
-  console.log("check_range_exist 1");
+ 
   if (body[maxField] < body[minField]) {
     return {
       message: "Min value must be less than Max value.",
@@ -300,4 +300,12 @@ const createEmployeeShiftLabel = (name, endDate, startDate) => {
   return `${name} - (${formatDates(new Date(startDate), 'p')} to ${formatDates(new Date(endDate), 'p')})`
 }
 
-module.exports = { handleNestedData, getRouteSlugs, getDdlItems, getAlarmTimesItems, customPaginate, paginationFacts, createDatetime, getPathStorageFromUrl, formatDates, getDateDiffInDays, addDaysInDate, check_range_exist, createFiscalYearLabel, createEmployeeShiftLabel };
+const createTaxYearSetupLabel = (endDate, startDate,isActive) => {
+  if(!endDate || !startDate){
+    return '';
+  }
+  return `Year - ${new Date(endDate).getFullYear()} (${formatDates(new Date(startDate), 'dd-MMM-yyyy')} to ${formatDates(new Date(endDate), 'dd-MMM-yyyy')}) - ${isActive? "Active":"Inactive"}`
+}
+
+
+module.exports = { handleNestedData, getRouteSlugs, getDdlItems, getAlarmTimesItems, customPaginate, paginationFacts, createDatetime, getPathStorageFromUrl, formatDates, getDateDiffInDays, addDaysInDate, check_range_exist, createFiscalYearLabel, createEmployeeShiftLabel, createTaxYearSetupLabel };

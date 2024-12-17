@@ -2,7 +2,8 @@ const Sequelize = require('sequelize');
 const { ResourceModel, SubsidiaryModel } = require('../..');
 
 //import Database connection configurations.
-const sequelize = require('../../../config/db')
+const sequelize = require('../../../config/db');
+const { formatDates } = require('../../../utils/common');
 
 const PayrollMonthModel = sequelize.define('t_payroll_month_Setup', {
 	Id: {
@@ -14,8 +15,24 @@ const PayrollMonthModel = sequelize.define('t_payroll_month_Setup', {
     year : { type: Sequelize.INTEGER, allowNull: true },
     month_days : { type: Sequelize.INTEGER, allowNull: true },
     shortFormat : { type: Sequelize.STRING(4), allowNull: true },
-	startDate : { type: Sequelize.DATE, allowNull: true },
-    endDate : { type: Sequelize.DATE, allowNull: true },
+	// startDate : { type: Sequelize.DATE, allowNull: true },
+	startDate: {
+		type: Sequelize.DATE,
+		allowNull: false,
+		get() {
+			const rawValue = this.getDataValue('startDate');
+			return rawValue ? formatDates(rawValue) : null;
+		}
+	},
+    // endDate : { type: Sequelize.DATE, allowNull: true },
+	endDate: {
+		type: Sequelize.DATE,
+		allowNull: false,
+		get() {
+			const rawValue = this.getDataValue('endDate');
+			return rawValue ? formatDates(rawValue) : null;
+		}
+	},
 	subsidiaryId : { type: Sequelize.INTEGER, allowNull: true },
 	companyId : { type: Sequelize.INTEGER, allowNull: true,defaultValue: 1 },
 	isActive: { type: Sequelize.BOOLEAN, allowNull: true, defaultValue: true },

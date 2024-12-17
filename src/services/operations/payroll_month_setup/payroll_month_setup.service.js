@@ -17,7 +17,7 @@ const Op = Sequelize.Op;
  */
 const createPayrollMonth = async (req, PayrollMonthBody) => {
    
-  console.log("PayrollMonthBody",PayrollMonthBody);
+
   PayrollMonthBody.createdBy = req.user.id;
  
   const resp = await sequelize.query(' update t_payroll_month_Setup set isActive = 0 where subsidiaryId =  ' + PayrollMonthBody.subsidiaryId);
@@ -80,13 +80,22 @@ const queryPayrollMonths = async (filter, options, searchQuery) => {
 
 const SP_GetActivePreviousPayrollMonth = async (p_subsidiaryId) => {
   try {
-    console.log("EmployeeTransfer p_subsidiaryId", p_subsidiaryId);
-    const results = await sequelize.query('CALL usp_GetActivePreviousPayrollMonth(:p_subsidiaryId)', {
-      replacements: { p_subsidiaryId: p_subsidiaryId || 'null' },
-      type: Sequelize.QueryTypes.RAW // Use RAW type for executing stored procedures
-    });
 
-    console.log("tsubs:::",results)
+    // const results = await sequelize.query('CALL usp_GetActivePreviousPayrollMonth(:p_subsidiaryId)', {
+    //   replacements: { p_subsidiaryId: p_subsidiaryId || 'null' },
+    //   type: Sequelize.QueryTypes.RAW // Use RAW type for executing stored procedures
+    // });
+    // select * from t_payroll_month_setup where isActive = 1 AND subsidiaryId=p_subsidiaryId
+
+   const results = await PayrollMonthModel.PayrollMonthModel.findOne({
+       where: {
+         subsidiaryId: p_subsidiaryId,
+         isActive:true
+       
+       },
+     });
+ 
+
 
     return results;
   } catch (error) {
@@ -110,12 +119,12 @@ const getPayrollMonthById = async (id) => {
  * @returns {Promise<ReceiptModel>}
  */
 const updatePayrollMonthById = async (Id, updateBody, updatedBy) => {
-  console.log("tool",Id, updateBody, updatedBy)
+
   const Item = await getPayrollMonthById(Id);
   if (!Item) {
     throw new ApiError(httpStatus.NOT_FOUND, "record not found");
   }
-  //console.log("Update Receipt Id" , item);
+
   // updateBody.slug = updateBody.name.replace(/ /g, "-").toLowerCase()
   updateBody.updatedBy = updatedBy;
   delete updateBody.id;
