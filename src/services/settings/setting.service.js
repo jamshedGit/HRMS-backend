@@ -1,5 +1,5 @@
 const { RoleModel, ResourceModel, CountryModel, CityModel, StatusTypeModel, BankModel, DeptModel, FormModel, EmployeeProfileModel, BranchModel, EmployeeSalaryRevisionModel, LeaveTypeModel, FiscalSetupModel, SubsidiaryModel, LeaveManagementConfigurationModel, LeaveTypePoliciesModel, AllocateLeavesModel, Employee_ShiftModel, LeaveTypeModelAccess } = require('../../models');
-const { getDdlItems, getAlarmTimesItems, formatDates, createFiscalYearLabel, createEmployeeShiftLabel } = require('../../utils/common');
+const { getDdlItems, getAlarmTimesItems, formatDates, createFiscalYearLabel, createEmployeeShiftLabel, createEmployeeNameLabel } = require('../../utils/common');
 const { DDL_FIELD_NAMES } = require('../../utils/constants');
 const { getRoleById } = require('./role.service');
 const Sequelize = require('sequelize');
@@ -104,11 +104,16 @@ const get_Bank_Branch_MasterData = async () => {
 };
 
 const getEmployeesMasterData = async () => {
-  const EmployeesMasterData = getDdlItems(DDL_FIELD_NAMES.EmployeesKeys, await EmployeeProfileModel.findAll({
+  const EmployeesMasterData = await EmployeeProfileModel.findAll({
     where: { isActive: true },
-    attributes: ['Id', 'firstName']
-  }));
-  return EmployeesMasterData
+    attributes: ['Id', 'firstName', 'middleName', 'lastName']
+  })
+  return EmployeesMasterData?.map(el => {
+    return {
+      label: createEmployeeNameLabel(el),
+      value: el.Id
+    }
+  }) || []
 };
 
 

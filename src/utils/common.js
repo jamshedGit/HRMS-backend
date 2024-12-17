@@ -300,6 +300,22 @@ const createEmployeeShiftLabel = (name, endDate, startDate) => {
   return `${name} - (${formatDates(new Date(startDate), 'p')} to ${formatDates(new Date(endDate), 'p')})`
 }
 
+/**
+ * 
+ * Create Label for Employee Name Dropdown
+ * 
+ * @param {Object} employee 
+ * @returns 
+ */
+const createEmployeeNameLabel = (employee) => {
+  const nameArray = [];
+  employee.firstName && nameArray.push(employee.firstName)
+  employee.middleName && nameArray.push(employee.middleName)
+  employee.lastName && nameArray.push(employee.lastName)
+
+  return nameArray.join(' ');
+}
+
 const createTaxYearSetupLabel = (endDate, startDate,isActive) => {
   if(!endDate || !startDate){
     return '';
@@ -308,4 +324,4 @@ const createTaxYearSetupLabel = (endDate, startDate,isActive) => {
 }
 
 
-module.exports = { handleNestedData, getRouteSlugs, getDdlItems, getAlarmTimesItems, customPaginate, paginationFacts, createDatetime, getPathStorageFromUrl, formatDates, getDateDiffInDays, addDaysInDate, check_range_exist, createFiscalYearLabel, createEmployeeShiftLabel, createTaxYearSetupLabel };
+module.exports = { handleNestedData, getRouteSlugs, getDdlItems, getAlarmTimesItems, customPaginate, paginationFacts, createDatetime, getPathStorageFromUrl, formatDates, getDateDiffInDays, addDaysInDate, check_range_exist, createFiscalYearLabel, createEmployeeShiftLabel, createTaxYearSetupLabel, createEmployeeNameLabel };
