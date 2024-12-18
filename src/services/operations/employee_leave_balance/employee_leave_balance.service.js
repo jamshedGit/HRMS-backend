@@ -1,9 +1,10 @@
 const httpStatus = require("http-status");
-const { AllocateLeavesModel, EmployeeProfileModel, LeaveApplicationModel, LeaveApplicationDetailModel, FiscalSetupModel, EmployeeLeaveBalanceModel, LeaveTypeModel, LeaveEncashmentModel } = require("../../../models/index");
+const { AllocateLeavesModel, EmployeeProfileModel, LeaveApplicationModel, LeaveApplicationDetailModel, FiscalSetupModel, EmployeeLeaveBalanceModel, LeaveTypeModel, LeaveEncashmentModel, LeaveTypePoliciesModel, LeaveManagementConfigurationModel, LeaveTypeModelAccess } = require("../../../models/index");
 const ApiError = require("../../../utils/ApiError");
 const Sequelize = require('sequelize');
 const { createFiscalYearLabel } = require("../../../utils/common");
 const { POLICY_TYPE } = require("../../../models/operations/allocate_leaves/enum/allocate_leaves.enum");
+const { startOfDay } = require("date-fns");
 
 const Op = Sequelize.Op;
 
@@ -38,165 +39,196 @@ const initialValues = {
  * @returns 
  */
 const allocateLeaveBalances = async (data) => {
-    //Get Year start and end dates to get leaves of employee in between that year
-    const YearData = await FiscalSetupModel.findByPk(data.yearId, {
-      attributes: ['startDate', 'endDate', 'Id']
-    });
+  //Get Year start and end dates to get leaves of employee in between that year
+  const YearData = await FiscalSetupModel.findOne({
+    where: { isActive: true, subsidiaryId: data.subsidiaryId },
+    attributes: ['startDate', 'endDate', 'Id']
+  });
 
-
-    //Get Old Year data to get Old remaining leaves in case of carry forward
-    const oldYearData = await FiscalSetupModel.findOne({
-      where: {
-        isActive: false
-      },
-      order: [['createdAt', 'DESC']],
-      attributes: ['Id']
-    });
-
-
-    //Get All Employee according to subsidiary and cycletypeId that we get from allocations data
-    //Also include Leave Application Details to check what leaves employee has taken in that year
-    //We include Leave Balance as well to get Leave Balance of previous year that have leaves remaining so we can carry forward those leaves if that applies
-    const employeeData = await EmployeeProfileModel.findAll({
-      where: {
-        subsidiaryId: data.subsidiaryId,
-        cycleTypeId: data.cycleTypeId
-      },
-      attributes: ['Id'],
-      include: [
-        {
-          model: LeaveApplicationModel,
-          required: false,
-          attributes: ['Id', 'leaveType'],
-          where: {
-            from: { [Op.gte]: YearData.startDate }, // `from` date should be on or after startDate
-            to: { [Op.lte]: YearData.endDate },      // `to` date should be on or before endDate
-            isActive: true
-          },
-          include: [
-            {
-              model: LeaveApplicationDetailModel,
-              required: false,
-              attributes: ['Id', 'day'],
-            }
-          ]
+  const leaveTypePolicyData = await LeaveTypePoliciesModel.findAll({
+    include: [
+      {
+        model: LeaveManagementConfigurationModel,
+        where: {
+          subsidiaryId: data.subsidiaryId
         },
-        {
-          model: EmployeeLeaveBalanceModel,
-          where: {
-            yearId: oldYearData?.Id || '',
-            remainingCount: { [Op.gte]: 0 }
-          },
-          required: false,
-        }
-      ],
-    });
+        attributes: [],
+        required: true
+      }
+    ]
+  })
 
-    if (employeeData?.length) {
-      for (const al of data.list) {
-        for (const emp of employeeData) {
-          //Initialize values for Leave balance Record
-          const init = { ...initialValues };
 
-          //This is to check if there are any leaves remaining of last year of the same leave type that are to be carry forwarded or are to be encashed for old year
-          if (emp.t_employee_leave_balances?.length) {
-            const oldBalance = emp.t_employee_leave_balances.find(el => el.leaveType == al.leaveType);
+  //Get Old Year data to get Old remaining leaves in case of carry forward
+  const oldYearData = await FiscalSetupModel.findOne({
+    where: {
+      isActive: false,
+      subsidiaryId: data.subsidiaryId
+    },
+    order: [['createdAt', 'DESC']],
+    attributes: ['Id']
+  });
 
-            if (oldBalance) {
-              const allocationPolicy = await AllocateLeavesModel.findOne({
-                where: {
-                  subsidiaryId: data.subsidiaryId,
-                  cycleTypeId: data.cycleTypeId,
-                  yearId: oldYearData.Id,
-                  leaveType: al.leaveType,
-                },
-                attributes: ['policyType', 'maxCount']
-              })
 
-              if (allocationPolicy && oldBalance.remainingCount && allocationPolicy.maxCount) {
-                //If Leaves are carry forwarded then they will be added to new year record
-                if (POLICY_TYPE[allocationPolicy.policyType] == POLICY_TYPE[1]) {
-                  init.carryForwardCount = oldBalance.remainingCount > allocationPolicy.maxCount ? allocationPolicy.maxCount : oldBalance.remainingCount;
-                }
-                //If leaves are encashed then they will be added to encashed key in the old balance record and a record of their encashment is created in Leave Encashment table
-                else if (POLICY_TYPE[allocationPolicy.policyType] == POLICY_TYPE[2]) {
-                  const oldEncashmentCount = oldBalance.encashmentCount;
-                  const maxCount = allocationPolicy.maxCount - oldEncashmentCount;
-                  if (maxCount > 0) {
-                    oldBalance.encashmentCount += oldBalance.remainingCount > maxCount ? maxCount : oldBalance.remainingCount;
-                    oldBalance.remainingCount -= oldBalance.encashmentCount - oldEncashmentCount;
+  //Get All Employee according to subsidiary and cycletypeId that we get from allocations data
+  //Also include Leave Application Details to check what leaves employee has taken in that year
+  //We include Leave Balance as well to get Leave Balance of previous year that have leaves remaining so we can carry forward those leaves if that applies
+  const employeeData = await EmployeeProfileModel.findAll({
+    where: {
+      subsidiaryId: data.subsidiaryId,
+      // dateOfJoining: startOfDay(new Date(YearData.startDate))
+    },
+    attributes: ['Id'],
+    include: [
+      {
+        model: LeaveApplicationModel,
+        required: false,
+        attributes: ['Id', 'leaveType'],
+        where: {
+          from: { [Op.gte]: YearData.startDate }, // `from` date should be on or after startDate
+          // to: { [Op.lte]: YearData.endDate },      // `to` date should be on or before endDate
+          isActive: true
+        },
+        include: [
+          {
+            model: LeaveApplicationDetailModel,
+            required: false,
+            attributes: ['Id', 'day'],
+          }
+        ]
+      },
+      {
+        model: EmployeeLeaveBalanceModel,
+        where: {
+          yearId: oldYearData?.Id || '',
+          remainingCount: { [Op.gte]: 0 }
+        },
+        required: false,
+      },
+      {
+        model: LeaveEncashmentModel,
+        where: {
+          yearId: YearData.Id
+        },
+        required: false,
+        attributes: ['leaveType', 'days']
+      }
+    ],
+  });
 
-                    await oldBalance.save()
-                    const payload = {
-                      subsidiaryId: data.subsidiaryId,
-                      employeeId: emp.Id,
-                      leaveType: al.leaveType,
-                      yearId: oldYearData.Id,
-                      days: oldBalance.encashmentCount - oldEncashmentCount,
-                      reason: 'Leave Balance Encashment on year end',
-                    }
 
-                    await LeaveEncashmentModel.create(payload);
+  if (employeeData?.length) {
+    for (const al of leaveTypePolicyData) {
+      for (const emp of employeeData) {
+        //Initialize values for Leave balance Record
+        const init = { ...initialValues };
+
+        //This is to check if there are any leaves remaining of last year of the same leave type that are to be carry forwarded or are to be encashed for old year
+        if (emp.t_employee_leave_balances?.length) {
+          const oldBalance = emp.t_employee_leave_balances.find(el => el.leaveType == al.leaveType);
+          const leavePolicy = leaveTypePolicyData.find(el => el.leaveType == al.leaveType)
+
+          if (oldBalance) {
+            if (leavePolicy && oldBalance.remainingCount && leavePolicy.maxAllowed) {
+              //If leaves are encashed then they will be added to encashed key in the old balance record and a record of their encashment is created in Leave Encashment table
+              if (leavePolicy.encashable) {
+                const oldEncashmentCount = oldBalance.encashmentCount;
+                const maxCount = leavePolicy.encashableCount - oldEncashmentCount;
+
+                if (maxCount > 0) {
+                  oldBalance.encashmentCount += oldBalance.remainingCount > maxCount ? maxCount : oldBalance.remainingCount;
+                  oldBalance.remainingCount -= oldBalance.encashmentCount - oldEncashmentCount;
+
+                  const payload = {
+                    subsidiaryId: data.subsidiaryId,
+                    employeeId: emp.Id,
+                    leaveType: al.leaveType,
+                    yearId: oldYearData.Id,
+                    days: oldBalance.encashmentCount - oldEncashmentCount,
+                    reason: 'Leave Balance Encashment on year end',
                   }
 
+                  await LeaveEncashmentModel.create(payload);
                 }
+
               }
+              //If Leaves are carry forwarded then they will be added to new year record
+              if (leavePolicy.carryForwardable) {
+                init.carryForwardCount = oldBalance.remainingCount > leavePolicy.carryForwardableCount ? leavePolicy.carryForwardableCount : oldBalance.remainingCount;
+                oldBalance.remainingCount -= init.carryForwardCount
+              }
+
+              oldBalance.remainingCount = 0;
+              await oldBalance.save()
             }
           }
+        }
 
-          //assigned fixed values to initialized values so we don't have to worry about them later
-          Object.assign(init, {
-            employeeId: emp.Id,
-            leaveType: al.leaveType,
-            yearId: YearData.Id,
-            allocatedCount: al.leaveCount
+
+        
+
+        //assigned fixed values to initialized values so we don't have to worry about them later
+        Object.assign(init, {
+          employeeId: emp.Id,
+          leaveType: al.leaveType,
+          yearId: YearData.Id,
+          allocatedCount: al.maxAllowed
+        });
+
+        //Get the number of Availed Leaves of Employee. If no leave is availed then it will set 0
+        const availedCount = emp.t_leave_applications.reduce((prev, curr) => {
+          if (curr.leaveType == al.leaveType) {
+            const detailCount = curr?.t_leave_application_details?.reduce((detailPrev, detailCurr) => {
+              return detailPrev + (detailCurr.day || 0)
+            }, 0) || 0;
+            return prev + detailCount;
+          }
+          return prev
+        }, 0)
+
+        //Set availed count
+        init.availedCount = availedCount;
+
+        //Set remaining count
+        init.remainingCount = availedCount > init.allocatedCount ? 0 : init.allocatedCount - availedCount;
+
+        //Add carry forward count to remaining count if there are any leaves from previous year that are carry forwarded
+        init.remainingCount += init.carryForwardCount
+
+        if (emp.t_leave_encashments?.length) {
+          const leaveTypeEncashments = emp.t_leave_encashments.filter((el) => el.leaveType == al.leaveType);
+          leaveTypeEncashments.forEach(lte => {
+            init.encashmentCount += Number(lte.days)
+            init.remainingCount -= Number(lte.days)
           });
+        }
 
-          //Get the number of Availed Leaves of Employee. If no leave is availed then it will set 0
-          const availedCount = emp.t_leave_applications.reduce((prev, curr) => {
-            if (curr.leaveType == al.leaveType) {
-              const detailCount = curr?.t_leave_application_details?.reduce((detailPrev, detailCurr) => {
-                return detailPrev + (detailCurr.day || 0)
-              }, 0) || 0;
-              return prev + detailCount;
+        try {
+          //Try updating considering there is record that is already present.
+          //if the record is updated then it will increase the affectedCount number. 
+          //if there was no previous record found to update that means no record was affected so we will create new record in the check below
+          //This way is used because Sequelize doesn't support upsert method with where option
+          const [affectedCount] = await EmployeeLeaveBalanceModel.update(
+            { ...init }, // new values to update
+            {
+              where: { employeeId: init.employeeId, leaveType: init.leaveType, yearId: init.yearId } // condition to find the record
             }
-            return prev
-          }, 0)
+          );
 
-          //Set availed count
-          init.availedCount = availedCount;
-
-          //Set remaining count
-          init.remainingCount = availedCount > init.allocatedCount ? 0 : init.allocatedCount - availedCount;
-
-          //Add carry forward count to remaining count if there are any leaves from previous year that are carry forwarded
-          init.remainingCount += init.carryForwardCount
-
-          try {
-            //Try updating considering there is record that is already present.
-            //if the record is updated then it will increase the affectedCount number. 
-            //if there was no previous record found to update that means no record was affected so we will create new record in the check below
-            //This way is used because Sequelize doesn't support upsert method with where option
-            const [affectedCount] = await EmployeeLeaveBalanceModel.update(
-              { ...init }, // new values to update
-              {
-                where: { employeeId: init.employeeId, leaveType: init.leaveType, yearId: init.yearId } // condition to find the record
-              }
-            );
-
-            // Check if any records were updated
-            if (affectedCount === 0) {
-              // If no record was updated, create a new record
-              await EmployeeLeaveBalanceModel.create({
-                ...init // values to set for the new record
-              });
-            }
-          } catch (error) {
-            console.log(`'::init::${emp.Id}::'`, init, error);
+          // Check if any records were updated
+          if (affectedCount === 0) {
+            // If no record was updated, create a new record
+            await EmployeeLeaveBalanceModel.create({
+              ...init // values to set for the new record
+            });
           }
+        } catch (error) {
+          console.log(`'::init::${emp.Id}::'`, init, error);
         }
       }
     }
+  }
+
 };
 
 /**
@@ -322,34 +354,41 @@ const getLeaveBalance = async (filters, attributes = null, include = null) => {
  */
 const getAllLeaveBalance = async (req) => {
   const body = req.body;
-  const employeeData = await EmployeeProfileModel.findByPk(body.employeeId,
-    {
-      attributes: ['Id'],
-      include: [
-        {
-          model: EmployeeLeaveBalanceModel,
-          required: false,
-          attributes: [...leaveBalanceAttributes, 'leaveType'],
-          include: [
-            {
-              model: FiscalSetupModel,
-              required: true,    // Ensures LeaveBalance is only included if FiscalSetup with isActive: true exists. This check will ensure that only leave balances of current year will be returned
-              where: {
-                isActive: true,
-              },
-              attributes: ['startDate', 'endDate']
-            },
-            {
-              model: LeaveTypeModel,
-              attributes: ['name', 'Id']
-            }
-          ],
-        }
-      ]
-    }
-  )
 
-  const data = employeeData.t_employee_leave_balances.map((lb) => {
+  const employeeData = await EmployeeProfileModel.findByPk(body.employeeId, { attributes: ['Id', 'subsidiaryId'] });
+
+  const leaveBalanceData = await EmployeeLeaveBalanceModel.findAll({
+    attributes: [...leaveBalanceAttributes, 'leaveType'],
+    where: { employeeId: employeeData.Id },
+    include: [
+      {
+        model: FiscalSetupModel,
+        required: true,    // Ensures LeaveBalance is only included if FiscalSetup with isActive: true exists. This check will ensure that only leave balances of current year will be returned
+        where: {
+          isActive: true,
+          subsidiaryId: employeeData.subsidiaryId
+        },
+        attributes: ['startDate', 'endDate']
+      },
+      {
+        model: LeaveTypeModel,
+        attributes: ['name', 'Id'],
+        required: true,
+        include: [
+          {
+            model: LeaveTypeModelAccess,
+            where: {
+              subsidiaryId: employeeData.subsidiaryId
+            },
+            required: true,
+            attributes: []
+          }
+        ]
+      }
+    ],
+  })
+
+  const data = leaveBalanceData.map((lb) => {
     return {
       leaveTypeName: lb?.t_leave_type?.name || '',
       leaveType: lb?.t_leave_type?.Id || '',

@@ -79,6 +79,7 @@ module.exports.FiscalSetupModel = require('./operations/fiscal_setup/fiscal_setu
 module.exports.PayrollMonthModel = require('./operations/payroll_month_setup/payroll_month_setup.model');
 //Model for Leave Type
 module.exports.LeaveTypeModel = require('./operations/leave_type/leave_type.model');
+module.exports.LeaveTypeModelAccess = require('./operations/leave_type/leave_type_access.model');
 //PayrollMonthModel Setup 
 module.exports.FinalSettlementModel = require('./operations/final_settlement_policy/final_settlement_policy.model');
 

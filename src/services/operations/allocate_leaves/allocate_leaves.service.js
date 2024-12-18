@@ -27,39 +27,25 @@ const allocateLeavesAttributes = [
 const createallocateLeaves = async (req) => {
   const { list, ...rest } = req.body;
 
-  const yearData = await FiscalSetupModel.findOne({ where: { Id: rest.yearId, isActive: true }, attributes: ['Id'] });
+  const yearData = await FiscalSetupModel.findOne({ where: { subsidiaryId: rest.subsidiaryId, isActive: true }, attributes: ['Id'] });
 
-  if(!yearData){
+  if (!yearData) {
     throw new ApiError(httpStatus.CONFLICT, 'Can only Edit or Update for current active year');
   }
-
-  const latestUpdatedAt = list.find(el => {
-    return el.updatedAt && differenceInMinutes(
-      new Date(),
-      new Date(el.updatedAt)
-    ) <= 3
-  })
-
-  if (latestUpdatedAt) {
-    throw new ApiError(httpStatus.CONFLICT, 'Allocating Leave balance is already in progress. Please update after some time.');
-  }
-
-  //This function is to check and throw error if allocated Count of any leave type exceeds it's maxAllowed Limit
-  await checkLeaveTypeLimits(req.body);
 
   for (let index = 0; index < list.length; index++) {
     const element = list[index];
     const payload = {
-      ...rest,
-      ...element,
+      subsidiaryId: rest.subsidiaryId,
+      yearId: yearData.Id,
+      leaveType: element.leaveType,
       createdBy: req.user.id
     };
     await AllocateLeavesModel.upsert(payload);
 
   }
-  const data = await getallocateLeavesData({ ...rest }, allocateLeavesAttributes);
-  allocateLeaveBalances({ ...rest, list: data })
-  return { ...rest, list: data };
+  allocateLeaveBalances({ ...rest })
+  return rest;
 };
 
 /**

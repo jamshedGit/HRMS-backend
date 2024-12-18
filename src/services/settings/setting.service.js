@@ -1,5 +1,5 @@
-const { RoleModel, ResourceModel, CountryModel, CityModel, StatusTypeModel, BankModel, DeptModel, FormModel, EmployeeProfileModel, BranchModel, EmployeeSalaryRevisionModel, LeaveTypeModel, FiscalSetupModel, SubsidiaryModel, LeaveManagementConfigurationModel, LeaveTypePoliciesModel, AllocateLeavesModel, Employee_ShiftModel } = require('../../models');
-const { getDdlItems, getAlarmTimesItems, formatDates, createFiscalYearLabel, createEmployeeShiftLabel } = require('../../utils/common');
+const { RoleModel, ResourceModel, CountryModel, CityModel, StatusTypeModel, BankModel, DeptModel, FormModel, EmployeeProfileModel, BranchModel, EmployeeSalaryRevisionModel, LeaveTypeModel, FiscalSetupModel, SubsidiaryModel, LeaveManagementConfigurationModel, LeaveTypePoliciesModel, AllocateLeavesModel, Employee_ShiftModel, LeaveTypeModelAccess } = require('../../models');
+const { getDdlItems, getAlarmTimesItems, formatDates, createFiscalYearLabel, createEmployeeShiftLabel, createEmployeeNameLabel } = require('../../utils/common');
 const { DDL_FIELD_NAMES } = require('../../utils/constants');
 const { getRoleById } = require('./role.service');
 const Sequelize = require('sequelize');
@@ -88,7 +88,7 @@ const getCountriesMasterData = async () => {
 const getBanksMasterData = async () => {
   const BanksMasterData = getDdlItems(DDL_FIELD_NAMES.BankName, await BankModel.findAll({
     where: { isActive: true },
-    attributes: ['Id', 'Name',"subsidiaryId"]
+    attributes: ['Id', 'Name', "subsidiaryId"]
   }));
   return BanksMasterData
 };
@@ -104,18 +104,23 @@ const get_Bank_Branch_MasterData = async () => {
 };
 
 const getEmployeesMasterData = async () => {
-  const EmployeesMasterData = getDdlItems(DDL_FIELD_NAMES.EmployeesKeys, await EmployeeProfileModel.findAll({
+  const EmployeesMasterData = await EmployeeProfileModel.findAll({
     where: { isActive: true },
-    attributes: ['Id', 'firstName']
-  }));
-  return EmployeesMasterData
+    attributes: ['Id', 'firstName', 'middleName', 'lastName']
+  })
+  return EmployeesMasterData?.map(el => {
+    return {
+      label: createEmployeeNameLabel(el),
+      value: el.Id
+    }
+  }) || []
 };
 
 
 const getDeptMasterData = async () => {
   const DeptMasterData = getDdlItems(DDL_FIELD_NAMES.DeptName, await DeptModel.findAll({
     where: { isActive: true },
-    attributes: ['deptId', 'deptName','subsidiaryId']
+    attributes: ['deptId', 'deptName', 'subsidiaryId']
   }));
   return DeptMasterData
 };
@@ -179,8 +184,12 @@ const getLeaveTypesData = async (employeeId) => {
 
       if (leaveConfigData?.t_leave_type_policies?.length) {
         LeaveTypeData = getDdlItems(DDL_FIELD_NAMES.LeaveType, await LeaveTypeModel.findAll({
-          where: { Id: leaveConfigData?.t_leave_type_policies.map((el) => el.leaveType) },
-          attributes: ['name', 'Id']
+          where: {
+            Id: leaveConfigData?.t_leave_type_policies.map((el) => el.leaveType), subsidiaryId: {
+              [Op.like]: Sequelize.fn('CONCAT', '%', `${employeeWithLeaveConfig.subsidiaryId}`, '%')
+            }
+          },
+          attributes: ['name', 'Id', 'type']
         }));
       }
 
@@ -199,8 +208,16 @@ const getLeaveTypesDataBySubsidiary = async (subsidiaryId) => {
   let LeaveTypeData = [];
   if (subsidiaryId) {
     LeaveTypeData = getDdlItems(DDL_FIELD_NAMES.LeaveType, await LeaveTypeModel.findAll({
-      where: {subsidiaryId: subsidiaryId},
-      attributes: ['name', 'Id']
+      // where: {subsidiaryId: subsidiaryId},
+      include: [
+        {
+          model: LeaveTypeModelAccess,
+          where: { subsidiaryId: subsidiaryId },
+          required: true,
+          attributes: []
+        }
+      ],
+      attributes: ['name', 'Id', 'type']
     }));
   }
   LeaveTypeData.unshift({ label: '--Select--', value: null })
@@ -228,38 +245,39 @@ const getEncashmentLeaveTypeData = async (employeeId, yearId) => {
         include: [
           {
             model: LeaveTypePoliciesModel,
-            attributes: ['leaveType']
+            attributes: ['leaveType', 'encashableCount'],
+            where: {
+              encashable: true,
+            }
           }
         ]
       })
 
       if (leaveConfigData?.t_leave_type_policies?.length) {
-        const allocatedData = await AllocateLeavesModel.findAll({
-          where: {
-            leaveType: leaveConfigData?.t_leave_type_policies.map((el) => el.leaveType),
-            subsidiaryId: employeeWithLeaveConfig.subsidiaryId,
-            cycleTypeId: employeeWithLeaveConfig.cycleTypeId,
-            yearId: yearId,
-            policyType: 2
-          },
-          attributes: ['leaveType', 'maxCount'],
+        // const allocatedData = await AllocateLeavesModel.findAll({
+        //   where: {
+        //     leaveType: leaveConfigData?.t_leave_type_policies.map((el) => el.leaveType),
+        //     subsidiaryId: employeeWithLeaveConfig.subsidiaryId,
+        //     cycleTypeId: employeeWithLeaveConfig.cycleTypeId,
+        //     yearId: yearId,
+        //     policyType: 2
+        //   },
+        //   attributes: ['leaveType', 'maxCount'],
+        // })
+
+        const leaveData = await LeaveTypeModel.findAll({
+          where: { Id: leaveConfigData?.t_leave_type_policies?.map((el) => el.leaveType) },
+          include: [{ model: LeaveTypeModelAccess, where: { subsidiaryId: employeeWithLeaveConfig.subsidiaryId }, required: true, attributes: [] }],
+          attributes: ['name', 'Id']
+        });
+
+        LeaveTypeData = leaveData.map((el) => {
+          return {
+            label: el.name,
+            value: el.Id,
+            limit: leaveConfigData?.t_leave_type_policies.find(ad => ad.leaveType == el.Id)?.encashableCount || 0
+          }
         })
-
-        if (allocatedData?.length) {
-          const leaveData = await LeaveTypeModel.findAll({
-            where: { Id: allocatedData?.map((el) => el.leaveType) },
-            attributes: ['name', 'Id']
-          });
-
-          LeaveTypeData = leaveData.map((el) => {
-            return {
-              label: el.name,
-              value: el.Id,
-              limit: allocatedData.find(ad =>  ad.leaveType == el.Id)?.maxCount || 0
-            }
-          })
-
-        }
       }
 
     }
@@ -272,7 +290,7 @@ const getEncashmentLeaveTypeData = async (employeeId, yearId) => {
 const getAllSubsidiaryData = async () => {
   const subsidiaryData = getDdlItems(DDL_FIELD_NAMES.Subsidiary, await SubsidiaryModel.findAll({
     where: { isActive: true },
-    attributes: ['name', 'Id','currencyId']
+    attributes: ['name', 'Id', 'currencyId']
   }));
   return subsidiaryData
 };
@@ -289,7 +307,7 @@ const getAllEmployeeShift = async () => {
     where: { isActive: true },
     attributes: ['name', 'Id', 'startTime', 'endTime']
   })
-  if(shiftData?.length){
+  if (shiftData?.length) {
     shiftData.forEach(el => {
       result.push({
         label: createEmployeeShiftLabel(el.name, el.endTime, el.startTime),
@@ -316,6 +334,20 @@ const getAllFiscalYearData = async () => {
     });
   }
   return result;
+};
+
+const getActiveFiscalYearData = async (subsidiaryId) => {
+  if (subsidiaryId) {
+    const data = await FiscalSetupModel.findOne({
+      where: { isActive: true, subsidiaryId: subsidiaryId },
+      attributes: ['startDate', 'endDate', 'Id']
+    });
+    if (!data) {
+      return null;
+    }
+    return { label: createFiscalYearLabel(data.endDate, data.startDate) }
+  }
+  return null;
 };
 
 
@@ -368,5 +400,6 @@ module.exports = {
   getAllFiscalYearData,
   getEncashmentLeaveTypeData,
   getAllEmployeeShift,
-  getLeaveTypesDataBySubsidiary
+  getLeaveTypesDataBySubsidiary,
+  getActiveFiscalYearData
 };
