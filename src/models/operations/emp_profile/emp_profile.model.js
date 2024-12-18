@@ -49,7 +49,7 @@ const DesigModel = sequelize.define('t_employee_profile', {
 	dateOfConfirmationEnter: { type: Sequelize.DATE, allowNull: true },
 	dateOfContractExpiry: { type: Sequelize.DATE, allowNull: true },
 	defaultShiftId: { type: Sequelize.INTEGER, allowNull: true },
-	attendanceType: { type: Sequelize.INTEGER, allowNull: true },
+	attendanceType: { type: Sequelize.INTEGER,  defaultValue: true },
 	dateOfBirth: { type: Sequelize.DATE, allowNull: true },
 	dateOfRetirement: { type: Sequelize.DATE, allowNull: true },
 	salesRep: { type: Sequelize.BOOLEAN, allowNull: true },

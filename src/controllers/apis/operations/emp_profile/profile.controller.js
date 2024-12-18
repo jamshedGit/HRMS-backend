@@ -188,7 +188,8 @@ const deleteEmp_profile = catchAsync(async (req, res) => {
 
   } catch (error) {
 
-    throw new ApiError(httpStatus.NOT_FOUND,"Could not delete record because in another used!");
+    // throw new ApiError(httpStatus.NOT_FOUND,"Could not delete record because in another used!");
+    throw new ApiError(httpStatus.NOT_FOUND,error);
   }
 });
 

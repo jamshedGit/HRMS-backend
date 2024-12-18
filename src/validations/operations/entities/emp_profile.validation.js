@@ -41,7 +41,7 @@ const createEmp_profileValidation = {
         dateOfConfirmationEnter: Joi.any().optional(),
         dateOfContractExpiry: Joi.any().optional(),
         defaultShiftId: Joi.number(),
-        attendanceType: Joi.string(),
+        attendanceType: Joi.number().optional(),
         dateOfBirth: Joi.date(),
         dateOfRetirement: Joi.date(),
         gradeId: Joi.number(),
