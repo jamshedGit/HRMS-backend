@@ -54,7 +54,7 @@ const getAllPayrollMonth = catchAsync(async (req, res) => {
 const SP_GetActivePreviousPayrollMonth = catchAsync(async (req, res) => {
 
 
-  const obj = await PayrollMonthServicePage.PayrollMonthServicePage.SP_GetActivePreviousPayrollMonth(req.body.subsidiaryId);
+  const obj = await PayrollMonthServicePage.PayrollMonthServicePage.SP_GetActivePreviousPayrollMonth(req.body.subsidiaryId, req.body.employeeId);
   if (!obj) {
     throw new ApiError(httpStatus.NOT_FOUND, "obj not found");
   }

@@ -1,6 +1,6 @@
 const httpStatus = require("http-status");
 const axios = require("axios")
-const  PayrollMonthModel  = require("../../../models/index");
+const PayrollMonthModel = require("../../../models/index");
 const ApiError = require("../../../utils/ApiError");
 const sequelize = require("../../../config/db");
 const Sequelize = require('sequelize');
@@ -78,8 +78,19 @@ const queryPayrollMonths = async (filter, options, searchQuery) => {
 };
 
 
-const SP_GetActivePreviousPayrollMonth = async (p_subsidiaryId) => {
+const SP_GetActivePreviousPayrollMonth = async (p_subsidiaryId, employeeId) => {
   try {
+    let subsidiaryId = p_subsidiaryId;
+    if (employeeId) {
+      const data = await PayrollMonthModel.EmployeeProfileModel.findByPk(employeeId, {
+        attributes: ['Id', 'subsidiaryId']
+      })
+
+      if(data.subsidiaryId){
+        subsidiaryId = data.subsidiaryId;
+      }
+    }
+
 
     // const results = await sequelize.query('CALL usp_GetActivePreviousPayrollMonth(:p_subsidiaryId)', {
     //   replacements: { p_subsidiaryId: p_subsidiaryId || 'null' },
@@ -87,14 +98,13 @@ const SP_GetActivePreviousPayrollMonth = async (p_subsidiaryId) => {
     // });
     // select * from t_payroll_month_setup where isActive = 1 AND subsidiaryId=p_subsidiaryId
 
-   const results = await PayrollMonthModel.PayrollMonthModel.findOne({
-       where: {
-         subsidiaryId: p_subsidiaryId,
-         isActive:true
-       
-       },
-     });
- 
+    const results = await PayrollMonthModel.PayrollMonthModel.findOne({
+      where: {
+        subsidiaryId: subsidiaryId,
+        isActive: true
+
+      },
+    });
 
 
     return results;
@@ -130,7 +140,7 @@ const updatePayrollMonthById = async (Id, updateBody, updatedBy) => {
   delete updateBody.id;
   Object.assign(Item, updateBody);
   await Item.save();
-  return  ;
+  return;
 };
 
 /**
@@ -138,7 +148,7 @@ const updatePayrollMonthById = async (Id, updateBody, updatedBy) => {
  * @param {ObjectId} Id
  * @returns {Promise<ReceiptModel>}
  */
-  const deletePayrollMonthById = async (Id) => {
+const deletePayrollMonthById = async (Id) => {
 
   const Item = await getPayrollMonthById(Id);
   if (!Item) {
