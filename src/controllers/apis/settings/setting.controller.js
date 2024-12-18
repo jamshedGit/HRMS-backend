@@ -132,6 +132,14 @@ const getAllFiscalYears = catchAsync(async (req, res) => {
   });
 });
 
+const getCurrentFiscalYears = catchAsync(async (req, res) => {
+  res.send({  
+    code: HttpStatusCodes.OK,
+    message: HttpResponseMessages.OK,
+    data: await settingService.getActiveFiscalYearData(req.body.subsidiaryId),
+  });
+});
+
 
 const getCitiesMasterData = catchAsync(async (req, res) => {
   res.send({
@@ -190,5 +198,6 @@ module.exports = {
   getAllFiscalYears,
   getEncashmentLeaveType,
   getAllEmployeeShift,
-  getAllLeaveTypeBySubsidiary
+  getAllLeaveTypeBySubsidiary,
+  getCurrentFiscalYears
 };

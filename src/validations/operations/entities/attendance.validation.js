@@ -76,6 +76,26 @@ const getAllItem = {
 };
 
 /**
+ * For Process All Attendance Records
+ */
+const processAllItem = {
+  query: Joi.disallow(),
+  params: Joi.disallow(),
+  body: Joi.object().keys({
+    subsidiaryId: Joi.number().allow('').optional(),
+    departmentId: Joi.number().allow('').optional(),
+    reportTo: Joi.number().allow('').optional(),
+    gradeId: Joi.number().allow('').optional(),
+    designationId: Joi.number().allow('').optional(),
+    locationId: Joi.number().allow('').optional(),
+    attendanceType: Joi.number().allow('').optional(),
+    employeeId: Joi.number().allow('').optional(),
+    from: Joi.date().allow('').optional(),
+    to: Joi.date().allow('').optional(),
+  }),
+};
+
+/**
  * For Getting Single Attendance Records By Id in Params
  */
 const getSingleItemByFilters = {
@@ -115,5 +135,6 @@ module.exports = {
   getAllItem,
   deleteSingleItem,
   getItemWihoutId,
-  getSingleItemByFilters
+  getSingleItemByFilters,
+  processAllItem
 };

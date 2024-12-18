@@ -12,5 +12,6 @@ router.route("/read-all-attendance").post(auth(), validate(itemValidation.getAll
 router.route("/read-attendance/:id").get(auth(), validate(itemValidation.getSingleItem), form_controller.getattendanceById);
 router.route("/read-attendance-data").post(auth(), validate(itemValidation.getSingleItemByFilters), form_controller.getattendanceByFilters);
 router.route("/delete-attendance/:id").delete(auth(), validate(itemValidation.deleteSingleItem), form_controller.deleteattendance);
+router.route("/process-all-attendance").post(auth(), validate(itemValidation.processAllItem), form_controller.processAllAttendance);
 
 module.exports = router;

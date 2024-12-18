@@ -1,5 +1,5 @@
 const httpStatus = require("http-status");
-const { LeaveTypeModel, SubsidiaryModel } = require("../../../models/index");
+const { LeaveTypeModel, SubsidiaryModel, LeaveTypeModelAccess } = require("../../../models/index");
 const ApiError = require("../../../utils/ApiError");
 const Sequelize = require('sequelize');
 const { paginationFacts } = require("../../../utils/common");
@@ -28,9 +28,11 @@ const createLeaveType = async (req) => {
   if (FORBIDDEN_CODES.includes(req.body.code)) {
     throw new ApiError(httpStatus.FORBIDDEN, `This code is forbidden ${req.body.code}. Please use another code.`);
   }
-  const oldRecord = await getLeaveData({ code: req.body.code, subsidiaryId: req.body.subsidiaryId })
+  const oldRecord = await getLeaveData({
+    code: req.body.code
+  })
   if (oldRecord) {
-    throw new ApiError(httpStatus.FORBIDDEN, `Code already in use ${req.body.code} for this Subsidiary.`);
+    throw new ApiError(httpStatus.FORBIDDEN, `Code ${req.body.code} already in use.`);
   }
   const payload = {
     ...req.body,
@@ -38,12 +40,15 @@ const createLeaveType = async (req) => {
     typeName: LEAVE_TYPE[req.body.type]
   };
   const createdData = await LeaveTypeModel.create(payload);
-  const data = await getLeaveTypeById(createdData.Id, leaveTypeAttributes, [
-    {
-      model: SubsidiaryModel,
-      attributes: ['name']
+  if (createdData) {
+    for (const subId of createdData.subsidiaryId) {
+      await LeaveTypeModelAccess.create({
+        leaveTypeId: createdData.Id,
+        subsidiaryId: subId,
+      })
     }
-  ]);
+  }
+  const data = await getLeaveTypeById(createdData.Id, leaveTypeAttributes);
   return data;
 };
 
@@ -62,7 +67,6 @@ const getAllLeaveType = async (req) => {
   const offset = 0 + (options.pageNumber - 1) * limit;
   const queryFilters = [
     { Name: Sequelize.where(Sequelize.fn('LOWER', Sequelize.col('t_leave_type.name')), 'LIKE', '%' + searchQuery + '%') },
-    { Name: Sequelize.where(Sequelize.fn('LOWER', Sequelize.col('t_subsidiary.name')), 'LIKE', '%' + searchQuery + '%') },
   ]
 
   const { count, rows } = await LeaveTypeModel.findAndCountAll({
@@ -73,12 +77,6 @@ const getAllLeaveType = async (req) => {
       [Op.or]: queryFilters,
       // isActive: true
     },
-    include: [
-      {
-        model: SubsidiaryModel,
-        attributes: ['name']
-      }
-    ],
     attributes: leaveTypeAttributes,
     offset: offset,
     limit: limit,
@@ -145,7 +143,9 @@ const updateLeaveTypeById = async (body, updatedBy) => {
   if (FORBIDDEN_CODES.includes(body.code)) {
     throw new ApiError(httpStatus.FORBIDDEN, `This code is forbidden ${body.code}. Please use another code.`);
   }
-  let oldRecord = await getLeaveData({ code: body.code, subsidiaryId: body.subsidiaryId });
+  let oldRecord = await getLeaveData({
+    code: body.code
+  })
   if (oldRecord && oldRecord.Id != body.Id) {
     throw new ApiError(httpStatus.FORBIDDEN, `Code already in use ${body.code} for this Subsidiary.`);
   }
@@ -156,12 +156,16 @@ const updateLeaveTypeById = async (body, updatedBy) => {
   body.typeName = LEAVE_TYPE[body.type];
   Object.assign(oldRecord, body);
   const updatedData = await oldRecord.save();
-  const data = await getLeaveTypeById(updatedData.Id, leaveTypeAttributes, [
-    {
-      model: SubsidiaryModel,
-      attributes: ['name']
+  if (updatedData) {
+    await LeaveTypeModelAccess.destroy({ where: { leaveTypeId: updatedData.Id } })
+    for (const subId of updatedData.subsidiaryId) {
+      await LeaveTypeModelAccess.create({
+        leaveTypeId: updatedData.Id,
+        subsidiaryId: subId,
+      })
     }
-  ])
+  }
+  const data = await getLeaveTypeById(updatedData.Id, leaveTypeAttributes)
   return data;
 };
 

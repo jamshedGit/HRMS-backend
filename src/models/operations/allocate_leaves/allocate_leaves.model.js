@@ -37,7 +37,16 @@ const allocateLeavesModel = sequelize.define('t_allocate_leaves', {
 	updatedBy: { type: Sequelize.INTEGER, allowNull: true },
 	createdAt: { type: Sequelize.DATE, allowNull: true },
 	updatedAt: { type: Sequelize.DATE, allowNull: true },
-});
+},
+{
+    indexes: [
+      {
+        name: 't_allocate_leaves_UNIQUE',
+        unique: true,
+        fields: ['subsidiaryId', 'yearId', 'leaveType']
+      }
+    ]
+  });
 
 // Association with SubsidiaryModel model (subsidiaryId is a foreign key)
 SubsidiaryModel.hasMany(allocateLeavesModel, { foreignKey: 'subsidiaryId' });

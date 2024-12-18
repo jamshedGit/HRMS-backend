@@ -38,6 +38,34 @@ LeaveTypePoliciesModel.init(
         return typeof rawValue != 'undefined' ? Number(rawValue) : null;
       }
     },
+    entitledAt: {
+      type: DataTypes.INTEGER,
+      allowNull: true
+    },
+    encashable: {
+      type: DataTypes.BOOLEAN,
+      allowNull: true
+    },
+    encashableCount: {
+      type: DataTypes.FLOAT,
+      allowNull: true,
+      get() {
+        const rawValue = this.getDataValue('encashableCount');
+        return typeof rawValue != 'undefined' ? Number(rawValue) : null;
+      }
+    },
+    carryForwardable: {
+      type: DataTypes.BOOLEAN,
+      allowNull: true
+    },
+    carryForwardableCount: {
+      type: DataTypes.FLOAT,
+      allowNull: true,
+      get() {
+        const rawValue = this.getDataValue('carryForwardableCount');
+        return typeof rawValue != 'undefined' ? Number(rawValue) : null;
+      }
+    },
     attachmentRequired: {
       type: DataTypes.BOOLEAN,
       allowNull: true
@@ -97,6 +125,15 @@ LeaveTypePoliciesModel.belongsTo(FormModel, {
   foreignKey: 'maritalStatus',
   targetKey: 'Id',  // Assuming 'Id' is the primary key in FormMenu table
   as: 'maritalDetail',
+  onDelete: 'RESTRICT',
+  onUpdate: 'CASCADE',
+});
+
+// Association with FormModel model (entitledAt is a foreign key)
+LeaveTypePoliciesModel.belongsTo(FormModel, {
+  foreignKey: 'entitledAt',
+  targetKey: 'Id',  // Assuming 'Id' is the primary key in FormMenu table
+  as: 'entitleType',
   onDelete: 'RESTRICT',
   onUpdate: 'CASCADE',
 });

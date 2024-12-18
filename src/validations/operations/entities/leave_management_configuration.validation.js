@@ -15,11 +15,16 @@ const createItem = {
     leavetypePolicies: Joi.array().items(
       Joi.object().keys({
         leaveType: Joi.number().required(),
+        entitledAt: Joi.number().optional().allow(null),
         gender: Joi.number().allow(null).required(),
         minExp: Joi.optional(),
         maxAllowed: Joi.number().required(),
         attachmentRequired: Joi.boolean().required(),
-        maritalStatus: Joi.number().allow(null).required(),
+        encashable: Joi.boolean().required(),
+        carryForwardable: Joi.boolean().required(),
+        encashableCount: Joi.number().optional().allow(""),
+        carryForwardableCount: Joi.number().optional().allow(""),
+        maritalStatus: Joi.number().allow(null).optional(),
       })
     ).optional(),
 
@@ -52,11 +57,16 @@ const updateItem = {
       Joi.object().keys({
         Id: Joi.number().optional(),
         leaveType: Joi.number().required(),
+        entitledAt: Joi.number().optional().allow(null),
         gender: Joi.number().allow(null).required(),
         minExp: Joi.optional(),
         maxAllowed: Joi.number().required(),
         attachmentRequired: Joi.boolean().required(),
-        maritalStatus: Joi.number().allow(null).required(),
+        encashable: Joi.boolean().required(),
+        carryForwardable: Joi.boolean().required(),
+        encashableCount: Joi.number().optional().allow(""),
+        carryForwardableCount: Joi.number().optional().allow(""),
+        maritalStatus: Joi.number().allow(null).optional(),
       })
     ).optional(),
 

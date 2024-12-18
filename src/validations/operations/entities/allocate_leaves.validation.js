@@ -8,16 +8,20 @@ const createItem = {
   params: Joi.disallow(),
   body: Joi.object().keys({
     subsidiaryId: Joi.number().required(),
-    cycleTypeId: Joi.number().optional(),
-    yearId: Joi.number().optional(),
     list: Joi.array().items(
       Joi.object().keys({
-        Id: Joi.number().optional(),
+        Id: Joi.optional(),
         leaveType: Joi.number().required(),
-        leaveCount: Joi.number().required(),
-        policyType: Joi.number().optional().allow(''),
-        maxCount: Joi.number().optional().allow(''),
-        updatedAt: Joi.any().optional()
+        entitledAt: Joi.number().optional().allow(null),
+        gender: Joi.number().allow(null).optional(),
+        minExp: Joi.optional(),
+        maxAllowed: Joi.number().optional(),
+        attachmentRequired: Joi.boolean().optional(),
+        encashable: Joi.boolean().optional(),
+        carryForwardable: Joi.boolean().optional(),
+        encashableCount: Joi.number().optional().allow(""),
+        carryForwardableCount: Joi.number().optional().allow(""),
+        maritalStatus: Joi.number().allow(null).optional(),
       })
     ).min(1).required(),
   }),

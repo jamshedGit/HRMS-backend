@@ -104,11 +104,28 @@ const deleteattendance = catchAsync(async (req, res) => {
   });
 });
 
+/**
+ * 
+ * Process All Attendance
+ * 
+ * @param {Object} req 
+ * @returns res
+ */
+const processAllAttendance = catchAsync(async (req, res) => {
+  const data = await AttendanceServicePage.processAllAttendance(req);
+  res.send({
+    code: HttpStatusCodes.OK,
+    message: HttpResponseMessages.OK,
+    data: data
+  });
+});
+
 module.exports = {
   createattendance,
   getattendanceById,
   getattendanceByFilters,
   updateattendance,
   getAllattendance,
-  deleteattendance
+  deleteattendance,
+  processAllAttendance
 };

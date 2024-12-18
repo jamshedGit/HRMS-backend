@@ -10,7 +10,10 @@ const createItem = {
     code: Joi.string().pattern(/^[A-Za-z]{1,3}$/).required(),
     name: Joi.string().required(),
     type: Joi.number().integer().min(1).max(2).required(),
-    subsidiaryId: Joi.number().required()
+    subsidiaryId: Joi.array()
+      .items(Joi.string().required())
+      .min(1)
+      .required()
   }),
 };
 
@@ -25,7 +28,10 @@ const updateItem = {
     code: Joi.string().pattern(/^[A-Za-z]{1,3}$/).required(),
     name: Joi.string().required(),
     type: Joi.number().integer().min(1).max(2).required(),
-    subsidiaryId: Joi.number().required(),
+    subsidiaryId: Joi.array()
+      .items(Joi.string().required())
+      .min(1)
+      .required(),
     isActive: Joi.number().optional(),
     typeName: Joi.string().optional(),
   }),
