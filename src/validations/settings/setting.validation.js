@@ -59,6 +59,14 @@ const getAllLeaveType = {
   }),
 }
 
+
+const getAllShiftType = {
+  query: Joi.disallow(),
+  params: Joi.disallow(),
+  body: Joi.disallow(),
+}
+
+
 const getAllLeaveTypeBySubsidiary = {
   query: Joi.disallow(),
   params: Joi.disallow(),
@@ -68,6 +76,13 @@ const getAllLeaveTypeBySubsidiary = {
 }
 
 const getAllSubsidiaries = {
+  query: Joi.disallow(),
+  params: Joi.disallow(),
+  body: Joi.disallow(),
+}
+
+
+const getAllFiscalYear = {
   query: Joi.disallow(),
   params: Joi.disallow(),
   body: Joi.disallow(),
@@ -214,5 +229,5 @@ module.exports = {
   getEmpSalaryRevisionByEmpId,
   getAllLeaveType,
   getAllSubsidiaries,
-  getAllLeaveTypeBySubsidiary
+  getAllLeaveTypeBySubsidiary,getAllFiscalYear,getAllShiftType
 };
