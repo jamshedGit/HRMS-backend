@@ -296,11 +296,79 @@ const deleteAttendanceById = async (id) => {
   return oldRecord;
 };
 
+
+/**
+ * 
+ * Process All Attendances
+ * 
+ * @param {Object} req 
+ * @returns 
+ */
+const processAllAttendance = async (req) => {
+  const filter = req?.body || {};
+
+  if (!filter.from || !filter.to) {
+    throw new ApiError(httpStatus.BAD_REQUEST, "Please provide date range");
+  }
+
+  //Prepare Employee Table Filters if any
+  const employeeFilter = {};
+
+  if (filter.subsidiaryId) employeeFilter.subsidiaryId = filter.subsidiaryId;
+  if (filter.departmentId) employeeFilter.departmentId = filter.departmentId;
+  if (filter.reportTo) employeeFilter.reportTo = filter.reportTo;
+  if (filter.gradeId) employeeFilter.gradeId = filter.gradeId;
+  if (filter.designationId) employeeFilter.designationId = filter.designationId;
+  if (filter.locationId) employeeFilter.locationId = filter.locationId;
+  if (filter.attendanceType) employeeFilter.attendanceType = filter.attendanceType;
+  if (filter.employeeId) employeeFilter.Id = filter.employeeId;
+
+  const employeeData = await EmployeeProfileModel.findAll({
+    where: employeeFilter,
+    attributes: ['Id'],
+    include: [
+      {
+        model: SubsidiaryModel,
+        attributes: ['Id'],
+        include: [
+          {
+            model: CompanyModel,
+            attributes: ['Id']
+          }
+        ]
+      }
+    ]
+  })
+
+  for (const emp of employeeData) {
+    if (emp?.t_subsidiary?.t_company) {
+      try {
+        await sequelize.query('CALL SP_SmartlyProceedAttendance(:p_CompanyId ,:p_SubsidiaryId ,:p_M_EmpId ,:p_FromDate ,:p_ToDate,:p_isSpecial)', {
+          replacements: {
+            p_CompanyId: emp.t_subsidiary.t_company.Id,
+            p_SubsidiaryId: emp.t_subsidiary.Id,
+            p_M_EmpId: emp.Id,
+            p_FromDate: formatDates(filter.from, 'yyyy-MM-dd'),
+            p_ToDate: formatDates(filter.to, 'yyyy-MM-dd'),
+            p_isSpecial: 0,
+          },
+          type: Sequelize.QueryTypes.RAW // Use RAW type for executing stored procedures
+        });
+      } catch (error) {
+        console.log(`'::init::${emp.Id}::'`, error);
+      }
+    }
+  }
+
+  return {};
+};
+
 module.exports = {
   getAllattendance,
   getAttendanceById,
   updateAttendanceById,
   deleteAttendanceById,
   createAttendance,
-  getattendanceByFilters
+  getattendanceByFilters,
+  processAllAttendance
 };
