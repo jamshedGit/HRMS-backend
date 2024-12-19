@@ -165,3 +165,4 @@ module.exports.EmployeeRosterModel = require('./operations/employee_roster/emplo
 //Employee Roster Detail Model
 module.exports.EmployeeRosterDetailModel = require('./operations/employee_roster_detail/employee_roster_detail.model');
 module.exports.HolidaysModel= require("./operations/holidays/holidays.model")
+module.exports.EarningSetupAccessModel = require('./operations/earning/earningSetupAccess.model');

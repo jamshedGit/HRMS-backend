@@ -1,6 +1,6 @@
 const httpStatus = require("http-status");
 const axios = require("axios")
-const EarningModel = require("../../models/index");
+const {EarningModel ,EarningSetupAccessModel}  = require("../../models/index");
 const ApiError = require("../../utils/ApiError");
 const sequelize = require("../../config/db");
 const Sequelize = require('sequelize');
@@ -21,8 +21,16 @@ const createEarning = async (req, EarningBody) => {
  
   EarningBody.createdBy = req.user.id;
   EarningBody.earningName=EarningBody.earningName.trimStart();
-  const addedEarningObj = await EarningModel.EarningModel.create(EarningBody);
+  const addedEarningObj = await EarningModel.create(EarningBody);
   //authSMSSend(addedEarningObj.dataValues);  // Quick send message at the time of donation
+    if (addedEarningObj) {
+      for (const subId of addedEarningObj.subsidiaryId) {
+        await EarningSetupAccessModel.create({
+          earningSetupId: addedEarningObj.Id,
+          subsidiaryId: subId,
+        })
+      }
+    }
   return addedEarningObj;
 };
 
@@ -48,7 +56,7 @@ const queryEarnings = async (filter, options, searchQuery) => {
   ]
 
 
-  const { count, rows } = await EarningModel.EarningModel.findAndCountAll({
+  const { count, rows } = await EarningModel.findAndCountAll({
     order: [
       ['createdAt', 'DESC']
     ],
@@ -132,7 +140,7 @@ function filterByValue(array, string) {
  */
 const getEarningById = async (id) => {
 
-  return EarningModel.EarningModel.findByPk(id);
+  return EarningModel.findByPk(id);
 };
 
 

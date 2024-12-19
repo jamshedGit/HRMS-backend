@@ -93,6 +93,8 @@ BranchModel,
 Payroll_ProcessModel,
 EmployeePolicyModel,
 Employee_ShiftModel,
+EarningSetupAccessModel,
+EarningModel,
 } = require('./models');
 // Tax_slabModel.sync({ force: true }); 
 // Employee_loan_request_detailModel.sync({ force: true }); 
@@ -126,11 +128,14 @@ Employee_ShiftModel,
 // RoleModel.sync({force:true});
 // EmployeePolicyModel.sync({force:true});
 // Employee_ShiftModel.sync({alter:true});
-
+// EarningModel.sync({alter:true});
+// EarningSetupAccessModel.sync({alter:true});
 // send back a 404 error for any unknown api request
 app.use((req, res, next) => {
   next(new ApiError(httpStatus.NOT_FOUND, "Not found"));
 });
+
+
 
 // convert error to ApiError, if needed
 app.use(errorConverter);
