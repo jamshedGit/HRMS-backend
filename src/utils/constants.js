@@ -108,7 +108,7 @@ const HttpResponseMessages = {
   FORBIDDEN: 'Forbidden to access required resource',
   NOT_FOUND: 'Resource not found',
   INTERNAL_SERVER_ERROR: 'Something went wrong',
-  ALREADY_EXIST:"Record already exist",
-  ASSOCIATED_RECORD:"The record is associated with other data"
+  ALREADY_EXIST:"Record already exists",
+  ASSOCIATED_RECORD:"Unable to Delete: This record is already used in Transaction forms."
 };
 module.exports = { DDL_FIELD_NAMES, HttpStatusCodes, HttpResponseMessages };

@@ -25,7 +25,7 @@ const createExchangeRate = catchAsync(async (req, res) => {
   } catch (error) {
    
      if (error.parent.errno === 1062) {
-      throw new ApiError(httpStatus.NOT_FOUND, "Duplicate entry not allowed!");
+      throw new ApiError(httpStatus.NOT_FOUND, HttpResponseMessages.ALREADY_EXIST);
     }
     else {
      
