@@ -165,6 +165,7 @@ const getAllattendance = async (req) => {
       }
     ],
     attributes: [
+      'Id',
       'employeeCode',
       'attDateIn',
       [
@@ -177,7 +178,11 @@ const getAllattendance = async (req) => {
       ],
       'timeIn',
       'timeOut',
-      'comments'
+      'comments',
+      [
+        Sequelize.literal(`fn_AttendanceStatus(t_employee_profile.Id, t_attendance.attDateIn)`),
+        'attendanceStatus'
+      ]
     ],
     offset: offset,
     limit: limit,
