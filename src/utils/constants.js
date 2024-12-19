@@ -99,8 +99,8 @@ const HttpStatusCodes = {
 const HttpResponseMessages = {
   OK: 'Successfully',
   // OK: 'Successfully',
-  CREATED: 'Successfully Created',
-  UPDATED: 'Successfully Updated',
+  CREATED: 'Record created Successfully!',
+  UPDATED: 'Record updated Successfully!',
   NO_CONTENT: 'No Content',
   BAD_REQUEST: 'Bad Request',
   UNAUTHORIZED: 'Unauthorized access',

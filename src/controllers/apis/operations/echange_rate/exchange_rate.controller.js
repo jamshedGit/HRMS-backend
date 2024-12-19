@@ -11,10 +11,10 @@ const {
 } = require("../../../../utils/constants");
 
 const createExchangeRate = catchAsync(async (req, res) => {
-  // console.log("reqested User", req.user.id);
+ 
   try {
 
-   
+
     const ExchangeRate = await ExchangeRateformService.ExchangeRateServicePage.createExchangeRate(req, req.body);
     res.status(httpStatus.CREATED).send({
       code: HttpStatusCodes.CREATED,
@@ -103,7 +103,7 @@ const updateExchangeRate = catchAsync(async (req, res) => {
   const Receipt = await ExchangeRateformService.ExchangeRateServicePage.updateExchangeRateById(req.body.Id, req.body, req.user.Id);
   res.send({
     code: HttpStatusCodes.OK,
-    message: HttpResponseMessages.OK,
+    message: HttpResponseMessages.UPDATED,
     data: Receipt,
   });
 });

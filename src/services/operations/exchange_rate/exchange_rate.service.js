@@ -19,16 +19,15 @@ const createExchangeRate = async (req, ExchangeRateBody) => {
   try {
 
 
-
-    // ExchangeRateBody.slug = ExchangeRateBody.name.replace(/ /g, "-").toLowerCase();
- 
     ExchangeRateBody.createdBy = req.user.id;
  
     const addedExchangeRateObj = await ExchangeRateModel.ExchangeRateModel.create(ExchangeRateBody);
-    //authSMSSend(addedExchangeRateObj.dataValues);  // Quick send message at the time of donation
-    return addedExchangeRateObj;
-  } catch (error) {
+    
  
+    return addedExchangeRateObj;
+
+  } catch (error) {
+
     throw error;
   }
 };
@@ -160,11 +159,14 @@ const updateExchangeRateById = async (Id, updateBody, updatedBy) => {
     throw new ApiError(httpStatus.NOT_FOUND, "record not found");
   }
 
-  // updateBody.slug = updateBody.name.replace(/ /g, "-").toLowerCase()
+  if (updateBody.effective_date) {
+  
+  }
   updateBody.updatedBy = updatedBy;
   delete updateBody.id;
   Object.assign(Item, updateBody);
   await Item.save();
+
   return;
 };
 

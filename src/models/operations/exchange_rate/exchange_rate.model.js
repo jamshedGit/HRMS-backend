@@ -4,6 +4,7 @@ const { ResourceModel } = require('../../..');
 //import Database connection configurations.
 const sequelize = require('../../../config/db');
 const { SubsidiaryModel, FormModel } = require('../..');
+const { formatDates } = require('../../../utils/common');
 
 const ExchangeRateModel = sequelize.define('t_exchange_rate', {
 	Id: {
@@ -17,6 +18,14 @@ const ExchangeRateModel = sequelize.define('t_exchange_rate', {
     currency_to_convert_id : { type: Sequelize.NUMBER, allowNull: true, defaultValue: true },
     exchange_rate : { type: Sequelize.DOUBLE, allowNull: true, defaultValue: true },
     effective_date : { type: Sequelize.DATE, allowNull: true, defaultValue: true },
+	// effective_date: {
+	// 	type: Sequelize.DATE,
+	// 	allowNull: false,
+	// 	get() {
+	// 		const rawValue = this.getDataValue('effective_date');
+	// 		return rawValue ? formatDates(rawValue) : null;
+	// 	}
+	// },
 	isActive: { type: Sequelize.BOOLEAN, allowNull: true, defaultValue: true },
 	createdBy: {
 		type: Sequelize.INTEGER,
