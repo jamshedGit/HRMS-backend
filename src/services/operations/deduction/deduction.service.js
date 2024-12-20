@@ -20,10 +20,21 @@ const createDeduction = async (req, DeductionBody) => {
   // DeductionBody.slug = DeductionBody.name.replace(/ /g, "-").toLowerCase();
 
   DeductionBody.createdBy = req.user.id;
-
+  DeductionBody.deductionName=DeductionBody.deductionName.trimStart();
   const addedDeductionObj = await DeductionModel.DeductionModel.create(DeductionBody);
-  //authSMSSend(addedDeductionObj.dataValues);  // Quick send message at the time of donation
+    //authSMSSend(addedEarningObj.dataValues);  // Quick send message at the time of donation
+    if (addedDeductionObj) {
+      for (const subId of addedDeductionObj.subsidiaryId) {
+        await DeductionModel.DeductionSetupAccessModel.create({
+          deductionSetupId: addedDeductionObj.Id,
+          subsidiaryId: subId,
+        })
+      }
+    }
   return addedDeductionObj;
+
+
+
 };
 
 
