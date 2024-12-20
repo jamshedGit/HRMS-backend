@@ -1,6 +1,6 @@
 const httpStatus = require("http-status");
 const axios = require("axios")
-const {EarningModel ,EarningSetupAccessModel}  = require("../../models/index");
+const {EarningModel ,EarningSetupAccessModel,FormModel}  = require("../../models/index");
 const ApiError = require("../../utils/ApiError");
 const sequelize = require("../../config/db");
 const Sequelize = require('sequelize');
@@ -81,6 +81,49 @@ const SP_getAllEarningInfo = async (filter, options, searchQuery, empId) => {
       type: Sequelize.QueryTypes.RAW // Use RAW type for executing stored procedures
     });
 
+
+    // const results = await EarningModel.findAll({
+    //   attributes: [
+    //     'Id',
+    //     'subsidiaryid',
+    //     'earningCode',
+    //     'earningName',
+    //     "mappedAllowance",
+    //     "account",
+    //     'isActive',
+    //     'createdBy',
+    //     'createdAt',
+    //     'updatedBy',
+    //     'updatedAt',
+    //     // [sequelize.col('subsidiary.name'), 'subsidiary'], // Get the subsidiary name
+    //     // Simplified CASE statements using sequelize.fn and sequelize.col
+    //     [
+    //       sequelize.fn('IF', sequelize.col('linkedAttendance'), 'Yes', 'No'), 
+    //       'linkedAttendance',
+    //     ],
+    //     [
+    //       sequelize.fn('IF', sequelize.col('isTaxable'), 'Yes', 'No'), 
+    //       'isTaxable',
+    //     ],
+        
+    //     [
+    //       sequelize.fn('CONCAT', sequelize.col('Account.formCode'), ' - ', sequelize.col('Account.formName')),
+    //       'account',
+    //     ],
+    //   ],
+    //   include: [
+      
+    //     {
+    //       model: FormModel,
+    //       attributes: ["formName", "formCode"],
+    //       as: "Account",
+    //     },
+
+    //   ],
+    //   // Optional: add any filters, such as `where` or `order`, depending on your use case
+    // });
+
+    // return earnings;
     let limit = options.pageSize;
     let offset = 0 + (options.pageNumber - 1) * limit;
     searchQuery = searchQuery.toLowerCase();
@@ -94,6 +137,8 @@ const SP_getAllEarningInfo = async (filter, options, searchQuery, empId) => {
     throw new ApiError(httpStatus.INTERNAL_SERVER_ERROR, error);
   }
 };
+
+
 
 
 const SP_getAllEarningInfoByEmpId = async (empId) => {

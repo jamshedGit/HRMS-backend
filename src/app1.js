@@ -128,7 +128,7 @@ EarningModel,
 // RoleModel.sync({force:true});
 // EmployeePolicyModel.sync({force:true});
 // Employee_ShiftModel.sync({alter:true});
-// EarningModel.sync({alter:true});
+// EarningModel.sync({force:true});
 // EarningSetupAccessModel.sync({alter:true});
 // send back a 404 error for any unknown api request
 app.use((req, res, next) => {
