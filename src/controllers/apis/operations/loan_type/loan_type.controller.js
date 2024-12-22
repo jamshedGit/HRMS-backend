@@ -23,7 +23,7 @@ const createLoanType = catchAsync(async (req, res) => {
     });
 
   } catch (error) {
-console.log("error111",error)
+
     if (error?.parent?.errno === 1062) {
       throw new ApiError(httpStatus.NOT_FOUND, "Duplicate entry not allowed!");
     }
@@ -35,7 +35,7 @@ console.log("error111",error)
 });
 
 const getAllLoanType = catchAsync(async (req, res) => {
-console.log("getAllLoanType111")
+
   const obj = {};
   const filter = obj;
   // const options = pick(req.body, ["sortBy", "limit", "page"]);
