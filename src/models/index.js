@@ -167,3 +167,4 @@ module.exports.EmployeeRosterDetailModel = require('./operations/employee_roster
 module.exports.HolidaysModel= require("./operations/holidays/holidays.model")
 
 module.exports.DeductionSetupAccessModel=require("./operations/deduction/deductionSetupAccess.model")
+module.exports.DepartmentSetupAccessModel=require("./operations/department/departmentSetupAccess.model")

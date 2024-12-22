@@ -95,6 +95,7 @@ EmployeePolicyModel,
 Employee_ShiftModel,
 DeductionSetupAccessModel,
 DeductionModel,
+DepartmentSetupAccessModel,
 } = require('./models');
 
 // Tax_slabModel.sync({ force: true }); 
@@ -131,6 +132,7 @@ DeductionModel,
 // Employee_ShiftModel.sync({alter:true});
 // DeductionSetupAccessModel.sync({force:true});
 // DeductionModel.sync({alter:true});
+// DepartmentSetupAccessModel.sync({force:true});
 // send back a 404 error for any unknown api request
 app.use((req, res, next) => {
   next(new ApiError(httpStatus.NOT_FOUND, "Not found"));
