@@ -93,6 +93,8 @@ BranchModel,
 Payroll_ProcessModel,
 EmployeePolicyModel,
 Employee_ShiftModel,
+EarningSetupAccessModel,
+EarningModel,
 DeductionSetupAccessModel,
 DeductionModel,
 DepartmentSetupAccessModel,
@@ -130,6 +132,8 @@ DepartmentSetupAccessModel,
 // RoleModel.sync({force:true});
 // EmployeePolicyModel.sync({force:true});
 // Employee_ShiftModel.sync({alter:true});
+// EarningModel.sync({force:true});
+// EarningSetupAccessModel.sync({alter:true});
 // DeductionSetupAccessModel.sync({force:true});
 // DeductionModel.sync({alter:true});
 // DepartmentSetupAccessModel.sync({force:true});
@@ -137,6 +141,8 @@ DepartmentSetupAccessModel,
 app.use((req, res, next) => {
   next(new ApiError(httpStatus.NOT_FOUND, "Not found"));
 });
+
+
 
 // convert error to ApiError, if needed
 app.use(errorConverter);

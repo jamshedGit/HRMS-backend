@@ -4,7 +4,7 @@ const createEarningValidation = {
     query: Joi.disallow(),
     params: Joi.disallow(),
     body: Joi.object().keys({
-        earningCode: Joi.string(), 
+        earningCode: Joi.string().optional(), 
         earningName: Joi.string(),
         linkedAttendance: Joi.boolean(),
         isTaxable: Joi.boolean(),
