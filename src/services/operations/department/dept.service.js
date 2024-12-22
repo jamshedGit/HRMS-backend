@@ -172,7 +172,7 @@ const updateDeptById = async (deptId, updateBody, updatedBy) => {
     }
   } catch (error) {
   
-    if (error.errno === 1062) {
+    if (error?.errno === 1062) {
       throw new ApiError(httpStatus.NOT_FOUND, "Duplicate entry not allowed!");
     }
     else {
