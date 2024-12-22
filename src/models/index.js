@@ -166,3 +166,7 @@ module.exports.EmployeeRosterModel = require('./operations/employee_roster/emplo
 module.exports.EmployeeRosterDetailModel = require('./operations/employee_roster_detail/employee_roster_detail.model');
 module.exports.HolidaysModel= require("./operations/holidays/holidays.model")
 module.exports.LoanTypeSetupAccess=require("./operations/loan_type/loanTypeSetupAccess.model")
+module.exports.EarningSetupAccessModel = require('./operations/earning/earningSetupAccess.model');
+
+module.exports.DeductionSetupAccessModel=require("./operations/deduction/deductionSetupAccess.model")
+module.exports.DepartmentSetupAccessModel=require("./operations/department/departmentSetupAccess.model")
