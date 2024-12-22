@@ -26,7 +26,7 @@ const createLoanType = async (req, LoanTypeBody) => {
   if (addedLoanTypeObj) {
     for (const subId of addedLoanTypeObj.subsidiaryId) {
       await LoanTypeSetupAccess.create({
-        loanTypeSetupId: addedLoanTypeObj.Id,
+        loan_typeSetupId: addedLoanTypeObj.Id,
         subsidiaryId: subId,
       })
     }
@@ -167,21 +167,65 @@ const getLoanTypeById = async (id) => {
  * @param {Object} updateBody
  * @returns {Promise<ReceiptModel>}
  */
-const updateLoanTypeById = async (Id, updateBody, updatedBy) => {
+// const updateLoanTypeById = async (Id, updateBody, updatedBy) => {
 
   
-  const Item = await getLoanTypeById(Id);
-  if (!Item) {
-    throw new ApiError(httpStatus.NOT_FOUND, "record not found");
+//   const Item = await getLoanTypeById(Id);
+//   if (!Item) {
+//     throw new ApiError(httpStatus.NOT_FOUND, "record not found");
+//   }
+//   // updateBody.slug = updateBody.name.replace(/ /g, "-").toLowerCase()
+//   updateBody.updatedBy = updatedBy;
+//   updateBody.name=updateBody.name.trimStart();
+//   delete updateBody.id;
+//   Object.assign(Item, updateBody);
+//   await Item.save();
+//   return;
+// };
+
+const updateLoanTypeById = async (Id, updateBody, updatedBy) => {
+ 
+  try {
+
+
+    const Item = await getLoanTypeById(Id);
+
+    if (!Item) {
+      throw new ApiError(httpStatus.NOT_FOUND, "record not found");
+    }
+
+    updateBody.updatedBy = updatedBy;
+    delete updateBody.Id;
+    Object.assign(Item, updateBody);
+
+    updatedData= await Item.save();
+    if (updatedData) {
+    
+     
+        await LoanTypeSetupAccess.destroy({ where: { loan_typeSetupId: updatedData.Id } })
+      // }
+   
+      for (const subId of updatedData.subsidiaryId) {
+        await LoanTypeSetupAccess.create({
+          loan_typeSetupId: updatedData.Id,
+          subsidiaryId: subId,
+        
+        })
+      }
+    }
+  } catch (error) {
+  
+    if (error?.errno === 1062) {
+      throw new ApiError(httpStatus.NOT_FOUND, "Duplicate entry not allowed!");
+    }
+    else {
+
+      throw error;
+    }
   }
-  // updateBody.slug = updateBody.name.replace(/ /g, "-").toLowerCase()
-  updateBody.updatedBy = updatedBy;
-  updateBody.name=updateBody.name.trimStart();
-  delete updateBody.id;
-  Object.assign(Item, updateBody);
-  await Item.save();
   return;
 };
+
 
 /**
  * Delete Item by id

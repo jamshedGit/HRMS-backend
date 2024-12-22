@@ -17,7 +17,7 @@ LoanTypeSetupAccess.init(
       autoIncrement: true,
       primaryKey: true
     },
-    loanTypeSetupId: {
+    loan_typeSetupId: {
       type: DataTypes.INTEGER,
       allowNull: false
     },
