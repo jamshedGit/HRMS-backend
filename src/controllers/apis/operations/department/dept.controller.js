@@ -27,7 +27,7 @@ const createDept = catchAsync(async (req, res) => {
     });
 
   } catch (error) {
-console.log("error111",error)
+
     if (error?.parent?.errno === 1062) {
       throw new ApiError(httpStatus.NOT_FOUND, "Duplicate entry not allowed!");
     }

@@ -21,14 +21,7 @@ const department = sequelize.define('t_department', {
 		set(value) {
 			this.setDataValue('subsidiaryId', value.map((v) => Number(v)));
 		},
-		// get() {
-		// 	const storedValue = this.getDataValue('subsidiaryId');
-		// 	if (storedValue && typeof storedValue == 'string') {
-        //         console.log("storedValue111",storedValue)
-		// 		return JSON.parse(storedValue)?.map((v) => String(v));
-		// 	}
-		// 	return storedValue;
-		// }
+
 
         get() {
             const storedValue = this.getDataValue('subsidiaryId');
@@ -41,7 +34,7 @@ const department = sequelize.define('t_department', {
                 }
                 return parsedValue; // If it's not an array, return the raw parsed value
               } catch (error) {
-                console.error("Error parsing subsidiaryId:", error);
+          
                 return null; // Return null if parsing fails
               }
             }
