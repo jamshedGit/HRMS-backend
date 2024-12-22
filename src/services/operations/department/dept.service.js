@@ -1,6 +1,6 @@
 const httpStatus = require("http-status");
 const axios = require("axios")
-const DeptModel = require("../../../models/index");
+const {DeptModel,DepartmentSetupAccessModel} = require("../../../models/index");
 const ApiError = require("../../../utils/ApiError");
 const sequelize = require("../../../config/db");
 const Sequelize = require('sequelize');
@@ -24,9 +24,24 @@ const createDept = async (req, DeptBody) => {
 
   if (DeptBody.parentDept == '') { DeptBody.parentDept = null }
 
-  const addedDeptObj = await DeptModel.DeptModel.create(DeptBody);
+  // const addedDeptObj = await DeptModel.DeptModel.create(DeptBody);
   //authSMSSend(addedDeptObj.dataValues);  // Quick send message at the time of donation
+
+
+  DeptBody.deptName=DeptBody.deptName.trimStart();
+  const addedDeptObj = await DeptModel.create(DeptBody);
+  //authSMSSend(addedDeptObj.dataValues);  // Quick send message at the time of donation
+ 
+  if (addedDeptObj) {
+      for (const subId of addedDeptObj.subsidiaryId) {
+        await DepartmentSetupAccessModel.create({
+          DepartmentSetupId: addedDeptObj.deptId,
+          subsidiaryId: subId,
+        })
+      }
+    }
   return addedDeptObj;
+  
 };
 
 
@@ -55,7 +70,7 @@ const queryDept = async (filter, options, searchQuery) => {
   ]
 
 
-  const { count, rows } = await DeptModel.DeptModel.findAndCountAll({
+  const { count, rows } = await DeptModel.findAndCountAll({
     order: [
       ['createdAt', 'ASC']
     ],
@@ -87,7 +102,7 @@ const queryParentDept = async (filter, options, searchQuery) => {
   ]
 
 
-  const { count, rows } = await DeptModel.DeptModel.findAndCountAll({
+  const { count, rows } = await DeptModel.findAndCountAll({
     order: [
       ['createdAt', 'DESC']
     ],
@@ -109,7 +124,7 @@ const queryParentDept = async (filter, options, searchQuery) => {
  * @returns {Promise<ReceiptModel>}
  */
 const getDeptById = async (id) => {
-  return DeptModel.DeptModel.findByPk(id);
+  return DeptModel.findByPk(id);
 };
 
 
@@ -120,6 +135,8 @@ const getDeptById = async (id) => {
  * @param {Object} updateBody
  * @returns {Promise<ReceiptModel>}
  */
+
+
 const updateDeptById = async (deptId, updateBody, updatedBy) => {
  
   try {
@@ -135,7 +152,24 @@ const updateDeptById = async (deptId, updateBody, updatedBy) => {
     delete updateBody.deptId;
     Object.assign(Item, updateBody);
 
-    await Item.save();
+    updatedData= await Item.save();
+    if (updatedData) {
+    
+      // const recordExists = await DepartmentSetupAccessModel.count({
+      //   where: { DepartmentSetupId: updatedData.deptId }
+      // });
+      // if(recordExists.length>0){
+        await DepartmentSetupAccessModel.destroy({ where: { DepartmentSetupId: updatedData.deptId } })
+      // }
+   
+      for (const subId of updatedData.subsidiaryId) {
+        await DepartmentSetupAccessModel.create({
+          DepartmentSetupId: updatedData.deptId,
+          subsidiaryId: subId,
+        
+        })
+      }
+    }
   } catch (error) {
   
     if (error.errno === 1062) {
