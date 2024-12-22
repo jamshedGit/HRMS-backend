@@ -56,14 +56,18 @@ const createleaveApplication = async (req) => {
   if (!employeeData) {
     throw new ApiError(httpStatus.NOT_FOUND, `No User Found`);
   }
-  
+
   // If it's a half day then set half day value in days otherwise get days from difference in from and to dates
   const days = Number(body.days) == 0.5 ? Number(body.days) : getDateDiffInDays(body.from, body.to);
-  
+
+  // Get days of only this month
+  const currentMonthDays = calculateDays(body, employeeData);
+
   //Check if employee have leave balance remaining of this leave type
-  if (!employeeData.t_employee_leave_balances?.length || (employeeData.t_employee_leave_balances[0].remainingCount < days)) {
+  if (!employeeData.t_employee_leave_balances?.length || (employeeData.t_employee_leave_balances[0].remainingCount < currentMonthDays)) {
     throw new ApiError(httpStatus.FORBIDDEN, `Remaining Leaves not enough`);
   }
+
   const startDate = startOfDay(new Date(body.from));
   const endDate = endOfDay(new Date(body.to));
   //Check if there is already an old application present that crosses with new date range
@@ -119,12 +123,35 @@ const createleaveApplication = async (req) => {
     await LeaveApplicationDetailModel.bulkCreate(detailData);
 
     //Update Leave Balance after saving leave Application
-    employeeData.t_employee_leave_balances[0].availedCount += createdData.days;
-    employeeData.t_employee_leave_balances[0].remainingCount -= createdData.days;
+    employeeData.t_employee_leave_balances[0].availedCount += currentMonthDays;
+    employeeData.t_employee_leave_balances[0].remainingCount -= currentMonthDays;
     await employeeData.t_employee_leave_balances[0].save();
   }
   return await getleaveApplicationData({ Id: createdData.Id }, leaveApplicationAttributes, [{ model: LeaveTypeModel, attributes: ['name'] }], true);
 };
+
+
+/**
+ * 
+ * Check if the date range is outside the current year or inside and calulcate days accordingly
+ * 
+ * @param {Object} body 
+ * @param {Object} employeeData 
+ * @returns 
+ */
+const calculateDays = (body, employeeData) => {
+  let days = getDateDiffInDays(body.from, body.to);
+  if (employeeData?.t_employee_leave_balances?.[0]?.t_fiscal_setup?.endDate) {
+    if (startOfDay(new Date(body.from)).getTime() > new Date(employeeData.t_employee_leave_balances[0].t_fiscal_setup.endDate)) {
+      return 0;
+    }
+    const value = getDateDiffInDays(employeeData.t_employee_leave_balances[0].t_fiscal_setup.endDate, startOfDay(new Date(body.to))) - 1
+    if (value > 0) {
+      days = days - value
+    }
+  }
+  return days;
+}
 
 
 /**
@@ -220,7 +247,7 @@ const updateleaveApplicationById = async (body, updatedBy) => {
  * @returns 
  */
 const deleteleaveApplicationById = async (id) => {
-  const oldRecord = await getleaveApplicationById(id, ['Id', 'employeeId', 'leaveType', 'days']);
+  const oldRecord = await getleaveApplicationById(id, ['Id', 'employeeId', 'leaveType', 'days', 'from']);
   if (!oldRecord) {
     throw new ApiError(httpStatus.NOT_FOUND, "Record not found");
   }
@@ -251,14 +278,15 @@ const deleteleaveApplicationById = async (id) => {
     ],
   })
 
-  //Update Leave Balance
-  if(leaveBalance && oldRecord.days){
-    leaveBalance.availedCount -= oldRecord.days;
-    leaveBalance.remainingCount += oldRecord.days;
+  if (oldRecord.from && leaveBalance?.t_fiscal_setup?.endDate && new Date(oldRecord.from).getTime() < new Date(leaveBalance.t_fiscal_setup.endDate).getTime()) {
+    //Update Leave Balance
+    if (leaveBalance && oldRecord.days) {
+      leaveBalance.availedCount -= oldRecord.days;
+      leaveBalance.remainingCount += oldRecord.days;
 
-    leaveBalance.save();
+      leaveBalance.save();
+    }
   }
-
 
   return oldRecord;
 };
