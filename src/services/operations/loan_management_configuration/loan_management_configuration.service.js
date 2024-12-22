@@ -200,13 +200,16 @@ const queryloan_management_configuration = async (filter, options, searchQuery) 
 
   searchQuery = searchQuery.toLowerCase();
   const queryFilters = [
-    {
-      emp_loan_account: Sequelize.where(
-        Sequelize.fn("", Sequelize.col("emp_loan_account")),
-        "LIKE",
-        "%" + searchQuery + "%"
-      ),
-    },
+   {
+         subsidiary: Sequelize.where(
+           Sequelize.fn("", Sequelize.col("installment_deduction_percentage")),
+           "LIKE",
+           "%" + searchQuery + "%"
+         ),
+       },
+
+    
+    
   ];
 
   const { count, rows } = await Loan_management_configurationModel.findAndCountAll({
@@ -440,7 +443,7 @@ const queryLoanTypes = async () => {
     order: [
       ['createdAt', 'DESC']
     ],
-    attributes: ['Id', 'code', 'name'],
+    attributes: ['Id', 'code', 'name','subsidiaryId'],
   });
 
   const transformedResults = [
@@ -449,6 +452,7 @@ const queryLoanTypes = async () => {
       value: item.Id,
       code: item.code,
       label: item.name, // Rename 'name' to 'value'
+      subsidiaryId:item.subsidiaryId
     })),
   ];
 

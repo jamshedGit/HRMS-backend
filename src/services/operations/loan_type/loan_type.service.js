@@ -1,6 +1,6 @@
 const httpStatus = require("http-status");
 const axios = require("axios")
-const LoanTypeModel = require("../../../models/index");
+const {LoanTypeModel,LoanTypeSetupAccess, SubsidiaryModel, FormModel} = require("../../../models/index");
 const ApiError = require("../../../utils/ApiError");
 const sequelize = require("../../../config/db");
 const Sequelize = require('sequelize');
@@ -22,9 +22,17 @@ const createLoanType = async (req, LoanTypeBody) => {
   LoanTypeBody.createdBy = req.user.id;
   LoanTypeBody.name=LoanTypeBody.name.trimStart();
   
-  const addedLoanTypeObj = await LoanTypeModel.LoanTypeModel.create(LoanTypeBody);
-  //authSMSSend(addedLoanTypeObj.dataValues);  // Quick send message at the time of donation
+  const addedLoanTypeObj = await LoanTypeModel.create(LoanTypeBody);
+  if (addedLoanTypeObj) {
+    for (const subId of addedLoanTypeObj.subsidiaryId) {
+      await LoanTypeSetupAccess.create({
+        loan_typeSetupId: addedLoanTypeObj.Id,
+        subsidiaryId: subId,
+      })
+    }
+  }
   return addedLoanTypeObj;
+
 };
 
 
@@ -45,17 +53,17 @@ const queryLoanTypes = async (filter, options, searchQuery) => {
 
   searchQuery = searchQuery.toLowerCase();
   const queryFilters = [
-    { name: Sequelize.where(Sequelize.fn('LOWER', Sequelize.col('subsList.name')), 'LIKE', '%' + searchQuery + '%') },
+    // { name: Sequelize.where(Sequelize.fn('LOWER', Sequelize.col('subsList.name')), 'LIKE', '%' + searchQuery + '%') },
     { code: Sequelize.where(Sequelize.fn('LOWER', Sequelize.col('code')), 'LIKE', '%' + searchQuery + '%') },
     { loanName: Sequelize.where(Sequelize.fn('LOWER', Sequelize.col('t_loan_type_setup.name')), 'LIKE', '%' + searchQuery + '%') },
     { accountName: Sequelize.where(Sequelize.fn('LOWER', Sequelize.col('LoanTypeAccount.formCode')), 'LIKE', '%' + searchQuery + '%') },
     { accountCode: Sequelize.where(Sequelize.fn('LOWER', Sequelize.col('LoanTypeAccount.formName')), 'LIKE', '%' + searchQuery + '%') },
   ]
-  const { count, rows } = await LoanTypeModel.LoanTypeModel.findAndCountAll({
-    order: [
-      [Sequelize.col("subsList.name"), "ASC"],   // Order by Subsidiary name
+  const { count, rows } = await LoanTypeModel.findAndCountAll({
+    // order: [
+    //   [Sequelize.col("subsList.name"), "ASC"],   // Order by Subsidiary name
      
-    ],
+    // ],
     where: {
       [Op.or]: queryFilters,
       // isActive: true
@@ -63,13 +71,13 @@ const queryLoanTypes = async (filter, options, searchQuery) => {
     offset: offset,
     limit: limit,
     include: [
+      // {
+      //   model: SubsidiaryModel,
+      //   attributes: ["Id", ["name", "subsName"]],
+      //   as: "subsList"
+      // },
       {
-        model: LoanTypeModel.SubsidiaryModel,
-        attributes: ["Id", ["name", "subsName"]],
-        as: "subsList"
-      },
-      {
-        model: LoanTypeModel.FormModel,
+        model:FormModel,
         attributes: ["formName", "formCode"],
         as: "LoanTypeAccount",
       },
@@ -148,7 +156,7 @@ function filterByValue(array, string) {
  */
 const getLoanTypeById = async (id) => {
 
-  return LoanTypeModel.LoanTypeModel.findByPk(id);
+  return LoanTypeModel.findByPk(id);
 };
 
 
@@ -159,21 +167,65 @@ const getLoanTypeById = async (id) => {
  * @param {Object} updateBody
  * @returns {Promise<ReceiptModel>}
  */
-const updateLoanTypeById = async (Id, updateBody, updatedBy) => {
+// const updateLoanTypeById = async (Id, updateBody, updatedBy) => {
 
   
-  const Item = await getLoanTypeById(Id);
-  if (!Item) {
-    throw new ApiError(httpStatus.NOT_FOUND, "record not found");
+//   const Item = await getLoanTypeById(Id);
+//   if (!Item) {
+//     throw new ApiError(httpStatus.NOT_FOUND, "record not found");
+//   }
+//   // updateBody.slug = updateBody.name.replace(/ /g, "-").toLowerCase()
+//   updateBody.updatedBy = updatedBy;
+//   updateBody.name=updateBody.name.trimStart();
+//   delete updateBody.id;
+//   Object.assign(Item, updateBody);
+//   await Item.save();
+//   return;
+// };
+
+const updateLoanTypeById = async (Id, updateBody, updatedBy) => {
+ 
+  try {
+
+
+    const Item = await getLoanTypeById(Id);
+
+    if (!Item) {
+      throw new ApiError(httpStatus.NOT_FOUND, "record not found");
+    }
+
+    updateBody.updatedBy = updatedBy;
+    delete updateBody.Id;
+    Object.assign(Item, updateBody);
+
+    updatedData= await Item.save();
+    if (updatedData) {
+    
+     
+        await LoanTypeSetupAccess.destroy({ where: { loan_typeSetupId: updatedData.Id } })
+      // }
+   
+      for (const subId of updatedData.subsidiaryId) {
+        await LoanTypeSetupAccess.create({
+          loan_typeSetupId: updatedData.Id,
+          subsidiaryId: subId,
+        
+        })
+      }
+    }
+  } catch (error) {
+  
+    if (error?.errno === 1062) {
+      throw new ApiError(httpStatus.NOT_FOUND, "Duplicate entry not allowed!");
+    }
+    else {
+
+      throw error;
+    }
   }
-  // updateBody.slug = updateBody.name.replace(/ /g, "-").toLowerCase()
-  updateBody.updatedBy = updatedBy;
-  updateBody.name=updateBody.name.trimStart();
-  delete updateBody.id;
-  Object.assign(Item, updateBody);
-  await Item.save();
   return;
 };
+
 
 /**
  * Delete Item by id

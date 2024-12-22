@@ -93,6 +93,7 @@ BranchModel,
 Payroll_ProcessModel,
 EmployeePolicyModel,
 Employee_ShiftModel,
+LoanTypeSetupAccess,
 EarningSetupAccessModel,
 EarningModel,
 DeductionSetupAccessModel,
@@ -132,6 +133,7 @@ DepartmentSetupAccessModel,
 // RoleModel.sync({force:true});
 // EmployeePolicyModel.sync({force:true});
 // Employee_ShiftModel.sync({alter:true});
+// LoanTypeSetupAccess.sync({force:true})
 // EarningModel.sync({force:true});
 // EarningSetupAccessModel.sync({alter:true});
 // DeductionSetupAccessModel.sync({force:true});
