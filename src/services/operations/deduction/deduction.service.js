@@ -1,6 +1,6 @@
 const httpStatus = require("http-status");
 const axios = require("axios")
-const DeductionModel = require("../../../models/index");
+const {DeductionModel,DeductionSetupAccessModel, SubsidiaryModel} = require("../../../models/index");
 const ApiError = require("../../../utils/ApiError");
 const sequelize = require("../../../config/db");
 const Sequelize = require('sequelize');
@@ -21,11 +21,11 @@ const createDeduction = async (req, DeductionBody) => {
 
   DeductionBody.createdBy = req.user.id;
   DeductionBody.deductionName=DeductionBody.deductionName.trimStart();
-  const addedDeductionObj = await DeductionModel.DeductionModel.create(DeductionBody);
+  const addedDeductionObj = await DeductionModel.create(DeductionBody);
     //authSMSSend(addedEarningObj.dataValues);  // Quick send message at the time of donation
     if (addedDeductionObj) {
       for (const subId of addedDeductionObj.subsidiaryId) {
-        await DeductionModel.DeductionSetupAccessModel.create({
+        await DeductionSetupAccessModel.create({
           deductionSetupId: addedDeductionObj.Id,
           subsidiaryId: subId,
         })
@@ -60,7 +60,7 @@ const queryDeductions = async (filter, options, searchQuery) => {
   ]
 
 
-  const { count, rows } = await DeductionModel.DeductionModel.findAndCountAll({
+  const { count, rows } = await DeductionModel.findAndCountAll({
     order: [
       ['createdAt', 'DESC']
     ],
@@ -70,13 +70,13 @@ const queryDeductions = async (filter, options, searchQuery) => {
     },
     offset: offset,
     limit: limit,
-    include: [
-      {
-        model: DeductionModel.SubsidiaryModel,
-        attributes: ["Id", ["name", "subsName"]],
-        as: "subsList"
-      }
-    ],
+    // include: [
+    //   {
+    //     model: SubsidiaryModel,
+    //     attributes: ["Id", ["name", "subsName"]],
+    //     as: "subsList"
+    //   }
+    // ],
     
   });
 
@@ -92,6 +92,8 @@ const SP_getAllDeductionInfo = async (filter, options, searchQuery,empId) => {
       replacements: { employeeId: empId || 'null' },
       type: Sequelize.QueryTypes.RAW // Use RAW type for executing stored procedures
     });
+
+    
 
     let limit = options.pageSize;
     let offset = 0 + (options.pageNumber - 1) * limit;
@@ -130,7 +132,7 @@ function filterByValue(array, string) {
   return array.filter(o => Object.keys(o).some(k => {
     return o['deductionCode'].toLowerCase().includes(string.toLowerCase()) 
     || o['deductionName'].toLowerCase().includes(string.toLowerCase()) 
-    || o['subsidiary'].toLowerCase().includes(string.toLowerCase())
+    // || o['subsidiary'].toLowerCase().includes(string.toLowerCase())
     || o['account'].toLowerCase().includes(string.toLowerCase())
   }
   )
@@ -145,7 +147,7 @@ function filterByValue(array, string) {
  * @returns {Promise<ReceiptModel>}
  */
 const getDeductionById = async (id) => {
-  return DeductionModel.DeductionModel.findByPk(id);
+  return DeductionModel.findByPk(id);
 };
 
 
@@ -156,22 +158,71 @@ const getDeductionById = async (id) => {
  * @param {Object} updateBody
  * @returns {Promise<ReceiptModel>}
  */
+// const updateDeductionById = async (Id, updateBody, updatedBy) => {
+
+
+//   const Item = await getDeductionById(Id);
+//   if (!Item) {
+//     throw new ApiError(httpStatus.NOT_FOUND, "record not found");
+//   }
+
+//   // updateBody.slug = updateBody.name.replace(/ /g, "-").toLowerCase()
+
+//   updateBody.updatedBy = updatedBy;
+//   delete updateBody.id;
+//   Object.assign(Item, updateBody);
+//   await Item.save();
+//   return;
+// };
+
+
+
 const updateDeductionById = async (Id, updateBody, updatedBy) => {
+ 
+  try {
 
 
-  const Item = await getDeductionById(Id);
-  if (!Item) {
-    throw new ApiError(httpStatus.NOT_FOUND, "record not found");
+    const Item = await getDeductionById(Id);
+
+    if (!Item) {
+      throw new ApiError(httpStatus.NOT_FOUND, "record not found");
+    }
+
+    updateBody.updatedBy = updatedBy;
+    delete updateBody.Id;
+    Object.assign(Item, updateBody);
+
+    updatedData= await Item.save();
+    if (updatedData) {
+    
+     
+        await DeductionSetupAccessModel.destroy({ where: { deductionSetupId: updatedData.Id } })
+      // }
+   
+      for (const subId of updatedData.subsidiaryId) {
+        await DeductionSetupAccessModel.create({
+          deductionSetupId: updatedData.Id,
+          subsidiaryId: subId,
+        
+        })
+      }
+    }
+  } catch (error) {
+  
+    if (error?.errno === 1062) {
+      throw new ApiError(httpStatus.NOT_FOUND, "Duplicate entry not allowed!");
+    }
+    else {
+
+      throw error;
+    }
   }
-
-  // updateBody.slug = updateBody.name.replace(/ /g, "-").toLowerCase()
-
-  updateBody.updatedBy = updatedBy;
-  delete updateBody.id;
-  Object.assign(Item, updateBody);
-  await Item.save();
   return;
 };
+
+
+
+
 
 /**
  * Delete Item by id
