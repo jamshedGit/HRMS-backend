@@ -34,6 +34,7 @@ const createLoanType = catchAsync(async (req, res) => {
   }
 });
 
+
 const getAllLoanType = catchAsync(async (req, res) => {
 
   const obj = {};
