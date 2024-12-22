@@ -161,8 +161,7 @@ function filterByValue(array, string) {
     return array;
   }
   return array.filter(o => Object.keys(o).some(k => {
-    return o['subsidiary'].toLowerCase().includes(string.toLowerCase())
-      || o['earningCode'].toLowerCase().includes(string.toLowerCase())
+    return o['earningCode'].toLowerCase().includes(string.toLowerCase())
       || o['earningName'].toLowerCase().includes(string.toLowerCase())
 
 
@@ -196,22 +195,66 @@ const getEarningById = async (id) => {
  * @param {Object} updateBody
  * @returns {Promise<ReceiptModel>}
  */
-const updateEarningById = async (Id, updateBody, updatedBy) => {
+// const updateEarningById = async (Id, updateBody, updatedBy) => {
 
 
-  const Item = await getEarningById(Id);
-  if (!Item) {
-    throw new ApiError(httpStatus.NOT_FOUND, "record not found");
-  }
+//   const Item = await getEarningById(Id);
+//   if (!Item) {
+//     throw new ApiError(httpStatus.NOT_FOUND, "record not found");
+//   }
   
-  // updateBody.slug = updateBody.name.replace(/ /g, "-").toLowerCase()
-  updateBody.updatedBy = updatedBy;
-  updateBody.earningName=updateBody.earningName.trimStart();
-  delete updateBody.id;
-  Object.assign(Item, updateBody);
-  await Item.save();
+//   // updateBody.slug = updateBody.name.replace(/ /g, "-").toLowerCase()
+//   updateBody.updatedBy = updatedBy;
+//   updateBody.earningName=updateBody.earningName.trimStart();
+//   delete updateBody.id;
+//   Object.assign(Item, updateBody);
+//   await Item.save();
+//   return;
+// };
+
+const updateEarningById = async (Id, updateBody, updatedBy) => {
+ 
+  try {
+
+
+    const Item = await getEarningById(Id);
+
+    if (!Item) {
+      throw new ApiError(httpStatus.NOT_FOUND, "record not found");
+    }
+
+    updateBody.updatedBy = updatedBy;
+    delete updateBody.Id;
+    Object.assign(Item, updateBody);
+
+    updatedData= await Item.save();
+    if (updatedData) {
+    
+     
+        await EarningSetupAccessModel.destroy({ where: { earningSetupId: updatedData.Id } })
+      // }
+   
+      for (const subId of updatedData.subsidiaryId) {
+        await EarningSetupAccessModel.create({
+          earningSetupId: updatedData.Id,
+          subsidiaryId: subId,
+        
+        })
+      }
+    }
+  } catch (error) {
+  
+    if (error?.errno === 1062) {
+      throw new ApiError(httpStatus.NOT_FOUND, "Duplicate entry not allowed!");
+    }
+    else {
+
+      throw error;
+    }
+  }
   return;
 };
+
 
 /**
  * Delete Item by id
