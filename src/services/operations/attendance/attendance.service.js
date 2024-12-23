@@ -34,7 +34,12 @@ const attendanceAttributes = [
   'lateInHours',
   'overtimeStart',
   'oT',
-  'approvedOT'
+  'approvedOT',
+  'workedHours',
+  [
+    Sequelize.literal(`fn_AttendanceStatus(t_attendance.employeeId, t_attendance.attDateIn)`),
+    'attendanceStatus'
+  ]
 ]
 
 /**
@@ -213,12 +218,27 @@ const getattendanceByFilters = async (req) => {
   const body = req.body;
   const startOfDayDate = startOfDay(new Date(body.attDateIn));
   const endOfDayDate = endOfDay(new Date(body.attDateIn));
-  return await getattendanceData({
+  const data = await getattendanceData({
     employeeId: body.employeeId,
-    attDateIn: {
+    attDate: {
       [Op.between]: [startOfDayDate, endOfDayDate],  // Filters between start and end of the day
     },
-  }, attendanceAttributes) || { ...body, attDateOut: body.attDateIn }
+  }, attendanceAttributes);
+
+  if (data) {
+    if (!data.comments) {
+      data.comments = "";
+    }
+    if (data.attDateIn && data.attDateOut) {
+      return data;
+    }
+    else {
+      data.attDateIn = data.attDate;
+      data.attDateOut = data.attDate;
+      return data
+    }
+  }
+  return { ...body, attDateOut: body.attDateIn }
 }
 
 
