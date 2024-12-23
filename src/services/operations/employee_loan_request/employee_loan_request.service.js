@@ -317,7 +317,7 @@ const getloan_configurationDetailsById = async (Id) => {
       },
      
     });
-  console.log("payroll_month111",payroll_month)
+
     // Combine employee, salary, and loan details in the return object
     return {
       employee: {
