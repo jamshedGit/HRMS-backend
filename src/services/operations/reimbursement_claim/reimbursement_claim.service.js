@@ -107,14 +107,14 @@ const queryreimbursement_claim = async (
   if(count && rows)
   {
  
-    return paginationFacts(count, limit, options.pageNumber, rows);
+    return paginationFacts(rows?.length, limit, options.pageNumber, rows);
   }    
   else {
       // return {
       //   message: "Data not present",
       //   status: "error",
       // };
-      return  paginationFacts(count, limit, options.pageNumber, rows=[]);
+      return  paginationFacts(rows?.length, limit, options.pageNumber, rows=[]);
     }
   
 };
@@ -261,14 +261,23 @@ const deletereimbursement_claimById = async (Id) => {
 };
 
 
-const getPayrollMonth = async () => {
+const getPayrollMonth = async (body) => {
   const monthNames = [
     "Jan", "Feb", "Mar", "Apr", "May", "Jun",
     "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"
   ];
-  
+
+
+  let employeeProfile;
+  if(body?.employeeId){
+   employeeProfile = await EmployeeProfileModel.findOne({
+      where:{id:body?.employeeId}
+    });
+    
+  }
+
   const result = await PayrollMonthModel.findAndCountAll({
-    // where:{isActive:true}
+    where:{subsidiaryId:employeeProfile?.subsidiaryId || body?.subsidiaryId }
   });
 
   // Sort the rows by year in descending order

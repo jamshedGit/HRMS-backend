@@ -251,8 +251,9 @@ const queryloan_management_configuration = async (filter, options, searchQuery) 
       },
     ],
   });
+  
 
-  return paginationFacts(count, limit, options.pageNumber, rows);
+  return paginationFacts(rows.length, limit, options.pageNumber, rows);
 };
 
 /**
