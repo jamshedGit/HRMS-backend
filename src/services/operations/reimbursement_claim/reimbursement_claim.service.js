@@ -261,18 +261,23 @@ const deletereimbursement_claimById = async (Id) => {
 };
 
 
-const getPayrollMonth = async (employeeId) => {
+const getPayrollMonth = async (body) => {
   const monthNames = [
     "Jan", "Feb", "Mar", "Apr", "May", "Jun",
     "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"
   ];
 
-  const employeeProfile = await EmployeeProfileModel.findOne({
-    where:{id:employeeId}
-  });
-  
+
+  let employeeProfile;
+  if(body?.employeeId){
+   employeeProfile = await EmployeeProfileModel.findOne({
+      where:{id:body?.employeeId}
+    });
+    
+  }
+
   const result = await PayrollMonthModel.findAndCountAll({
-    where:{subsidiaryId:employeeProfile.subsidiaryId}
+    where:{subsidiaryId:employeeProfile?.subsidiaryId || body?.subsidiaryId }
   });
 
   // Sort the rows by year in descending order
