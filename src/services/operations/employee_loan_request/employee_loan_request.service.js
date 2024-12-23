@@ -86,6 +86,7 @@ const createEmployee_loan_request = async (req, Employee_loan_requestBody) => {
  * @returns {Promise<QueryResult>}
  */
 const queryEmployee_loan_request = async (
+  
   filter,
   options,
   searchQuery,
@@ -128,15 +129,16 @@ const queryEmployee_loan_request = async (
 
   if(count && rows)
   {
- 
-    return paginationFacts(count, limit, options.pageNumber, rows);
+  
+    return paginationFacts( rows?.length, limit, options.pageNumber, rows);
   }    
   else {
       // return {
       //   message: "Data not present",
       //   status: "error",
       // };
-      return  paginationFacts(count, limit, options.pageNumber, rows=[]);
+   
+      return  paginationFacts( rows?.length, limit, options.pageNumber, rows=[]);
     }
   
 };
@@ -308,13 +310,14 @@ const getloan_configurationDetailsById = async (Id) => {
       order: [
         ['createdAt', 'DESC']
       ],
+    
       where: {
-       
+        subsidiaryId:employee.subsidiaryId,
         isActive: true
       },
      
     });
-  
+  console.log("payroll_month111",payroll_month)
     // Combine employee, salary, and loan details in the return object
     return {
       employee: {

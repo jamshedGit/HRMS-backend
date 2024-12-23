@@ -132,8 +132,8 @@ const deletereimbursement_claim = catchAsync(async (req, res) => {
 
     const getPayrollMonth = catchAsync(async (req, res) => {
 
-
-        const result = await reimbursement_claimService.getPayrollMonth();
+console.log("req.body111",req.body)
+        const result = await reimbursement_claimService.getPayrollMonth(req.body.employeeId);
       
         res.send({
           code: HttpStatusCodes.OK,
