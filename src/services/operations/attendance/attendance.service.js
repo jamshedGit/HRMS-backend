@@ -287,10 +287,6 @@ const updateAttendanceById = async (body, updatedBy) => {
   Object.assign(oldRecord, body);
   const updatedData = await oldRecord.save({ fields: ['comments', 'attDate', 'attDateIn', 'attDateOut', 'timeIn', 'timeOut', 'updatedBy'] });
 
-  console.log(':::::updatedData::::',JSON.stringify(updatedData));
-  console.log(':::::oldRecord::::',JSON.stringify(oldRecord));
-  
-
   try {
     await sequelize.query('CALL SP_SmartlyProceedAttendance(:p_CompanyId ,:p_SubsidiaryId ,:p_M_EmpId ,:p_FromDate ,:p_ToDate,:p_isSpecial)', {
       replacements: {
