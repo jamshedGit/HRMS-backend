@@ -187,7 +187,9 @@ const getAllattendance = async (req) => {
       [
         Sequelize.literal(`fn_AttendanceStatus(t_employee_profile.Id, t_attendance.attDate)`),
         'attendanceStatus'
-      ]
+      ],
+      'workedHours',
+      'oT'
     ],
     offset: offset,
     limit: limit,
