@@ -85,7 +85,9 @@ const getAllSubsidiaries = {
 const getAllFiscalYear = {
   query: Joi.disallow(),
   params: Joi.disallow(),
-  body: Joi.disallow(),
+  body: Joi.object().keys({
+    employeeId: Joi.optional()
+  }),
 }
 
 const getCitiesMasterData = {

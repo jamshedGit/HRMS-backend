@@ -128,7 +128,7 @@ const getAllFiscalYears = catchAsync(async (req, res) => {
   res.send({  
     code: HttpStatusCodes.OK,
     message: HttpResponseMessages.OK,
-    data: await settingService.getAllFiscalYearData(),
+    data: await settingService.getAllFiscalYearData(req.body.employeeId),
   });
 });
 
