@@ -37,7 +37,7 @@ const attendanceAttributes = [
   'approvedOT',
   'workedHours',
   [
-    Sequelize.literal(`fn_AttendanceStatus(t_attendance.employeeId, t_attendance.attDateIn)`),
+    Sequelize.literal(`fn_AttendanceStatus(t_attendance.employeeId, t_attendance.attDate)`),
     'attendanceStatus'
   ]
 ]
@@ -185,7 +185,7 @@ const getAllattendance = async (req) => {
       'timeOut',
       'comments',
       [
-        Sequelize.literal(`fn_AttendanceStatus(t_employee_profile.Id, t_attendance.attDateIn)`),
+        Sequelize.literal(`fn_AttendanceStatus(t_employee_profile.Id, t_attendance.attDate)`),
         'attendanceStatus'
       ]
     ],
