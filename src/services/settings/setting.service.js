@@ -117,12 +117,27 @@ const getEmployeesMasterData = async () => {
 };
 
 
-const getDeptMasterData = async () => {
-  const DeptMasterData = getDdlItems(DDL_FIELD_NAMES.DeptName, await DeptModel.findAll({
+const getDeptMasterData = async (Id) => {
+  const deptMasterData = await DeptModel.findAll({
     where: { isActive: true },
     attributes: ['deptId', 'deptName', 'subsidiaryId']
+  });
+
+  const filteredDeptMasterData = deptMasterData
+  .filter((x) => x.subsidiaryId?.some((id) => id === String(Id))) // Check if any value in subsidiaryId matches Id
+  .map((x) => ({
+    deptId: x.deptId,
+    deptName: x.deptName,
+    subsidiaryId: x.subsidiaryId,
+    // Assuming mergeLabel should be a combination of deptName and subsidiaryId
+    // mergeLabel: `${x.deptName} - ${x.subsidiaryId.join(', ')}`  // Create mergeLabel from deptName and subsidiaryId
   }));
-  return DeptMasterData
+
+// Process the filtered data if necessary
+const processedDeptMasterData = getDdlItems(DDL_FIELD_NAMES.DeptName, filteredDeptMasterData);
+
+
+  return processedDeptMasterData
 };
 
 const getChildMenusByParentId = async (parentMenuId) => {
