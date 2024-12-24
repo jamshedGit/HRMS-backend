@@ -68,6 +68,7 @@ const payroll_process=require('./operations/payroll_process/payroll_process.rout
 const attendance=require('./operations/attendance/attendance.route')
 const employee_roster = require('./operations/employee_roster/employee_roster.route');
 const leave_register = require('./operations/leave_register/leave_register.route');
+const payroll_register = require('./operations/payroll_register/payroll_register.route');
 
 const router = express.Router();
 
@@ -335,6 +336,10 @@ const defaultRoutes = [
   {
     path: "/leave_register",
     route: leave_register
+  },
+  {
+    path: "/payroll_register",
+    route: payroll_register
   },
 
 ];
