@@ -65,7 +65,7 @@ const queryStoppageAllowances = async (filter, options, searchQuery) => {
 
 };
 
-const SP_getAllStoppageAllowanceInfo = async (filter, options, searchQuery,empId) => {
+const SP_getAllStoppageAllowanceInfo = async (filter, options, searchQuery, empId) => {
   try {
     console.log("StoppageAllowance section")
     const results = await sequelize.query('CALL usp_GetAllEarningDeductionDetails()');
@@ -77,7 +77,6 @@ const SP_getAllStoppageAllowanceInfo = async (filter, options, searchQuery,empId
     console.log("searchlist", searchlist)
     let count = searchlist.length;
     const rows = searchlist.slice(offset, offset + limit)
-    
     return paginationFacts(count, limit, options.pageNumber, rows); // 
   } catch (error) {
     throw new ApiError(httpStatus.INTERNAL_SERVER_ERROR, error);
@@ -87,7 +86,6 @@ const SP_getAllStoppageAllowanceInfo = async (filter, options, searchQuery,empId
 
 const SP_getAllStoppageAllowanceInfoByEmpId = async (empId) => {
   try {
-    console.log("StoppageAllowance empID",empId);
     const results = await sequelize.query('CALL usp_GetAllStoppageAllowancesByEmpId(:employeeId)', {
       replacements: { employeeId: empId || 'null' },
       type: Sequelize.QueryTypes.RAW // Use RAW type for executing stored procedures
@@ -99,13 +97,56 @@ const SP_getAllStoppageAllowanceInfoByEmpId = async (empId) => {
   }
 };
 
-const SP_GetAllEarningDeductionList = async (flagId) => {
+const SP_GetAllEarningDeductionList = async (flagId, subsidiary, employeeId) => {
   try {
-    console.log("SP_GetAllEarningDeductionList empID",flagId);
-    const results = await sequelize.query('CALL usp_GetEarningDeductionResultSet(:flag)', {
-      replacements: { flag: flagId || 1 },
-      type: Sequelize.QueryTypes.RAW // Use RAW type for executing stored procedures
-    });
+    let subsidiaryId = subsidiary || '';
+    let results = [];
+
+    if (employeeId) {
+      const data = await StoppageAllowanceModel.EmployeeProfileModel.findByPk(employeeId, { attributes: ['subsidiaryId'] })
+      if (data.subsidiaryId) {
+        subsidiaryId = data.subsidiaryId;
+      }
+    }
+
+    if (subsidiaryId) {
+      if (flagId == 1) {
+        results = await StoppageAllowanceModel.EarningModel.findAll({
+          attributes: [
+            ['Id', 'value'],
+            ['earningName', 'label']
+          ],
+          include: [
+            {
+              model: StoppageAllowanceModel.EarningSetupAccessModel,
+              where: {
+                subsidiaryId: subsidiaryId
+              },
+              attributes: [],
+              required: true
+            }
+          ]
+        })
+      }
+      else {
+        results = await StoppageAllowanceModel.DeductionModel.findAll({
+          attributes: [
+            ['Id', 'value'],
+            ['deductionName', 'label']
+          ],
+          include: [
+            {
+              model: StoppageAllowanceModel.DeductionSetupAccessModel,
+              where: {
+                subsidiaryId: subsidiaryId
+              },
+              attributes: [],
+              required: true
+            }
+          ]
+        })
+      }
+    }
 
     return results;
   } catch (error) {
