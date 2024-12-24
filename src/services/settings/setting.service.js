@@ -124,13 +124,12 @@ const getDeptMasterData = async (Id) => {
   });
 
   const filteredDeptMasterData = deptMasterData
-  .filter((x) => x.subsidiaryId?.some((id) => id === String(Id))) // Check if any value in subsidiaryId matches Id
+  .filter((x) => x.subsidiaryId?.some((id) => id === String(Id))) 
   .map((x) => ({
     deptId: x.deptId,
     deptName: x.deptName,
     subsidiaryId: x.subsidiaryId,
-    // Assuming mergeLabel should be a combination of deptName and subsidiaryId
-    // mergeLabel: `${x.deptName} - ${x.subsidiaryId.join(', ')}`  // Create mergeLabel from deptName and subsidiaryId
+   
   }));
 
 // Process the filtered data if necessary
