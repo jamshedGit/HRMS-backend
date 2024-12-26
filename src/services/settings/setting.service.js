@@ -116,6 +116,20 @@ const getEmployeesMasterData = async () => {
   }) || []
 };
 
+const getEmployeesMasterDataBySubsidiary = async (subsidiaryId) => {
+  const EmployeesMasterData = subsidiaryId ? await EmployeeProfileModel.findAll({
+    where: { isActive: true, subsidiaryId: subsidiaryId },
+    attributes: ['Id', 'firstName', 'middleName', 'lastName']
+  }) : [];
+
+  return EmployeesMasterData?.map(el => {
+    return {
+      label: createEmployeeNameLabel(el),
+      value: el.Id
+    }
+  }) || []
+};
+
 
 const getDeptMasterData = async () => {
   const DeptMasterData = getDdlItems(DDL_FIELD_NAMES.DeptName, await DeptModel.findAll({
@@ -410,5 +424,6 @@ module.exports = {
   getEncashmentLeaveTypeData,
   getAllEmployeeShift,
   getLeaveTypesDataBySubsidiary,
-  getActiveFiscalYearData
+  getActiveFiscalYearData,
+  getEmployeesMasterDataBySubsidiary
 };
