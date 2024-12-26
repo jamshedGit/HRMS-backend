@@ -319,13 +319,14 @@ const getAllEmployeeShift = async () => {
   const result = [];
   const shiftData = await Employee_ShiftModel.findAll({
     where: { isActive: true },
-    attributes: ['name', 'Id', 'startTime', 'endTime']
+    attributes: ['name', 'Id', 'startTime', 'endTime','subsidiaryId']
   })
   if (shiftData?.length) {
     shiftData.forEach(el => {
       result.push({
         label: createEmployeeShiftLabel(el.name, el.endTime, el.startTime),
-        value: el.Id
+        value: el.Id,
+        subsidiaryId:el.subsidiaryId
       })
     })
   }
