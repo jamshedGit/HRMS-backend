@@ -56,6 +56,14 @@ const getEmployeesMasterData = catchAsync(async (req, res) => {
   });
 });
 
+const getEmployeesMasterDataBySubsidiary = catchAsync(async (req, res) => {
+  res.send({
+    code: HttpStatusCodes.OK,
+    message: HttpResponseMessages.OK,
+    data: await settingService.getEmployeesMasterDataBySubsidiary(req.body.subsidiaryId),
+  });
+});
+
 
 const getDeptMasterData = catchAsync(async (req, res) => {
   
@@ -199,5 +207,6 @@ module.exports = {
   getEncashmentLeaveType,
   getAllEmployeeShift,
   getAllLeaveTypeBySubsidiary,
-  getCurrentFiscalYears
+  getCurrentFiscalYears,
+  getEmployeesMasterDataBySubsidiary
 };
