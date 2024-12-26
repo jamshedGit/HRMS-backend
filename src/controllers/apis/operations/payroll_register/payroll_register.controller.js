@@ -7,13 +7,13 @@ const {
 
 /**
  * 
- * Get All Registered Leave Application with Pagination
+ * Get All Payroll with Pagination
  * 
  * @param {Object} req 
  * @returns res
  */
-const getAllRegisteredLeaves = catchAsync(async (req, res) => {
-  const data = await PayrollRegisterServicePage.getAllRegisteredLeaves(req);
+const getAllRegisteredPayroll = catchAsync(async (req, res) => {
+  const data = await PayrollRegisterServicePage.getAllRegisteredPayroll(req);
   res.send({
     code: HttpStatusCodes.OK,
     message: HttpResponseMessages.OK,
@@ -23,13 +23,13 @@ const getAllRegisteredLeaves = catchAsync(async (req, res) => {
 
 /**
  * 
- * Get All Registered Leave Application for Pdf
+ * Get All Payroll for Pdf
  * 
  * @param {Object} req 
  * @returns res
  */
-const getAllRegisteredLeavesPdfData = catchAsync(async (req, res) => {
-  const data = await PayrollRegisterServicePage.getAllRegisteredLeavesForPdf(req);
+const getAllRegisteredPayrollPdfData = catchAsync(async (req, res) => {
+  const data = await PayrollRegisterServicePage.getAllRegisteredPayrollForPdf(req);
   res.set({
     "Content-Type": "application/pdf",
     "Content-Disposition": 'attachment; filename="kamil_test.pdf"',
@@ -38,6 +38,6 @@ const getAllRegisteredLeavesPdfData = catchAsync(async (req, res) => {
 });
 
 module.exports = {
-  getAllRegisteredLeaves,
-  getAllRegisteredLeavesPdfData
+  getAllRegisteredPayroll,
+  getAllRegisteredPayrollPdfData
 };
