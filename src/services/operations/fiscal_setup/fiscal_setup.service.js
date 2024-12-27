@@ -4,7 +4,7 @@ const  FiscalSetupModel  = require("../../../models/index");
 const ApiError = require("../../../utils/ApiError");
 const sequelize = require("../../../config/db");
 const Sequelize = require('sequelize');
-const { paginationFacts, check_range_exist } = require("../../../utils/common");
+const { paginationFacts, check_range_exist, formatDates } = require("../../../utils/common");
 const https = require('https');
 const { XMLParser, XMLBuilder, XMLValidator } = require("fast-xml-parser");
 const fns = require('date-fns')
@@ -16,6 +16,9 @@ const Op = Sequelize.Op;
  * @returns {Promise<FiscalSetup>}
  */
 const createFiscalSetup = async (req, FiscalSetupBody) => {
+  FiscalSetupBody.startDate= formatDates(FiscalSetupBody.startDate, 'yyyy-MM-dd')
+  FiscalSetupBody.endDate=formatDates(FiscalSetupBody.endDate, 'yyyy-MM-dd')
+
 
   // FiscalSetupBody.slug = FiscalSetupBody.name.replace(/ /g, "-").toLowerCase();
 
