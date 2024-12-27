@@ -4,7 +4,7 @@ const TaxSetupModel = require("../../../models/index");
 const ApiError = require("../../../utils/ApiError");
 const sequelize = require("../../../config/db");
 const Sequelize = require('sequelize');
-const { paginationFacts, check_range_exist } = require("../../../utils/common");
+const { paginationFacts, check_range_exist, formatDates } = require("../../../utils/common");
 const https = require('https');
 const { XMLParser, XMLBuilder, XMLValidator } = require("fast-xml-parser");
 const fns = require('date-fns')
@@ -16,7 +16,9 @@ const Op = Sequelize.Op;
  * @returns {Promise<TaxSetup>}
  */
 const createTaxSetup = async (req, TaxSetupBody) => {
-
+ 
+  TaxSetupBody.startDate= formatDates(TaxSetupBody.startDate, 'yyyy-MM-dd')
+  TaxSetupBody.endDate=formatDates(TaxSetupBody.endDate, 'yyyy-MM-dd')
   // TaxSetupBody.slug = TaxSetupBody.name.replace(/ /g, "-").toLowerCase();
 
   TaxSetupBody.createdBy = req.user.id;
