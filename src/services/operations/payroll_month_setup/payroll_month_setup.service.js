@@ -4,7 +4,7 @@ const PayrollMonthModel = require("../../../models/index");
 const ApiError = require("../../../utils/ApiError");
 const sequelize = require("../../../config/db");
 const Sequelize = require('sequelize');
-const { paginationFacts } = require("../../../utils/common");
+const { paginationFacts, formatDates } = require("../../../utils/common");
 const https = require('https');
 const { XMLParser, XMLBuilder, XMLValidator } = require("fast-xml-parser");
 const fns = require('date-fns')
@@ -16,7 +16,8 @@ const Op = Sequelize.Op;
  * @returns {Promise<PayrollMonth>}
  */
 const createPayrollMonth = async (req, PayrollMonthBody) => {
-   
+  PayrollMonthBody.startDate= formatDates(PayrollMonthBody.startDate, 'yyyy-MM-dd')
+  PayrollMonthBody.endDate=formatDates(PayrollMonthBody.endDate, 'yyyy-MM-dd')
 
   PayrollMonthBody.createdBy = req.user.id;
  
