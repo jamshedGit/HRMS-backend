@@ -71,7 +71,7 @@ const DesigModel = sequelize.define('t_employee_profile', {
 	requireDeligation: { type: Sequelize.BOOLEAN, allowNull: true },
 
 	isActive: { type: Sequelize.BOOLEAN, allowNull: true, defaultValue: true },
-
+	employeeStatusId: { type: Sequelize.INTEGER, allowNull: true },
 
 	createdBy: {
 		type: Sequelize.INTEGER,
@@ -110,6 +110,11 @@ DesigModel.belongsTo(SubsidiaryModel, {
 	targetKey: 'Id',
 });
 
+DesigModel.belongsTo(FormModel, {
+	foreignKey: 'employeeStatusId',
+	targetKey: 'Id',
+	as: "employeeStatus"
+});
 
 
 

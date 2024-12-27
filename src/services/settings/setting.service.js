@@ -131,12 +131,26 @@ const getEmployeesMasterDataBySubsidiary = async (subsidiaryId) => {
 };
 
 
-const getDeptMasterData = async () => {
-  const DeptMasterData = getDdlItems(DDL_FIELD_NAMES.DeptName, await DeptModel.findAll({
+const getDeptMasterData = async (Id) => {
+  const deptMasterData = await DeptModel.findAll({
     where: { isActive: true },
     attributes: ['deptId', 'deptName', 'subsidiaryId']
+  });
+
+  const filteredDeptMasterData = deptMasterData
+  .filter((x) => x.subsidiaryId?.some((id) => id === String(Id))) 
+  .map((x) => ({
+    deptId: x.deptId,
+    deptName: x.deptName,
+    subsidiaryId: x.subsidiaryId,
+   
   }));
-  return DeptMasterData
+
+// Process the filtered data if necessary
+const processedDeptMasterData = getDdlItems(DDL_FIELD_NAMES.DeptName, filteredDeptMasterData);
+
+
+  return processedDeptMasterData
 };
 
 const getChildMenusByParentId = async (parentMenuId) => {
@@ -319,13 +333,14 @@ const getAllEmployeeShift = async () => {
   const result = [];
   const shiftData = await Employee_ShiftModel.findAll({
     where: { isActive: true },
-    attributes: ['name', 'Id', 'startTime', 'endTime']
+    attributes: ['name', 'Id', 'startTime', 'endTime','subsidiaryId']
   })
   if (shiftData?.length) {
     shiftData.forEach(el => {
       result.push({
         label: createEmployeeShiftLabel(el.name, el.endTime, el.startTime),
-        value: el.Id
+        value: el.Id,
+        subsidiaryId:el.subsidiaryId
       })
     })
   }

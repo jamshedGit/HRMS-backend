@@ -10,7 +10,7 @@ const DesigModel = sequelize.define('t_contact_information', {
 		autoIncrement: true,
 		primaryKey: true
 	},
-	relation: { type: Sequelize.NUMBER, allowNull: true },
+	relation: { type: Sequelize.INTEGER, allowNull: true },
 	relation_name: { type: Sequelize.STRING, allowNull: true },
 	contactNo: { type: Sequelize.STRING, allowNull: true },
 	employeeId: { type: Sequelize.STRING, allowNull: true },
@@ -26,6 +26,7 @@ const DesigModel = sequelize.define('t_contact_information', {
 	},
 	createdAt: { type: Sequelize.DATE, allowNull: true },
 	updatedAt: { type: Sequelize.DATE, allowNull: true },
+	relation_text: { type: Sequelize.STRING, allowNull: true },
 
 });
 

@@ -66,11 +66,11 @@ const getEmployeesMasterDataBySubsidiary = catchAsync(async (req, res) => {
 
 
 const getDeptMasterData = catchAsync(async (req, res) => {
-  
+
   res.send({
     code: HttpStatusCodes.OK,
     message: HttpResponseMessages.OK,
-    data: await settingService.getDeptMasterData(),
+    data: await settingService.getDeptMasterData(req?.body?.Id),
   });
 });
 

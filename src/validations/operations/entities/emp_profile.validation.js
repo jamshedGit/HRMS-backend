@@ -68,7 +68,8 @@ const createEmp_profileValidation = {
         workExperienceList: Joi.disallow(),
         academicList: Joi.disallow(),
         skillsList: Joi.disallow(),
-        incidentList: Joi.disallow()
+        incidentList: Joi.disallow(),
+        employeeStatusId:Joi.any(),
     }),
 };
 

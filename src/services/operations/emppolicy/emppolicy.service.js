@@ -7,7 +7,8 @@ const Sequelize = require('sequelize');
 const { paginationFacts } = require("../../../utils/common");
 const https = require('https');
 const { XMLParser, XMLBuilder, XMLValidator } = require("fast-xml-parser");
-const fns = require('date-fns')
+const fns = require('date-fns');
+const { HttpResponseMessages } = require("../../../utils/constants");
 
 const Op = Sequelize.Op;
 /**
@@ -189,6 +190,16 @@ const deleteEmpPolicyById = async (Id) => {
   const Item = await getEmpPolicyById(Id);
   if (!Item) {
     throw new ApiError(httpStatus.NOT_FOUND, "Item not found");
+  }
+  if(Item){
+
+    const checkUserExist = await EmpPolicyModel.EmployeeProfileModel.findOne({
+      where:{subsidiaryId:Item.subsidiaryId}
+    });
+    if(checkUserExist){
+      throw new ApiError(httpStatus.FORBIDDEN,HttpResponseMessages.ASSOCIATED_RECORD);
+    }
+
   }
   await Item.destroy();
   return Item;
