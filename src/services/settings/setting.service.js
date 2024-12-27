@@ -116,6 +116,20 @@ const getEmployeesMasterData = async () => {
   }) || []
 };
 
+const getEmployeesMasterDataBySubsidiary = async (subsidiaryId) => {
+  const EmployeesMasterData = subsidiaryId ? await EmployeeProfileModel.findAll({
+    where: { isActive: true, subsidiaryId: subsidiaryId },
+    attributes: ['Id', 'firstName', 'middleName', 'lastName']
+  }) : [];
+
+  return EmployeesMasterData?.map(el => {
+    return {
+      label: createEmployeeNameLabel(el),
+      value: el.Id
+    }
+  }) || []
+};
+
 
 const getDeptMasterData = async (Id) => {
   const deptMasterData = await DeptModel.findAll({
@@ -333,21 +347,30 @@ const getAllEmployeeShift = async () => {
   return result
 };
 
-const getAllFiscalYearData = async () => {
+const getAllFiscalYearData = async (employeeId) => {
   const result = []
-  const yearData = await FiscalSetupModel.findAll({
-    attributes: ['startDate', 'endDate', 'Id']
-  });
-  if (yearData.length) {
-    yearData.forEach(element => {
-      if (element.startDate && element.endDate) {
-        result.push({
-          label: createFiscalYearLabel(element.endDate, element.startDate),
-          value: element.Id,
-        })
+  if (employeeId) {
+    const employeeData = await EmployeeProfileModel.findByPk(employeeId, { attributes: ['subsidiaryId'] })
+    if (employeeData?.subsidiaryId) {
+
+      const yearData = await FiscalSetupModel.findAll({
+        where: {subsidiaryId: employeeData?.subsidiaryId},
+        attributes: ['startDate', 'endDate', 'Id']
+      });
+      if (yearData.length) {
+        yearData.forEach(element => {
+          if (element.startDate && element.endDate) {
+            result.push({
+              label: createFiscalYearLabel(element.endDate, element.startDate),
+              value: element.Id,
+            })
+          }
+        });
       }
-    });
+    }
+
   }
+
   return result;
 };
 
@@ -416,5 +439,6 @@ module.exports = {
   getEncashmentLeaveTypeData,
   getAllEmployeeShift,
   getLeaveTypesDataBySubsidiary,
-  getActiveFiscalYearData
+  getActiveFiscalYearData,
+  getEmployeesMasterDataBySubsidiary
 };
