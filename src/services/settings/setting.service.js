@@ -137,16 +137,28 @@ const getDeptMasterData = async (Id) => {
     attributes: ['deptId', 'deptName', 'subsidiaryId']
   });
 
-  const filteredDeptMasterData = deptMasterData
-  .filter((x) => x.subsidiaryId?.some((id) => id === String(Id))) 
-  .map((x) => ({
-    deptId: x.deptId,
-    deptName: x.deptName,
-    subsidiaryId: x.subsidiaryId,
+  // const filteredDeptMasterData = deptMasterData
+  // .filter((x) => x.subsidiaryId?.some((id) => id === String(Id))) 
+  // .map((x) => ({
+  //   deptId: x.deptId,
+  //   deptName: x.deptName,
+  //   subsidiaryId: x.subsidiaryId,
    
-  }));
+  // }));
 
-// Process the filtered data if necessary
+
+  let filteredDeptMasterData = deptMasterData;
+
+  if (Id) {
+    filteredDeptMasterData = deptMasterData
+      .filter((x) => x.subsidiaryId?.some((id) => id === String(Id)))
+      .map((x) => ({
+        deptId: x.deptId,
+        deptName: x.deptName,
+        subsidiaryId: x.subsidiaryId,
+      }));
+  }
+
 const processedDeptMasterData = getDdlItems(DDL_FIELD_NAMES.DeptName, filteredDeptMasterData);
 
 
