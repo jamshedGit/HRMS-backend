@@ -166,7 +166,7 @@ const queryEmp_profile = async (filter, options, searchQuery) => {
     ],
     where: {
       [Op.or]: queryFilters,
-      // isActive: true
+      isActive: options.isActive
     },
     offset: offset,
     limit: limit,
