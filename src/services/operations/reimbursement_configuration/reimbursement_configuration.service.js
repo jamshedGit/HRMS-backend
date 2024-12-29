@@ -1,5 +1,5 @@
 const httpStatus = require("http-status");
-const { Reimbursement_configurationModel,Reimbursement_policies_detailModel,Policies_grade_detailModel,Reimbursement_accounts_detailModel ,SubsidiaryModel} = require("../../../models/index");
+const { Reimbursement_configurationModel, Reimbursement_policies_detailModel, Policies_grade_detailModel, Reimbursement_accounts_detailModel, SubsidiaryModel } = require("../../../models/index");
 const { FormModel } = require("../../../models/index");
 
 const ApiError = require("../../../utils/ApiError");
@@ -12,7 +12,7 @@ const Op = Sequelize.Op;
 
 const createreimbursement_configuration = async (req, reimbursement_configurationBody) => {
   try {
-  
+
 
     // Check if the parent configuration already exists
     const subsidiaryExists = await Reimbursement_configurationModel.findOne({
@@ -37,7 +37,7 @@ const createreimbursement_configuration = async (req, reimbursement_configuratio
 
     // Check if policies exist and create them
     if (addedReimbursementConfiguration && Array.isArray(reimbursement_configurationBody.policies)) {
-     
+
       const createdPolicies = await Reimbursement_policies_detailModel.bulkCreate(
         reimbursement_configurationBody.policies.map(policy => ({
           ...policy,
@@ -45,15 +45,15 @@ const createreimbursement_configuration = async (req, reimbursement_configuratio
         }))
       );
 
- 
+
 
 
       for (const policy of reimbursement_configurationBody.policies) {
         const createdPolicy = createdPolicies.find(p => p.reimbursement_typeId === policy.reimbursement_typeId);
-    
+
         if (createdPolicy && Array.isArray(policy.grades)) {
-   
-          
+
+
           // Create grade details, dynamically adding `salary_gradeId` if only IDs are sent
           await Policies_grade_detailModel.bulkCreate(
             policy.grades.map(gradeDetail => {
@@ -64,8 +64,8 @@ const createreimbursement_configuration = async (req, reimbursement_configuratio
                   reimbursement_policies_detailId: createdPolicy.Id,
                 };
               }
-    
-            
+
+
               return {
                 ...gradeDetail,
                 reimbursement_policies_detailId: createdPolicy.Id,
@@ -81,7 +81,7 @@ const createreimbursement_configuration = async (req, reimbursement_configuratio
 
 
     if (addedReimbursementConfiguration && Array.isArray(reimbursement_configurationBody.accounts)) {
-  
+
       const createdAccounts = await Reimbursement_accounts_detailModel.bulkCreate(
         reimbursement_configurationBody.accounts.map(account => ({
           ...account,
@@ -92,13 +92,13 @@ const createreimbursement_configuration = async (req, reimbursement_configuratio
 
     }
 
-  
 
-    return await getreimbursement_configurationById(addedReimbursementConfiguration.Id );
+
+    return await getreimbursement_configurationById(addedReimbursementConfiguration.Id);
     // return "Done"
 
   } catch (error) {
-    
+
     throw error; // Rethrow or handle the error as needed
   }
 };
@@ -124,20 +124,17 @@ const queryreimbursement_configuration = async (
 
   searchQuery = searchQuery.toLowerCase();
   const queryFilters = [
-    {
-      min_year: Sequelize.where(
-        Sequelize.fn("", Sequelize.col("subsidiaryId")),
-        "LIKE",
-        "%" + searchQuery + "%"
-      ),
-    },
+ ,
+    { search1: Sequelize.where(Sequelize.fn('LOWER', Sequelize.col("Subsidiary.name")), 'LIKE', '%' + searchQuery + '%') },
+    { search2: Sequelize.where(Sequelize.fn('LOWER', Sequelize.col("PayrollGroup.formName")), 'LIKE', '%' + searchQuery + '%') },
+    { search3: Sequelize.where(Sequelize.fn('LOWER', Sequelize.col('CycleType.formName')), 'LIKE', '%' + searchQuery + '%') },
   ];
 
 
 
   const { count, rows } = await Reimbursement_configurationModel.findAndCountAll({
     order: [
-      ["Subsidiary", "name", "ASC"], 
+      ["Subsidiary", "name", "ASC"],
       ["PayrollGroup", "formName", "ASC"],   // Use the alias and attribute name instead of Sequelize.col()
     ],
     where: {
@@ -147,45 +144,6 @@ const queryreimbursement_configuration = async (
     offset: offset,
     limit: limit,
     include: [
-      {
-        model: Reimbursement_policies_detailModel,
-        as: "policies",
-        include: [
-          {
-            model: Policies_grade_detailModel,
-            as: "grades", // Ensure this matches the alias in the child model
-            include: [
-              {
-                model: FormModel, // Include the salary grade model
-                attributes: ["formName", "formCode"],
-                as: "salary_grade", // Ensure this matches the alias in the grandchild model
-              },
-            ],
-          },
-        ],
-      },
-   
-      {
-        model: Reimbursement_accounts_detailModel,
-        as: "accounts",
-        include: [
-          {
-            model: FormModel,
-            attributes: ["formName", "formCode"],
-            as: "Reimbursement_type",
-          },
-          {
-            model: FormModel,
-            attributes: ["formName", "formCode"],
-            as: "Expense_account",
-          },
-          {
-            model: FormModel,
-            attributes: ["formName", "formCode"],
-            as: "Bank_account",
-          },
-        ],
-      },
       {
         model: SubsidiaryModel,
         attributes: ["name"],
@@ -197,14 +155,56 @@ const queryreimbursement_configuration = async (
         attributes: ["formName", "formCode"],
         as: "PayrollGroup",
       },
+
       {
         model: FormModel,
         attributes: ["formName", "formCode"],
         as: "CycleType",
       },
+      // {
+      //   model: Reimbursement_policies_detailModel,
+      //   as: "policies",
+      //   include: [
+      //     {
+      //       model: Policies_grade_detailModel,
+      //       as: "grades", // Ensure this matches the alias in the child model
+      //       include: [
+      //         {
+      //           model: FormModel, // Include the salary grade model
+      //           attributes: ["formName", "formCode"],
+      //           as: "salary_grade", // Ensure this matches the alias in the grandchild model
+      //         },
+      //       ],
+      //     },
+      //   ],
+      // },
+
+      // {
+      //   model: Reimbursement_accounts_detailModel,
+      //   as: "accounts",
+      //   include: [
+      //     {
+      //       model: FormModel,
+      //       attributes: ["formName", "formCode"],
+      //       as: "Reimbursement_type",
+      //     },
+      //     {
+      //       model: FormModel,
+      //       attributes: ["formName", "formCode"],
+      //       as: "Expense_account",
+      //     },
+      //     {
+      //       model: FormModel,
+      //       attributes: ["formName", "formCode"],
+      //       as: "Bank_account",
+      //     },
+      //   ],
+      // },
+
+
     ],
   });
-    
+
   return paginationFacts(rows?.length, limit, options.pageNumber, rows);
 };
 
@@ -217,7 +217,7 @@ const queryreimbursement_configuration = async (
 
 
 const getreimbursement_configurationById = async (id) => {
- 
+
 
   // Fetch the reimbursement configuration
   const result = await Reimbursement_configurationModel.findOne({
@@ -292,7 +292,7 @@ const getreimbursement_configurationById = async (id) => {
         }
       });
     }
-  
+
     return transformedResult;
   }
 
@@ -315,15 +315,15 @@ const updatereimbursement_configurationById = async (
   const { subsidiaryId, payroll_groupId } = updateBody;
 
 
-const overlappingSubsidiary = await Reimbursement_configurationModel.findOne({
+  const overlappingSubsidiary = await Reimbursement_configurationModel.findOne({
 
 
-  where: {
-    Id: { [Op.ne]: Id }, // Exclude the current record by ID
-    subsidiaryId: subsidiaryId,
-    payroll_groupId: payroll_groupId,
-  }
-});
+    where: {
+      Id: { [Op.ne]: Id }, // Exclude the current record by ID
+      subsidiaryId: subsidiaryId,
+      payroll_groupId: payroll_groupId,
+    }
+  });
 
 
   if (overlappingSubsidiary) {
@@ -341,7 +341,7 @@ const overlappingSubsidiary = await Reimbursement_configurationModel.findOne({
       {
         model: Reimbursement_accounts_detailModel,
         as: "accounts",
-      
+
       },
     ],
   });
@@ -356,9 +356,9 @@ const overlappingSubsidiary = await Reimbursement_configurationModel.findOne({
   // Update or create child records
   if (updateBody.policies && Array.isArray(updateBody.policies)) {
     const newPolicyIds = [];
-  
+
     for (const policy of updateBody.policies) {
-  
+
 
       if (policy.Id) {
         // Update existing policy detail
@@ -371,14 +371,14 @@ const overlappingSubsidiary = await Reimbursement_configurationModel.findOne({
           await Policies_grade_detailModel.destroy({
             where: { reimbursement_policies_detailId: policyDetail.Id }
           });
-    
+
           Object.assign(policyDetail, policy); // Apply updates
           await policyDetail.save();
 
- 
+
           if (policy.grades && Array.isArray(policy.grades)) {
- 
-            
+
+
             // Create grade details, dynamically adding `salary_gradeId` if only IDs are sent
             await Policies_grade_detailModel.bulkCreate(
               policy.grades.map(gradeDetail => {
@@ -389,8 +389,8 @@ const overlappingSubsidiary = await Reimbursement_configurationModel.findOne({
                     reimbursement_policies_detailId: policyDetail.Id,
                   };
                 }
-      
-              
+
+
                 return {
                   ...gradeDetail,
                   reimbursement_policies_detailId: policyDetail.Id,
@@ -407,8 +407,8 @@ const overlappingSubsidiary = await Reimbursement_configurationModel.findOne({
         policy.reimbursement_configurationId = Item.Id; // Associate with the configuration ID
         const newPolicyDetail = await Reimbursement_policies_detailModel.create(policy);
         if (policy.grades && Array.isArray(policy.grades)) {
-   
-          
+
+
           // Create grade details, dynamically adding `salary_gradeId` if only IDs are sent
           await Policies_grade_detailModel.bulkCreate(
             policy.grades.map(gradeDetail => {
@@ -419,8 +419,8 @@ const overlappingSubsidiary = await Reimbursement_configurationModel.findOne({
                   reimbursement_policies_detailId: newPolicyDetail.Id,
                 };
               }
-    
-            
+
+
               return {
                 ...gradeDetail,
                 reimbursement_policies_detailId: newPolicyDetail.Id,
@@ -447,10 +447,10 @@ const overlappingSubsidiary = await Reimbursement_configurationModel.findOne({
     const newAccountDetailIds = [];
 
     for (const account of updateBody.accounts) {
-  
+
       if (account.Id) {
         // Update existing detail
-   
+
         const accountchildDetail = await Reimbursement_accounts_detailModel.findOne({
           where: { Id: account.Id }
         });
@@ -464,7 +464,7 @@ const overlappingSubsidiary = await Reimbursement_configurationModel.findOne({
             throw error
           }
         } else {
-         
+
         }
         newAccountDetailIds.push(account.Id);
       } else {
@@ -480,7 +480,7 @@ const overlappingSubsidiary = await Reimbursement_configurationModel.findOne({
     for (const existingId of existingAccountDetailIds) {
 
       if (!newAccountDetailIds.includes(existingId)) {
- 
+
         await Reimbursement_accounts_detailModel.destroy({
           where: { Id: existingId }
         });
