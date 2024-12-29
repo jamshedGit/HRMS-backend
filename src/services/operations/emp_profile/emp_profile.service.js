@@ -20,6 +20,9 @@ const createEmp_profile = async (req, Emp_profileBody) => {
 
   Emp_profileBody.createdBy = req.user.id;
 
+  
+
+
   const checkDateOverlap = (startDate1, endDate1, startDate2, endDate2) => {
     return startDate1 <= endDate2 && endDate1 >= startDate2;
   };
@@ -56,7 +59,18 @@ const createEmp_profile = async (req, Emp_profileBody) => {
   }
 
   else {
-
+    Emp_profileBody.dateOfJoining= formatDates(Emp_profileBody.dateOfJoining, 'yyyy-MM-dd')
+    Emp_profileBody.dateOfConfirmation= formatDates(Emp_profileBody.dateOfConfirmation, 'yyyy-MM-dd')
+    Emp_profileBody.dateOfConfirmationDue= formatDates(Emp_profileBody.dateOfConfirmationDue, 'yyyy-MM-dd')
+    Emp_profileBody.dateOfConfirmationEnter= formatDates(Emp_profileBody.dateOfConfirmationEnter, 'yyyy-MM-dd')
+    Emp_profileBody.dateOfContractExpiry= formatDates(Emp_profileBody.dateOfContractExpiry, 'yyyy-MM-dd')
+    Emp_profileBody.dateOfBirth= formatDates(Emp_profileBody.dateOfBirth, 'yyyy-MM-dd')
+    Emp_profileBody.dateOfRetirement= formatDates(Emp_profileBody.dateOfRetirement, 'yyyy-MM-dd')
+    Emp_profileBody.lastReviewDate= formatDates(Emp_profileBody.lastReviewDate, 'yyyy-MM-dd')
+    Emp_profileBody.nextReviewDate= formatDates(Emp_profileBody.nextReviewDate, 'yyyy-MM-dd')
+    Emp_profileBody.drivingLicenseExpiry= formatDates(Emp_profileBody.drivingLicenseExpiry, 'yyyy-MM-dd')
+    Emp_profileBody.passportExpiry= formatDates(Emp_profileBody.passportExpiry, 'yyyy-MM-dd')
+    Emp_profileBody.nicExpiry= formatDates(Emp_profileBody.nicExpiry, 'yyyy-MM-dd')
     addedEmp_profileObj = await Emp_profileModel.EmployeeProfileModel.create(Emp_profileBody);
   }
 
@@ -153,8 +167,8 @@ const queryEmp_profile = async (filter, options, searchQuery) => {
   let offset = 0 + (options.pageNumber - 1) * limit;
   searchQuery = searchQuery.toLowerCase();
   const queryFilters = [
-    // { isActive: sequelize.where }
-    // { Id: Sequelize.where(Sequelize.fn('LOWER', Sequelize.col('Id')), 'LIKE', '%' + searchQuery + '%') },
+   
+    { Id: Sequelize.where(Sequelize.fn('LOWER', Sequelize.col('employeeCode')), 'LIKE', '%' + searchQuery + '%') },
     { firstName: Sequelize.where(Sequelize.fn('LOWER', Sequelize.col('firstName')), 'LIKE', '%' + searchQuery + '%') },
     { lastName: Sequelize.where(Sequelize.fn('LOWER', Sequelize.col('lastName')), 'LIKE', '%' + searchQuery + '%') },
 
