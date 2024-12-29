@@ -96,6 +96,11 @@ const querygratuity_configuration = async (filter, options, searchQuery) => {
         "%" + searchQuery + "%"
       ),
     },
+     { name1: Sequelize.where(Sequelize.fn('LOWER', Sequelize.col('Subsidiary.name')), 'LIKE', '%' + searchQuery + '%') },
+         { max_year: Sequelize.where(Sequelize.fn('LOWER', Sequelize.col("max_year")), 'LIKE', '%' + searchQuery + '%') },
+         { nam3: Sequelize.where(Sequelize.fn('LOWER', Sequelize.col('Contract_Type.formName')), 'LIKE', '%' + searchQuery + '%') },
+       
+      
   ];
 
   const { count, rows } = await Gratuity_configurationModel.findAndCountAll({
