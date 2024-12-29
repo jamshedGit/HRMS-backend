@@ -144,7 +144,7 @@ const getAllParentChildForms = async (filter, options, searchQuery) => {
     let searchlist = filterByValue(results, searchQuery);
  
     let count = searchlist.length;
-    const rows = searchlist; //searchlist.slice(offset, offset + limit)
+    const rows =searchlist.slice(offset, offset + limit)
 
     return paginationFacts(count, limit, options.pageNumber, rows); // 
   } catch (error) {

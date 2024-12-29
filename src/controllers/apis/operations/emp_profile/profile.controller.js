@@ -17,7 +17,12 @@ const imageUpload = async (req, res) => {
   }
 
   // Generate the URL for the uploaded image (assuming a public uploads folder)
-  const imageUrl = `http://119.153.103.211:${3011}/uploads/${req.file.filename}`;
+  // const imageUrl = `http://119.153.103.211:${3011}/uploads/${req.file.filename}`;
+  
+  const baseUrl = `${req.protocol}://${req.get('host')}`; 
+  
+  // Generate the URL for the uploaded image
+  const imageUrl = `${baseUrl}/uploads/${req.file.filename}`;
 
   res.json({ message: 'Image uploaded successfully!', imageUrl });
 };
@@ -52,6 +57,13 @@ const createEmp_profile = catchAsync(async (req, res) => {
     });
 
   } catch (error) {
+    if (error?.parent?.errno === 1062) {
+      throw new ApiError(httpStatus.NOT_FOUND, "Duplicate entry not allowed!");
+    }
+    else {
+
+      throw error;
+    }
 
   }
 });

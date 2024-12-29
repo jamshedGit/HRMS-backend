@@ -86,14 +86,20 @@ const queryaccrue_gratuity_configuration = async (
 
   searchQuery = searchQuery.toLowerCase();
   const queryFilters = [
-    {
-      min_year: Sequelize.where(
-        Sequelize.fn("", Sequelize.col("subsidiaryId")),
-        "LIKE",
-        "%" + searchQuery + "%"
-      ),
-    },
-  ];
+    // {
+    //   subsidiaryId: Sequelize.where(
+    //     Sequelize.fn("", Sequelize.col("t_subsidiary.name")),
+    //     // Sequelize.fn('LOWER', Sequelize.col('accrue_gratuity_configuration.subsidiaryId')), // Correct reference to subsidiaryId
+    //     "LIKE",
+    //     "%" + searchQuery + "%"
+    //   ),
+    // },
+     { name1: Sequelize.where(Sequelize.fn('LOWER', Sequelize.col('Subsidiary.name')), 'LIKE', '%' + searchQuery + '%') },
+     { nam2: Sequelize.where(Sequelize.fn('LOWER', Sequelize.col('GraduityExpenseAccount.formName')), 'LIKE', '%' + searchQuery + '%') },
+     { nam3: Sequelize.where(Sequelize.fn('LOWER', Sequelize.col('GraduityPayableAccount.formName')), 'LIKE', '%' + searchQuery + '%') },
+     { name4: Sequelize.where(Sequelize.fn('LOWER', Sequelize.col('BankCashAccount.formName')), 'LIKE', '%' + searchQuery + '%') },
+  
+    ];
 
   const { count, rows } =
     await accrue_gratuity_configurationModel.findAndCountAll({

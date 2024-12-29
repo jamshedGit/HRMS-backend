@@ -71,8 +71,8 @@ const getAllChildForms = catchAsync(async (req, res) => {
   const obj = {};
   const filter = obj;
   // const options = pick(req.body, ["sortBy", "limit", "page"]);
-  const options = {}; //pick(req.body, ['sortOrder', 'pageSize', 'pageNumber']);
-  const searchQuery = ''; // req.body.filter.searchQuery? req.body.filter.searchQuery : '';
+  const options =  pick(req.body, ['sortOrder', 'pageSize', 'pageNumber']);
+  const searchQuery =  req?.body?.filter?.searchQuery? req.body.filter.searchQuery : '';
 
   if (req.body.id) {
     req.body.parentId = req.body.id;

@@ -7,8 +7,8 @@ const createGratuity_configurationValidation = {
     body: Joi.object().keys({
         Id:'',
         subsidiaryId: Joi.number(),
-        contract_typeId: Joi.number(),
-        gratuity_fraction: Joi.number(), 
+        contract_typeId: Joi.number().allow(null),
+        gratuity_fraction: Joi.number().allow(null), 
         num_of_days: Joi.number(),
         min_year: Joi.number(),
         max_year: Joi.number(),

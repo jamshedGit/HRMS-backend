@@ -8,7 +8,7 @@ const createholidaysValidation = {
         Id:'',
         subsidiaryId: Joi.number(),
         name: Joi.string(),
-        religionId: Joi.number(), 
+        religionId: Joi.number().allow(null), 
         from_date: Joi.date(),
         to_date: Joi.date(),
         number_of_days: Joi.number(),

@@ -17,7 +17,7 @@ const creategratuity_configuration = catchAsync(async (req, res) => {
 
     const gratuity_configuration = await Gratuity_configurationService.creategratuity_configuration(req, req.body);
 
-    if (gratuity_configuration?.status && gratuity_configuration.status === "error") {
+    if (gratuity_configuration?.status && gratuity_configuration?.status === "error") {
 
       res.status(HttpStatusCodes.INTERNAL_SERVER_ERROR).send({
         code: HttpStatusCodes.INTERNAL_SERVER_ERROR,
