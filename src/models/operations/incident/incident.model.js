@@ -12,7 +12,7 @@ const IncidentModel = sequelize.define('T_employee_incident', {
 	},
 	employeeId: { type: Sequelize.NUMBER, allowNull: true, defaultValue: true },
 	incidentDetail: { type: Sequelize.STRING, allowNull: true, defaultValue: true },
-	date: { type: Sequelize.DATE, allowNull: true, defaultValue: true },
+	incidentDate: { type: Sequelize.DATE, allowNull: true, defaultValue: true },
 	actionTaken: { type: Sequelize.STRING, allowNull: true, defaultValue: true },
 	actionTakenBy: { type: Sequelize.NUMBER, allowNull: true, defaultValue: true },
 	isActive: { type: Sequelize.BOOLEAN, allowNull: true, defaultValue: true },
