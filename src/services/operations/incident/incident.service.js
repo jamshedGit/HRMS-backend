@@ -16,11 +16,11 @@ const Op = Sequelize.Op;
  * @returns {Promise<Incident>}
  */
 const createIncident = async (req, IncidentBody) => {
-  console.log("Incident Body", IncidentBody)
+ 
   // IncidentBody.slug = IncidentBody.name.replace(/ /g, "-").toLowerCase();
-  console.log(req.user.id);
+ 
   IncidentBody.createdBy = req.user.id;
-  console.log(IncidentBody, "body");
+  
   const addedIncidentObj = await IncidentModel.IncidentModel.create(IncidentBody);
   //authSMSSend(addedIncidentObj.dataValues);  // Quick send message at the time of donation
   return addedIncidentObj;
@@ -77,7 +77,7 @@ const SP_getAllIncidentInfo = async (filter, options, searchQuery,empId) => {
     let offset = 0 + (options.pageNumber - 1) * limit;
     searchQuery = searchQuery.toLowerCase();
     let searchlist = filterByValue(results, searchQuery);
-    console.log("searchlist", searchlist)
+  
     let count = searchlist.length;
     const rows = searchlist.slice(offset, offset + limit)
 
@@ -90,7 +90,7 @@ const SP_getAllIncidentInfo = async (filter, options, searchQuery,empId) => {
 
 const SP_getAllIncidentInfoByEmpId = async (empId) => {
   try {
-    console.log("incident empID",empId);
+  
     const results = await sequelize.query('CALL usp_GetAllEmployeeIncidentDetails(:employeeId)', {
       replacements: { employeeId: empId },
       type: Sequelize.QueryTypes.RAW // Use RAW type for executing stored procedures
@@ -122,7 +122,7 @@ function filterByValue(array, string) {
  * @returns {Promise<ReceiptModel>}
  */
 const getIncidentById = async (id) => {
-  console.log("getIncidentById", id)
+ 
   return IncidentModel.IncidentModel.findByPk(id);
 };
 
@@ -136,12 +136,12 @@ const getIncidentById = async (id) => {
  */
 const updateIncidentById = async (Id, updateBody, updatedBy) => {
 
-  console.log("zzz", updateBody);
+  
   const Item = await getIncidentById(Id);
   if (!Item) {
     throw new ApiError(httpStatus.NOT_FOUND, "record not found");
   }
-  //console.log("Update Receipt Id" , item);
+
   // updateBody.slug = updateBody.name.replace(/ /g, "-").toLowerCase()
   updateBody.updatedBy = updatedBy;
   delete updateBody.id;
