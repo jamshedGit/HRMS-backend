@@ -159,9 +159,9 @@ const updateExchangeRateById = async (Id, updateBody, updatedBy) => {
     throw new ApiError(httpStatus.NOT_FOUND, "record not found");
   }
 
-  if (updateBody.effective_date) {
+  // if (updateBody.effective_date) {
   
-  }
+  // }
   updateBody.updatedBy = updatedBy;
   delete updateBody.id;
   Object.assign(Item, updateBody);
@@ -185,13 +185,19 @@ const deleteExchangeRateById = async (Id) => {
   return Item;
 };
 
-const getLastExchangeRateBySubsidiary = async (subsidiaryId) => {
-  // return ExchangeRateModel.ExchangeRateModel.findOne({
-  //   where: { subsidiaryId: subsidiaryId },
+const getLastExchangeRateBySubsidiary = async (data) => {
+
+
+  // return  await ExchangeRateModel.ExchangeRateModel.max('effective_date', {
+  //   where: { subsidiaryId: data.subsidiaryId },
   // });
 
-  return  await ExchangeRateModel.ExchangeRateModel.max('effective_date', {
-    where: { subsidiaryId: subsidiaryId },
+  return await ExchangeRateModel.ExchangeRateModel.max('effective_date', {
+    where: {
+      subsidiaryId: data.subsidiaryId,
+      base_currency_id: data.base_currency_id,
+      currency_to_convert_id: data.currency_to_convert_id
+    }
   });
   
 };

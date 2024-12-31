@@ -123,8 +123,8 @@ const deleteExchangeRate = catchAsync(async (req, res) => {
 const getLastExchangeRateBySubsidiary = catchAsync(async (req, res) => {
 
 
-  const Receipt = await ExchangeRateformService.ExchangeRateServicePage.getLastExchangeRateBySubsidiary(req?.body?.subsidiaryId);
-  console.log("Receipt111",Receipt)
+  const Receipt = await ExchangeRateformService.ExchangeRateServicePage.getLastExchangeRateBySubsidiary(req?.body?.data);
+  
   if (!Receipt) {
     throw new ApiError(httpStatus.NOT_FOUND, "Data not found");
   }
