@@ -3,7 +3,7 @@ const {EmployeeSalaryModel, Employee_loan_requestModel,Loan_management_configura
 
 const ApiError = require("../../../utils/ApiError");
 const Sequelize = require("sequelize");
-const { paginationFacts } = require("../../../utils/common");
+const { paginationFacts, formatDates } = require("../../../utils/common");
 const { HttpStatusCodes } = require("../../../utils/constants");
 const Employee_loan_request_detail = require("../../../models/operations/employee_loan_request/employee_loan_request_detail.model");
 
@@ -24,7 +24,9 @@ const createEmployee_loan_request = async (req, Employee_loan_requestBody) => {
     }
 
     const userId = req.user.id;
-
+   
+    Employee_loan_requestBody.applied_date= formatDates(Employee_loan_requestBody.applied_date, 'yyyy-MM-dd')
+    Employee_loan_requestBody.installment_start_date=formatDates(Employee_loan_requestBody.installment_start_date, 'yyyy-MM-dd')
     // Initial setup
     Employee_loan_requestBody.loan_amount_remaining = Employee_loan_requestBody.total_loan_amount;
     Employee_loan_requestBody.createdBy = userId;
@@ -214,7 +216,8 @@ const updateEmployee_loan_requestById = async (
 }
 
   
-  
+updateBody.applied_date= formatDates(updateBody.applied_date, 'yyyy-MM-dd')
+updateBody.installment_start_date=formatDates(updateBody.installment_start_date, 'yyyy-MM-dd')
   updateBody.updatedBy = updatedBy;
   delete updateBody.id;
   Object.assign(Item, updateBody);
