@@ -107,8 +107,8 @@ WHERE`;
     array.push(`(y.attendanceType = ${employeeFilter.attendanceType})`)
   }
 
-  if (employeeFilter.employeeId) {
-    array.push(`(y.Id = ${employeeFilter.employeeId})`)
+  if (employeeFilter.Id) {
+    array.push(`(y.Id = ${employeeFilter.Id})`)
   }
 
   if (employeeFilter.monthId) {
