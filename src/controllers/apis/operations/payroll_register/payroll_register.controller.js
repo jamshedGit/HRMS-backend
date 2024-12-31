@@ -32,7 +32,7 @@ const generatePayslip = catchAsync(async (req, res) => {
   const data = await PayrollRegisterServicePage.generatePaySlip(req);
   res.set({
     "Content-Type": "application/pdf",
-    "Content-Disposition": 'attachment; filename="kamil_test.pdf"',
+    "Content-Disposition": 'attachment; filename="payslip.pdf"',
   });
   res.end(data);
 });
