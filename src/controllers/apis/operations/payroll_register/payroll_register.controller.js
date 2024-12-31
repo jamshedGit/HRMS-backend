@@ -28,8 +28,8 @@ const getAllRegisteredPayroll = catchAsync(async (req, res) => {
  * @param {Object} req 
  * @returns res
  */
-const getAllRegisteredPayrollPdfData = catchAsync(async (req, res) => {
-  const data = await PayrollRegisterServicePage.getAllRegisteredPayrollForPdf(req);
+const generatePayslip = catchAsync(async (req, res) => {
+  const data = await PayrollRegisterServicePage.generatePaySlip(req);
   res.set({
     "Content-Type": "application/pdf",
     "Content-Disposition": 'attachment; filename="kamil_test.pdf"',
@@ -39,5 +39,5 @@ const getAllRegisteredPayrollPdfData = catchAsync(async (req, res) => {
 
 module.exports = {
   getAllRegisteredPayroll,
-  getAllRegisteredPayrollPdfData
+  generatePayslip
 };

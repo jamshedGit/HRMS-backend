@@ -3,13 +3,15 @@ const { format, differenceInDays, addDays } = require('date-fns');
 const Sequelize = require("sequelize");
 const Op = Sequelize.Op;
 const modelMapping = require("../models/index");
+const { ToWords } = require('to-words');
+const { DEFAULT_NUM_TO_WORDS_OPTIONS } = require('./constants');
 
 const getRouteSlugs = (req) => {
   const route = req.originalUrl;
   const params = req.params;
- 
+
   let arr = route.split("/");
-  
+
   //If param is available then get the endpoints from the 2 parts before the params
   //else take last two parts as endpoints from url
   if (Object.keys(params).length) {
@@ -22,25 +24,25 @@ const getRouteSlugs = (req) => {
 };
 
 const getDdlItems = (
-  columns = { labelField: "", valueField: "", codeField: "",mergeLabel:"",subsidiaryId:"",currencyId:"" },
+  columns = { labelField: "", valueField: "", codeField: "", mergeLabel: "", subsidiaryId: "", currencyId: "" },
   data = [],
-  mergeLabel=false,
+  mergeLabel = false,
   parentId = null
- 
 
- 
+
+
 ) => {
   return data.map((i) => ({
-    mergeLabel:i[columns.codeField] +" - " + i[columns.labelField],
-    label:mergeLabel? i[columns.codeField] +" - " + i[columns.labelField] : i[columns.labelField],
+    mergeLabel: i[columns.codeField] + " - " + i[columns.labelField],
+    label: mergeLabel ? i[columns.codeField] + " - " + i[columns.labelField] : i[columns.labelField],
     value: i[columns.valueField],
     code: i[columns.codeField],
-    subsidiaryId:i[columns.subsidiaryId],
-    currencyId:i[columns?.currencyId],
+    subsidiaryId: i[columns.subsidiaryId],
+    currencyId: i[columns?.currencyId],
     type: i[columns.typeField]
 
 
-   
+
   }));
 };
 
@@ -97,7 +99,7 @@ const createDatetime = (stringDate) => {
     // Format the date and time to the desired format
     const outputDateTime = momentObj.format("YYYY-MM-DD HH:mm:ss.SSSZ");
 
- 
+
     return outputDateTime;
   }
 
@@ -108,7 +110,7 @@ const getPathStorageFromUrl = (url) => {
   // url = "https://firebasestorage.googleapis.com/v0/b/eams-test-7f4a7.appspot.com/o/testing%2F1685006218395-5f0911c1-91c2-4153-bd83-d71f35c7e942-CRN.10?alt=media&token=6c7c1fde-4ce1-4941-bca6-a121b80d403c"
   const baseUrl =
     "https://firebasestorage.googleapis.com/v0/b/eams-test-7f4a7.appspot.com/o/";
-  
+
   let imagePath = url.replace(baseUrl, "");
   const indexOfEndPath = imagePath.indexOf("?");
   imagePath = imagePath.substring(0, indexOfEndPath);
@@ -178,7 +180,7 @@ const check_range_exist = async (
   fieldMappings = []
 ) => {
   // Validate that max is greater than min
- 
+
   if (body[maxField] < body[minField]) {
     return {
       message: "Min value must be less than Max value.",
@@ -236,7 +238,7 @@ const check_range_exist = async (
  * @returns 
  */
 const formatDates = (date, dateFormat = null) => {
-  if(!date)
+  if (!date)
     return null;
 
   return format(new Date(date), dateFormat || 'dd/MMM/yyyy')
@@ -278,7 +280,7 @@ const addDaysInDate = (startDate, days = 0) => {
  * @returns 
  */
 const createFiscalYearLabel = (endDate, startDate) => {
-  if(!endDate || !startDate){
+  if (!endDate || !startDate) {
     return '';
   }
   return `Year - ${new Date(endDate).getFullYear()} (${formatDates(new Date(startDate), 'dd-MMM-yyyy')} to ${formatDates(new Date(endDate), 'dd-MMM-yyyy')})`
@@ -294,7 +296,7 @@ const createFiscalYearLabel = (endDate, startDate) => {
  * @returns 
  */
 const createEmployeeShiftLabel = (name, endDate, startDate) => {
-  if(!endDate || !startDate){
+  if (!endDate || !startDate) {
     return '';
   }
   return `${name}`
@@ -316,12 +318,20 @@ const createEmployeeNameLabel = (employee) => {
   return nameArray.join(' ');
 }
 
-const createTaxYearSetupLabel = (endDate, startDate,isActive) => {
-  if(!endDate || !startDate){
+const createTaxYearSetupLabel = (endDate, startDate, isActive) => {
+  if (!endDate || !startDate) {
     return '';
   }
-  return `Year - ${new Date(endDate).getFullYear()} (${formatDates(new Date(startDate), 'dd-MMM-yyyy')} to ${formatDates(new Date(endDate), 'dd-MMM-yyyy')}) - ${isActive? "Active":"Inactive"}`
+  return `Year - ${new Date(endDate).getFullYear()} (${formatDates(new Date(startDate), 'dd-MMM-yyyy')} to ${formatDates(new Date(endDate), 'dd-MMM-yyyy')}) - ${isActive ? "Active" : "Inactive"}`
 }
 
 
-module.exports = { handleNestedData, getRouteSlugs, getDdlItems, getAlarmTimesItems, customPaginate, paginationFacts, createDatetime, getPathStorageFromUrl, formatDates, getDateDiffInDays, addDaysInDate, check_range_exist, createFiscalYearLabel, createEmployeeShiftLabel, createTaxYearSetupLabel, createEmployeeNameLabel };
+const digitsToWords = (number, config = null) => {
+  const options = config || DEFAULT_NUM_TO_WORDS_OPTIONS;
+  const toWords = new ToWords(options)
+  return toWords.convert(number)
+}
+
+
+
+module.exports = { handleNestedData, getRouteSlugs, getDdlItems, getAlarmTimesItems, customPaginate, paginationFacts, createDatetime, getPathStorageFromUrl, formatDates, getDateDiffInDays, addDaysInDate, check_range_exist, createFiscalYearLabel, createEmployeeShiftLabel, createTaxYearSetupLabel, createEmployeeNameLabel, digitsToWords };
