@@ -17,7 +17,7 @@ const createEmployee_loan_request = catchAsync(async (req, res) => {
 
         const Employee_loan_request = await Employee_loan_requestService.createEmployee_loan_request(req, req.body);
 
-        if (Employee_loan_request?.status && Employee_loan_request.status === "error") {
+        if (Employee_loan_request?.status && Employee_loan_request?.status === "error") {
 
             res.status(HttpStatusCodes.INTERNAL_SERVER_ERROR).send({
                 code: HttpStatusCodes.INTERNAL_SERVER_ERROR,
