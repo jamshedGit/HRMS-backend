@@ -185,7 +185,16 @@ const deleteExchangeRateById = async (Id) => {
   return Item;
 };
 
+const getLastExchangeRateBySubsidiary = async (subsidiaryId) => {
+  // return ExchangeRateModel.ExchangeRateModel.findOne({
+  //   where: { subsidiaryId: subsidiaryId },
+  // });
 
+  return  await ExchangeRateModel.ExchangeRateModel.max('effective_date', {
+    where: { subsidiaryId: subsidiaryId },
+  });
+  
+};
 
 module.exports = {
   createExchangeRate,
@@ -195,5 +204,6 @@ module.exports = {
   deleteExchangeRateById,
   SP_getAllExchangeRateInfo,
   SP_getAllExchangeRateInfoByEmpId,
-  SP_GetAllEarningDeductionList
+  SP_GetAllEarningDeductionList,
+  getLastExchangeRateBySubsidiary
 };

@@ -119,6 +119,21 @@ const deleteExchangeRate = catchAsync(async (req, res) => {
 });
 
 
+
+const getLastExchangeRateBySubsidiary = catchAsync(async (req, res) => {
+
+
+  const Receipt = await ExchangeRateformService.ExchangeRateServicePage.getLastExchangeRateBySubsidiary(req?.body?.subsidiaryId);
+  console.log("Receipt111",Receipt)
+  if (!Receipt) {
+    throw new ApiError(httpStatus.NOT_FOUND, "Data not found");
+  }
+  res.send({
+    code: HttpStatusCodes.OK,
+    message: HttpResponseMessages.OK,
+    data: Receipt,
+  });
+});
 module.exports = {
   createExchangeRate,
   getAllExchangeRate,
@@ -126,5 +141,6 @@ module.exports = {
   updateExchangeRate,
   deleteExchangeRate,
   SP_getAllExchangeRateInfoByEmpId,
-  SP_getAllEarningDeductionList
+  SP_getAllEarningDeductionList,
+  getLastExchangeRateBySubsidiary
 };
