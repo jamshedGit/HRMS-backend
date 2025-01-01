@@ -65,7 +65,7 @@ const getAllRegisteredPayroll = async (req) => {
         WHEN TransactionType = 'LoanType' THEN (SELECT e.Name FROM t_loan_type_setup e WHERE x.earning_deduction_id = e.Id)
         ELSE ''
     END AS EarningName, 
-    Amount_Actual 
+    Amount_TakeHome AS Amount_Actual 
 FROM t_payrollearningdeduction X
 INNER JOIN t_employee_profile y ON x.EmpId = y.Id
 INNER JOIN t_payroll_month_setup z ON x.SubsidiaryId = z.subsidiaryId 
@@ -264,7 +264,7 @@ pe.MonthId = ${filter.monthId}`;
         WHEN TransactionType = 'LoanType' THEN (SELECT e.Name FROM t_loan_type_setup e WHERE x.earning_deduction_id = e.Id)
         ELSE ''
     END AS EarningName, 
-    Amount_Actual 
+    Amount_TakeHome AS Amount_Actual
 FROM t_payrollearningdeduction X
 INNER JOIN t_employee_profile y ON x.EmpId = y.Id
 INNER JOIN t_payroll_month_setup z ON x.SubsidiaryId = z.subsidiaryId 
