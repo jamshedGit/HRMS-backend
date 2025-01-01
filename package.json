@@ -94,6 +94,7 @@
     "swagger-ui-express": "^4.1.6",
     "to-camel-case": "^1.0.0",
     "to-pascal-case": "^1.0.0",
+    "to-words": "^4.2.0",
     "underscore": "^1.13.4",
     "validator": "^13.0.0",
     "winston": "^3.2.1",

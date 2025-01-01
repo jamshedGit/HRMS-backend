@@ -111,4 +111,15 @@ const HttpResponseMessages = {
   ALREADY_EXIST:"Record already exists",
   ASSOCIATED_RECORD:"Unable to Delete: This record is already used in Transaction forms."
 };
-module.exports = { DDL_FIELD_NAMES, HttpStatusCodes, HttpResponseMessages };
+
+
+const DEFAULT_NUM_TO_WORDS_OPTIONS = {
+  localeCode: 'en-IN',
+  converterOptions: {
+    currency: false,
+    ignoreDecimal: true,
+    ignoreZeroCurrency: true,
+  },
+}
+
+module.exports = { DDL_FIELD_NAMES, HttpStatusCodes, HttpResponseMessages, DEFAULT_NUM_TO_WORDS_OPTIONS };

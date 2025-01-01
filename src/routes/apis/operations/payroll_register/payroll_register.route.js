@@ -7,6 +7,6 @@ const itemValidation = require("../../../../validations/operations/entities/payr
 const router = express.Router();
 
 router.route("/read-all-registered-payroll").post(auth(), validate(itemValidation.getAllItem), form_controller.getAllRegisteredPayroll);
-router.route("/read-all-registered-payroll-pdf-data").post(auth(), validate(itemValidation.getItemForPdf), form_controller.getAllRegisteredPayrollPdfData);
+router.route("/generate-payslip-pdf").post(auth(), validate(itemValidation.getItemForPdf), form_controller.generatePayslip);
 
 module.exports = router;
