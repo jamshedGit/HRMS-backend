@@ -80,7 +80,7 @@ const getEmployee_loan_requestById = catchAsync(async (req, res) => {
 
     const Receipt = await Employee_loan_requestService.getEmployee_loan_requestById(req.body.Id);
     if (!Receipt) {
-        throw new ApiError(httpStatus.NOT_FOUND, "Receipt not found");
+        throw new ApiError(httpStatus.NOT_FOUND, "Data not found");
     }
     res.send({
         code: HttpStatusCodes.OK,
@@ -93,7 +93,7 @@ const getEmployee_loan_requestById = catchAsync(async (req, res) => {
 });
 
 const updateEmployee_loan_request = catchAsync(async (req, res) => {
-
+    console.log("req.body.dataupdate",req.body,req.user.Id)
     const Employee_loan_request = await Employee_loan_requestService.updateEmployee_loan_requestById(req.body.Id, req.body, req.user.Id);
 
 
@@ -160,6 +160,23 @@ const getloan_configurationDetailsById = catchAsync(async (req, res) => {
     });
     
 
+    const update_approved_statusById = catchAsync(async (req, res) => {
+
+        const Receipt = await Employee_loan_requestService.update_approved_statusById(req.body.data);
+        if (!Receipt) {
+            throw new ApiError(httpStatus.NOT_FOUND, "Data not found");
+        }
+        res.send({
+            code: HttpStatusCodes.OK,
+            message: HttpResponseMessages.OK,
+            data: Receipt,
+        });
+    
+    
+    
+    });
+    
+
 module.exports = {
     createEmployee_loan_request,
     getAllEmployee_loan_request,
@@ -167,5 +184,6 @@ module.exports = {
     updateEmployee_loan_request,
     deleteEmployee_loan_request,
     getPayrollMonth,
-    getloan_configurationDetailsById
+    getloan_configurationDetailsById,
+    update_approved_statusById,
 };

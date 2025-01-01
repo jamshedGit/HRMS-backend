@@ -342,6 +342,19 @@ const getloan_configurationDetailsById = async (Id) => {
   }
 };
 
+const update_approved_statusById = async (data,updatedBy) => {
+  console.log("data111",data)
+  const Item = await Employee_loan_requestModel.findByPk(data.Id);
+
+  if (!Item) {
+    throw new ApiError(httpStatus.NOT_FOUND, "Item not found");
+  }
+//  Item.approval_byId=updatedBy
+  Item.approved_status = data.approved_status;
+  await Item.save();
+ console.log("Item111",Item)
+  return Item;
+};
 
 
 module.exports = {
@@ -350,5 +363,6 @@ module.exports = {
   updateEmployee_loan_requestById,
   deleteEmployee_loan_requestById,
   queryEmployee_loan_request,
-  getloan_configurationDetailsById
+  getloan_configurationDetailsById,
+  update_approved_statusById
 };
