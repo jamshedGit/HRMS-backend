@@ -4,7 +4,7 @@ const { FormModel } = require("../../../models/index");
 
 const ApiError = require("../../../utils/ApiError");
 const Sequelize = require("sequelize");
-const { paginationFacts } = require("../../../utils/common");
+const { paginationFacts, formatDates } = require("../../../utils/common");
 const { HttpStatusCodes } = require("../../../utils/constants");
 
 const Op = Sequelize.Op;
@@ -35,6 +35,8 @@ const createreimbursement_claim = async (req, reimbursement_claimBody) => {
     } else {
       // Create new record
       reimbursement_claimBody.createdBy = userId;
+      reimbursement_claimBody.date= formatDates(reimbursement_claimBody.date, 'yyyy-MM-dd')
+     
       const addedReimbursementClaim = await Reimbursement_claimModel.create(reimbursement_claimBody);
 
       // Return the new record
@@ -120,67 +122,6 @@ const queryreimbursement_claim = async (
 };
 
 
-// const queryreimbursement_claim = async (
-//   filter,
-//   options,
-//   searchQuery,
-//   employeeId
-// ) => {
-//   let limit = options.pageSize;
-//   let offset = 0 + (options.pageNumber - 1) * limit;
-
-//   // Fetch the data with the specified models
-//   let { count, rows } = await Reimbursement_claimModel.findAndCountAll({
-//     order: [["createdAt", "DESC"]],
-//     where: {
-//       employeeId
-//     },
-//     offset: offset,
-//     limit: limit,
-//     include: [
-//       {
-//         model: FormModel,
-//         attributes: ["formName", "formCode"],
-//         as: "ReimbursementType",
-//       },
-//       {
-//         model: EmployeeProfileModel,
-//         attributes: ["firstName"],
-//         as: "Employee",
-//       },
-//       {
-//         model: Reimbursement_configurationModel,
-//         attributes: ["subsidiaryId", "payroll_groupId"],
-//         as: "ReimbursementConfiguration",
-//       },
-//       {
-//         model: PayrollMonthModel,
-//         attributes: ["month", "year"],
-//         as: "PayInPayrollForId",
-//       },
-//     ],
-//   });
- 
-
-//   // Check if data is present and format the month-year for each row
-//   if (count && rows) {
-//     // Mapping of month numbers to abbreviations
-//     const monthNames = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
-
-//     // Iterate over the rows and add the formatted month-year to each entry
-//     let rows2 = rows.map(row => {
-//       // Get the corresponding month and year from the related model
-//       row.PayInPayrollForIdYear=null
-//       const month = row.PayInPayrollForId ? row.PayInPayrollForId.month : null;
-//       const year = row.PayInPayrollForId ? row.PayInPayrollForId.year : null;
-//       row.PayInPayrollForIdYear=`${monthNames[month - 1]}-${year}`
-//       return row
-//     });
-//     return paginationFacts(count, limit, options.pageNumber, rows2);
-//   } else {
-//     return paginationFacts(count, limit, options.pageNumber, rows2 = []);
-//   }
-// };
 
 
 
@@ -221,6 +162,7 @@ const getreimbursement_claimById = async (id) => {
 
 
 const updatereimbursement_claimById = async (
+
   Id,
   updateBody,
   updatedBy
@@ -232,7 +174,7 @@ const updatereimbursement_claimById = async (
   }
 
   
-  
+  updateBody.date= formatDates(updateBody.date, 'yyyy-MM-dd')
   updateBody.updatedBy = updatedBy;
   delete updateBody.id;
   Object.assign(Item, updateBody);
