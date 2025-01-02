@@ -15,7 +15,7 @@ const Payroll_ProcessModel = sequelize.define('t_payroll_process', {
     subsidiaryId: { type: Sequelize.INTEGER, allowNull: false },
     companyId: { type: Sequelize.INTEGER, allowNull: false, defaultValue: 1 },
     isActive: { type: Sequelize.BOOLEAN, allowNull: true, defaultValue: true },
-    completed: { type: Sequelize.BOOLEAN, allowNull: true, defaultValue: false },
+    completed: { type: Sequelize.INTEGER, allowNull: true, defaultValue: 0 },
 
     createdBy: {
         type: Sequelize.INTEGER,
@@ -26,6 +26,7 @@ const Payroll_ProcessModel = sequelize.define('t_payroll_process', {
         allowNull: true,
     },
     createdAt: { type: Sequelize.DATE, allowNull: true },
+    completedAt: { type: Sequelize.DATE, allowNull: true },
     updatedAt: { type: Sequelize.DATE, allowNull: true, defaultValue: null },
 
 

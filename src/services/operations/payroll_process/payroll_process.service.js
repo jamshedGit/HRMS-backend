@@ -11,11 +11,101 @@ const { HttpStatusCodes } = require("../../../utils/constants");
 const Op = Sequelize.Op;
 const sequelize = require("../../../config/db");
 
+// const createPayroll_Process = async (req, payroll_processBody) => {
+
+//   try {
+
+
+//     const subsidiaryExists = await Payroll_ProcessModel.findOne({
+//       where: {
+//         subsidiaryId: payroll_processBody.subsidiaryId,
+//         payroll_groupId: payroll_processBody.payroll_groupId,
+//         payroll_monthId: payroll_processBody.payroll_monthId,
+//       },
+//     });
+
+
+//     let addedPayroll_Process;
+//     let result;
+
+//     if (subsidiaryExists) {
+
+//       payroll_processBody.Id = subsidiaryExists.dataValues.Id;  // Ensure the ID is set correctly
+
+//       // Removing `id` from payroll_processBody before updating (since `id` might be redundant)
+//       delete payroll_processBody.Id;
+
+//       // Assign the updated data to the existing record and save
+//       payroll_processBody.createdAt = new Date();
+//       payroll_processBody.completed = 0;
+//       Object.assign(subsidiaryExists, payroll_processBody);
+//       addedPayroll_Process = await subsidiaryExists.save();
+
+//       //procedure
+
+
+//       result = await sequelize.query(
+//         'CALL SP_PayrollProcess(:p_SubsidiaryId, :p_PayrollGroupId, :p_MonthId)', {
+//         replacements: {
+//           p_SubsidiaryId: payroll_processBody.subsidiaryId || 'null',
+//           p_PayrollGroupId: payroll_processBody.payroll_groupId || 'null',
+//           p_MonthId: payroll_processBody.payroll_monthId || 'null'
+//         },
+//         type: Sequelize.QueryTypes.RAW // Use RAW type for executing stored procedures
+//       });
+
+//       // if (result) {
+
+//         addedPayroll_Process.completedAt = new Date();
+//         addedPayroll_Process.completed = 1;
+//         await addedPayroll_Process.save();
+//       // }
+
+//       return await getPayroll_ProcessById(addedPayroll_Process.Id);
+//     }
+
+
+
+//     // Set createdBy field
+//     payroll_processBody.createdBy = req.user.id;
+//     addedPayroll_Process = await Payroll_ProcessModel.create(payroll_processBody);
+//     addedPayroll_Process.createdAt = new Date();
+//     await addedPayroll_Process.save();
+
+//     result = await sequelize.query(
+//       'CALL SP_PayrollProcess(:p_SubsidiaryId, :p_PayrollGroupId, :p_MonthId)', {
+//       replacements: {
+//         p_SubsidiaryId: payroll_processBody.subsidiaryId || 'null',
+//         p_PayrollGroupId: payroll_processBody.payroll_groupId || 'null',
+//         p_MonthId: payroll_processBody.payroll_monthId || 'null'
+//       },
+//       type: Sequelize.QueryTypes.RAW, // Use RAW type for executing stored procedures
+
+//     });
+
+
+//     // if (result) {
+
+//       addedPayroll_Process.completedAt = new Date();
+//       addedPayroll_Process.completed = 1;
+//       await addedPayroll_Process.save();
+//     // }
+
+//     return await getPayroll_ProcessById(addedPayroll_Process.Id);
+//     // return "Done"
+
+//   } catch (error) {
+
+//     throw error; // Rethrow or handle the error as needed
+//   }
+// };
+
+
 const createPayroll_Process = async (req, payroll_processBody) => {
 
   try {
 
-    // await payroll_group_detail(payroll_processBody.subsidiaryId, payroll_processBody.payroll_groupId);
+
     const subsidiaryExists = await Payroll_ProcessModel.findOne({
       where: {
         subsidiaryId: payroll_processBody.subsidiaryId,
@@ -27,50 +117,30 @@ const createPayroll_Process = async (req, payroll_processBody) => {
 
     let addedPayroll_Process;
     let result;
-  
+
     if (subsidiaryExists) {
-      // return {
-      //   message: "Record already exist.",
-      //   status: "error",
-      // };
+
       payroll_processBody.Id = subsidiaryExists.dataValues.Id;  // Ensure the ID is set correctly
 
       // Removing `id` from payroll_processBody before updating (since `id` might be redundant)
       delete payroll_processBody.Id;
 
       // Assign the updated data to the existing record and save
+      payroll_processBody.createdAt = new Date();
+      payroll_processBody.completed = 0;
       Object.assign(subsidiaryExists, payroll_processBody);
       addedPayroll_Process = await subsidiaryExists.save();
-
-      //procedure
-
-
-      result = await sequelize.query(
-        'CALL SP_PayrollProcess(:p_SubsidiaryId, :p_PayrollGroupId, :p_MonthId)', {
-        replacements: {
-          p_SubsidiaryId: payroll_processBody.subsidiaryId || 'null',
-          p_PayrollGroupId: payroll_processBody.payroll_groupId || 'null',
-          p_MonthId: payroll_processBody.payroll_monthId || 'null'
-        },
-        type: Sequelize.QueryTypes.RAW // Use RAW type for executing stored procedures
-      });
-
-      if (result) {
-  
-        addedPayroll_Process.updatedAt = new Date();
-        addedPayroll_Process.completed = true;
-        await addedPayroll_Process.save();
-      }
-
-      return await getPayroll_ProcessById(addedPayroll_Process.Id);
+    } else {
+      payroll_processBody.createdBy = req.user.id;
+      addedPayroll_Process = await Payroll_ProcessModel.create(payroll_processBody);
+      addedPayroll_Process.createdAt = new Date();
+      await addedPayroll_Process.save();
     }
 
-    // Set createdBy field
-    payroll_processBody.createdBy = req.user.id;
-    addedPayroll_Process = await Payroll_ProcessModel.create(payroll_processBody);
-    addedPayroll_Process.createdAt = new Date();
-    await addedPayroll_Process.save();
-   
+
+    //procedure
+
+
     result = await sequelize.query(
       'CALL SP_PayrollProcess(:p_SubsidiaryId, :p_PayrollGroupId, :p_MonthId)', {
       replacements: {
@@ -81,14 +151,41 @@ const createPayroll_Process = async (req, payroll_processBody) => {
       type: Sequelize.QueryTypes.RAW // Use RAW type for executing stored procedures
     });
 
-    if (result) {
-
-      addedPayroll_Process.u,pdatedAt = new Date();
-      addedPayroll_Process.completed = true;
-      await addedPayroll_Process.save();
-    }
+    // if (result) {
+   
+    addedPayroll_Process.completedAt = new Date();
+    addedPayroll_Process.completed = 1;
+    await addedPayroll_Process.save();
+    // }
 
     return await getPayroll_ProcessById(addedPayroll_Process.Id);
+
+
+
+
+    // Set createdBy field
+
+
+    // result = await sequelize.query(
+    //   'CALL SP_PayrollProcess(:p_SubsidiaryId, :p_PayrollGroupId, :p_MonthId)', {
+    //   replacements: {
+    //     p_SubsidiaryId: payroll_processBody.subsidiaryId || 'null',
+    //     p_PayrollGroupId: payroll_processBody.payroll_groupId || 'null',
+    //     p_MonthId: payroll_processBody.payroll_monthId || 'null'
+    //   },
+    //   type: Sequelize.QueryTypes.RAW, // Use RAW type for executing stored procedures
+
+    // });
+
+
+    // // if (result) {
+
+    // addedPayroll_Process.completedAt = new Date();
+    // addedPayroll_Process.completed = 1;
+    // await addedPayroll_Process.save();
+    // // }
+
+    // return await getPayroll_ProcessById(addedPayroll_Process.Id);
     // return "Done"
 
   } catch (error) {
@@ -97,55 +194,6 @@ const createPayroll_Process = async (req, payroll_processBody) => {
   }
 };
 
-
-// const createPayroll_Process = async (req, payroll_processBody) => {
-//   try {
-//     // Step 1: Check if the payroll process already exists
-//     const subsidiaryExists = await Payroll_ProcessModel.findOne({
-//       where: {
-//         subsidiaryId: payroll_processBody.subsidiaryId,
-//         payroll_groupId: payroll_processBody.payroll_groupId,
-//         payroll_monthId: payroll_processBody.payroll_monthId,
-//       },
-//     });
-
-//     let addedPayroll_Process;
-
-//     if (subsidiaryExists) {
-//       // If the record exists, update it
-
-//       payroll_processBody.Id = subsidiaryExists.dataValues.Id;  // Ensure the ID is set correctly
-
-//       // Removing `id` from payroll_processBody before updating (since `id` might be redundant)
-//       delete payroll_processBody.Id;
-
-//       // Assign the updated data to the existing record and save
-//       Object.assign(subsidiaryExists, payroll_processBody);
-//       addedPayroll_Process = await subsidiaryExists.save();
-
-//       // Return the updated record by calling the relevant function
-//       return await getPayroll_ProcessById(addedPayroll_Process.Id);
-
-//     } else {
-//       // If the record doesn't exist, create a new one
-//    
-//       payroll_processBody.createdBy = req.user.id; // Assign createdBy field
-
-//       // Create a new payroll process
-//       addedPayroll_Process = await Payroll_ProcessModel.create(payroll_processBody);
-
-//       // Save the new record
-//       await addedPayroll_Process.save();
-
-//       // Return the created record by calling the relevant function
-//       return await getPayroll_ProcessById(addedPayroll_Process.Id);
-//     }
-
-//   } catch (error) {
-//     console.error("Error in createPayroll_Process:", error);
-//     throw error; // Rethrow or handle the error as needed
-//   }
-// };
 
 
 /**
@@ -345,6 +393,59 @@ const payroll_group_detail = async (subsidiaryId, payroll_groupId) => {
 
 };
 
+const checkPayroll_EmployeesByIds = async (data) => {
+  const { SubsidiaryId, PayrollGroupId, MonthId } = data;
+  let results;
+
+  if (!data.revert) {
+    results = await sequelize.query(
+      'SELECT * FROM t_PayrollEmployees WHERE SubsidiaryId = :SubsidiaryId AND PayrollGroupId = :PayrollGroupId AND MonthId = :MonthId',
+      {
+        replacements: { SubsidiaryId, PayrollGroupId, MonthId },
+        type: sequelize.QueryTypes.SELECT
+      }
+    );
+
+  }
+
+  else if (data.revert && data.SubsidiaryId && data.PayrollGroupId && data.MonthId) {
+    //SP_PayrollProcess
+    let a = await sequelize.query(
+      'CALL SP_PayrollProcess_RevertBack(:p_SubsidiaryId, :p_PayrollGroupId, :p_MonthId)',
+      {
+        replacements: {
+          p_SubsidiaryId: data.SubsidiaryId,
+          p_PayrollGroupId: data.PayrollGroupId,
+          p_MonthId: data.MonthId
+        },
+        type: Sequelize.QueryTypes.RAW // Use RAW type for executing stored procedures
+      }
+    );
+
+
+    const Item = await Payroll_ProcessModel.findOne({
+      where: {
+        subsidiaryId: data.SubsidiaryId,
+        payroll_groupId: data.PayrollGroupId,
+        payroll_monthId: data.MonthId
+      },
+    })
+    Item.completed = 2
+    await Item.save();
+    // return Item;
+
+
+
+
+  }
+
+  return results?.length > 0 ? results : null;
+
+
+
+
+};
+
 
 module.exports = {
   createPayroll_Process,
@@ -353,5 +454,6 @@ module.exports = {
   deletePayroll_ProcessById,
   queryPayroll_Process,
   payroll_group_detail,
+  checkPayroll_EmployeesByIds,
 
 };

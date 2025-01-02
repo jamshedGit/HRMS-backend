@@ -15,4 +15,5 @@ router.route("/delete-payroll-process").patch(auth(),payroll_processController.d
 
 router.route("/create-payroll-process").post(auth(), payroll_processController.createPayroll_Process);
 router.route("/read-all-payroll-group-detail").post(payroll_processController.payroll_group_detail)
+router.route("/check-payroll-employees").post(payroll_processController.checkPayroll_EmployeesByIds)
 module.exports = router;

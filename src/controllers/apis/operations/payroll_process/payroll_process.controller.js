@@ -64,7 +64,7 @@ const getPayroll_ProcessById = catchAsync(async (req, res) => {
 
   const Receipt = await Payroll_ProcessService.getPayroll_ProcessById(req.body.Id);
   if (!Receipt) {
-    throw new ApiError(httpStatus.NOT_FOUND, "Receipt not found");
+    throw new ApiError(httpStatus.NOT_FOUND, "Data not found");
   }
   res.send({
     code: HttpStatusCodes.OK,
@@ -78,7 +78,7 @@ const updatePayroll_Process = catchAsync(async (req, res) => {
   const Payroll_Process = await Payroll_ProcessService.updatePayroll_ProcessById(req.body.Id, req.body, req.user.Id);
 
 
-  if (Payroll_Process.status == "error") {
+  if (Payroll_Process?.status == "error") {
 
     res.status(HttpStatusCodes.INTERNAL_SERVER_ERROR).send({
       code: HttpStatusCodes.INTERNAL_SERVER_ERROR,
@@ -128,7 +128,19 @@ const payroll_group_detail = catchAsync(async (req, res) => {
     });
   });
 
+  const checkPayroll_EmployeesByIds = catchAsync(async (req, res) => {
 
+    const Receipt = await Payroll_ProcessService.checkPayroll_EmployeesByIds(req.body.data);
+    if (!Receipt) {
+      throw new ApiError(httpStatus.NOT_FOUND, "Data not found");
+    }
+    res.send({
+      code: HttpStatusCodes.OK,
+      message: HttpResponseMessages.OK,
+      data: Receipt,
+    });
+  });
+  
 
 
 module.exports = {
@@ -138,5 +150,6 @@ module.exports = {
   updatePayroll_Process,
   deletePayroll_Process,
   payroll_group_detail,
+  checkPayroll_EmployeesByIds
 
 };
