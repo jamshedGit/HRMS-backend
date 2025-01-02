@@ -38,6 +38,7 @@ const Employee_loan_request = sequelize.define('t_employee_loan_request', {
 	approval_byId: { type: Sequelize.INTEGER,allowNull: false,defaultValue: 1 },
     subsidiaryId: { type: Sequelize.INTEGER,allowNull: false,defaultValue: 1 },
 	companyId: { type: Sequelize.INTEGER,allowNull: false ,defaultValue: 1},
+	approved_status: { type: Sequelize.INTEGER, allowNull: true, defaultValue: 0 },
     isActive: { type: Sequelize.BOOLEAN, allowNull: true, defaultValue: true },
 	createdBy: {
 		type: Sequelize.INTEGER,

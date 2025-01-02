@@ -252,6 +252,9 @@ const deleteEmployee_loan_requestById = async (Id) => {
   if (checkRecordsWithDeduction.length > 0) {
     throw new ApiError(httpStatus.BAD_REQUEST, "Unable to delete: This transaction is already processed for previous months");
   }
+  if(Item?.approved_status==1){
+    throw new ApiError(httpStatus.NOT_FOUND, "Record cannot be deleted as it has been approved");
+  }
   
 
   await Item.destroy();
@@ -342,6 +345,18 @@ const getloan_configurationDetailsById = async (Id) => {
   }
 };
 
+const update_approved_statusById = async (data,updatedBy) => {
+  
+  const Item = await Employee_loan_requestModel.findByPk(data.Id);
+
+  if (!Item) {
+    throw new ApiError(httpStatus.NOT_FOUND, "Item not found");
+  }
+//  Item.approval_byId=updatedBy
+  Item.approved_status = data.approved_status;
+  await Item.save();
+  return Item;
+};
 
 
 module.exports = {
@@ -350,5 +365,6 @@ module.exports = {
   updateEmployee_loan_requestById,
   deleteEmployee_loan_requestById,
   queryEmployee_loan_request,
-  getloan_configurationDetailsById
+  getloan_configurationDetailsById,
+  update_approved_statusById
 };

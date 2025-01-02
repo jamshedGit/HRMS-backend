@@ -255,6 +255,9 @@ const deletereimbursement_claimById = async (Id) => {
   if (!Item) {
     throw new ApiError(httpStatus.NOT_FOUND, "Item not found");
   }
+  if(Item?.approved_status==1){
+    throw new ApiError(httpStatus.NOT_FOUND, "Record cannot be deleted as it has been approved");
+  }
 
   await Item.destroy();
   return Item;
