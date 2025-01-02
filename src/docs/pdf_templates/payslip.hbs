@@ -1,0 +1,283 @@
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Salary Slip</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        .container {
+            width: 80%;
+            margin: 20px auto;
+            border: 2px solid #f2a349;
+        }
+
+        .header {
+            background-color: #f2a349;
+            color: white;
+            padding: 10px;
+        }
+
+        .header-content {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .left {
+            text-align: left;
+        }
+
+        .right {
+            text-align: right;
+        }
+
+
+        .header .company-name {
+            font-size: 24px;
+            font-weight: bold;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 14px;
+        }
+
+        .tdWidth {
+            width: 10%;
+        }
+
+        .tdWidthOther {
+            border: 0px;
+            padding: 0%;
+        }
+
+        .alligntd {
+            vertical-align: top;
+        }
+
+        th,
+        td {
+            border: 1px solid #ddd;
+            text-align: left;
+            padding: 8px;
+        }
+
+        th {
+            background-color: #f2a349;
+            color: white;
+        }
+
+        .section-title {
+            background-color: #f2a349;
+            color: white;
+            text-align: center;
+            font-weight: bold;
+        }
+
+        .footer {
+            text-align: center;
+            font-style: italic;
+            margin: 10px 0;
+        }
+
+        .amount-in-words {
+            font-weight: bold;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <div class="header">
+            <div class="header-content">
+                <div class="left">
+                    <h1>{{employeeData.companyName}}</h1>
+                    <p>Salary Slip of Mar 2024</p>
+                </div>
+                <div class="right">
+                    <p>50 Washington St<br>San Francisco CA 94109<br>United States</p>
+                </div>
+            </div>
+        </div>
+
+
+        <table>
+            <tbody>
+                <tr class="section-title">
+                    <td colspan="6">Employee Information</td>
+                </tr>
+                <tr>
+                    <td>Employee ID:</td>
+                    <td colspan="2">{{employeeData.employeeCode}} {{employeeData.EmployeeName}}</td>
+
+                    <td>Designation:</td>
+                    <td colspan="2">{{employeeData.designationName}}</td>
+
+                </tr>
+                <tr>
+                    <td>Employee Name:</td>
+                    <td colspan="2">{{employeeData.EmployeeName}}</td>
+                    <td>Grade:</td>
+                    <td colspan="2">{{employeeData.gradeName}}</td>
+                </tr>
+
+                <tr class="section-title">
+                    <td colspan="4">Employee Attendance</td>
+                    <td colspan="2">Salary Transferred To</td>
+                </tr>
+                <tr>
+                    <td class="tdWidth">Working Days:</td>
+                    <td class="tdWidth">{{employeeData.monthDays}}</td>
+                    <td class="tdWidth">Payable Days:</td>
+                    <td class="tdWidth">{{employeeData.paidDays}}</td>
+                    <td class="tdWidth">Bank Name:</td>
+                    <td class="tdWidth">{{employeeData.bankName}}</td>
+                </tr>
+                <tr>
+                    <td>Leaves Deducted:</td>
+                    <td>{{employeeData.leaveCount}}</td>
+                    <td>Total Lates:</td>
+                    <td>{{employeeData.lateCount}}</td>
+                    <td>Account No:</td>
+                    <td>{{employeeData.accountNumber}}</td>
+                </tr>
+                <tr>
+                    <td>Lates per Day Deduction:</td>
+                    <td></td>
+                    <td>Lates Deducted:</td>
+                    <td></td>
+                    <td>IBAN Number:</td>
+                    <td></td>
+                </tr>
+
+                <tr class="section-title">
+                    <td colspan="6">Salary Calculations</td>
+                </tr>
+                <tr>
+                    <td colspan="3" class="tdWidthOther alligntd">
+                        <table>
+                            <tbody>
+                                <tr>
+                                    <td colspan="3"><strong>Basic &amp; Allowances</strong></td>
+                                </tr>
+                                {{#each earningData}}
+                                <tr>
+                                    <td>{{EarningName}}</td>
+                                    <td>{{Amount_Actual}}</td>
+                                </tr>
+                                {{/each}}
+
+                                <tr>
+                                    <td>Total Allowances:</td>
+                                    <td colspan="2">{{totalEarningAmount}}</td>
+                                </tr>
+
+                            </tbody>
+                        </table>
+                    </td>
+                    <td colspan="3" class="tdWidthOther alligntd">
+                        <table>
+                            <tbody>
+                                <tr>
+                                    <td colspan="3"><strong>Deduction</strong></td>
+                                </tr>
+
+                                {{#each deductionData}}
+                                <tr>
+                                    <td>{{EarningName}}</td>
+                                    <td>{{Amount_Actual}}</td>
+                                </tr>
+                                {{/each}}
+
+                                {{#each loanData}}
+                                <tr>
+                                    <td>{{EarningName}}</td>
+                                    <td>{{Amount_Actual}}</td>
+                                </tr>
+                                {{/each}}
+
+                                <tr>
+                                    <td>Total Deductions:</td>
+                                    <td colspan="2">{{totalDeductionAmount}}</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </td>
+                </tr>
+                <tr>
+                    <td><strong>Gross Salary:</strong></td>
+                    <td colspan="2">{{employeeData.grossSalary}}</td>
+
+                    <td><strong>Net Payable Salary:</strong></td>
+                    <td colspan="2">{{ earningDeductionDifference }}</td>
+                </tr>
+
+                <tr>
+                    <td colspan="2">Amount in Words: </td>
+                    <td colspan="4">{{ earningDeductionDifferenceInWords }}</td>
+                </tr>
+
+                <tr class="section-title">
+                    <td colspan="6">Leave Balance</td>
+                </tr>
+                <tr>
+                    <td colspan="2">Leave Type</td>
+                    <td colspan="2">Allocated Leaves</td>
+                    <td colspan="2">Remaining Leaves</td>
+                </tr>
+                <tr>
+                    <td colspan="2">Annual</td>
+                    <td colspan="2">2.5</td>
+                    <td colspan="2">2.5</td>
+                </tr>
+                <tr>
+                    <td colspan="2">Casual</td>
+                    <td colspan="2">10</td>
+                    <td colspan="2">10</td>
+                </tr>
+                <tr>
+                    <td colspan="2">Hajj</td>
+                    <td colspan="2">30</td>
+                    <td colspan="2">30</td>
+                </tr>
+                <tr>
+                    <td colspan="2">Sick</td>
+                    <td colspan="2">10</td>
+                    <td colspan="2">10</td>
+                </tr>
+
+
+                {{#if loanDetailData.length}}
+                <tr class="section-title">
+                    <td colspan="6">Loan Balance</td>
+                </tr>
+                <tr>
+                    <td colspan="2">Name</td>
+                    <td colspan="2">Remaining Installments</td>
+                    <td colspan="2">Remaining Amount</td>
+                </tr>
+                {{#each loanDetailData}}
+                <tr>
+                    <td colspan="2">{{name}}</td>
+                    <td colspan="2">{{OutstandingInstallment}}</td>
+                    <td colspan="2">{{OutStandingBalance}}</td>
+                </tr>
+                {{/each}}
+                {{/if}}
+            </tbody>
+        </table>
+
+        <div class="footer">*** This is a system-generated document. ***</div>
+    </div>
+
+</body>
+
+</html>

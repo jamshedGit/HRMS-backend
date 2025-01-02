@@ -32,7 +32,7 @@ const getAllRegisteredLeavesPdfData = catchAsync(async (req, res) => {
   const data = await LeaveRegisterServicePage.getAllRegisteredLeavesForPdf(req);
   res.set({
     "Content-Type": "application/pdf",
-    "Content-Disposition": 'attachment; filename="kamil_test.pdf"',
+    "Content-Disposition": 'attachment; filename="payroll_register.pdf"',
   });
   res.end(data);
 });
