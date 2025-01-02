@@ -93,7 +93,7 @@ const getEmployee_loan_requestById = catchAsync(async (req, res) => {
 });
 
 const updateEmployee_loan_request = catchAsync(async (req, res) => {
-    console.log("req.body.dataupdate",req.body,req.user.Id)
+   
     const Employee_loan_request = await Employee_loan_requestService.updateEmployee_loan_requestById(req.body.Id, req.body, req.user.Id);
 
 
