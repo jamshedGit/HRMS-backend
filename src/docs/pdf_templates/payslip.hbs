@@ -118,7 +118,7 @@
                 </tr>
                 <tr>
                     <td>Employee ID:</td>
-                    <td colspan="2">{{employeeData.employeeCode}} {{employeeData.EmployeeName}}</td>
+                    <td colspan="2">{{employeeData.employeeCode}}</td>
 
                     <td>Designation:</td>
                     <td colspan="2">{{employeeData.designationName}}</td>
@@ -176,8 +176,7 @@
                                 {{/each}}
 
                                 <tr>
-                                    <td>Total Allowances:</td>
-                                    <td colspan="2">{{totalEarningAmount}}</td>
+                                    
                                 </tr>
 
                             </tbody>
@@ -204,20 +203,23 @@
                                 </tr>
                                 {{/each}}
 
-                                <tr>
-                                    <td>Total Deductions:</td>
-                                    <td colspan="2">{{totalDeductionAmount}}</td>
-                                </tr>
+
                             </tbody>
                         </table>
                     </td>
                 </tr>
                 <tr>
-                    <td><strong>Gross Salary:</strong></td>
-                    <td colspan="2">{{employeeData.grossSalary}}</td>
+                    <td colspan="2">Total Allowances:</td>
+                    <td colspan="1">{{totalEarningAmount}}</td>
+                    <td colspan="2">Total Deductions:</td>
+                    <td colspan="1">{{totalDeductionAmount}}</td>
+                </tr>
+                <tr>
+                    <td colspan="2"><strong>Gross Salary:</strong></td>
+                    <td colspan="1">{{employeeData.grossSalary}}</td>
 
-                    <td><strong>Net Payable Salary:</strong></td>
-                    <td colspan="2">{{ earningDeductionDifference }}</td>
+                    <td colspan="2"><strong>Net Payable Salary:</strong></td>
+                    <td colspan="1">{{ earningDeductionDifference }}</td>
                 </tr>
 
                 <tr>
@@ -239,7 +241,7 @@
                 <tr>
                     <td colspan="2">{{name}}</td>
                     <td colspan="2">{{allocatedCount}}</td>
-                    <td colspan="2">{{availedCount}}</td>
+                    <td colspan="2">{{remainingCount}}</td>
                 </tr>
                 {{/each}}
                 {{/if}}

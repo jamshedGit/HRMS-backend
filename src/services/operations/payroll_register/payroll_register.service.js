@@ -283,7 +283,7 @@ ld.EmpId = ${filter.employeeId}
 AND
 ld.MonthId = ${filter.monthId}`;
 
-const leaveQuery = `SELECT lb.allocatedCount, lb.availedCount, lt.name 
+const leaveQuery = `SELECT lb.allocatedCount, lb.remainingCount, lt.name 
 FROM t_payroll_leave_balance lb
 LEFT JOIN t_leave_type lt ON lt.Id = lb.leaveType
 WHERE
