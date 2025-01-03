@@ -100,10 +100,12 @@
             <div class="header-content">
                 <div class="left">
                     <h1>{{employeeData.companyName}}</h1>
-                    <p>Salary Slip of Mar 2024</p>
+                    {{#if monthName}}
+                    <p>Salary Slip of {{monthName}}</p>
+                    {{/if}}
                 </div>
                 <div class="right">
-                    <p>50 Washington St<br>San Francisco CA 94109<br>United States</p>
+                    <p>{{employeeData.companyAddress}}</p>
                 </div>
             </div>
         </div>
@@ -151,11 +153,9 @@
                 </tr>
                 <tr>
                     <td>Lates per Day Deduction:</td>
-                    <td></td>
+                    <td>{{employeeData.LatePerDayAmount}}</td>
                     <td>Lates Deducted:</td>
-                    <td></td>
-                    <td>IBAN Number:</td>
-                    <td></td>
+                    <td>{{employeeData.LateDaysCount}}</td>
                 </tr>
 
                 <tr class="section-title">
@@ -225,6 +225,8 @@
                     <td colspan="4">{{ earningDeductionDifferenceInWords }}</td>
                 </tr>
 
+
+                {{#if leaveDetailData.length}}
                 <tr class="section-title">
                     <td colspan="6">Leave Balance</td>
                 </tr>
@@ -233,27 +235,14 @@
                     <td colspan="2">Allocated Leaves</td>
                     <td colspan="2">Remaining Leaves</td>
                 </tr>
+                {{#each leaveDetailData}}
                 <tr>
-                    <td colspan="2">Annual</td>
-                    <td colspan="2">2.5</td>
-                    <td colspan="2">2.5</td>
+                    <td colspan="2">{{name}}</td>
+                    <td colspan="2">{{allocatedCount}}</td>
+                    <td colspan="2">{{availedCount}}</td>
                 </tr>
-                <tr>
-                    <td colspan="2">Casual</td>
-                    <td colspan="2">10</td>
-                    <td colspan="2">10</td>
-                </tr>
-                <tr>
-                    <td colspan="2">Hajj</td>
-                    <td colspan="2">30</td>
-                    <td colspan="2">30</td>
-                </tr>
-                <tr>
-                    <td colspan="2">Sick</td>
-                    <td colspan="2">10</td>
-                    <td colspan="2">10</td>
-                </tr>
-
+                {{/each}}
+                {{/if}}
 
                 {{#if loanDetailData.length}}
                 <tr class="section-title">
