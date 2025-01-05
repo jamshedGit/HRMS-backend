@@ -1,5 +1,5 @@
 const httpStatus = require("http-status");
-const { FormModel, SubsidiaryModel, PayrollMonthModel, Payroll_ProcessModel, EmployeeProfileModel, EmployeeSalaryModel } = require("../../../models/index");
+const {Employee_loan_requestModel, FormModel, SubsidiaryModel, PayrollMonthModel, Payroll_ProcessModel, EmployeeProfileModel, EmployeeSalaryModel, Employee_loan_request_detailModel } = require("../../../models/index");
 
 const ApiError = require("../../../utils/ApiError");
 const Sequelize = require("sequelize");
@@ -347,7 +347,7 @@ const deletePayroll_ProcessById = async (Id) => {
   return Item;
 };
 
-const payroll_group_detail = async (subsidiaryId, payroll_groupId) => {
+const payroll_group_detail = async (subsidiaryId, payroll_groupId,payroll_monthId) => {
   // Step 1: Get employees based on the provided subsidiaryId and payroll_groupId
   const employees = await EmployeeProfileModel.findAndCountAll({
     where: {
@@ -358,10 +358,11 @@ const payroll_group_detail = async (subsidiaryId, payroll_groupId) => {
 
 
   // Check if employees are found
-  if (employees.count === 0) {
+  if (employees?.count === 0) {
     data = {
       total_employees: 0,
-      slary_setup_not_created: 0
+      slary_setup_not_created: 0,
+      loan_to_be_processed: 0
 
     }
     return data
@@ -383,10 +384,47 @@ const payroll_group_detail = async (subsidiaryId, payroll_groupId) => {
     return !employeesWithoutSalarySetup.some((salary) => salary.employeeId === emp.Id);
   }).length;
 
-  data = {
-    total_employees: employees.rows.length,
-    slary_setup_not_created: employeesWithNoSalarySetupCount
 
+
+  const employeesApprovedLoanRequest = await Employee_loan_requestModel.findAll({
+    where: {
+      employeeId: {
+        [Op.in]: employees.rows.map((emp) => emp.Id), // Assuming `id` is the employee's unique identifier
+      },
+      approved_status:1
+    },
+  });
+
+  const currentPayrollMonth = await PayrollMonthModel.findOne({
+    where: {
+     
+      
+        Id:payroll_monthId
+      
+    },
+  });
+  
+  const employeesLoanToBeProcessed = await Employee_loan_request_detailModel.findAll({
+    where: {
+      // employeeId: {
+      //   [Op.in]: employees.rows.map((emp) => emp.Id), // Assuming `id` is the employee's unique identifier
+      // },
+      emp_loan_reqId: {
+        [Op.in]: employeesApprovedLoanRequest?.map((req) => req.Id), // Ensure 'Id' is the correct column name in your model
+      },
+      payroll_month_date: {
+        [Op.gte]: currentPayrollMonth?.startDate,
+        [Op.lte]: currentPayrollMonth?.endDate
+      }
+    },
+  });
+
+
+
+  data = {
+    total_employees: employees?.rows?.length,
+    slary_setup_not_created: employeesWithNoSalarySetupCount,
+    loan_to_be_processed:  employeesLoanToBeProcessed?.length || 0
   }
 
   return data
