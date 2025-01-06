@@ -70,6 +70,9 @@ const createEmp_profileValidation = {
         skillsList: Joi.disallow(),
         incidentList: Joi.disallow(),
         employeeStatusId:Joi.any(),
+        codeAuto:Joi.string(),
+        approvedForPayroll: Joi.any(),
+        codePrefix:Joi.string(),
     }),
 };
 

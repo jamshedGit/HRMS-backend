@@ -24,6 +24,7 @@ const EmployeePolicyModel = sequelize.define('t_employeepolicy', {
 	empPictureIsMandatory: { type: Sequelize.BOOLEAN, allowNull: true },
 	probationPolicyInMonth: { type: Sequelize.INTEGER, allowNull: true },
 	contractualPolicyInMonth: { type: Sequelize.INTEGER, allowNull: true },
+	codePrefix: { type: Sequelize.STRING, allowNull: true },
 	isActive: { type: Sequelize.BOOLEAN, allowNull: true, defaultValue: true },
 	createdBy: {
 		type: Sequelize.INTEGER,

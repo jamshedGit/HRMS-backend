@@ -20,6 +20,7 @@ const createEmpPolicyValidation = {
         contractualPolicyInMonth: Joi.number(),
         currencyId: Joi.number(),
         code: Joi.string(),
+        codePrefix:Joi.string(),
         
         
 
