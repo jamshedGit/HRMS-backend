@@ -91,6 +91,10 @@
         .amount-in-words {
             font-weight: bold;
         }
+
+        .right-align {
+            text-align: end;
+        }
     </style>
 </head>
 
@@ -171,12 +175,12 @@
                                 {{#each earningData}}
                                 <tr>
                                     <td>{{EarningName}}</td>
-                                    <td>{{Amount_Actual}}</td>
+                                    <td class="right-align">{{Amount_Actual}}</td>
                                 </tr>
                                 {{/each}}
 
                                 <tr>
-                                    
+
                                 </tr>
 
                             </tbody>
@@ -192,14 +196,14 @@
                                 {{#each deductionData}}
                                 <tr>
                                     <td>{{EarningName}}</td>
-                                    <td>{{Amount_Actual}}</td>
+                                    <td class="right-align">{{Amount_Actual}}</td>
                                 </tr>
                                 {{/each}}
 
                                 {{#each loanData}}
                                 <tr>
                                     <td>{{EarningName}}</td>
-                                    <td>{{Amount_Actual}}</td>
+                                    <td class="right-align">{{Amount_Actual}}</td>
                                 </tr>
                                 {{/each}}
 
@@ -210,16 +214,16 @@
                 </tr>
                 <tr>
                     <td colspan="2">Total Allowances:</td>
-                    <td colspan="1">{{totalEarningAmount}}</td>
+                    <td colspan="1" class="right-align">{{totalEarningAmount}}</td>
                     <td colspan="2">Total Deductions:</td>
-                    <td colspan="1">{{totalDeductionAmount}}</td>
+                    <td colspan="1" class="right-align">{{totalDeductionAmount}}</td>
                 </tr>
                 <tr>
                     <td colspan="2"><strong>Gross Salary:</strong></td>
-                    <td colspan="1">{{employeeData.grossSalary}}</td>
+                    <td colspan="1" class="right-align">{{employeeData.grossSalary}}</td>
 
                     <td colspan="2"><strong>Net Payable Salary:</strong></td>
-                    <td colspan="1">{{ earningDeductionDifference }}</td>
+                    <td colspan="1" class="right-align">{{ earningDeductionDifference }}</td>
                 </tr>
 
                 <tr>
@@ -233,9 +237,9 @@
                     <td colspan="6">Leave Balance</td>
                 </tr>
                 <tr>
-                    <td colspan="2">Leave Type</td>
-                    <td colspan="2">Allocated Leaves</td>
-                    <td colspan="2">Remaining Leaves</td>
+                    <td colspan="2"><strong>Leave Type</strong></td>
+                    <td colspan="2"><strong>Allocated Leaves</strong></td>
+                    <td colspan="2"><strong>Remaining Leaves</strong></td>
                 </tr>
                 {{#each leaveDetailData}}
                 <tr>
@@ -251,9 +255,9 @@
                     <td colspan="6">Loan Balance</td>
                 </tr>
                 <tr>
-                    <td colspan="2">Name</td>
-                    <td colspan="2">Remaining Installments</td>
-                    <td colspan="2">Remaining Amount</td>
+                    <td colspan="2"><strong>Name</strong></td>
+                    <td colspan="2"><strong>Remaining Installments</strong></td>
+                    <td colspan="2"><strong>Remaining Amount</strong></td>
                 </tr>
                 {{#each loanDetailData}}
                 <tr>
