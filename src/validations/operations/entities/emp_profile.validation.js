@@ -43,7 +43,7 @@ const createEmp_profileValidation = {
         defaultShiftId: Joi.number(),
         attendanceType: Joi.number().optional(),
         dateOfBirth: Joi.date(),
-        dateOfRetirement: Joi.date(),
+        dateOfRetirement: Joi.date().allow(null),
         gradeId: Joi.number(),
         reportTo: Joi.number().allow(null),
         email: Joi.any().optional(),
