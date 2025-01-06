@@ -141,25 +141,25 @@
                 </tr>
                 <tr>
                     <td class="tdWidth">Working Days:</td>
-                    <td class="tdWidth">{{employeeData.monthDays}}</td>
+                    <td class="tdWidth right-align">{{employeeData.monthDays}}</td>
                     <td class="tdWidth">Payable Days:</td>
-                    <td class="tdWidth">{{employeeData.paidDays}}</td>
+                    <td class="tdWidth right-align">{{employeeData.paidDays}}</td>
                     <td class="tdWidth">Bank Name:</td>
                     <td class="tdWidth">{{employeeData.bankName}}</td>
                 </tr>
                 <tr>
                     <td>Leaves Deducted:</td>
-                    <td>{{employeeData.leaveCount}}</td>
+                    <td class="right-align">{{employeeData.leaveCount}}</td>
                     <td>Total Lates:</td>
-                    <td>{{employeeData.lateCount}}</td>
+                    <td class="right-align">{{employeeData.lateCount}}</td>
                     <td>Account No:</td>
                     <td>{{employeeData.accountNumber}}</td>
                 </tr>
                 <tr>
                     <td>Lates per Day Deduction:</td>
-                    <td>{{employeeData.LatePerDayAmount}}</td>
+                    <td class="right-align">{{employeeData.LatePerDayAmount}}</td>
                     <td>Lates Deducted:</td>
-                    <td>{{employeeData.LateDaysCount}}</td>
+                    <td class="right-align">{{employeeData.LateDaysCount}}</td>
                 </tr>
 
                 <tr class="section-title">
@@ -220,7 +220,7 @@
                 </tr>
                 <tr>
                     <td colspan="2"><strong>Gross Salary:</strong></td>
-                    <td colspan="1" class="right-align">{{employeeData.grossSalary}}</td>
+                    <td colspan="1" class="right-align">{{ grossSalary }}</td>
 
                     <td colspan="2"><strong>Net Payable Salary:</strong></td>
                     <td colspan="1" class="right-align">{{ earningDeductionDifference }}</td>
@@ -244,8 +244,8 @@
                 {{#each leaveDetailData}}
                 <tr>
                     <td colspan="2">{{name}}</td>
-                    <td colspan="2">{{allocatedCount}}</td>
-                    <td colspan="2">{{remainingCount}}</td>
+                    <td colspan="2" class="right-align">{{allocatedCount}}</td>
+                    <td colspan="2" class="right-align">{{remainingCount}}</td>
                 </tr>
                 {{/each}}
                 {{/if}}
@@ -262,8 +262,8 @@
                 {{#each loanDetailData}}
                 <tr>
                     <td colspan="2">{{name}}</td>
-                    <td colspan="2">{{OutstandingInstallment}}</td>
-                    <td colspan="2">{{OutStandingBalance}}</td>
+                    <td colspan="2" class="right-align">{{OutstandingInstallment}}</td>
+                    <td colspan="2" class="right-align">{{OutStandingBalance}}</td>
                 </tr>
                 {{/each}}
                 {{/if}}
