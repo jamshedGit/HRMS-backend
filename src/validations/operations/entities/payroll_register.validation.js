@@ -38,6 +38,7 @@ const getItemForPdf = {
     attendanceType: Joi.number().allow('').optional(),
     employeeId: Joi.number().allow('').optional(),
     monthId: Joi.number().allow('').optional(),
+    labels: Joi.object().optional()
   }),
 }
 
