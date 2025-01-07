@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Payroll Register</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+            background-color: #f9f9f9;
+        }
+
+        h1 {
+            text-align: center;
+            color: #333;
+        }
+
+        .payroll-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+            background-color: #fff;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+
+        .payroll-table th,
+        .payroll-table td {
+            border: 1px solid #ccc;
+            padding: 10px;
+            text-align: center;
+        }
+
+        .payroll-table th {
+            background-color: #f4f4f4;
+            color: #333;
+            font-weight: bold;
+        }
+
+        .payroll-table td {
+            color: #555;
+        }
+
+        .payroll-table tfoot td {
+            font-weight: bold;
+            background-color: #ffeb3b;
+        }
+
+        .header-info {
+            margin-bottom: 20px;
+        }
+
+        .header-info span {
+            font-weight: bold;
+        }
+    </style>
+</head>
+
+<body>
+
+    <h1>Payroll Register</h1>
+
+    <div class="header-info">
+        <p>For the Month of: <span>July, 2024</span></p>
+        <p>Subsidiary: <span>Dynasoft Cloud (Pakistan)</span></p>
+        <p>Payroll: <span>Group Wise</span></p>
+    </div>
+
+    <table class="payroll-table">
+        <thead>
+            <tr>
+                <th>S. No.</th>
+                <th>Employee Code</th>
+                <th>Employee Name</th>
+                <th>Department</th>
+                <th>Grade</th>
+                <th>Designation</th>
+                <th>Date of Joining</th>
+                <th>Gross Salary</th>
+                <th>Working Days</th>
+                <th>Payable Days</th>
+                <th>Absent Days</th>
+                <th>Overtime Hours</th>
+                {{#each earningColumns}}
+                <th>{{this}}</th>
+                {{/each}}
+                <th>Total Allowances</th>
+                {{#each deductionColumns}}
+                <th>Deduction {{this}}</th>
+                {{/each}}
+                {{#each loanColumns}}
+                <th>Loan {{this}}</th>
+                {{/each}}
+                <th>Total Deduction</th>
+                <th>Net Payable Salary</th>
+            </tr>
+        </thead>
+        <tbody>
+            {{#each employeeData}}
+            <tr>
+                <td>{{sno}}</td>
+                <td>{{employeeCode}}</td>
+                <td>{{EmployeeName}}</td>
+                <td>{{departmentName}}</td>
+                <td>{{gradeName}}</td>
+                <td>{{designationName}}</td>
+                <td>{{dateOfJoining}}</td>
+                <td>{{GrossSalary}}</td>
+                <td>{{monthDays}}</td>
+                <td>{{paidDays}}</td>
+                <td>{{AbsentDays}}</td>
+                <td>{{OTHours}}</td>
+                {{#each ../earningColumns}}
+                <td>{{lookup ../this this}}</td>
+                {{/each}}
+                <td>{{totalAllowances}}</td>
+                {{#each ../deductionColumns}}
+                <td>{{lookup ../this this}}</td>
+                {{/each}}
+                {{#each ../loanColumns}}
+                <td>{{lookup ../this this}}</td>
+                {{/each}}
+                <td>{{totalDeductions}}</td>
+                <td>{{netPayableSalary}}</td>
+            </tr>
+            {{/each}}
+        </tbody>
+        <tfoot>
+            <tr>
+                <td colspan="7">Grand Total</td>
+                <td>{{totals.grossSalary}}</td>
+                <td colspan="4"></td>
+                {{#each earningColumns}}
+                <td>{{lookup ../totals this}}</td>
+                {{/each}}
+                <td>{{totals.totalAllowances}}</td>
+                {{#each deductionColumns}}
+                <td>{{lookup ../totals this}}</td>
+                {{/each}}
+                {{#each loanColumns}}
+                <td>{{lookup ../totals this}}</td>
+                {{/each}}
+                <td>{{totals.totalDeductions}}</td>
+                <td>{{totals.netPayableSalary}}</td>
+            </tr>
+        </tfoot>
+    </table>
+
+</body>
+
+</html>

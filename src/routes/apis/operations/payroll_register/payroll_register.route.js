@@ -8,5 +8,6 @@ const router = express.Router();
 
 router.route("/read-all-registered-payroll").post(auth(), validate(itemValidation.getAllItem), form_controller.getAllRegisteredPayroll);
 router.route("/generate-payslip-pdf").post(auth(), validate(itemValidation.getItemForPdf), form_controller.generatePayslip);
+router.route("/read-all-registered-payroll-pdf").post(auth(), validate(itemValidation.getItemForPdf), form_controller.generateRegisteredPayrollPdf);
 
 module.exports = router;

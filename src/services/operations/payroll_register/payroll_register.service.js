@@ -1,5 +1,5 @@
 const Sequelize = require('sequelize');
-const { paginationFacts, digitsToWords } = require("../../../utils/common");
+const { paginationFacts, digitsToWords, groupBy } = require("../../../utils/common");
 const pick = require("../../../utils/pick");
 const generatePdf = require("../../../utils/pdf");
 const ApiError = require("../../../utils/ApiError");
@@ -183,7 +183,7 @@ ld.EmpId = ${filter.employeeId}
 AND
 ld.MonthId = ${filter.monthId}`;
 
-const leaveQuery = `SELECT lb.allocatedCount, lb.remainingCount, lt.name 
+  const leaveQuery = `SELECT lb.allocatedCount, lb.remainingCount, lt.name 
 FROM t_payroll_leave_balance lb
 LEFT JOIN t_leave_type lt ON lt.Id = lb.leaveType
 WHERE
@@ -252,7 +252,163 @@ lb.MonthId = ${filter.monthId}`;
   return pdfStream
 };
 
+
+const generatePayrollRegisterPdf = async (req) => {
+  const employeeQuery = `SELECT
+    pf.Id AS employeeId,
+    CONCAT(
+        pf.firstName,
+        ' ',
+        IFNULL(pf.middleName, ''),
+        ' ',
+        IFNULL(pf.lastName, '')
+    ) AS EmployeeName,
+    DATE_FORMAT(pf.dateOfJoining, '%e-%b-%Y') AS dateOfJoining,
+    pf.employeeCode,
+    desig.formName AS designationName,
+    grade.formName AS gradeName,
+    loc.formName AS locationName,
+    paygrp.formName AS payrollGroup,
+    dp.deptName AS departmentName,
+    pe.GrossSalary,
+    pm.month_days AS monthDays,
+    sum.PresentDays AS paidDays,
+    sum.AbsentDays,
+    sum.OTHours
+FROM
+    t_payrollemployees pe
+LEFT JOIN t_employee_profile pf ON
+    pe.EmpId = pf.Id
+LEFT JOIN t_department dp ON
+    dp.deptId = pf.departmentId
+LEFT JOIN t_form_menu grade ON
+    grade.Id = pe.gradeId
+LEFT JOIN t_form_menu desig ON
+    desig.Id = pe.designationId
+LEFT JOIN t_form_menu loc ON
+    loc.Id = pe.locationId
+LEFT JOIN t_form_menu paygrp ON
+    paygrp.Id = pe.PayrollGroupId
+LEFT JOIN t_attendancesummary SUM ON
+    sum.MonthId = pe.MonthId AND sum.EmpId = pe.EmpId
+LEFT JOIN t_payroll_month_setup pm ON
+    pm.Id = pe.MonthId
+    `
+
+  const earningDeductionQuery = `SELECT
+    ped.EmpId,
+    ped.TransactionType,
+     CASE 
+        WHEN ped.TransactionType = 'Earning' THEN (SELECT e.earningName FROM t_employee_earning e WHERE ped.earning_deduction_id = e.Id)
+        WHEN ped.TransactionType = 'Deduction' THEN (SELECT e.DeductionName FROM t_employee_deduction e WHERE ped.earning_deduction_id = e.Id)
+        WHEN ped.TransactionType = 'LoanType' THEN (SELECT e.Name FROM t_loan_type_setup e WHERE ped.earning_deduction_id = e.Id)
+        ELSE ''
+    END AS EarningName,
+    ped.Amount_TakeHome AS Amount_Actual
+FROM
+    t_payrollemployees pe
+    LEFT JOIN
+    t_payrollearningdeduction ped ON ped.EmpId = pe.EmpId
+`;
+
+
+  const [employeeData] = await sequelize.query(employeeQuery, {
+    type: Sequelize.QueryTypes.RAW
+  })
+
+  const [earningData] = await sequelize.query(earningDeductionQuery, {
+    type: Sequelize.QueryTypes.RAW
+  })
+
+  const earningColumns = new Set();
+  const deductionColumns = new Set();
+  const loanColumns = new Set();
+
+  const totals = {
+    grossSalary: 0,
+    totalAllowances: 0,
+    totalDeductions: 0,
+    netPayableSalary: 0
+  }
+
+  employeeData.forEach((emp, i) => {
+    const employeeEarning = earningData.filter((el) => el.EmpId == emp.employeeId);
+    emp.sno = i + 1;
+    totals.grossSalary += Number(emp.GrossSalary);
+
+    employeeEarning.forEach(earn => {
+      emp[earn.EarningName] = earn.Amount_Actual;
+      if (earn.TransactionType == 'Earning') {
+        earningColumns.add(earn.EarningName);
+        emp.totalAllowances = (emp.totalAllowances || 0) + Number(earn.Amount_Actual)
+        totals.totalAllowances += Number(earn.Amount_Actual)
+      }
+      else if (earn.TransactionType == 'Deduction') {
+        deductionColumns.add(earn.EarningName);
+        emp.totalDeductions = (emp.totalDeductions || 0) + Number(earn.Amount_Actual)
+        totals.totalDeductions += Number(earn.Amount_Actual)
+      }
+      else if (earn.TransactionType == 'LoanType') {
+        loanColumns.add(earn.EarningName);
+        emp.totalDeductions = (emp.totalDeductions || 0) + Number(earn.Amount_Actual)
+        totals.totalDeductions += Number(earn.Amount_Actual)
+      }
+      totals[earn.EarningName] = totals[earn.EarningName] ? totals[earn.EarningName] + Number(earn.Amount_Actual) : Number(earn.Amount_Actual);
+    });
+
+    emp.netPayableSalary = Number(emp.totalAllowances) - Number(emp.totalDeductions)
+    totals.netPayableSalary += Number(emp.netPayableSalary)
+  });
+
+  console.log(':::::::employeeData:::::', employeeData);
+
+
+  const result = groupBy(employeeData, 'departmentName')
+
+  const obj = {}
+  Object.keys(result).forEach((key) => {
+    const currentData = result[key]
+    const totals = currentData.reduce((prev, curr) => {
+      earningColumns.forEach((col) => {
+        if (curr[col]) {
+          prev[col] = (prev[col] || 0) + Number(curr[col])
+          prev.totalAllowances = (prev.totalAllowances || 0) + Number(curr[col])
+        }
+      })
+      deductionColumns.forEach((col) => {
+        if (curr[col]) {
+          prev[col] = (prev[col] || 0) + Number(curr[col])
+          prev.totalDeductions = (prev.totalDeductions || 0) + Number(curr[col])
+        }
+      })
+      loanColumns.forEach((col) => {
+        if (curr[col]) {
+          prev[col] = (prev[col] || 0) + Number(curr[col])
+          prev.totalDeductions = (prev.totalDeductions || 0) + Number(curr[col])
+        }
+      })
+      if (curr.GrossSalary) {
+        prev.grossSalary = (prev.grossSalary || 0) + Number(curr.GrossSalary)
+      }
+      return prev
+    }, {})
+    totals.netPayableSalary = Number(totals.totalAllowances) - Number(totals.totalDeductions)
+
+    obj[key] = { data: currentData, totals: totals }
+  })
+
+  console.log('::::: OBJ :::::', JSON.stringify(obj));
+
+
+  const pdfStream = await generatePdf('payroll_register_grouped.hbs', { obj, earningColumns, deductionColumns, loanColumns, totals });
+
+  return pdfStream
+}
+
+
+
 module.exports = {
   getAllRegisteredPayroll,
-  generatePaySlip
+  generatePaySlip,
+  generatePayrollRegisterPdf
 };
