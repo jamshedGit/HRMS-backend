@@ -108,9 +108,9 @@ const createPayroll_Process = async (req, payroll_processBody) => {
 
     const subsidiaryExists = await Payroll_ProcessModel.findOne({
       where: {
-        subsidiaryId: payroll_processBody.subsidiaryId,
-        payroll_groupId: payroll_processBody.payroll_groupId,
-        payroll_monthId: payroll_processBody.payroll_monthId,
+        subsidiaryId: payroll_processBody?.subsidiaryId,
+        payroll_groupId: payroll_processBody?.payroll_groupId,
+        payroll_monthId: payroll_processBody?.payroll_monthId,
       },
     });
 
@@ -144,21 +144,22 @@ const createPayroll_Process = async (req, payroll_processBody) => {
     result = await sequelize.query(
       'CALL SP_PayrollProcess(:p_SubsidiaryId, :p_PayrollGroupId, :p_MonthId)', {
       replacements: {
-        p_SubsidiaryId: payroll_processBody.subsidiaryId || 'null',
-        p_PayrollGroupId: payroll_processBody.payroll_groupId || 'null',
-        p_MonthId: payroll_processBody.payroll_monthId || 'null'
+        p_SubsidiaryId: payroll_processBody?.subsidiaryId || null,
+        p_PayrollGroupId: payroll_processBody?.payroll_groupId || null,
+        p_MonthId: payroll_processBody?.payroll_monthId || null
       },
       type: Sequelize.QueryTypes.RAW // Use RAW type for executing stored procedures
     });
-
-    // if (result) {
+console.log("result111",result)
+    if (result?.length >0) {
    
     addedPayroll_Process.completedAt = new Date();
     addedPayroll_Process.completed = 1;
     await addedPayroll_Process.save();
-    // }
+    }
+    return result[0]
 
-    return await getPayroll_ProcessById(addedPayroll_Process.Id);
+    // return await getPayroll_ProcessById(addedPayroll_Process.Id);
 
 
 
@@ -452,9 +453,9 @@ const checkPayroll_EmployeesByIds = async (data) => {
       'CALL SP_PayrollProcess_RevertBack(:p_SubsidiaryId, :p_PayrollGroupId, :p_MonthId)',
       {
         replacements: {
-          p_SubsidiaryId: data.SubsidiaryId,
-          p_PayrollGroupId: data.PayrollGroupId,
-          p_MonthId: data.MonthId
+          p_SubsidiaryId: data?.SubsidiaryId,
+          p_PayrollGroupId: data?.PayrollGroupId,
+          p_MonthId: data?.MonthId
         },
         type: Sequelize.QueryTypes.RAW // Use RAW type for executing stored procedures
       }
@@ -463,9 +464,9 @@ const checkPayroll_EmployeesByIds = async (data) => {
 
     const Item = await Payroll_ProcessModel.findOne({
       where: {
-        subsidiaryId: data.SubsidiaryId,
-        payroll_groupId: data.PayrollGroupId,
-        payroll_monthId: data.MonthId
+        subsidiaryId: data?.SubsidiaryId,
+        payroll_groupId: data?.PayrollGroupId,
+        payroll_monthId: data?.MonthId
       },
     })
     Item.completed = 2

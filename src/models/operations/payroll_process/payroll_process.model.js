@@ -10,7 +10,7 @@ const Payroll_ProcessModel = sequelize.define('t_payroll_process', {
         autoIncrement: true,
         primaryKey: true
     },
-    payroll_groupId: { type: Sequelize.INTEGER, allowNull: false },
+    payroll_groupId: { type: Sequelize.INTEGER, allowNull: true },
     payroll_monthId: { type: Sequelize.INTEGER, allowNull: false },
     subsidiaryId: { type: Sequelize.INTEGER, allowNull: false },
     companyId: { type: Sequelize.INTEGER, allowNull: false, defaultValue: 1 },
