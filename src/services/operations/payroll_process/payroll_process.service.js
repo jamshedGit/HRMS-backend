@@ -435,20 +435,32 @@ const payroll_group_detail = async (subsidiaryId, payroll_groupId,payroll_monthI
 const checkPayroll_EmployeesByIds = async (data) => {
   const { SubsidiaryId, PayrollGroupId, MonthId } = data;
   let results;
-
+  console.log("data111",data)
+  //   'SELECT * FROM t_PayrollEmployees WHERE SubsidiaryId = :SubsidiaryId AND PayrollGroupId = :PayrollGroupId AND MonthId = :MonthId',
   if (!data.revert) {
+    // results = await sequelize.query(
+    //   'SELECT * FROM t_PayrollEmployees WHERE SubsidiaryId = :SubsidiaryId AND PayrollGroupId = :PayrollGroupId AND MonthId = :MonthId',
+    //   {
+    //     replacements: { SubsidiaryId, PayrollGroupId, MonthId },
+    //     type: sequelize.QueryTypes.SELECT
+    //   }
+    // );
+
+  
     results = await sequelize.query(
-      'SELECT * FROM t_PayrollEmployees WHERE SubsidiaryId = :SubsidiaryId AND PayrollGroupId = :PayrollGroupId AND MonthId = :MonthId',
+      'SELECT * FROM t_PayrollEmployees WHERE SubsidiaryId = :SubsidiaryId AND MonthId = :MonthId' + 
+      (PayrollGroupId ? ' AND PayrollGroupId = :PayrollGroupId' : ''),
       {
         replacements: { SubsidiaryId, PayrollGroupId, MonthId },
         type: sequelize.QueryTypes.SELECT
       }
     );
-
+  
   }
 
-  else if (data.revert && data.SubsidiaryId && data.PayrollGroupId && data.MonthId) {
+  else if (data.revert && data.SubsidiaryId  && data.MonthId) {
     //SP_PayrollProcess
+
     let a = await sequelize.query(
       'CALL SP_PayrollProcess_RevertBack(:p_SubsidiaryId, :p_PayrollGroupId, :p_MonthId)',
       {
