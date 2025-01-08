@@ -150,7 +150,7 @@ const createPayroll_Process = async (req, payroll_processBody) => {
       },
       type: Sequelize.QueryTypes.RAW // Use RAW type for executing stored procedures
     });
-console.log("result111",result)
+
     if (result?.length >0) {
    
     addedPayroll_Process.completedAt = new Date();
@@ -431,13 +431,14 @@ const payroll_group_detail = async (subsidiaryId, payroll_groupId,payroll_monthI
   return data
 
 };
-
+//t_payrollprocess_locking
 const checkPayroll_EmployeesByIds = async (data) => {
   const { SubsidiaryId, PayrollGroupId, MonthId } = data;
+  console.log('data111',data)
   let results;
-  console.log("data111",data)
+ 
   //   'SELECT * FROM t_PayrollEmployees WHERE SubsidiaryId = :SubsidiaryId AND PayrollGroupId = :PayrollGroupId AND MonthId = :MonthId',
-  if (!data.revert) {
+  if (!data.revert && !data.finalize) {
     // results = await sequelize.query(
     //   'SELECT * FROM t_PayrollEmployees WHERE SubsidiaryId = :SubsidiaryId AND PayrollGroupId = :PayrollGroupId AND MonthId = :MonthId',
     //   {
@@ -474,6 +475,9 @@ const checkPayroll_EmployeesByIds = async (data) => {
     );
 
 
+    
+
+
     const Item = await Payroll_ProcessModel.findOne({
       where: {
         subsidiaryId: data?.SubsidiaryId,
@@ -490,6 +494,38 @@ const checkPayroll_EmployeesByIds = async (data) => {
 
   }
 
+  else if (data.finalize && data.SubsidiaryId  && data.MonthId) {
+console.log("finalizing")
+
+    let finalized = await sequelize.query(
+      'SELECT * FROM t_payrollprocess_locking WHERE SubsidiaryId = :SubsidiaryId AND MonthId = :MonthId' + 
+      (PayrollGroupId ? ' AND PayrollGroupId = :PayrollGroupId' : ''),
+      {
+        replacements: { SubsidiaryId, PayrollGroupId, MonthId },
+        type: sequelize.QueryTypes.SELECT
+      }
+    );
+
+    if (finalized && finalized.length > 0) {
+      let record = finalized[0];
+    
+      // Update the record using raw SQL
+      await sequelize.query(
+        'UPDATE t_payrollprocess_locking SET isFinalized = :isFinalized WHERE Id = :Id',
+        {
+          replacements: { isFinalized: 1, Id: record.Id },
+          type: sequelize.QueryTypes.UPDATE
+        }
+      );
+    }
+
+    
+
+
+
+
+
+  }
   return results?.length > 0 ? results : null;
 
 
