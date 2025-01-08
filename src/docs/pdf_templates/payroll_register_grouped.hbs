@@ -10,6 +10,8 @@
             font-family: Arial, sans-serif;
             margin: 20px;
             background-color: #f9f9f9;
+            transform: scale(0.6); /* Adjust the scale as needed */
+            transform-origin: top left;
         }
 
         h1 {
@@ -66,9 +68,15 @@
     <h1>Payroll Register</h1>
 
     <div class="header-info">
-        <p>For the Month of: <span>July, 2024</span></p>
-        <p>Subsidiary: <span>Dynasoft Cloud (Pakistan)</span></p>
-        <p>Payroll: <span>Group Wise</span></p>
+        {{#if labels.monthLabel}}
+        <p>For the Month of: <span>{{labels.monthLabel}}</span></p>
+        {{/if}}
+        {{#if labels.subsidiaryLabel}}
+        <p>Subsidiary: <span>{{labels.subsidiaryLabel}}</span></p>
+        {{/if}}
+        {{#if labels.groupWiseLabel}}
+        <p>Payroll: <span>{{labels.groupWiseLabel}}</span></p>
+        {{/if}}
     </div>
 
     <table class="payroll-table">
@@ -103,11 +111,11 @@
         <tbody>
             {{#each obj}}
             <tr>
-                <td colspan="2" class="left">{{@key}}</td>
+                <td colspan="3" class="left">{{@key}}</td>
             </tr>
             {{#each this.data}}
             <tr>
-                <td>{{sno}}</td>
+                <td>{{increment @index}}</td>
                 <td>{{employeeCode}}</td>
                 <td>{{EmployeeName}}</td>
                 <td>{{departmentName}}</td>
@@ -120,35 +128,35 @@
                 <td>{{AbsentDays}}</td>
                 <td>{{OTHours}}</td>
                 {{#each ../../earningColumns}}
-                <td>{{lookup ../this this}}</td>
+                <td>{{toFixed (lookup ../this this)}}</td>
                 {{/each}}
-                <td>{{totalAllowances}}</td>
+                <td>{{toFixed totalAllowances}}</td>
                 {{#each ../../deductionColumns}}
-                <td>{{lookup ../this this}}</td>
+                <td>{{toFixed (lookup ../this this)}}</td>
                 {{/each}}
                 {{#each ../../loanColumns}}
-                <td>{{lookup ../this this}}</td>
+                <td>{{toFixed (lookup ../this this)}}</td>
                 {{/each}}
-                <td>{{totalDeductions}}</td>
-                <td>{{netPayableSalary}}</td>
+                <td>{{toFixed totalDeductions}}</td>
+                <td>{{toFixed netPayableSalary}}</td>
             </tr>
             {{/each}}
             <tr class="totals-row">
                 <td colspan="7" class="left">Subtotal</td>
-                <td>{{totals.grossSalary}}</td>
+                <td>{{toFixed totals.grossSalary}}</td>
                 <td colspan="4"></td>
                 {{#each ../earningColumns}}
-                <td>{{lookup ../totals this}}</td>
+                <td>{{toFixed (lookup ../totals this)}}</td>
                 {{/each}}
-                <td>{{totals.totalAllowances}}</td>
+                <td>{{toFixed totals.totalAllowances}}</td>
                 {{#each ../deductionColumns}}
-                <td>{{lookup ../totals this}}</td>
+                <td>{{toFixed (lookup ../totals this)}}</td>
                 {{/each}}
                 {{#each ../loanColumns}}
-                <td>{{lookup ../totals this}}</td>
+                <td>{{toFixed (lookup ../totals this)}}</td>
                 {{/each}}
-                <td>{{totals.totalDeductions}}</td>
-                <td>{{totals.netPayableSalary}}</td>
+                <td>{{toFixed totals.totalDeductions}}</td>
+                <td>{{toFixed totals.netPayableSalary}}</td>
             </tr>
             {{/each}}
 
@@ -157,20 +165,20 @@
         <tfoot>
             <tr>
                 <td colspan="7" class="left">Grand Total</td>
-                <td>{{totals.grossSalary}}</td>
+                <td>{{toFixed totals.grossSalary}}</td>
                 <td colspan="4"></td>
                 {{#each earningColumns}}
-                <td>{{lookup ../totals this}}</td>
+                <td>{{toFixed (lookup ../totals this)}}</td>
                 {{/each}}
-                <td>{{totals.totalAllowances}}</td>
+                <td>{{toFixed totals.totalAllowances}}</td>
                 {{#each deductionColumns}}
-                <td>{{lookup ../totals this}}</td>
+                <td>{{toFixed (lookup ../totals this)}}</td>
                 {{/each}}
                 {{#each loanColumns}}
-                <td>{{lookup ../totals this}}</td>
+                <td>{{toFixed (lookup ../totals this)}}</td>
                 {{/each}}
-                <td>{{totals.totalDeductions}}</td>
-                <td>{{totals.netPayableSalary}}</td>
+                <td>{{toFixed totals.totalDeductions}}</td>
+                <td>{{toFixed totals.netPayableSalary}}</td>
             </tr>
         </tfoot>
     </table>

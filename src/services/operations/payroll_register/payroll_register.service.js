@@ -254,6 +254,24 @@ lb.MonthId = ${filter.monthId}`;
 
 
 const generatePayrollRegisterPdf = async (req) => {
+  const filter = req?.body || {};
+  const labels = filter?.labels || {};
+
+  const array = [];
+
+  if (filter.subsidiaryId) {
+    array.push(`(pe.SubsidiaryId = ${filter.subsidiaryId})`)
+  }
+
+  if (filter.employeeId) {
+    array.push(`(pe.EmpId = ${filter.employeeId})`)
+  }
+
+  if (filter.monthId) {
+    array.push(`(pe.MonthId = ${filter.monthId})`)
+  }
+
+
   const employeeQuery = `SELECT
     pf.Id AS employeeId,
     CONCAT(
@@ -307,16 +325,26 @@ LEFT JOIN t_payroll_month_setup pm ON
     ped.Amount_TakeHome AS Amount_Actual
 FROM
     t_payrollemployees pe
-    LEFT JOIN
+LEFT JOIN
     t_payrollearningdeduction ped ON ped.EmpId = pe.EmpId
 `;
 
+  let filters = '';
 
-  const [employeeData] = await sequelize.query(employeeQuery, {
+  if (array.length) {
+    filters = array.join(' AND ');
+    filters = ' WHERE ' + filters;
+  }
+
+  const [employeeData] = await sequelize.query(employeeQuery + filters, {
     type: Sequelize.QueryTypes.RAW
   })
 
-  const [earningData] = await sequelize.query(earningDeductionQuery, {
+  if (!employeeData.length) {
+    throw new ApiError(httpStatus.NOT_FOUND, 'Cannot generate Register');
+  }
+
+  const [earningData] = await sequelize.query(earningDeductionQuery + filters, {
     type: Sequelize.QueryTypes.RAW
   })
 
@@ -360,49 +388,59 @@ FROM
     totals.netPayableSalary += Number(emp.netPayableSalary)
   });
 
-  console.log(':::::::employeeData:::::', employeeData);
+  // Object.keys(totals).forEach((key) => {
+  //   totals[key] = Number(totals[key].toFixed(2));
+  // })
 
+  if (filter.groupBy) {
+    const result = groupBy(employeeData, filter.groupBy)
 
-  const result = groupBy(employeeData, 'departmentName')
-
-  const obj = {}
-  Object.keys(result).forEach((key) => {
-    const currentData = result[key]
-    const totals = currentData.reduce((prev, curr) => {
-      earningColumns.forEach((col) => {
-        if (curr[col]) {
-          prev[col] = (prev[col] || 0) + Number(curr[col])
-          prev.totalAllowances = (prev.totalAllowances || 0) + Number(curr[col])
+    const obj = {}
+    Object.keys(result).forEach((key) => {
+      const currentData = result[key]
+      const totals = currentData.reduce((prev, curr) => {
+        earningColumns.forEach((col) => {
+          if (curr[col]) {
+            prev[col] = (prev[col] || 0) + Number(curr[col])
+            prev.totalAllowances = (prev.totalAllowances || 0) + Number(curr[col])
+          }
+        })
+        deductionColumns.forEach((col) => {
+          if (curr[col]) {
+            prev[col] = (prev[col] || 0) + Number(curr[col])
+            prev.totalDeductions = (prev.totalDeductions || 0) + Number(curr[col])
+          }
+        })
+        loanColumns.forEach((col) => {
+          if (curr[col]) {
+            prev[col] = (prev[col] || 0) + Number(curr[col])
+            prev.totalDeductions = (prev.totalDeductions || 0) + Number(curr[col])
+          }
+        })
+        if (curr.GrossSalary) {
+          prev.grossSalary = (prev.grossSalary || 0) + Number(curr.GrossSalary)
         }
-      })
-      deductionColumns.forEach((col) => {
-        if (curr[col]) {
-          prev[col] = (prev[col] || 0) + Number(curr[col])
-          prev.totalDeductions = (prev.totalDeductions || 0) + Number(curr[col])
-        }
-      })
-      loanColumns.forEach((col) => {
-        if (curr[col]) {
-          prev[col] = (prev[col] || 0) + Number(curr[col])
-          prev.totalDeductions = (prev.totalDeductions || 0) + Number(curr[col])
-        }
-      })
-      if (curr.GrossSalary) {
-        prev.grossSalary = (prev.grossSalary || 0) + Number(curr.GrossSalary)
-      }
-      return prev
-    }, {})
-    totals.netPayableSalary = Number(totals.totalAllowances) - Number(totals.totalDeductions)
+        return prev
+      }, {})
+      totals.netPayableSalary = Number(totals.totalAllowances) - Number(totals.totalDeductions)
 
-    obj[key] = { data: currentData, totals: totals }
-  })
+      // Object.keys(totals).forEach((key) => {
+      //   totals[key] = Number(totals[key].toFixed(2));
+      // })
 
-  console.log('::::: OBJ :::::', JSON.stringify(obj));
+      obj[key] = { data: currentData, totals: totals }
+    })
+
+    const pdfStream = await generatePdf('payroll_register_grouped.hbs', { obj, earningColumns, deductionColumns, loanColumns, totals, labels }, { landscape: true });
+
+    return pdfStream
+  }
+  else {
+    const pdfStream = await generatePdf('payroll_register.hbs', { employeeData, earningColumns, deductionColumns, loanColumns, totals, labels }, { landscape: true });
+    return pdfStream
+  }
 
 
-  const pdfStream = await generatePdf('payroll_register_grouped.hbs', { obj, earningColumns, deductionColumns, loanColumns, totals });
-
-  return pdfStream
 }
 
 
