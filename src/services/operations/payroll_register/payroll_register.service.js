@@ -115,6 +115,13 @@ WHERE`;
   return paginationFacts(totalCount[0].TotalCount, limit, options.pageNumber, data);
 };
 
+/**
+ * 
+ * Generate Payslip PDF
+ * 
+ * @param {Object} req 
+ * @returns 
+ */
 const generatePaySlip = async (req) => {
   const filter = req?.body || {};
   const labels = filter?.labels || {};
@@ -252,7 +259,13 @@ lb.MonthId = ${filter.monthId}`;
   return pdfStream
 };
 
-
+/**
+ * 
+ * Generate Payroll Register PDF according to filters
+ * 
+ * @param {Object} req 
+ * @returns 
+ */
 const generatePayrollRegisterPdf = async (req) => {
   const filter = req?.body || {};
   const labels = filter?.labels || {};
@@ -368,18 +381,18 @@ LEFT JOIN
       emp[earn.EarningName] = earn.Amount_Actual;
       if (earn.TransactionType == 'Earning') {
         earningColumns.add(earn.EarningName);
-        emp.totalAllowances = (emp.totalAllowances || 0) + Number(earn.Amount_Actual)
-        totals.totalAllowances += Number(earn.Amount_Actual)
+        emp.totalAllowances = (emp.totalAllowances || 0) + Number(earn.Amount_Actual);
+        totals.totalAllowances += Number(earn.Amount_Actual);
       }
       else if (earn.TransactionType == 'Deduction') {
         deductionColumns.add(earn.EarningName);
-        emp.totalDeductions = (emp.totalDeductions || 0) + Number(earn.Amount_Actual)
-        totals.totalDeductions += Number(earn.Amount_Actual)
+        emp.totalDeductions = (emp.totalDeductions || 0) + Number(earn.Amount_Actual);
+        totals.totalDeductions += Number(earn.Amount_Actual);
       }
       else if (earn.TransactionType == 'LoanType') {
         loanColumns.add(earn.EarningName);
-        emp.totalDeductions = (emp.totalDeductions || 0) + Number(earn.Amount_Actual)
-        totals.totalDeductions += Number(earn.Amount_Actual)
+        emp.totalDeductions = (emp.totalDeductions || 0) + Number(earn.Amount_Actual);
+        totals.totalDeductions += Number(earn.Amount_Actual);
       }
       totals[earn.EarningName] = totals[earn.EarningName] ? totals[earn.EarningName] + Number(earn.Amount_Actual) : Number(earn.Amount_Actual);
     });
@@ -387,10 +400,6 @@ LEFT JOIN
     emp.netPayableSalary = Number(emp.totalAllowances) - Number(emp.totalDeductions)
     totals.netPayableSalary += Number(emp.netPayableSalary)
   });
-
-  // Object.keys(totals).forEach((key) => {
-  //   totals[key] = Number(totals[key].toFixed(2));
-  // })
 
   if (filter.groupBy) {
     const result = groupBy(employeeData, filter.groupBy)
@@ -424,26 +433,17 @@ LEFT JOIN
       }, {})
       totals.netPayableSalary = Number(totals.totalAllowances) - Number(totals.totalDeductions)
 
-      // Object.keys(totals).forEach((key) => {
-      //   totals[key] = Number(totals[key].toFixed(2));
-      // })
-
       obj[key] = { data: currentData, totals: totals }
     })
 
     const pdfStream = await generatePdf('payroll_register_grouped.hbs', { obj, earningColumns, deductionColumns, loanColumns, totals, labels }, { landscape: true });
-
     return pdfStream
   }
   else {
     const pdfStream = await generatePdf('payroll_register.hbs', { employeeData, earningColumns, deductionColumns, loanColumns, totals, labels }, { landscape: true });
     return pdfStream
   }
-
-
 }
-
-
 
 module.exports = {
   getAllRegisteredPayroll,

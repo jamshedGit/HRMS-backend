@@ -40,7 +40,7 @@ const generatePayslip = catchAsync(async (req, res) => {
 
 /**
  * 
- * Get All Payroll for Pdf
+ * Get All Registered Payroll for Pdf
  * 
  * @param {Object} req 
  * @returns res
