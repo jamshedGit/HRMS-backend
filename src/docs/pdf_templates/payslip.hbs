@@ -91,6 +91,10 @@
         .amount-in-words {
             font-weight: bold;
         }
+
+        .right-align {
+            text-align: end;
+        }
     </style>
 </head>
 
@@ -100,10 +104,12 @@
             <div class="header-content">
                 <div class="left">
                     <h1>{{employeeData.companyName}}</h1>
-                    <p>Salary Slip of Mar 2024</p>
+                    {{#if monthName}}
+                    <p>Salary Slip of {{monthName}}</p>
+                    {{/if}}
                 </div>
                 <div class="right">
-                    <p>50 Washington St<br>San Francisco CA 94109<br>United States</p>
+                    <p>{{employeeData.companyAddress}}</p>
                 </div>
             </div>
         </div>
@@ -116,7 +122,7 @@
                 </tr>
                 <tr>
                     <td>Employee ID:</td>
-                    <td colspan="2">{{employeeData.employeeCode}} {{employeeData.EmployeeName}}</td>
+                    <td colspan="2">{{employeeData.employeeCode}}</td>
 
                     <td>Designation:</td>
                     <td colspan="2">{{employeeData.designationName}}</td>
@@ -135,27 +141,25 @@
                 </tr>
                 <tr>
                     <td class="tdWidth">Working Days:</td>
-                    <td class="tdWidth">{{employeeData.monthDays}}</td>
+                    <td class="tdWidth right-align">{{employeeData.monthDays}}</td>
                     <td class="tdWidth">Payable Days:</td>
-                    <td class="tdWidth">{{employeeData.paidDays}}</td>
+                    <td class="tdWidth right-align">{{employeeData.paidDays}}</td>
                     <td class="tdWidth">Bank Name:</td>
                     <td class="tdWidth">{{employeeData.bankName}}</td>
                 </tr>
                 <tr>
                     <td>Leaves Deducted:</td>
-                    <td>{{employeeData.leaveCount}}</td>
+                    <td class="right-align">{{employeeData.leaveCount}}</td>
                     <td>Total Lates:</td>
-                    <td>{{employeeData.lateCount}}</td>
+                    <td class="right-align">{{employeeData.lateCount}}</td>
                     <td>Account No:</td>
                     <td>{{employeeData.accountNumber}}</td>
                 </tr>
                 <tr>
                     <td>Lates per Day Deduction:</td>
-                    <td></td>
+                    <td class="right-align">{{employeeData.LatePerDayAmount}}</td>
                     <td>Lates Deducted:</td>
-                    <td></td>
-                    <td>IBAN Number:</td>
-                    <td></td>
+                    <td class="right-align">{{employeeData.LateDaysCount}}</td>
                 </tr>
 
                 <tr class="section-title">
@@ -171,13 +175,12 @@
                                 {{#each earningData}}
                                 <tr>
                                     <td>{{EarningName}}</td>
-                                    <td>{{Amount_Actual}}</td>
+                                    <td class="right-align">{{Amount_Actual}}</td>
                                 </tr>
                                 {{/each}}
 
                                 <tr>
-                                    <td>Total Allowances:</td>
-                                    <td colspan="2">{{totalEarningAmount}}</td>
+
                                 </tr>
 
                             </tbody>
@@ -193,31 +196,34 @@
                                 {{#each deductionData}}
                                 <tr>
                                     <td>{{EarningName}}</td>
-                                    <td>{{Amount_Actual}}</td>
+                                    <td class="right-align">{{Amount_Actual}}</td>
                                 </tr>
                                 {{/each}}
 
                                 {{#each loanData}}
                                 <tr>
                                     <td>{{EarningName}}</td>
-                                    <td>{{Amount_Actual}}</td>
+                                    <td class="right-align">{{Amount_Actual}}</td>
                                 </tr>
                                 {{/each}}
 
-                                <tr>
-                                    <td>Total Deductions:</td>
-                                    <td colspan="2">{{totalDeductionAmount}}</td>
-                                </tr>
+
                             </tbody>
                         </table>
                     </td>
                 </tr>
                 <tr>
-                    <td><strong>Gross Salary:</strong></td>
-                    <td colspan="2">{{employeeData.grossSalary}}</td>
+                    <td colspan="2">Total Allowances:</td>
+                    <td colspan="1" class="right-align">{{totalEarningAmount}}</td>
+                    <td colspan="2">Total Deductions:</td>
+                    <td colspan="1" class="right-align">{{totalDeductionAmount}}</td>
+                </tr>
+                <tr>
+                    <td colspan="2"><strong>Gross Salary:</strong></td>
+                    <td colspan="1" class="right-align">{{ grossSalary }}</td>
 
-                    <td><strong>Net Payable Salary:</strong></td>
-                    <td colspan="2">{{ earningDeductionDifference }}</td>
+                    <td colspan="2"><strong>Net Payable Salary:</strong></td>
+                    <td colspan="1" class="right-align">{{ earningDeductionDifference }}</td>
                 </tr>
 
                 <tr>
@@ -225,50 +231,39 @@
                     <td colspan="4">{{ earningDeductionDifferenceInWords }}</td>
                 </tr>
 
+
+                {{#if leaveDetailData.length}}
                 <tr class="section-title">
                     <td colspan="6">Leave Balance</td>
                 </tr>
                 <tr>
-                    <td colspan="2">Leave Type</td>
-                    <td colspan="2">Allocated Leaves</td>
-                    <td colspan="2">Remaining Leaves</td>
+                    <td colspan="2"><strong>Leave Type</strong></td>
+                    <td colspan="2"><strong>Allocated Leaves</strong></td>
+                    <td colspan="2"><strong>Remaining Leaves</strong></td>
                 </tr>
+                {{#each leaveDetailData}}
                 <tr>
-                    <td colspan="2">Annual</td>
-                    <td colspan="2">2.5</td>
-                    <td colspan="2">2.5</td>
+                    <td colspan="2">{{name}}</td>
+                    <td colspan="2" class="right-align">{{allocatedCount}}</td>
+                    <td colspan="2" class="right-align">{{remainingCount}}</td>
                 </tr>
-                <tr>
-                    <td colspan="2">Casual</td>
-                    <td colspan="2">10</td>
-                    <td colspan="2">10</td>
-                </tr>
-                <tr>
-                    <td colspan="2">Hajj</td>
-                    <td colspan="2">30</td>
-                    <td colspan="2">30</td>
-                </tr>
-                <tr>
-                    <td colspan="2">Sick</td>
-                    <td colspan="2">10</td>
-                    <td colspan="2">10</td>
-                </tr>
-
+                {{/each}}
+                {{/if}}
 
                 {{#if loanDetailData.length}}
                 <tr class="section-title">
                     <td colspan="6">Loan Balance</td>
                 </tr>
                 <tr>
-                    <td colspan="2">Name</td>
-                    <td colspan="2">Remaining Installments</td>
-                    <td colspan="2">Remaining Amount</td>
+                    <td colspan="2"><strong>Name</strong></td>
+                    <td colspan="2"><strong>Remaining Installments</strong></td>
+                    <td colspan="2"><strong>Remaining Amount</strong></td>
                 </tr>
                 {{#each loanDetailData}}
                 <tr>
                     <td colspan="2">{{name}}</td>
-                    <td colspan="2">{{OutstandingInstallment}}</td>
-                    <td colspan="2">{{OutStandingBalance}}</td>
+                    <td colspan="2" class="right-align">{{OutstandingInstallment}}</td>
+                    <td colspan="2" class="right-align">{{OutStandingBalance}}</td>
                 </tr>
                 {{/each}}
                 {{/if}}
