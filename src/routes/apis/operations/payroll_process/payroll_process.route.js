@@ -11,9 +11,8 @@ router.route("/read-all-payroll-process").post(auth(),  payroll_processControlle
 // router.route("/create-payroll_process").post(auth(), payroll_processController.createpayroll_process);
 router.route("/update-payroll-process").put(auth(),  payroll_processController.updatePayroll_Process);
 router.route("/delete-payroll-process").patch(auth(),payroll_processController.deletePayroll_Process);
-// router.route("/donation-report").post(auth(),validate(receiptValidation.getDonationReceiptByBookNo),receiptController.getDonationReceiptReport);
 
-router.route("/create-payroll-process").post(auth(), payroll_processController.createPayroll_Process);
+router.route("/create-payroll-process").post(auth(),validate(payroll_processValidation.CreatePayroll_ProcessValidation), payroll_processController.createPayroll_Process);
 router.route("/read-all-payroll-group-detail").post(payroll_processController.payroll_group_detail)
 router.route("/check-payroll-employees").post(payroll_processController.checkPayroll_EmployeesByIds)
 module.exports = router;

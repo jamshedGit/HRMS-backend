@@ -24,7 +24,7 @@ router.route("/image-upload").post(upload.single('image'), emp_profile_Controlle
 // router.get('/api/getFile:path', (req, res) => {
 //     try {
 //         var file = __dirname + './uploads/' + req.params.path;
-//         console.log(file);
+//        
 //         var filename = path.basename(file);
 //         var mimetype = mime.getType(file);
 
@@ -58,7 +58,7 @@ router.route("/read-profile-view/:id").get( emp_profile_Controller.getProfileVie
 
 
 // router.post('/uploadImage',upload.single('image'),(req,res)=>{
-//     console.log(req.file.filename);
+//    
 //     let resp={
 //         name:req.file.originalname,
 //         filename:req.file.filename

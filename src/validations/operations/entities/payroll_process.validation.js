@@ -6,7 +6,7 @@ const CreatePayroll_ProcessValidation = {
     params: Joi.disallow(),
     body: Joi.object().keys({
         Id:'',
-        payroll_groupId: Joi.number(),
+        payroll_groupId: Joi.number().allow(null),
         payroll_monthId: Joi.number(),
         subsidiaryId: Joi.number(),
 

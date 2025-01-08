@@ -69,7 +69,9 @@ const DesigModel = sequelize.define('t_employee_profile', {
 	contractTypeId: { type: Sequelize.INTEGER, allowNull: true },
 	cycleTypeId: { type: Sequelize.INTEGER, allowNull: true },
 	requireDeligation: { type: Sequelize.BOOLEAN, allowNull: true },
-
+	codeAuto:{ type: Sequelize.STRING, allowNull: true },
+	approvedForPayroll:{ type: Sequelize.BOOLEAN, allowNull: true },
+	codePrefix: { type: Sequelize.STRING, allowNull: true },
 	isActive: { type: Sequelize.BOOLEAN, allowNull: true, defaultValue: true },
 	employeeStatusId: { type: Sequelize.INTEGER, allowNull: true },
 

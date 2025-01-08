@@ -1,5 +1,5 @@
 const httpStatus = require("http-status");
-const { FormModel, SubsidiaryModel, PayrollMonthModel, Payroll_ProcessModel, EmployeeProfileModel, EmployeeSalaryModel } = require("../../../models/index");
+const {Employee_loan_requestModel, FormModel, SubsidiaryModel, PayrollMonthModel, Payroll_ProcessModel, EmployeeProfileModel, EmployeeSalaryModel, Employee_loan_request_detailModel } = require("../../../models/index");
 
 const ApiError = require("../../../utils/ApiError");
 const Sequelize = require("sequelize");
@@ -108,9 +108,9 @@ const createPayroll_Process = async (req, payroll_processBody) => {
 
     const subsidiaryExists = await Payroll_ProcessModel.findOne({
       where: {
-        subsidiaryId: payroll_processBody.subsidiaryId,
-        payroll_groupId: payroll_processBody.payroll_groupId,
-        payroll_monthId: payroll_processBody.payroll_monthId,
+        subsidiaryId: payroll_processBody?.subsidiaryId,
+        payroll_groupId: payroll_processBody?.payroll_groupId,
+        payroll_monthId: payroll_processBody?.payroll_monthId,
       },
     });
 
@@ -144,21 +144,22 @@ const createPayroll_Process = async (req, payroll_processBody) => {
     result = await sequelize.query(
       'CALL SP_PayrollProcess(:p_SubsidiaryId, :p_PayrollGroupId, :p_MonthId)', {
       replacements: {
-        p_SubsidiaryId: payroll_processBody.subsidiaryId || 'null',
-        p_PayrollGroupId: payroll_processBody.payroll_groupId || 'null',
-        p_MonthId: payroll_processBody.payroll_monthId || 'null'
+        p_SubsidiaryId: payroll_processBody?.subsidiaryId || null,
+        p_PayrollGroupId: payroll_processBody?.payroll_groupId || null,
+        p_MonthId: payroll_processBody?.payroll_monthId || null
       },
       type: Sequelize.QueryTypes.RAW // Use RAW type for executing stored procedures
     });
 
-    // if (result) {
+    if (result?.length >0) {
    
     addedPayroll_Process.completedAt = new Date();
     addedPayroll_Process.completed = 1;
     await addedPayroll_Process.save();
-    // }
+    }
+    return result[0]
 
-    return await getPayroll_ProcessById(addedPayroll_Process.Id);
+    // return await getPayroll_ProcessById(addedPayroll_Process.Id);
 
 
 
@@ -347,7 +348,7 @@ const deletePayroll_ProcessById = async (Id) => {
   return Item;
 };
 
-const payroll_group_detail = async (subsidiaryId, payroll_groupId) => {
+const payroll_group_detail = async (subsidiaryId, payroll_groupId,payroll_monthId) => {
   // Step 1: Get employees based on the provided subsidiaryId and payroll_groupId
   const employees = await EmployeeProfileModel.findAndCountAll({
     where: {
@@ -358,10 +359,11 @@ const payroll_group_detail = async (subsidiaryId, payroll_groupId) => {
 
 
   // Check if employees are found
-  if (employees.count === 0) {
+  if (employees?.count === 0) {
     data = {
       total_employees: 0,
-      slary_setup_not_created: 0
+      slary_setup_not_created: 0,
+      loan_to_be_processed: 0
 
     }
     return data
@@ -383,51 +385,104 @@ const payroll_group_detail = async (subsidiaryId, payroll_groupId) => {
     return !employeesWithoutSalarySetup.some((salary) => salary.employeeId === emp.Id);
   }).length;
 
-  data = {
-    total_employees: employees.rows.length,
-    slary_setup_not_created: employeesWithNoSalarySetupCount
 
+
+  const employeesApprovedLoanRequest = await Employee_loan_requestModel.findAll({
+    where: {
+      employeeId: {
+        [Op.in]: employees.rows.map((emp) => emp.Id), // Assuming `id` is the employee's unique identifier
+      },
+      approved_status:1
+    },
+  });
+
+  const currentPayrollMonth = await PayrollMonthModel.findOne({
+    where: {
+     
+      
+        Id:payroll_monthId
+      
+    },
+  });
+  
+  const employeesLoanToBeProcessed = await Employee_loan_request_detailModel.findAll({
+    where: {
+      // employeeId: {
+      //   [Op.in]: employees.rows.map((emp) => emp.Id), // Assuming `id` is the employee's unique identifier
+      // },
+      emp_loan_reqId: {
+        [Op.in]: employeesApprovedLoanRequest?.map((req) => req.Id), // Ensure 'Id' is the correct column name in your model
+      },
+      payroll_month_date: {
+        [Op.gte]: currentPayrollMonth?.startDate,
+        [Op.lte]: currentPayrollMonth?.endDate
+      }
+    },
+  });
+
+
+
+  data = {
+    total_employees: employees?.rows?.length,
+    slary_setup_not_created: employeesWithNoSalarySetupCount,
+    loan_to_be_processed:  employeesLoanToBeProcessed?.length || 0
   }
 
   return data
 
 };
-
+//t_payrollprocess_locking
 const checkPayroll_EmployeesByIds = async (data) => {
   const { SubsidiaryId, PayrollGroupId, MonthId } = data;
+  console.log('data111',data)
   let results;
+ 
+  //   'SELECT * FROM t_PayrollEmployees WHERE SubsidiaryId = :SubsidiaryId AND PayrollGroupId = :PayrollGroupId AND MonthId = :MonthId',
+  if (!data.revert && !data.finalize) {
+    // results = await sequelize.query(
+    //   'SELECT * FROM t_PayrollEmployees WHERE SubsidiaryId = :SubsidiaryId AND PayrollGroupId = :PayrollGroupId AND MonthId = :MonthId',
+    //   {
+    //     replacements: { SubsidiaryId, PayrollGroupId, MonthId },
+    //     type: sequelize.QueryTypes.SELECT
+    //   }
+    // );
 
-  if (!data.revert) {
+  
     results = await sequelize.query(
-      'SELECT * FROM t_PayrollEmployees WHERE SubsidiaryId = :SubsidiaryId AND PayrollGroupId = :PayrollGroupId AND MonthId = :MonthId',
+      'SELECT * FROM t_PayrollEmployees WHERE SubsidiaryId = :SubsidiaryId AND MonthId = :MonthId' + 
+      (PayrollGroupId ? ' AND PayrollGroupId = :PayrollGroupId' : ''),
       {
         replacements: { SubsidiaryId, PayrollGroupId, MonthId },
         type: sequelize.QueryTypes.SELECT
       }
     );
-
+  
   }
 
-  else if (data.revert && data.SubsidiaryId && data.PayrollGroupId && data.MonthId) {
+  else if (data.revert && data.SubsidiaryId  && data.MonthId) {
     //SP_PayrollProcess
+
     let a = await sequelize.query(
       'CALL SP_PayrollProcess_RevertBack(:p_SubsidiaryId, :p_PayrollGroupId, :p_MonthId)',
       {
         replacements: {
-          p_SubsidiaryId: data.SubsidiaryId,
-          p_PayrollGroupId: data.PayrollGroupId,
-          p_MonthId: data.MonthId
+          p_SubsidiaryId: data?.SubsidiaryId,
+          p_PayrollGroupId: data?.PayrollGroupId,
+          p_MonthId: data?.MonthId
         },
         type: Sequelize.QueryTypes.RAW // Use RAW type for executing stored procedures
       }
     );
 
 
+    
+
+
     const Item = await Payroll_ProcessModel.findOne({
       where: {
-        subsidiaryId: data.SubsidiaryId,
-        payroll_groupId: data.PayrollGroupId,
-        payroll_monthId: data.MonthId
+        subsidiaryId: data?.SubsidiaryId,
+        payroll_groupId: data?.PayrollGroupId,
+        payroll_monthId: data?.MonthId
       },
     })
     Item.completed = 2
@@ -439,6 +494,38 @@ const checkPayroll_EmployeesByIds = async (data) => {
 
   }
 
+  else if (data.finalize && data.SubsidiaryId  && data.MonthId) {
+console.log("finalizing")
+
+    let finalized = await sequelize.query(
+      'SELECT * FROM t_payrollprocess_locking WHERE SubsidiaryId = :SubsidiaryId AND MonthId = :MonthId' + 
+      (PayrollGroupId ? ' AND PayrollGroupId = :PayrollGroupId' : ''),
+      {
+        replacements: { SubsidiaryId, PayrollGroupId, MonthId },
+        type: sequelize.QueryTypes.SELECT
+      }
+    );
+
+    if (finalized && finalized.length > 0) {
+      let record = finalized[0];
+    
+      // Update the record using raw SQL
+      await sequelize.query(
+        'UPDATE t_payrollprocess_locking SET isFinalized = :isFinalized WHERE Id = :Id',
+        {
+          replacements: { isFinalized: 1, Id: record.Id },
+          type: sequelize.QueryTypes.UPDATE
+        }
+      );
+    }
+
+    
+
+
+
+
+
+  }
   return results?.length > 0 ? results : null;
 
 

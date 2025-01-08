@@ -23,7 +23,8 @@ const Loan_management_detail = sequelize.define("t_loan_management_detail", {
     type: Sequelize.INTEGER,
     allowNull: false,
   },
-
+  max_no_of_installment_for_loan:{ type: Sequelize.INTEGER, allowNull: false },
+  installment_start_date_policy:{ type: Sequelize.INTEGER, allowNull: false },
   isActive: { type: Sequelize.BOOLEAN, allowNull: true, defaultValue: true },
   createdBy: {
     type: Sequelize.INTEGER,

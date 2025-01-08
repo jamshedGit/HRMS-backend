@@ -10,7 +10,7 @@ const createLoan_management_configurationValidation = {
         accountId: Joi.number(),
         installment_deduction_percentage: Joi.number().precision(2).required(), 
         emp_loan_account: Joi.number(),
-        installment_deduction_basis_type: Joi.number(),
+        installment_deduction_basis_type: Joi.number().allow(null),
         details: Joi.array(),
         // loan_type: Joi.number(),
         // max_loan_amount: Joi.number(),
