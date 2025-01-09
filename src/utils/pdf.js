@@ -45,4 +45,4 @@ async function generatePdf(fileName, data, options = {}) {
   }
 }
 
-module.exports = generatePdf;
+module.exports = { generatePdf };
