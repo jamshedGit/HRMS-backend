@@ -145,7 +145,7 @@ const updateEmployeeSalaryById = async (Id, updateBody, updatedBy) => {
  */
 const deleteEmployeeSalaryById = async (Id) => {
   //const Item = await getEmployeeSalaryById(Id);
-  let Item = await EmployeeSalaryModel.EmployeeSalaryModel.findOne({ employeeId: Id });
+  let Item = await EmployeeSalaryModel.EmployeeSalaryModel.findOne({where: { employeeId: Id }});
   
   if (!Item) {
     throw new ApiError(httpStatus.NOT_FOUND, "Item not found");
