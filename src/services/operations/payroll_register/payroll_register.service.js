@@ -463,6 +463,8 @@ const generatePayrollRegisterExcel = async (req) => {
   const filter = req?.body || {};
   const labels = filter?.labels || {};
 
+  labels.groupWiseLabel = labels.groupWiseLabel == 'No Grouping' ? '' : labels.groupWiseLabel;
+
   if (!(filter.subsidiaryId && filter.monthId)) {
     throw new ApiError(httpStatus.BAD_REQUEST, 'Please Provide Subsidiary and Month.');
   }
@@ -561,11 +563,16 @@ const generatePayrollRegisterExcel = async (req) => {
 
   createHeader(worksheet, ['Payroll Register'], { bold: true, size: 18, })
 
-  createFilters(worksheet, labels, [{ label: 'monthLabel', message: 'For the Month of:' }, { label: 'subsidiaryLabel', message: 'Subsidiary:' }, { label: 'groupWiseLabel', message: 'Payroll:' }])
+  createFilters(worksheet, labels, [{ label: 'monthLabel', message: 'For the Month of:' }, { label: 'subsidiaryLabel', message: 'Subsidiary:' }, { label: 'groupWiseLabel', message: 'Group By:' }], {
+    bold: true,
+  })
 
   worksheet.addRow([]);
 
-  createTableHeader(worksheet, columns, null, {
+  createTableHeader(worksheet, columns, {
+    bold: true,
+    color: { argb: 'FFFFFFFF' }
+  }, {
     type: 'pattern',
     pattern: 'solid',
     fgColor: { argb: '0093DD' },
@@ -603,7 +610,10 @@ const generatePayrollRegisterExcel = async (req) => {
       }, {})
       totals.netPayableSalary = Number(totals.totalAllowances) - Number(totals.totalDeductions)
 
-      createGroupHeader(worksheet, [key], null, {
+      createGroupHeader(worksheet, [key], {
+        bold: true,        // Make the font bold
+        color: { argb: 'FF000000' }
+      }, {
         type: 'pattern',
         pattern: 'solid',
         fgColor: { argb: 'F1A983' },
@@ -613,7 +623,11 @@ const generatePayrollRegisterExcel = async (req) => {
         const data = worksheet.addRow({ ...row, sno: index + 1 })
       })
 
-      createSubtotal(worksheet, { ...totals, sno: 'Sub total' }, null, {
+      createSubtotal(worksheet, { ...totals, sno: 'Sub total' },
+        {
+          bold: true,
+          color: { argb: 'FF000000' }
+        }, {
         type: 'pattern',
         pattern: 'solid',
         fgColor: { argb: 'F1A983' },
@@ -623,6 +637,11 @@ const generatePayrollRegisterExcel = async (req) => {
     worksheet.addRow({ ...totals, sno: 'Grand Total' })
 
     const lastRow = worksheet.lastRow;
+
+    lastRow.font = {
+      bold: true,
+      color: { argb: 'FFFFFFFF' }
+    }
 
     lastRow.fill = {
       type: 'pattern',
@@ -638,6 +657,11 @@ const generatePayrollRegisterExcel = async (req) => {
     })
 
     const lastRow = worksheet.lastRow;
+
+    lastRow.font = {
+      bold: true,
+      color: { argb: 'FFFFFFFF' }
+    }
 
     lastRow.fill = {
       type: 'pattern',

@@ -40,10 +40,19 @@ async function createHeader(worksheet, title, font = null, fill = null) {
   }
 }
 
-async function createFilters(worksheet, data, labelsArr) {
+async function createFilters(worksheet, data, labelsArr, font = null, fill = null) {
   labelsArr.forEach(element => {
-    if (data[element.label])
-      worksheet.addRow([element.message, data[element.label]]);
+    if (data[element.label]){
+      const row = worksheet.addRow([element.message, data[element.label]]);
+      const Row = worksheet.getRow(row._number);
+      
+      if (font) {
+        Row.getCell(2).font = font;
+      }
+      if (fill) {
+        Row.getCell(2).fill = fill;
+      }
+    }
   });
 }
 
