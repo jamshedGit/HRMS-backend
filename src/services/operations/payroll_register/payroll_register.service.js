@@ -544,6 +544,14 @@ const generatePayrollRegisterExcel = async (req) => {
     totals.netPayableSalary += Number(emp.netPayableSalary)
   });
 
+  employeeData.forEach((empDat) => {
+    [...earningColumns, ...deductionColumns, ...loanColumns].forEach((key) => {
+      if (!empDat[key]) {
+        empDat[key] = 0;
+      }
+    })
+  })
+
   const { workbook, worksheet } = await createExcelSheet('payroll_register')
   const columns = createColumns(earningColumns, deductionColumns, loanColumns);
 
