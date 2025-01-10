@@ -19,7 +19,7 @@ async function generateExcel(workbook) {
 }
 
 async function createExcelSheet(fileName) {
-  
+
   // Create a new workbook and worksheet
   const workbook = new ExcelJS.Workbook();
   const worksheet = workbook.addWorksheet(fileName || 'Sheet');
@@ -27,4 +27,60 @@ async function createExcelSheet(fileName) {
   return { workbook, worksheet }
 }
 
-module.exports = { createExcelSheet, generateExcel };
+async function createHeader(worksheet, font = null, fill = null) {
+  const header = worksheet.addRow(['Payroll Register'],);
+  worksheet.addRow([]);
+
+  const headerRow = worksheet.getRow(header._number);
+  if (font) {
+    headerRow.font = font;
+  }
+  if (fill) {
+    headerRow.fill = fill;
+  }
+}
+
+async function createFilters(worksheet, data, labelsArr) {
+  labelsArr.forEach(element => {
+    if (data[element.label])
+      worksheet.addRow([element.message, data[element.label]]);
+  });
+}
+
+async function createTableHeader(worksheet, columns, font = null, fill = null) {
+  const tableHeader = worksheet.addRow(columns.map((el) => el.header));
+
+  const columnRow = worksheet.getRow(tableHeader._number);
+  if (font) {
+    columnRow.font = font;
+  }
+  if (fill) {
+    columnRow.fill = fill;
+  }
+}
+
+async function createGroupHeader(worksheet, header, font = null, fill = null) {
+  const groupHeaderRow = worksheet.addRow(header)
+  const groupByHeaderRow = worksheet.getRow(groupHeaderRow._number);
+
+  if (font) {
+    groupByHeaderRow.font = font;
+  }
+  if (fill) {
+    groupByHeaderRow.fill = fill;
+  }
+}
+
+async function createSubtotal(worksheet, data, font = null, fill = null) {
+  const subtotal = worksheet.addRow(data)
+  const subTotalRow = worksheet.getRow(subtotal._number);
+
+  if (font) {
+    subTotalRow.font = font;
+  }
+  if (fill) {
+    subTotalRow.fill = fill;
+  }
+}
+
+module.exports = { createExcelSheet, generateExcel, createHeader, createFilters, createTableHeader, createGroupHeader, createSubtotal };

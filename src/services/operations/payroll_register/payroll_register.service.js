@@ -5,7 +5,7 @@ const { generatePdf } = require("../../../utils/pdf");
 const ApiError = require("../../../utils/ApiError");
 const httpStatus = require("http-status");
 const sequelize = require("../../../config/db");
-const { createExcelSheet, generateExcel } = require('../../../utils/xslx');
+const { createExcelSheet, generateExcel, createHeader, createFilters, createTableHeader, createGroupHeader, createSubtotal } = require('../../../utils/xslx');
 
 const PRINT_REGISTER_EMPLOYEE_QUERY = `SELECT
     pf.Id AS employeeId,
@@ -23,11 +23,11 @@ const PRINT_REGISTER_EMPLOYEE_QUERY = `SELECT
     loc.formName AS locationName,
     paygrp.formName AS payrollGroup,
     dp.deptName AS departmentName,
-    pe.GrossSalary,
+    CAST(pe.GrossSalary AS FLOAT) AS GrossSalary,
     pm.month_days AS monthDays,
-    sum.PresentDays AS paidDays,
-    sum.AbsentDays,
-    sum.OTHours
+    CAST(sum.PresentDays AS FLOAT) AS paidDays,
+    CAST(sum.AbsentDays AS FLOAT) AS AbsentDays,
+    CAST(sum.OTHours AS FLOAT) AS OTHours
 FROM
     t_payrollemployees pe
 LEFT JOIN t_employee_profile pf ON
@@ -57,7 +57,7 @@ const PRINT_REGISTER_EARNING_DEDUCTION_QUERY = `SELECT
         WHEN ped.TransactionType = 'LoanType' THEN (SELECT e.Name FROM t_loan_type_setup e WHERE ped.earning_deduction_id = e.Id)
         ELSE ''
     END AS EarningName,
-    ped.Amount_TakeHome AS Amount_Actual
+    CAST(ped.Amount_TakeHome  AS FLOAT) AS Amount_Actual
 FROM
     t_payrollemployees pe
 LEFT JOIN
@@ -548,6 +548,21 @@ const generatePayrollRegisterExcel = async (req) => {
   const columns = createColumns(earningColumns, deductionColumns, loanColumns);
 
   worksheet.columns = columns;
+  const dobCol = worksheet.getRow(1);
+  dobCol.hidden = true
+
+  createHeader(worksheet, { bold: true, size: 18, })
+
+  createFilters(worksheet, labels, [{ label: 'monthLabel', message: 'For the Month of:' }, { label: 'subsidiaryLabel', message: 'Subsidiary:' }, { label: 'groupWiseLabel', message: 'Payroll:' }])
+
+  worksheet.addRow([]);
+
+  createTableHeader(worksheet, columns, null, {
+    type: 'pattern',
+    pattern: 'solid',
+    fgColor: { argb: 'FFFF00' }, // Yellow background
+  });
+
 
   if (filter.groupBy) {
     const result = groupBy(employeeData, filter.groupBy)
@@ -580,14 +595,32 @@ const generatePayrollRegisterExcel = async (req) => {
       }, {})
       totals.netPayableSalary = Number(totals.totalAllowances) - Number(totals.totalDeductions)
 
-      worksheet.addRow({ sno: key })
+      createGroupHeader(worksheet, [key], null, {
+        type: 'pattern',
+        pattern: 'solid',
+        fgColor: { argb: 'FFCCCB' },
+      })
 
       currentData.forEach((row, index) => {
-        worksheet.addRow({ ...row, sno: index + 1 })
+        const data = worksheet.addRow({ ...row, sno: index + 1 })
       })
-      worksheet.addRow({ ...totals, sno: 'Sub total' })
+
+      createSubtotal(worksheet, { ...totals, sno: 'Sub total' }, null, {
+        type: 'pattern',
+        pattern: 'solid',
+        fgColor: { argb: '90EE90' },
+      })
+
     })
     worksheet.addRow({ ...totals, sno: 'Grand Total' })
+
+    const lastRow = worksheet.lastRow;
+
+    lastRow.fill = {
+      type: 'pattern',
+      pattern: 'solid',
+      fgColor: { argb: 'FFFF00' }, // Yellow background
+    }
     const pdfStream = await generateExcel(workbook);
     return pdfStream
   }
@@ -595,6 +628,14 @@ const generatePayrollRegisterExcel = async (req) => {
     [...employeeData, { ...totals, sno: 'Grand Total' }].forEach((row) => {
       worksheet.addRow(row);
     })
+
+    const lastRow = worksheet.lastRow;
+
+    lastRow.fill = {
+      type: 'pattern',
+      pattern: 'solid',
+      fgColor: { argb: 'FFFF00' }, // Yellow background
+    }
     const pdfStream = await generateExcel(workbook);
     return pdfStream
   }
