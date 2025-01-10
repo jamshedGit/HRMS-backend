@@ -551,7 +551,7 @@ const generatePayrollRegisterExcel = async (req) => {
   const dobCol = worksheet.getRow(1);
   dobCol.hidden = true
 
-  createHeader(worksheet, { bold: true, size: 18, })
+  createHeader(worksheet, ['Payroll Register'], { bold: true, size: 18, })
 
   createFilters(worksheet, labels, [{ label: 'monthLabel', message: 'For the Month of:' }, { label: 'subsidiaryLabel', message: 'Subsidiary:' }, { label: 'groupWiseLabel', message: 'Payroll:' }])
 

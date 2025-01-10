@@ -27,8 +27,8 @@ async function createExcelSheet(fileName) {
   return { workbook, worksheet }
 }
 
-async function createHeader(worksheet, font = null, fill = null) {
-  const header = worksheet.addRow(['Payroll Register'],);
+async function createHeader(worksheet, title, font = null, fill = null) {
+  const header = worksheet.addRow(title);
   worksheet.addRow([]);
 
   const headerRow = worksheet.getRow(header._number);
