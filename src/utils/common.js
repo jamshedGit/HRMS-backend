@@ -332,6 +332,19 @@ const digitsToWords = (number, config = null) => {
   return toWords.convert(number)
 }
 
+const groupBy = (data, key) => {
+  const value = data.reduce((prev, current) => {
+    if (prev[current[key]]) {
+      prev[current[key]].push(current)
+    }
+    else {
+      prev[current[key]] = [current]
+    }
+    return prev;
+  }, {})
+  return value;
+}
 
 
-module.exports = { handleNestedData, getRouteSlugs, getDdlItems, getAlarmTimesItems, customPaginate, paginationFacts, createDatetime, getPathStorageFromUrl, formatDates, getDateDiffInDays, addDaysInDate, check_range_exist, createFiscalYearLabel, createEmployeeShiftLabel, createTaxYearSetupLabel, createEmployeeNameLabel, digitsToWords };
+
+module.exports = { handleNestedData, getRouteSlugs, getDdlItems, getAlarmTimesItems, customPaginate, paginationFacts, createDatetime, getPathStorageFromUrl, formatDates, getDateDiffInDays, addDaysInDate, check_range_exist, createFiscalYearLabel, createEmployeeShiftLabel, createTaxYearSetupLabel, createEmployeeNameLabel, digitsToWords, groupBy };

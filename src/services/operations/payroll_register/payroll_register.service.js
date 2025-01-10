@@ -1,12 +1,69 @@
 const Sequelize = require('sequelize');
-const { paginationFacts, digitsToWords } = require("../../../utils/common");
+const { paginationFacts, digitsToWords, groupBy } = require("../../../utils/common");
 const pick = require("../../../utils/pick");
-const generatePdf = require("../../../utils/pdf");
+const { generatePdf } = require("../../../utils/pdf");
 const ApiError = require("../../../utils/ApiError");
 const httpStatus = require("http-status");
 const sequelize = require("../../../config/db");
+const { createExcelSheet, generateExcel, createHeader, createFilters, createTableHeader, createGroupHeader, createSubtotal } = require('../../../utils/xslx');
 
-const Op = Sequelize.Op;
+const PRINT_REGISTER_EMPLOYEE_QUERY = `SELECT
+    pf.Id AS employeeId,
+    CONCAT(
+        pf.firstName,
+        ' ',
+        IFNULL(pf.middleName, ''),
+        ' ',
+        IFNULL(pf.lastName, '')
+    ) AS EmployeeName,
+    DATE_FORMAT(pf.dateOfJoining, '%e-%b-%Y') AS dateOfJoining,
+    pf.employeeCode,
+    desig.formName AS designationName,
+    grade.formName AS gradeName,
+    loc.formName AS locationName,
+    paygrp.formName AS payrollGroup,
+    dp.deptName AS departmentName,
+    CAST(pe.GrossSalary AS FLOAT) AS GrossSalary,
+    pm.month_days AS monthDays,
+    CAST(sum.PresentDays AS FLOAT) AS paidDays,
+    CAST(sum.AbsentDays AS FLOAT) AS AbsentDays,
+    CAST(sum.OTHours AS FLOAT) AS OTHours
+FROM
+    t_payrollemployees pe
+LEFT JOIN t_employee_profile pf ON
+    pe.EmpId = pf.Id
+LEFT JOIN t_department dp ON
+    dp.deptId = pf.departmentId
+LEFT JOIN t_form_menu grade ON
+    grade.Id = pe.gradeId
+LEFT JOIN t_form_menu desig ON
+    desig.Id = pe.designationId
+LEFT JOIN t_form_menu loc ON
+    loc.Id = pe.locationId
+LEFT JOIN t_form_menu paygrp ON
+    paygrp.Id = pe.PayrollGroupId
+LEFT JOIN t_attendancesummary SUM ON
+    sum.MonthId = pe.MonthId AND sum.EmpId = pe.EmpId
+LEFT JOIN t_payroll_month_setup pm ON
+    pm.Id = pe.MonthId
+    `;
+
+const PRINT_REGISTER_EARNING_DEDUCTION_QUERY = `SELECT
+    ped.EmpId,
+    ped.TransactionType,
+     CASE 
+        WHEN ped.TransactionType = 'Earning' THEN (SELECT e.earningName FROM t_employee_earning e WHERE ped.earning_deduction_id = e.Id)
+        WHEN ped.TransactionType = 'Deduction' THEN (SELECT e.DeductionName FROM t_employee_deduction e WHERE ped.earning_deduction_id = e.Id)
+        WHEN ped.TransactionType = 'LoanType' THEN (SELECT e.Name FROM t_loan_type_setup e WHERE ped.earning_deduction_id = e.Id)
+        ELSE ''
+    END AS EarningName,
+    CAST(ped.Amount_TakeHome  AS FLOAT) AS Amount_Actual
+FROM
+    t_payrollemployees pe
+LEFT JOIN
+    t_payrollearningdeduction ped ON ped.EmpId = pe.EmpId
+`;
+
 
 /**
  * 
@@ -115,6 +172,13 @@ WHERE`;
   return paginationFacts(totalCount[0].TotalCount, limit, options.pageNumber, data);
 };
 
+/**
+ * 
+ * Generate Payslip PDF
+ * 
+ * @param {Object} req 
+ * @returns 
+ */
 const generatePaySlip = async (req) => {
   const filter = req?.body || {};
   const labels = filter?.labels || {};
@@ -183,7 +247,7 @@ ld.EmpId = ${filter.employeeId}
 AND
 ld.MonthId = ${filter.monthId}`;
 
-const leaveQuery = `SELECT lb.allocatedCount, lb.remainingCount, lt.name 
+  const leaveQuery = `SELECT lb.allocatedCount, lb.remainingCount, lt.name 
 FROM t_payroll_leave_balance lb
 LEFT JOIN t_leave_type lt ON lt.Id = lb.leaveType
 WHERE
@@ -252,7 +316,385 @@ lb.MonthId = ${filter.monthId}`;
   return pdfStream
 };
 
+/**
+ * 
+ * Generate Payroll Register PDF according to filters
+ * 
+ * @param {Object} req 
+ * @returns 
+ */
+const generatePayrollRegisterPdf = async (req) => {
+  const filter = req?.body || {};
+  const labels = filter?.labels || {};
+
+  if (!(filter.subsidiaryId && filter.monthId)) {
+    throw new ApiError(httpStatus.BAD_REQUEST, 'Please Provide Subsidiary and Month.');
+  }
+
+  const array = [];
+
+  if (filter.subsidiaryId) {
+    array.push(`(pe.SubsidiaryId = ${filter.subsidiaryId})`)
+  }
+
+  if (filter.employeeId) {
+    array.push(`(pe.EmpId = ${filter.employeeId})`)
+  }
+
+  if (filter.monthId) {
+    array.push(`(pe.MonthId = ${filter.monthId})`)
+  }
+
+
+  const employeeQuery = PRINT_REGISTER_EMPLOYEE_QUERY;
+  const earningDeductionQuery = PRINT_REGISTER_EARNING_DEDUCTION_QUERY;
+
+  let filters = '';
+
+  if (array.length) {
+    filters = array.join(' AND ');
+    filters = ' WHERE ' + filters;
+  }
+
+  const [employeeData] = await sequelize.query(employeeQuery + filters, {
+    type: Sequelize.QueryTypes.RAW
+  })
+
+  if (!employeeData.length) {
+    throw new ApiError(httpStatus.NOT_FOUND, 'No Data Found');
+  }
+
+  const [earningData] = await sequelize.query(earningDeductionQuery + filters, {
+    type: Sequelize.QueryTypes.RAW
+  })
+
+  const earningColumns = new Set();
+  const deductionColumns = new Set();
+  const loanColumns = new Set();
+
+  const totals = {
+    grossSalary: 0,
+    totalAllowances: 0,
+    totalDeductions: 0,
+    netPayableSalary: 0
+  }
+
+  employeeData.forEach((emp, i) => {
+    const employeeEarning = earningData.filter((el) => el.EmpId == emp.employeeId);
+    emp.sno = i + 1;
+    totals.grossSalary += Number(emp.GrossSalary);
+
+    employeeEarning.forEach(earn => {
+      emp[earn.EarningName] = earn.Amount_Actual;
+      if (earn.TransactionType == 'Earning') {
+        earningColumns.add(earn.EarningName);
+        emp.totalAllowances = (emp.totalAllowances || 0) + Number(earn.Amount_Actual);
+        totals.totalAllowances += Number(earn.Amount_Actual);
+      }
+      else if (earn.TransactionType == 'Deduction') {
+        deductionColumns.add(earn.EarningName);
+        emp.totalDeductions = (emp.totalDeductions || 0) + Number(earn.Amount_Actual);
+        totals.totalDeductions += Number(earn.Amount_Actual);
+      }
+      else if (earn.TransactionType == 'LoanType') {
+        loanColumns.add(earn.EarningName);
+        emp.totalDeductions = (emp.totalDeductions || 0) + Number(earn.Amount_Actual);
+        totals.totalDeductions += Number(earn.Amount_Actual);
+      }
+      totals[earn.EarningName] = totals[earn.EarningName] ? totals[earn.EarningName] + Number(earn.Amount_Actual) : Number(earn.Amount_Actual);
+    });
+
+    emp.netPayableSalary = Number(emp.totalAllowances) - Number(emp.totalDeductions)
+    totals.netPayableSalary += Number(emp.netPayableSalary)
+  });
+
+  if (filter.groupBy) {
+    const result = groupBy(employeeData, filter.groupBy)
+
+    const obj = {}
+    Object.keys(result).forEach((key) => {
+      const currentData = result[key]
+      const totals = currentData.reduce((prev, curr) => {
+        earningColumns.forEach((col) => {
+          if (curr[col]) {
+            prev[col] = (prev[col] || 0) + Number(curr[col])
+            prev.totalAllowances = (prev.totalAllowances || 0) + Number(curr[col])
+          }
+        })
+        deductionColumns.forEach((col) => {
+          if (curr[col]) {
+            prev[col] = (prev[col] || 0) + Number(curr[col])
+            prev.totalDeductions = (prev.totalDeductions || 0) + Number(curr[col])
+          }
+        })
+        loanColumns.forEach((col) => {
+          if (curr[col]) {
+            prev[col] = (prev[col] || 0) + Number(curr[col])
+            prev.totalDeductions = (prev.totalDeductions || 0) + Number(curr[col])
+          }
+        })
+        if (curr.GrossSalary) {
+          prev.grossSalary = (prev.grossSalary || 0) + Number(curr.GrossSalary)
+        }
+        return prev
+      }, {})
+      totals.netPayableSalary = Number(totals.totalAllowances) - Number(totals.totalDeductions)
+
+      obj[key] = { data: currentData, totals: totals }
+    })
+
+    const pdfStream = await generatePdf('payroll_register_grouped.hbs', { obj, earningColumns, deductionColumns, loanColumns, totals, labels }, { landscape: true });
+    return pdfStream
+  }
+  else {
+    const pdfStream = await generatePdf('payroll_register.hbs', { employeeData, earningColumns, deductionColumns, loanColumns, totals, labels }, { landscape: true });
+    return pdfStream
+  }
+}
+
+/**
+ * 
+ * Generate Payroll Register PDF according to filters
+ * 
+ * @param {Object} req 
+ * @returns 
+ */
+const generatePayrollRegisterExcel = async (req) => {
+  const filter = req?.body || {};
+  const labels = filter?.labels || {};
+
+  if (!(filter.subsidiaryId && filter.monthId)) {
+    throw new ApiError(httpStatus.BAD_REQUEST, 'Please Provide Subsidiary and Month.');
+  }
+
+  const array = [];
+
+  if (filter.subsidiaryId) {
+    array.push(`(pe.SubsidiaryId = ${filter.subsidiaryId})`)
+  }
+
+  if (filter.employeeId) {
+    array.push(`(pe.EmpId = ${filter.employeeId})`)
+  }
+
+  if (filter.monthId) {
+    array.push(`(pe.MonthId = ${filter.monthId})`)
+  }
+
+
+  const employeeQuery = PRINT_REGISTER_EMPLOYEE_QUERY;
+  const earningDeductionQuery = PRINT_REGISTER_EARNING_DEDUCTION_QUERY;
+
+  let filters = '';
+
+  if (array.length) {
+    filters = array.join(' AND ');
+    filters = ' WHERE ' + filters;
+  }
+
+  const [employeeData] = await sequelize.query(employeeQuery + filters, {
+    type: Sequelize.QueryTypes.RAW
+  })
+
+  if (!employeeData.length) {
+    throw new ApiError(httpStatus.NOT_FOUND, 'No Data Found');
+  }
+
+  const [earningData] = await sequelize.query(earningDeductionQuery + filters, {
+    type: Sequelize.QueryTypes.RAW
+  })
+
+  const earningColumns = new Set();
+  const deductionColumns = new Set();
+  const loanColumns = new Set();
+
+  const totals = {
+    GrossSalary: 0,
+    totalAllowances: 0,
+    totalDeductions: 0,
+    netPayableSalary: 0
+  }
+
+  employeeData.forEach((emp, i) => {
+    const employeeEarning = earningData.filter((el) => el.EmpId == emp.employeeId);
+    emp.sno = i + 1;
+    totals.GrossSalary += Number(emp.GrossSalary);
+
+    employeeEarning.forEach(earn => {
+      emp[earn.EarningName] = earn.Amount_Actual;
+      if (earn.TransactionType == 'Earning') {
+        earningColumns.add(earn.EarningName);
+        emp.totalAllowances = (emp.totalAllowances || 0) + Number(earn.Amount_Actual);
+        totals.totalAllowances += Number(earn.Amount_Actual);
+      }
+      else if (earn.TransactionType == 'Deduction') {
+        deductionColumns.add(earn.EarningName);
+        emp.totalDeductions = (emp.totalDeductions || 0) + Number(earn.Amount_Actual);
+        totals.totalDeductions += Number(earn.Amount_Actual);
+      }
+      else if (earn.TransactionType == 'LoanType') {
+        loanColumns.add(earn.EarningName);
+        emp.totalDeductions = (emp.totalDeductions || 0) + Number(earn.Amount_Actual);
+        totals.totalDeductions += Number(earn.Amount_Actual);
+      }
+      totals[earn.EarningName] = totals[earn.EarningName] ? totals[earn.EarningName] + Number(earn.Amount_Actual) : Number(earn.Amount_Actual);
+    });
+
+    emp.netPayableSalary = Number(emp.totalAllowances) - Number(emp.totalDeductions)
+    totals.netPayableSalary += Number(emp.netPayableSalary)
+  });
+
+  employeeData.forEach((empDat) => {
+    [...earningColumns, ...deductionColumns, ...loanColumns].forEach((key) => {
+      if (!empDat[key]) {
+        empDat[key] = 0;
+      }
+    })
+  })
+
+  const { workbook, worksheet } = await createExcelSheet('payroll_register')
+  const columns = createColumns(earningColumns, deductionColumns, loanColumns);
+
+  worksheet.columns = columns;
+  const dobCol = worksheet.getRow(1);
+  dobCol.hidden = true
+
+  createHeader(worksheet, ['Payroll Register'], { bold: true, size: 18, })
+
+  createFilters(worksheet, labels, [{ label: 'monthLabel', message: 'For the Month of:' }, { label: 'subsidiaryLabel', message: 'Subsidiary:' }, { label: 'groupWiseLabel', message: 'Payroll:' }])
+
+  worksheet.addRow([]);
+
+  createTableHeader(worksheet, columns, null, {
+    type: 'pattern',
+    pattern: 'solid',
+    fgColor: { argb: 'FFFF00' }, // Yellow background
+  });
+
+
+  if (filter.groupBy) {
+    const result = groupBy(employeeData, filter.groupBy)
+
+    Object.keys(result).forEach((key) => {
+      const currentData = result[key]
+      const totals = currentData.reduce((prev, curr) => {
+        earningColumns.forEach((col) => {
+          if (curr[col]) {
+            prev[col] = (prev[col] || 0) + Number(curr[col])
+            prev.totalAllowances = (prev.totalAllowances || 0) + Number(curr[col])
+          }
+        })
+        deductionColumns.forEach((col) => {
+          if (curr[col]) {
+            prev[col] = (prev[col] || 0) + Number(curr[col])
+            prev.totalDeductions = (prev.totalDeductions || 0) + Number(curr[col])
+          }
+        })
+        loanColumns.forEach((col) => {
+          if (curr[col]) {
+            prev[col] = (prev[col] || 0) + Number(curr[col])
+            prev.totalDeductions = (prev.totalDeductions || 0) + Number(curr[col])
+          }
+        })
+        if (curr.GrossSalary) {
+          prev.GrossSalary = (prev.GrossSalary || 0) + Number(curr.GrossSalary)
+        }
+        return prev
+      }, {})
+      totals.netPayableSalary = Number(totals.totalAllowances) - Number(totals.totalDeductions)
+
+      createGroupHeader(worksheet, [key], null, {
+        type: 'pattern',
+        pattern: 'solid',
+        fgColor: { argb: 'FFCCCB' },
+      })
+
+      currentData.forEach((row, index) => {
+        const data = worksheet.addRow({ ...row, sno: index + 1 })
+      })
+
+      createSubtotal(worksheet, { ...totals, sno: 'Sub total' }, null, {
+        type: 'pattern',
+        pattern: 'solid',
+        fgColor: { argb: '90EE90' },
+      })
+
+    })
+    worksheet.addRow({ ...totals, sno: 'Grand Total' })
+
+    const lastRow = worksheet.lastRow;
+
+    lastRow.fill = {
+      type: 'pattern',
+      pattern: 'solid',
+      fgColor: { argb: 'FFFF00' }, // Yellow background
+    }
+    const pdfStream = await generateExcel(workbook);
+    return pdfStream
+  }
+  else {
+    [...employeeData, { ...totals, sno: 'Grand Total' }].forEach((row) => {
+      worksheet.addRow(row);
+    })
+
+    const lastRow = worksheet.lastRow;
+
+    lastRow.fill = {
+      type: 'pattern',
+      pattern: 'solid',
+      fgColor: { argb: 'FFFF00' }, // Yellow background
+    }
+    const pdfStream = await generateExcel(workbook);
+    return pdfStream
+  }
+}
+
+/**
+ * 
+ * Create Columns for Excel
+ * 
+ * @param {Array} earningColumns 
+ * @param {Array} deductionColumns 
+ * @param {Array} loanColumns 
+ * 
+ * @returns 
+ */
+const createColumns = (earningColumns, deductionColumns, loanColumns) => {
+  const columns = [
+    { header: "S. No.", key: "sno", width: 20 },
+    { header: "Employee Code", key: "employeeCode", width: 20 },
+    { header: "Employee Name", key: "EmployeeName", width: 20 },
+    { header: "Department", key: "departmentName", width: 20 },
+    { header: "Grade", key: "gradeName", width: 15 },
+    { header: "Designation", key: "designationName", width: 20 },
+    { header: "Date of Joining", key: "dateOfJoining", width: 20 },
+    { header: "Gross Salary", key: "GrossSalary", width: 20 },
+    { header: "Working Days", key: "monthDays", width: 15 },
+    { header: "Payable Days", key: "paidDays", width: 15 },
+    { header: "Absent Days", key: "AbsentDays", width: 15 },
+    { header: "Overtime Hours", key: "OTHours", width: 15 },
+  ]
+
+  earningColumns.forEach((col) => {
+    columns.push({ header: col, key: col, width: 20 })
+  })
+  columns.push({ header: 'Total Allowances', key: 'totalAllowances', width: 20 })
+
+  deductionColumns.forEach((col) => {
+    columns.push({ header: col, key: col, width: 20 })
+  })
+  loanColumns.forEach((col) => {
+    columns.push({ header: col, key: col, width: 20 })
+  })
+  columns.push({ header: 'Total Deduction', key: 'totalDeductions', width: 20 })
+  columns.push({ header: 'Net Payable Salary', key: 'netPayableSalary', width: 20 })
+
+  return columns;
+}
+
 module.exports = {
   getAllRegisteredPayroll,
-  generatePaySlip
+  generatePaySlip,
+  generatePayrollRegisterPdf,
+  generatePayrollRegisterExcel
 };
