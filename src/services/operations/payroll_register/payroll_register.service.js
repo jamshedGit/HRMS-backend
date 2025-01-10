@@ -568,7 +568,7 @@ const generatePayrollRegisterExcel = async (req) => {
   createTableHeader(worksheet, columns, null, {
     type: 'pattern',
     pattern: 'solid',
-    fgColor: { argb: 'FFFF00' }, // Yellow background
+    fgColor: { argb: '0093DD' },
   });
 
 
@@ -606,7 +606,7 @@ const generatePayrollRegisterExcel = async (req) => {
       createGroupHeader(worksheet, [key], null, {
         type: 'pattern',
         pattern: 'solid',
-        fgColor: { argb: 'FFCCCB' },
+        fgColor: { argb: 'F1A983' },
       })
 
       currentData.forEach((row, index) => {
@@ -616,7 +616,7 @@ const generatePayrollRegisterExcel = async (req) => {
       createSubtotal(worksheet, { ...totals, sno: 'Sub total' }, null, {
         type: 'pattern',
         pattern: 'solid',
-        fgColor: { argb: '90EE90' },
+        fgColor: { argb: 'F1A983' },
       })
 
     })
@@ -627,7 +627,7 @@ const generatePayrollRegisterExcel = async (req) => {
     lastRow.fill = {
       type: 'pattern',
       pattern: 'solid',
-      fgColor: { argb: 'FFFF00' }, // Yellow background
+      fgColor: { argb: '0093DD' }, // Yellow background
     }
     const pdfStream = await generateExcel(workbook);
     return pdfStream
@@ -642,7 +642,7 @@ const generatePayrollRegisterExcel = async (req) => {
     lastRow.fill = {
       type: 'pattern',
       pattern: 'solid',
-      fgColor: { argb: 'FFFF00' }, // Yellow background
+      fgColor: { argb: '0093DD' }, // Yellow background
     }
     const pdfStream = await generateExcel(workbook);
     return pdfStream
