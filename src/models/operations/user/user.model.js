@@ -37,7 +37,7 @@ const user = sequelize.define('t_user', {
 	employeeName: { type: Sequelize.STRING, allowNull: true },
 	deactiveflag: { type: Sequelize.BOOLEAN, allowNull: true, },
 	roleId:{ type: Sequelize.INTEGER, allowNull: false },
-	isActive: { type: Sequelize.BOOLEAN, allowNull: true },
+	isActive: { type: Sequelize.BOOLEAN, allowNull: true ,default:true},
 	createdBy: {
 		type: Sequelize.INTEGER,
 		allowNull: true,

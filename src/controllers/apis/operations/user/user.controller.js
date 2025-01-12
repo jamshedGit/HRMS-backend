@@ -8,6 +8,7 @@ const { HttpStatusCodes, HttpResponseMessages } = require('../../../../utils/con
 
 const createUser = catchAsync(async (req, res) => {
   const user = await UserService.createUser(req.body, req.user.id);
+  console.log("user111",user)
   res.status(httpStatus.CREATED).send({
     code: HttpStatusCodes.CREATED,
     message: HttpResponseMessages.CREATED,
@@ -33,7 +34,7 @@ const getAllUser= catchAsync(async (req, res) => {
   });
 
 const getUser = catchAsync(async (req, res) => {
-  const user = await UserService.getUserById(req.body.id);
+  const user = await UserService.getUserById(req.body.Id);
   if (!user) {
     throw new ApiError(httpStatus.NOT_FOUND, 'User not found');
   }

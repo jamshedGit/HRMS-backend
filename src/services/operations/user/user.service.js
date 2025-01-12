@@ -1,5 +1,5 @@
 const httpStatus = require("http-status");
-const { User_Model, SubsidiaryModel } = require("../../../models/index");
+const { User_Model, SubsidiaryModel, RoleModel } = require("../../../models/index");
 const { DataTypes } = require('sequelize');
 
 const ApiError = require("../../../utils/ApiError");
@@ -31,7 +31,7 @@ const queryUser = async (
   const { count, rows } =
     await User_Model.findAndCountAll({
       order: [
-        ["Subsidiary", "name", "ASC"],   // Use the alias and attribute name
+        ["employeeName", "ASC"],   // Use the alias and attribute name
       ],
       where: {
         [Op.or]: queryFilters,
@@ -41,14 +41,13 @@ const queryUser = async (
       limit: limit,
       include: [
         {
-          model: SubsidiaryModel,
-          attributes: ["name"],
-          as: "Subsidiary",
-        },
-
+            model: RoleModel,
+            as: 'role',
+            attributes: ['id', 'name'],
+        }],
   
     
-      ],
+   
     });
 
     
@@ -68,11 +67,13 @@ const createUser = async (userBody, createdBy) => {
     User_Model.beforeCreate(userBody);
     userBody.createdBy = createdBy;
     const user = await User_Model.create(userBody);
-    return getUserById(user.id)
+    console.log("user222",user)
+    return getUserById(user.Id)
 };
 
 
 const getUserById = async (id) => {
+  console.log("id111",id)
     return User_Model.findByPk(id, {
         include: [
             {

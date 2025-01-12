@@ -11,11 +11,11 @@ const createUser = {
         supervisedbyId: Joi.number(),
         allowUserCreation: Joi.number(),
         companyId: Joi.number().allow(null),
-        subsidiaryId: Joi.number(),
+        subsidiaryId: Joi.any(),
 
-        employeeIdMapping: Joi.number(),
+        employeeIdMapping: Joi.number().allow(null),
         employeeName: Joi.string(),
-        deactiveflag: Joi.boolean(),
+        deactiveflag: Joi.number(),
         roleId: Joi.number(),
         isActive: Joi.number(),
 
