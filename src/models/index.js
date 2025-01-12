@@ -170,3 +170,6 @@ module.exports.EarningSetupAccessModel = require('./operations/earning/earningSe
 
 module.exports.DeductionSetupAccessModel=require("./operations/deduction/deductionSetupAccess.model")
 module.exports.DepartmentSetupAccessModel=require("./operations/department/departmentSetupAccess.model")
+
+module.exports.User_Model = require('./operations/user/user.model');
+module.exports.UserAccessModel =require('./operations/user/user.model');
