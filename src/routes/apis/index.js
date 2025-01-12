@@ -345,7 +345,7 @@ const defaultRoutes = [
     route: payroll_register
   },
   {
-    path:"user",
+    path:"/user",
     route:user
   }
 
