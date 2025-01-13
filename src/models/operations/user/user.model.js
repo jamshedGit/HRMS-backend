@@ -84,7 +84,9 @@ user.isPasswordMatch = (email, password) => user.findOne(
 		where: { email: email }
 	}).then((data) => {
 
-		return true; //bcrypt.compare(password, data.password);
+		return bcrypt.compare(password, data.password);;
+
+		//  bcrypt.compare(password, data.password);
 	});
 
 user.isEmailTakenOldUser = (email, excludeUserId) => user.findOne(

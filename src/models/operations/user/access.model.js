@@ -25,6 +25,7 @@ UserAccess.init(
       type: DataTypes.INTEGER,
       allowNull: true
     },
+    companyId: { type: Sequelize.INTEGER, allowNull: true },
     isActive: {
       type: DataTypes.INTEGER,
       allowNull: true,

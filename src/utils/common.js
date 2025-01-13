@@ -24,7 +24,7 @@ const getRouteSlugs = (req) => {
 };
 
 const getDdlItems = (
-  columns = { labelField: "", valueField: "", codeField: "", mergeLabel: "", subsidiaryId: "", currencyId: "" },
+  columns = { labelField: "", valueField: "", codeField: "", mergeLabel: "", subsidiaryId: "", currencyId: "", companyId:"" },
   data = [],
   mergeLabel = false,
   parentId = null
@@ -39,7 +39,8 @@ const getDdlItems = (
     code: i[columns.codeField],
     subsidiaryId: i[columns.subsidiaryId],
     currencyId: i[columns?.currencyId],
-    type: i[columns.typeField]
+    type: i[columns.typeField],
+    companyId:i[columns.companyId]
 
 
 
@@ -331,6 +332,7 @@ const digitsToWords = (number, config = null) => {
   const toWords = new ToWords(options)
   return toWords.convert(number)
 }
+
 
 
 

@@ -9,15 +9,14 @@ const createUser = {
         email: Joi.string(),
         password: Joi.string(),
         supervisedbyId: Joi.number(),
-        allowUserCreation: Joi.number(),
+        allowUserCreation: Joi.boolean(),
         companyId: Joi.number().allow(null),
         subsidiaryId: Joi.any(),
 
         employeeIdMapping: Joi.number().allow(null),
-        employeeName: Joi.string(),
-        deactiveflag: Joi.number(),
+        deactiveflag: Joi.boolean(),
         roleId: Joi.number(),
-        isActive: Joi.number(),
+        isActive: Joi.boolean(),
 
 
     }),

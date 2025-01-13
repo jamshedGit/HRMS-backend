@@ -1,4 +1,4 @@
-const { RoleModel, ResourceModel, CountryModel, CityModel, StatusTypeModel, BankModel, DeptModel, FormModel, EmployeeProfileModel, BranchModel, EmployeeSalaryRevisionModel, LeaveTypeModel, FiscalSetupModel, SubsidiaryModel, LeaveManagementConfigurationModel, LeaveTypePoliciesModel, AllocateLeavesModel, Employee_ShiftModel, LeaveTypeModelAccess } = require('../../models');
+const { RoleModel, ResourceModel, CountryModel, CityModel, StatusTypeModel, BankModel, DeptModel, FormModel, EmployeeProfileModel, BranchModel, EmployeeSalaryRevisionModel, LeaveTypeModel, FiscalSetupModel, SubsidiaryModel, LeaveManagementConfigurationModel, LeaveTypePoliciesModel, AllocateLeavesModel, Employee_ShiftModel, LeaveTypeModelAccess, CompanyModel } = require('../../models');
 const { getDdlItems, getAlarmTimesItems, formatDates, createFiscalYearLabel, createEmployeeShiftLabel, createEmployeeNameLabel } = require('../../utils/common');
 const { DDL_FIELD_NAMES } = require('../../utils/constants');
 const { getRoleById } = require('./role.service');
@@ -330,7 +330,7 @@ const getEncashmentLeaveTypeData = async (employeeId, yearId) => {
 const getAllSubsidiaryData = async () => {
   const subsidiaryData = getDdlItems(DDL_FIELD_NAMES.Subsidiary, await SubsidiaryModel.findAll({
     where: { isActive: true },
-    attributes: ['name', 'Id', 'currencyId']
+    attributes: ['name', 'Id', 'currencyId','companyId']
   }));
   return subsidiaryData
 };
@@ -431,6 +431,16 @@ const GetLastInserted_ID_ByTableName = async (p_TableName, pkIdColumnName, where
 };
 
 
+const getCompanyMasterData = async () => {
+
+
+  const comapnyData = getDdlItems(DDL_FIELD_NAMES.Company, await CompanyModel.findAll({
+    where: { isActive: true },
+    attributes: ['companyLegalName', 'Id']
+  }));
+  return comapnyData
+};
+
 module.exports = {
   getRolesMasterData,
   getResourcesMasterData,
@@ -452,5 +462,7 @@ module.exports = {
   getAllEmployeeShift,
   getLeaveTypesDataBySubsidiary,
   getActiveFiscalYearData,
-  getEmployeesMasterDataBySubsidiary
+  getEmployeesMasterDataBySubsidiary,
+  getCompanyMasterData,
+
 };

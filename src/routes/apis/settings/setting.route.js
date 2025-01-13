@@ -52,5 +52,6 @@ router.route('/read-current-fiscal-year').post(auth(), validate(settingValidatio
 
 router.route('/get-max-tableId').post(validate(settingValidation.getFormMenuMasterData),  settingController.GetLastInserted_ID_ByTableName);
 
+router.route('/read-all-companies').get( validate(settingValidation.getAllCompanies), settingController.getCompanyMasterData);
 module.exports = router;
 

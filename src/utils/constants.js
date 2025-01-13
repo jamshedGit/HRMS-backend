@@ -76,13 +76,21 @@ const DDL_FIELD_NAMES = {
   Subsidiary:{
     labelField: 'name',
     valueField: 'Id',
-    currencyId:'currencyId'
+    currencyId:'currencyId',
+    companyId:'companyId'
   },
 
   SalaryRevisionKeys:{
     labelField: 'reviewDate',
     valueField: 'Id',
   },
+
+  Company:{
+    labelField: 'companyLegalName',
+    valueField: 'Id',
+    currencyId:'currencyId'
+  },
+
 };
 
 const HttpStatusCodes = {

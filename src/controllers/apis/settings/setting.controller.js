@@ -187,6 +187,15 @@ const GetLastInserted_ID_ByTableName = catchAsync(async (req, res) => {
   });
 });
 
+
+const getCompanyMasterData = catchAsync(async (req, res) => {
+  res.send({
+    code: HttpStatusCodes.OK,
+    message: HttpResponseMessages.OK,
+    data: await settingService.getCompanyMasterData(),
+  });
+});
+
 module.exports = {
   getRolesMasterData,
   getResourcesMasterData,
@@ -208,5 +217,6 @@ module.exports = {
   getAllEmployeeShift,
   getAllLeaveTypeBySubsidiary,
   getCurrentFiscalYears,
-  getEmployeesMasterDataBySubsidiary
+  getEmployeesMasterDataBySubsidiary,
+  getCompanyMasterData,
 };
