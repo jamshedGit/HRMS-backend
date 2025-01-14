@@ -17,12 +17,16 @@ const Op = Sequelize.Op;
  * @returns {Promise<Compensation_Beneftis>}
  */
 const createCompensation_Beneftis = async (req, Compensation_BeneftisBody) => {
-
   try {
     Compensation_BeneftisBody.createdBy = req.user.id;
-    const addedCompensation_BeneftisObj = await Compensation_BeneftisModel.CompensationBenefitsModel.create(Compensation_BeneftisBody);
-    return addedCompensation_BeneftisObj;
-
+    if(Compensation_BeneftisBody.upsert){
+      const addedCompensation_BeneftisObj = await Compensation_BeneftisModel.CompensationBenefitsModel.upsert(Compensation_BeneftisBody);
+      return addedCompensation_BeneftisObj[0];
+    }
+    else{
+      const addedCompensation_BeneftisObj = await Compensation_BeneftisModel.CompensationBenefitsModel.create(Compensation_BeneftisBody);
+      return addedCompensation_BeneftisObj;
+    }
   } catch (error) {
     // throw new ApiError(httpStatus.INTERNAL_SERVER_ERROR, error);
     throw new ApiError(httpStatus.CONFLICT, "Duplicate entry not allowed");
