@@ -1,5 +1,7 @@
 const fs = require('fs');
 const path = require('path');
+const ExcelJS = require('exceljs');
+const { getExcelSheetData } = require('../../../utils/xslx');
 
 /**
  * 
@@ -15,6 +17,14 @@ const downloadTemplate = async (req, res) => {
   return data
 }
 
+const saveLeaveData = async (req) => {
+  const file = req.file
+  const data = await getExcelSheetData(file.buffer)
+  console.log(':::data::::::', data);
+  return ''
+}
+
 module.exports = {
-  downloadTemplate
+  downloadTemplate,
+  saveLeaveData
 };

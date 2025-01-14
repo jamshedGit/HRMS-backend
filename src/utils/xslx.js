@@ -42,10 +42,10 @@ async function createHeader(worksheet, title, font = null, fill = null) {
 
 async function createFilters(worksheet, data, labelsArr, font = null, fill = null) {
   labelsArr.forEach(element => {
-    if (data[element.label]){
+    if (data[element.label]) {
       const row = worksheet.addRow([element.message, data[element.label]]);
       const Row = worksheet.getRow(row._number);
-      
+
       if (font) {
         Row.getCell(2).font = font;
       }
@@ -92,4 +92,35 @@ async function createSubtotal(worksheet, data, font = null, fill = null) {
   }
 }
 
-module.exports = { createExcelSheet, generateExcel, createHeader, createFilters, createTableHeader, createGroupHeader, createSubtotal };
+
+
+async function getExcelSheetData(buffer) {
+  const workbook = new ExcelJS.Workbook();
+
+  // Load the file from buffer
+  await workbook.xlsx.load(buffer);
+
+  const obj = {};
+
+  let i = 1;
+  while (true) {
+    const worksheet = workbook.getWorksheet(i);
+
+    if(!worksheet){
+      break;
+    }
+
+    const data = [];
+    worksheet.eachRow((row) => {
+      data.push(row.values);
+    });
+
+    obj[worksheet._name] = data;
+    i++
+  }
+
+
+  return obj
+}
+
+module.exports = { createExcelSheet, generateExcel, createHeader, createFilters, createTableHeader, createGroupHeader, createSubtotal, getExcelSheetData };

@@ -21,6 +21,18 @@ const downloadTemplate = catchAsync(async (req, res) => {
   res.end(data);
 });
 
+const saveLeaveData = catchAsync(async (req, res) => {
+  console.log('::::AYAA::::');
+  
+  const data = await UploadServicePage.saveLeaveData(req);
+  res.send({
+    code: HttpStatusCodes.OK,
+    message: HttpResponseMessages.OK,
+    data: data,
+  });
+});
+
 module.exports = {
   downloadTemplate,
+  saveLeaveData
 };
