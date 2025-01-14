@@ -52,7 +52,7 @@ const user = sequelize.define('t_user', {
 
 
 user.belongsTo(SubsidiaryModel, {
-	foreignKey: 'subsidiaryIds',
+	foreignKey: 'subsidiaryId',
 	targetKey: 'Id',
 		as:"Subsidiary"
   });
@@ -84,7 +84,8 @@ user.isPasswordMatch = (email, password) => user.findOne(
 		where: { email: email }
 	}).then((data) => {
 
-		return bcrypt.compare(password, data.password);;
+		return bcrypt.compare(password, data.password);
+		// bcrypt.compare(password, data.password);;
 
 		//  bcrypt.compare(password, data.password);
 	});

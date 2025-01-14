@@ -29,7 +29,7 @@ const login = catchAsync(async (req, res) => {
   const user = await authService.loginUserWithEmailAndPassword(email, password);
   const userAccess = await UserService.getUserCompleteRoleAccess(user.roleId);
 
- 
+
   const _tokens = await tokenService.generateAuthTokens(user);
   const tokens = {access: _tokens.access.token, refresh: _tokens.refresh.token};
 

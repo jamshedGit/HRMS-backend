@@ -69,13 +69,13 @@ const createUser = async (userBody, createdBy) => {
     userBody.createdBy = createdBy;
     userBody.isActive=true;
     const user = await User_Model.create(userBody);
-    console.log("user222",user)
+    
     return getUserById(user.Id)
 };
 
 
 const getUserById = async (id) => {
-  console.log("id111",id)
+
     return User_Model.findByPk(id, {
         include: [
             {
@@ -119,8 +119,9 @@ const updateUserById = async (userId, updateBody, updatedBy) => {
   
 const getUserCompleteRoleAccess = async (roleId) => {
     const roleAccessData = await AccessRightModel.findAll({
+   
       where: { roleId: roleId, isAccess: true, isActive: true },
-      
+     
       include: [
         {
           model: RoleModel,
@@ -128,9 +129,9 @@ const getUserCompleteRoleAccess = async (roleId) => {
         },
         {
           model: ResourceModel,
-          
+        
           where: { isParentShow: true },
-          
+        
           attributes: ['name', 'parentName', 'parentSlug', 'slug', 'isResourceShow','sortOrder']
         },
         
@@ -138,7 +139,7 @@ const getUserCompleteRoleAccess = async (roleId) => {
       attributes: ['isAccess', 'isActive', 'roleId', 'resourceId']
   
     });
-  
+ 
     const formatedData = [];
     roleAccessData.forEach((element) => {
       formatedData.push({
@@ -168,7 +169,83 @@ const getUserCompleteRoleAccess = async (roleId) => {
   };
   
 
+// const getUserCompleteRoleAccess = async (roleId) => {
+//   // Fetch role access data from the database
+//   const roleAccessData = await AccessRightModel.findAll({
+//     include: [
+//       {
+//         model: RoleModel,
+//         attributes: ['name', 'slug']
+//       },
+//       {
+//         model: ResourceModel,
+//         where: { isParentShow: true },
+//         attributes: ['name', 'parentName', 'parentSlug', 'slug', 'isResourceShow', 'sortOrder']
+//       },
+//     ],
+//     attributes: ['isAccess', 'isActive', 'roleId', 'resourceId']
+//   });
+
+//   // Initialize an array to hold formatted data
+//   const formatedData = [];
+
+//   // Loop through each item in roleAccessData
+//   roleAccessData.forEach((item) => {
+//     const resource = item.t_resource;
+
+//     // Check if sortOrder is 1 - this is a special case where we show the data immediately
+//     if (resource.sortOrder === 1) {
+//       formatedData.push({
+//         isResourceShow: resource.isResourceShow,
+//         name: resource.name,
+//         parentName: resource.parentName,
+//         url: resource.parentSlug + '/' + resource.slug,
+//         componentName: toPascalCase(resource.slug),
+//         isAccess: item.isAccess,
+//         isActive: item.isActive, // Ensure isActive is included
+//         slug: resource.slug,
+//         sortOrder: resource.sortOrder,
+//         parentSlug: resource.parentSlug,
+//         resourceId: item.resourceId,
+//       });
+//     } else {
+//       // For sortOrder other than 1, check the roleId, isAccess, and isActive fields
+//       if (item.roleId === roleId && item.isAccess && item.isActive) {
+//         formatedData.push({
+//           isResourceShow: resource.isResourceShow,
+//           name: resource.name,
+//           parentName: resource.parentName,
+//           url: resource.parentSlug + '/' + resource.slug,
+//           componentName: toPascalCase(resource.slug),
+//           isAccess: item.isAccess,
+//           isActive: item.isActive, // Ensure isActive is included
+//           slug: resource.slug,
+//           sortOrder: resource.sortOrder,
+//           parentSlug: resource.parentSlug,
+//           resourceId: item.resourceId,
+//         });
+//       }
+//     }
+//   });
+
+//   // Group the formatted data by parentName
+//   const groupedData = _.groupBy(formatedData, (f) => f.parentName);
+
+//   // Remove parentName from the final object
+//   delete formatedData.parentName;
+
+//   // Return the grouped data
+//   return groupedData;
+// };
+
+
+
   ///getUserAccessForMiddleware
+ 
+ 
+ 
+ 
+ 
   const getUserAccessForMiddleware = async (roleId, slugs) => {
   
   
