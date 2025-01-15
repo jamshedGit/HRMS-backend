@@ -7,7 +7,7 @@ const createUser = {
     body: Joi.object().keys({
         Id: '',
         email: Joi.string(),
-        password: Joi.string(),
+        password: Joi.string().trim(),
         supervisedbyId: Joi.number(),
         allowUserCreation: Joi.boolean(),
         companyId: Joi.number().allow(null),

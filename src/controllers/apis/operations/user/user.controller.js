@@ -46,7 +46,8 @@ const getUser = catchAsync(async (req, res) => {
 });
 
 const updateUser = catchAsync(async (req, res) => {
-  const user = await UserService.updateUserById(req.body.id, req.body, req.user.id);
+  // const user = await UserService.updateUserById(req.body.id, req.body, req.user.id);
+  const user = await UserService.updateUserById(req.body.Id, req.body, req.user.id);
   res.send({
     code: HttpStatusCodes.OK,
     message: HttpResponseMessages.OK,
@@ -56,11 +57,12 @@ const updateUser = catchAsync(async (req, res) => {
 
 const deleteUser = catchAsync(async (req, res) => {
   // req.body.isActive = false;
-  const user = await UserService.deleteUserById(req.body.id);
+  const user = await UserService.deleteUserById(req.body.Id);
+
   res.send({
     code: HttpStatusCodes.OK,
     message: HttpResponseMessages.OK,
-    data: user,
+    data: user
   });
 });
 
