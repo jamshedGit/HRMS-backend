@@ -7,6 +7,7 @@ const createRole = {
   body: Joi.object().keys({
     id: Joi.disallow(),
     name: Joi.string().required(),
+    isActive:Joi.boolean(),
     // createdBy: Joi.string().required(),
     // updatedBy: Joi.allow(),
   }),
@@ -41,6 +42,7 @@ const updateRole = {
     .keys({
       id: Joi.number().integer(),
       name: Joi.string(),
+      isActive: Joi.boolean(),
     })
     .min(1),
 };

@@ -20,17 +20,41 @@ const createRole = async (req, RoleBody) => {
     attributes: ['id', 'slug']
   });
   // console.log("allResources",allResources);
+const not_in_use=[33,34,35,37,38,39, 40, 41, 42, 43, 44, 45, 46, 47, 48,122, 123,124, 125, 126,127, 128,129, 130, 131,
+  132, 133,134, 135, 136,137, 138,139, 140, 141,162, 164,165, 166,167,169, 170,171,
+  172,174, 175,176,182,184, 185,186,197,199, 200,201,212,214, 215,216,218,220, 221,222,
+  229,231, 232,233,234,236, 237,238,239,241, 242,243,246,248, 249,250,266,268, 269,270,
+  272,273, 274,275,276, 278,279,280,296, 298,299,300,347,364,177,179,180,181,327,1763,240,
+  277,271,267,168,297,173,183,178,163,245,247,198,235,230,223,219,357,355,358,359,1744,1743,356,1742,1745,1762]
 
-  const accessRights = [];
-  allResources.forEach((element) => {
-    accessRights.push({
-      createdBy: req.user.id,
-      resourceId: element.id,
-      roleId: roleAdded.id,
-      isAccess: element.slug ? (element.slug === 'get-user-by-token') ? true : false : false
-    })
-  });
+  // const accessRights = [];
+  // allResources.forEach((element) => {
+ 
+  //   accessRights.push({
+  //     createdBy: req.user.id,
+  //     resourceId: element.id,
+  //     roleId: roleAdded.id,
+  //     isAccess: element.slug ? (element.slug === 'get-user-by-token') ? true : false : false,
+  //     isActive: element.slug ? (element.slug === 'get-user-by-token') ? true : false : false
+  //   })
+  // });
   // console.log("accessRights",accessRights);
+  
+  const accessRights = [];
+allResources.forEach((element) => {
+  // Check if the element.id is not in the not_in_use array
+  if (!not_in_use.includes(element.id)) {
+    accessRights.push({
+          createdBy: req.user.id,
+          resourceId: element.id,
+          roleId: roleAdded.id,
+          isAccess: element.slug ? (element.slug === 'get-user-by-token') ? true : false : false,
+        })
+  }
+});
+  
+  
+  
   const bulkAccessRightsCreated = await AccessRightModel.bulkCreate(accessRights);
   return roleAdded;
 };
@@ -190,6 +214,7 @@ const updateRoleById = async (RoleId, updateBody) => {
   if (!Role) {
     throw new ApiError(httpStatus.NOT_FOUND, 'Role not found');
   }
+  
   delete updateBody.id;
   Object.assign(Role, updateBody);
   await Role.save();

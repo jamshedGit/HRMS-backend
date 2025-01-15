@@ -6,7 +6,7 @@ const ApiError = require("../../../utils/ApiError");
 const Sequelize = require("sequelize");
 let _ = require('underscore');
 const {
-    paginationFacts,
+  paginationFacts,
 
 } = require("../../../utils/common");
 
@@ -25,9 +25,9 @@ const queryUser = async (
   searchQuery = searchQuery.toLowerCase();
   const queryFilters = [
 
-     { name1: Sequelize.where(Sequelize.fn('LOWER', Sequelize.col('email')), 'LIKE', '%' + searchQuery + '%') },
-    
-    ];
+    { name1: Sequelize.where(Sequelize.fn('LOWER', Sequelize.col('email')), 'LIKE', '%' + searchQuery + '%') },
+
+  ];
 
   const { count, rows } =
     await User_Model.findAndCountAll({
@@ -42,16 +42,16 @@ const queryUser = async (
       limit: limit,
       include: [
         {
-            model: RoleModel,
-            as: 'role',
-            attributes: ['id', 'name'],
+          model: RoleModel,
+          as: 'role',
+          attributes: ['id', 'name'],
         }],
-  
-    
-   
+
+
+
     });
 
-    
+
 
 
 
@@ -62,66 +62,67 @@ const queryUser = async (
 
 const createUser = async (userBody, createdBy) => {
 
-    if (await User_Model.isEmailTakenNewUser(userBody.email)) {
-        throw new ApiError(httpStatus.BAD_REQUEST, 'Email already taken');
-    }
-    User_Model.beforeCreate(userBody);
-    userBody.createdBy = createdBy;
-    userBody.isActive=true;
-    const user = await User_Model.create(userBody);
-    
-    return getUserById(user.Id)
+  if (await User_Model.isEmailTakenNewUser(userBody.email)) {
+    throw new ApiError(httpStatus.BAD_REQUEST, 'Email already taken');
+  }
+  User_Model.beforeCreate(userBody);
+  userBody.createdBy = createdBy;
+  userBody.isActive = true;
+  const user = await User_Model.create(userBody);
+
+  return getUserById(user.Id)
 };
 
 
 const getUserById = async (id) => {
 
-    return User_Model.findByPk(id, {
-        include: [
-            {
-                model: RoleModel,
-                as: 'role',
-                attributes: ['id', 'name'],
-            }],
-    });
+  return User_Model.findByPk(id, {
+    include: [
+      {
+        model: RoleModel,
+        as: 'role',
+        attributes: ['id', 'name'],
+      }],
+  });
 };
 
 
 const deleteUserById = async (Id) => {
 
-    const Item = await getUserById(Id);
-    if (!Item) {
-        throw new ApiError(httpStatus.NOT_FOUND, "User not found");
-    }
-    await Item.destroy();
-    return Item;
+  const Item = await getUserById(Id);
+  if (!Item) {
+    throw new ApiError(httpStatus.NOT_FOUND, "User not found");
+  }
+  await Item.destroy();
+  return Item;
 };
 
 const updateUserById = async (userId, updateBody, updatedBy) => {
-    const user = await getUserById(userId);
-    if (!user) {
-      throw new ApiError(httpStatus.NOT_FOUND, 'User not found');
-    }
-  
-    if (updateBody.email && (await User_Model.isEmailTakenOldUser(updateBody.email, updateBody.id))) {
-      throw new ApiError(httpStatus.BAD_REQUEST, 'Email already taken');
-    }
-    updateBody.updatedBy = updatedBy;
-    delete updateBody.id;
-    User_Model.beforeCreate(updateBody);
-    Object.assign(user, updateBody);
-    const updatedUser = await user.save();
-    return getUserById(updatedUser.id)
-  };
+  const user = await getUserById(userId);
+  if (!user) {
+    throw new ApiError(httpStatus.NOT_FOUND, 'User not found');
+  }
+
+  if (updateBody.email && (await User_Model.isEmailTakenOldUser(updateBody.email, updateBody.Id))) {
+    throw new ApiError(httpStatus.BAD_REQUEST, 'Email already taken');
+  }
+  updateBody.updatedBy = updatedBy;
+  delete updateBody.Id;
+  delete updateBody.password
+  User_Model.beforeCreate(updateBody);
+  Object.assign(user, updateBody);
+  const updatedUser = await user.save();
+  return getUserById(updatedUser.id)
+};
 
 
 //getUserCompleteRoleAccess
-  
+
 const getUserCompleteRoleAccess = async (roleId) => {
     const roleAccessData = await AccessRightModel.findAll({
-   
+
       where: { roleId: roleId, isAccess: true, isActive: true },
-     
+
       include: [
         {
           model: RoleModel,
@@ -129,17 +130,17 @@ const getUserCompleteRoleAccess = async (roleId) => {
         },
         {
           model: ResourceModel,
-        
+
           where: { isParentShow: true },
-        
+
           attributes: ['name', 'parentName', 'parentSlug', 'slug', 'isResourceShow','sortOrder']
         },
-        
+
       ],
       attributes: ['isAccess', 'isActive', 'roleId', 'resourceId']
-  
+
     });
- 
+
     const formatedData = [];
     roleAccessData.forEach((element) => {
       formatedData.push({
@@ -157,17 +158,17 @@ const getUserCompleteRoleAccess = async (roleId) => {
         // roleId: element.roleId,
       })
     });
-    
+
     var groupedData = _.groupBy(formatedData, f => { return f.parentName });
     delete formatedData.parentName;
     return groupedData;
-  
+
     // if(Array.isArray(groupedData) && groupedData.length > 0)
     //   return groupedData;
     // else
     //   return [];
   };
-  
+
 
 // const getUserCompleteRoleAccess = async (roleId) => {
 //   // Fetch role access data from the database
@@ -180,7 +181,7 @@ const getUserCompleteRoleAccess = async (roleId) => {
 //       {
 //         model: ResourceModel,
 //         where: { isParentShow: true },
-//         attributes: ['name', 'parentName', 'parentSlug', 'slug', 'isResourceShow', 'sortOrder']
+//         attributes: ['name', 'parentName', 'parentSlug', 'slug', 'isResourceShow', 'sortOrder', 'forDropdown']
 //       },
 //     ],
 //     attributes: ['isAccess', 'isActive', 'roleId', 'resourceId']
@@ -192,9 +193,10 @@ const getUserCompleteRoleAccess = async (roleId) => {
 //   // Loop through each item in roleAccessData
 //   roleAccessData.forEach((item) => {
 //     const resource = item.t_resource;
-
+//     console.log("resource.forDropdown", resource.forDropdown)
 //     // Check if sortOrder is 1 - this is a special case where we show the data immediately
-//     if (resource.sortOrder === 1) {
+//     if (resource.forDropdown == 1) {
+//       console.log("roleAccessData111")
 //       formatedData.push({
 //         isResourceShow: resource.isResourceShow,
 //         name: resource.name,
@@ -240,16 +242,50 @@ const getUserCompleteRoleAccess = async (roleId) => {
 
 
 
-  ///getUserAccessForMiddleware
- 
- 
- 
- 
- 
-  const getUserAccessForMiddleware = async (roleId, slugs) => {
-  
-  
-    try {
+// /getUserAccessForMiddleware
+
+
+
+
+
+// const getUserAccessForMiddleware = async (roleId, slugs) => {
+
+
+//   try {
+//     const roleAccessData = await AccessRightModel.findAll({
+//       where: { roleId: roleId, isAccess: true },
+//       include: [
+//         {
+//           model: ResourceModel,
+//           where: { slug: slugs.rightSlug },
+//           attributes: ['name', 'parentName', 'slug']
+//         }
+//       ],
+//       attributes: ['isAccess', 'isActive', 'roleId', 'resourceId']
+
+//     });
+
+//     return roleAccessData?.[0]?.isAccess || false;
+//     // return 1
+//     // return roleAccessData;
+//   } catch (error) {
+//     console.log(error)
+//     return false;
+//   }
+// };
+
+
+const getUserAccessForMiddleware = async (roleId, slugs) => {
+
+console.log("slugs111",slugs)
+  try {
+    const isForDropdown = await ResourceModel.findAll({
+      where: { slug: slugs.rightSlug,forDropdown: true },
+
+    })
+    console.log("isForDropdown111",isForDropdown)
+    if (isForDropdown?.length==0) {
+
       const roleAccessData = await AccessRightModel.findAll({
         where: { roleId: roleId, isAccess: true },
         include: [
@@ -260,26 +296,33 @@ const getUserCompleteRoleAccess = async (roleId) => {
           }
         ],
         attributes: ['isAccess', 'isActive', 'roleId', 'resourceId']
-  
+
       });
-  
       return roleAccessData?.[0]?.isAccess || false;
-      // return 1
-      // return roleAccessData;
-    } catch (error) {
-      console.log(error)
-      return false;
     }
-  };
-  
-  module.exports = {
-    createUser,
-    queryUser,
-    getUserById,
-    updateUserById,
-    deleteUserById,
-  
-    getUserAccessForMiddleware,
-    getUserCompleteRoleAccess,
-  };
-  
+    else if (isForDropdown?.length>0){
+      return true;
+    }
+
+
+
+    // return 1
+    // return roleAccessData;
+  } catch (error) {
+    console.log(error)
+    return false;
+  }
+};
+
+
+
+module.exports = {
+  createUser,
+  queryUser,
+  getUserById,
+  updateUserById,
+  deleteUserById,
+
+  getUserAccessForMiddleware,
+  getUserCompleteRoleAccess,
+};

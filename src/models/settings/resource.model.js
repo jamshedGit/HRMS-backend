@@ -20,7 +20,9 @@ const resource = sequelize.define('t_resources', {
 	slug: { type: Sequelize.STRING, allowNull:true },
 	sortOrder: { type: Sequelize.INTEGER, allowNull:true },
 	isResourceShow: { type: Sequelize.BOOLEAN, allowNull:true, defaultValue: false },
+	forDropdown :{ type: Sequelize.BOOLEAN, allowNull:true, defaultValue: false },
 	isActive: { type: Sequelize.BOOLEAN, allowNull:true, defaultValue: true },
+	
     createdBy:{
 		type:Sequelize.INTEGER,
 		allowNull:true,

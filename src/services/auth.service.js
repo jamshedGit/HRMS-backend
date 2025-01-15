@@ -7,7 +7,7 @@ const ApiError = require('../utils/ApiError');
 const { tokenTypes } = require('../config/tokens');
 const { HttpStatusCodes, HttpResponseMessages } = require('../utils/constants');
 const { User_Model, RoleModel } = require('../models/index');
-const {UserService} = require('./index');
+const { UserService } = require('./index');
 
 /**
  * Login with username and password
@@ -18,15 +18,15 @@ const {UserService} = require('./index');
 
 const getUserByEmail = async (email) => {
   const userByEmail = await User_Model.findOne({
-    where: { email: email },
+    where: { email: email,deactiveflag:true },
     include: [
       {
         model: RoleModel,
         as: 'role',
-        attributes: ['name', 'slug'],
+        attributes: ['name', 'slug', 'isActive'],
       }]
   });
-
+console.log("userByEmail111",userByEmail)
   return userByEmail;
 };
 
@@ -34,12 +34,16 @@ const getUserByEmail = async (email) => {
 const loginUserWithEmailAndPassword = async (email, password) => {
   // const user = await userService.getUserByEmail(email);  
 
-  const user = await getUserByEmail(email); 
+  const user = await getUserByEmail(email);
+console.log("!user?.role?.isActiv",user?.role.isActive,email, password)
+  if (!user?.role?.isActive) {
+    throw new ApiError(httpStatus.UNAUTHORIZED, 'This role user is not allowed');
+  }
 
 
-    if (!user || !(await User_Model.isPasswordMatch(email, password))) {
+  else if (!user || !(await User_Model.isPasswordMatch(email, password))) {
 
-    
+
     throw new ApiError(httpStatus.UNAUTHORIZED, 'Incorrect email or password');
   }
   return user;
@@ -65,12 +69,12 @@ const logout = async (refreshToken) => {
  */
 const refreshAuth = async (refreshToken) => {
   try {
-   
+
     const refreshTokenDoc = await tokenService.verifyToken(refreshToken, tokenTypes.REFRESH);
-   
+
     const user = await userService.getUserById(1);
 
- 
+
     if (!user) {
       throw new Error();
     }
@@ -78,7 +82,7 @@ const refreshAuth = async (refreshToken) => {
     return tokenService.generateAuthTokens(user);
   } catch (error) {
 
-  
+
     // throw new ApiError(httpStatus.UNAUTHORIZED, 'Please authenticate',error);
   }
 };

@@ -8,7 +8,7 @@ const router = express.Router();
 
 router.route("/read-user").post(auth(), userController.getUser);
 router.route("/read-all-user").post(auth(),  userController.getAllUser);
-router.route("/update-user").put(auth(),  userController.updateUser);
+router.route("/update-user").put(auth(), validate(userValidation.updateUser),  userController.updateUser);
 router.route("/delete-user").patch(auth(),userController.deleteUser);
 
 
