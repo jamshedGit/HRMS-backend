@@ -345,6 +345,25 @@ const groupBy = (data, key) => {
   return value;
 }
 
+/**
+ * 
+ * Map data according to Column names in Array of Objects with key being column name and value being the value in that column
+ * 
+ * @param {*} data 
+ * @param {Array} keys 
+ * @returns 
+ */
+const formatExcelData = (data, keys) => {
+  const result = data.slice(1).map(row => {
+    return keys.reduce((obj, key, index) => {
+      obj[key] = row[index + 1];
+      return obj;
+    }, {});
+  });
+
+  return result
+}
 
 
-module.exports = { handleNestedData, getRouteSlugs, getDdlItems, getAlarmTimesItems, customPaginate, paginationFacts, createDatetime, getPathStorageFromUrl, formatDates, getDateDiffInDays, addDaysInDate, check_range_exist, createFiscalYearLabel, createEmployeeShiftLabel, createTaxYearSetupLabel, createEmployeeNameLabel, digitsToWords, groupBy };
+
+module.exports = { handleNestedData, getRouteSlugs, getDdlItems, getAlarmTimesItems, customPaginate, paginationFacts, createDatetime, getPathStorageFromUrl, formatDates, getDateDiffInDays, addDaysInDate, check_range_exist, createFiscalYearLabel, createEmployeeShiftLabel, createTaxYearSetupLabel, createEmployeeNameLabel, digitsToWords, groupBy, formatExcelData };

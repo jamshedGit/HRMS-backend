@@ -99,6 +99,7 @@ async function getExcelSheetData(buffer) {
 
   // Load the file from buffer
   await workbook.xlsx.load(buffer);
+  workbook.properties.date1904 = true;
 
   const obj = {};
 
