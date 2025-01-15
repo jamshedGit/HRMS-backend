@@ -349,7 +349,7 @@ const groupBy = (data, key) => {
  * 
  * Map data according to Column names in Array of Objects with key being column name and value being the value in that column
  * 
- * @param {*} data 
+ * @param {Array} data 
  * @param {Array} keys 
  * @returns 
  */
