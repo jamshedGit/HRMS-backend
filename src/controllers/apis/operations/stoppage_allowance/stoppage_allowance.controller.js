@@ -63,7 +63,7 @@ const SP_getAllStoppageAllowanceInfoByEmpId = catchAsync(async (req, res) => {
 const SP_getAllEarningDeductionList = catchAsync(async (req, res) => {
   console.log("SP_getAllEarningDeductionList Controller",req.body)
 
-  const list = await StoppageAllowanceformService.StoppageAllowanceServicePage.SP_GetAllEarningDeductionList(req.body.flag, req.body.subsidiaryId, req.body.employeeId);
+  const list = await StoppageAllowanceformService.StoppageAllowanceServicePage.SP_GetAllEarningDeductionList(req.body.flag, req.body.subsidiaryId, req.body.employeeId, req.body.excludeBasic);
   if (!list) {
     throw new ApiError(httpStatus.NOT_FOUND, "list not found");
   }
