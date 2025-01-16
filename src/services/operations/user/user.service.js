@@ -277,7 +277,7 @@ const getUserCompleteRoleAccess = async (roleId) => {
 
 const getUserAccessForMiddleware = async (roleId, slugs) => {
 
-console.log("slugs111",slugs)
+
   try {
     const isForDropdown = await ResourceModel.findAll({
       where: { slug: slugs.rightSlug,forDropdown: true },
