@@ -42,10 +42,10 @@ router.route('/read-all-child-forms').get(auth(), validate(settingValidation.get
 router.route('/read-all-profile').post(auth(true), validate(settingValidation.getAllEmployees), settingController.getEmployeesMasterData);
 router.route('/read-all-profile-by-subsidiary').post(auth(true), validate(settingValidation.getAllEmployeesBySubsidiary), settingController.getEmployeesMasterDataBySubsidiary);
 router.route('/read-salary-revision-by-employeeId').post( validate(settingValidation.getEmpSalaryRevisionByEmpId), settingController.getRevisionHistoryByEmpId);
-router.route('/read-all-leave-types').post(auth(), validate(settingValidation.getAllLeaveType), settingController.getAllLeaveType);
+router.route('/read-all-leave-types').post(auth(true), validate(settingValidation.getAllLeaveType), settingController.getAllLeaveType);
 router.route('/read-all-leave-types-by-subsidiary').post(auth(true), validate(settingValidation.getAllLeaveTypeBySubsidiary), settingController.getAllLeaveTypeBySubsidiary);
 router.route('/read-all-subsidiaries').get(auth(), validate(settingValidation.getAllSubsidiaries), settingController.getAllSubsidiaries);
-router.route('/read-all-fiscal-year').post(auth(), validate(settingValidation.getAllFiscalYear), settingController.getAllFiscalYears);
+router.route('/read-all-fiscal-year').post(auth(true), validate(settingValidation.getAllFiscalYear), settingController.getAllFiscalYears);
 router.route('/read-encashment-leave-types').post(auth(), validate(settingValidation.getAllLeaveType), settingController.getEncashmentLeaveType);
 router.route('/read-all-employee-shift').post(auth(), validate(settingValidation.getAllShiftType), settingController.getAllEmployeeShift);
 router.route('/read-current-fiscal-year').post(auth(), validate(settingValidation.getAllLeaveTypeBySubsidiary), settingController.getCurrentFiscalYears);
