@@ -49,10 +49,11 @@ const get_Bank_Branch_MasterData = catchAsync(async (req, res) => {
 
 
 const getEmployeesMasterData = catchAsync(async (req, res) => {
+
   res.send({
     code: HttpStatusCodes.OK,
     message: HttpResponseMessages.OK,
-    data: await settingService.getEmployeesMasterData(),
+    data: await settingService.getEmployeesMasterData(req.user.Id),
   });
 });
 

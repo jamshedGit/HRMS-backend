@@ -1,4 +1,4 @@
-const { RoleModel, ResourceModel, CountryModel, CityModel, StatusTypeModel, BankModel, DeptModel, FormModel, EmployeeProfileModel, BranchModel, EmployeeSalaryRevisionModel, LeaveTypeModel, FiscalSetupModel, SubsidiaryModel, LeaveManagementConfigurationModel, LeaveTypePoliciesModel, AllocateLeavesModel, Employee_ShiftModel, LeaveTypeModelAccess, CompanyModel } = require('../../models');
+const { RoleModel, ResourceModel, CountryModel, CityModel, StatusTypeModel, BankModel, DeptModel, FormModel, EmployeeProfileModel, BranchModel, EmployeeSalaryRevisionModel, LeaveTypeModel, FiscalSetupModel, SubsidiaryModel, LeaveManagementConfigurationModel, LeaveTypePoliciesModel, AllocateLeavesModel, Employee_ShiftModel, LeaveTypeModelAccess, CompanyModel, User_Model } = require('../../models');
 const { getDdlItems, getAlarmTimesItems, formatDates, createFiscalYearLabel, createEmployeeShiftLabel, createEmployeeNameLabel } = require('../../utils/common');
 const { DDL_FIELD_NAMES } = require('../../utils/constants');
 const { getRoleById } = require('./role.service');
@@ -103,9 +103,16 @@ const get_Bank_Branch_MasterData = async () => {
   return Bank_Branch_MasterData
 };
 
-const getEmployeesMasterData = async () => {
+const getEmployeesMasterData = async (Id) => {
+  const userById = await User_Model.findOne({
+    where: { Id: Id },
+  });
+  let sub=userById.subsidiaryId
+
   const EmployeesMasterData = await EmployeeProfileModel.findAll({
-    where: { isActive: true },
+    where: { isActive: true,subsidiaryId: {
+      [Op.in]: sub  // Use the Op.in operator here
+    } },
     attributes: ['Id', 'firstName', 'middleName', 'lastName']
   })
   return EmployeesMasterData?.map(el => {
