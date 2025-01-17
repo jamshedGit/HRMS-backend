@@ -13,6 +13,6 @@ router.route("/update-payroll-process").put(auth(),  payroll_processController.u
 router.route("/delete-payroll-process").patch(auth(),payroll_processController.deletePayroll_Process);
 
 router.route("/create-payroll-process").post(auth(),validate(payroll_processValidation.CreatePayroll_ProcessValidation), payroll_processController.createPayroll_Process);
-router.route("/read-all-payroll-group-detail").post(payroll_processController.payroll_group_detail)
-router.route("/check-payroll-employees").post(payroll_processController.checkPayroll_EmployeesByIds)
+router.route("/read-all-payroll-group-detail").post(auth(),payroll_processController.payroll_group_detail)
+router.route("/check-payroll-employees").post(auth(),payroll_processController.checkPayroll_EmployeesByIds)
 module.exports = router;

@@ -5,7 +5,7 @@ const ApiError = require('../utils/ApiError');
 const { userService } = require('../services');
 const { getRouteSlugs } = require('../utils/common');
 const {UserService}=require("../services/index")
-const verifyCallback = (req, resolve, reject) => async (err, user, info) => {
+const verifyCallback = (req, resolve, reject,byPass) => async (err, user, info) => {
   // console.log("err",err)
   // console.log("user",user)
   // console.log("info",info)
@@ -15,6 +15,9 @@ const verifyCallback = (req, resolve, reject) => async (err, user, info) => {
     return reject(new ApiError(httpStatus.UNAUTHORIZED, 'Please authenticate'));
   }
   req.user = user;
+  if (byPass) {
+    return resolve(); // Resolve immediately, skipping the access check
+  }
 
   // console.log("UserRoleId",user.roleId);
   // const hasAccess = await userService.getUserAccessForMiddleware(user.roleId, getRouteSlugs(req))
@@ -27,10 +30,10 @@ const verifyCallback = (req, resolve, reject) => async (err, user, info) => {
   resolve();
 };
 
-const auth = () => async (req, res, next) => {
+const auth = (byPass=false) => async (req, res, next) => {
 
   return new Promise((resolve, reject) => {
-    passport.authenticate('jwt', { session: false }, verifyCallback(req, resolve, reject))(req, res, next);
+    passport.authenticate('jwt', { session: false }, verifyCallback(req, resolve, reject,byPass))(req, res, next);
   })
     .then(() => next())
     .catch((err) => next(err));
