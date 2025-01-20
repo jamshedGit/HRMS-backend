@@ -53,7 +53,7 @@ const getEmployeesMasterData = catchAsync(async (req, res) => {
   res.send({
     code: HttpStatusCodes.OK,
     message: HttpResponseMessages.OK,
-    data: await settingService.getEmployeesMasterData(req.user.Id),
+    data: await settingService.getEmployeesMasterData(req),
   });
 });
 
@@ -197,6 +197,16 @@ const getCompanyMasterData = catchAsync(async (req, res) => {
   });
 });
 
+const getEmployeesNoNeedPermission= catchAsync(async (req, res) => {
+
+  res.send({
+    code: HttpStatusCodes.OK,
+    message: HttpResponseMessages.OK,
+    data: await settingService.getEmployeesNoNeedPermission(),
+  });
+});
+
+
 module.exports = {
   getRolesMasterData,
   getResourcesMasterData,
@@ -219,5 +229,5 @@ module.exports = {
   getAllLeaveTypeBySubsidiary,
   getCurrentFiscalYears,
   getEmployeesMasterDataBySubsidiary,
-  getCompanyMasterData,
+  getCompanyMasterData,getEmployeesNoNeedPermission,
 };

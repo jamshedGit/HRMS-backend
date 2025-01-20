@@ -283,7 +283,7 @@ const getUserAccessForMiddleware = async (roleId, slugs) => {
       where: { slug: slugs.rightSlug,forDropdown: true },
 
     })
-    console.log("isForDropdown111",isForDropdown)
+
     if (isForDropdown?.length==0) {
 
       const roleAccessData = await AccessRightModel.findAll({

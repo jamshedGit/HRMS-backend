@@ -333,7 +333,13 @@ const digitsToWords = (number, config = null) => {
   return toWords.convert(number)
 }
 
+const currentSubsidiaryPermission=async(req)=>{
+    const userById = await modelMapping.User_Model.findOne({
+      where: { Id: req?.user?.Id },
+    });
+
+    return userById.subsidiaryId
+}
 
 
-
-module.exports = { handleNestedData, getRouteSlugs, getDdlItems, getAlarmTimesItems, customPaginate, paginationFacts, createDatetime, getPathStorageFromUrl, formatDates, getDateDiffInDays, addDaysInDate, check_range_exist, createFiscalYearLabel, createEmployeeShiftLabel, createTaxYearSetupLabel, createEmployeeNameLabel, digitsToWords };
+module.exports = { handleNestedData, getRouteSlugs, getDdlItems, getAlarmTimesItems, customPaginate, paginationFacts, createDatetime, getPathStorageFromUrl, formatDates, getDateDiffInDays, addDaysInDate, check_range_exist, createFiscalYearLabel, createEmployeeShiftLabel, createTaxYearSetupLabel, createEmployeeNameLabel, digitsToWords,currentSubsidiaryPermission };

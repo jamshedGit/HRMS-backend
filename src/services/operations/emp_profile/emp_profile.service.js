@@ -4,7 +4,7 @@ const Emp_profileModel = require("../../../models/index");
 const ApiError = require("../../../utils/ApiError");
 const sequelize = require("../../../config/db");
 const Sequelize = require('sequelize');
-const { paginationFacts, formatDates } = require("../../../utils/common");
+const { paginationFacts, formatDates, currentSubsidiaryPermission } = require("../../../utils/common");
 const https = require('https');
 const { XMLParser, XMLBuilder, XMLValidator } = require("fast-xml-parser");
 const fns = require('date-fns');
@@ -161,7 +161,7 @@ const BUlkInsertEmployeeDetails = async (updateBody, employeeId) => {
  * @param {number} [options.page] - Current page (default = 1)
  * @returns {Promise<QueryResult>}
  */
-const queryEmp_profile = async (filter, options, searchQuery) => {
+const queryEmp_profile = async (req,filter, options, searchQuery) => {
 
   let limit = options.pageSize;
   let offset = 0 + (options.pageNumber - 1) * limit;
@@ -180,7 +180,10 @@ const queryEmp_profile = async (filter, options, searchQuery) => {
     ],
     where: {
       [Op.or]: queryFilters,
-      isActive: options.isActive
+      isActive: options.isActive,
+      subsidiaryId: {
+        [Op.in]: await currentSubsidiaryPermission(req)  // Use the Op.in operator here
+      }
     },
     offset: offset,
     limit: limit,

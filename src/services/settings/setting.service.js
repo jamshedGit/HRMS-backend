@@ -1,5 +1,5 @@
 const { RoleModel, ResourceModel, CountryModel, CityModel, StatusTypeModel, BankModel, DeptModel, FormModel, EmployeeProfileModel, BranchModel, EmployeeSalaryRevisionModel, LeaveTypeModel, FiscalSetupModel, SubsidiaryModel, LeaveManagementConfigurationModel, LeaveTypePoliciesModel, AllocateLeavesModel, Employee_ShiftModel, LeaveTypeModelAccess, CompanyModel, User_Model } = require('../../models');
-const { getDdlItems, getAlarmTimesItems, formatDates, createFiscalYearLabel, createEmployeeShiftLabel, createEmployeeNameLabel } = require('../../utils/common');
+const { getDdlItems, getAlarmTimesItems, formatDates, createFiscalYearLabel, createEmployeeShiftLabel, createEmployeeNameLabel, currentSubsidiaryPermission } = require('../../utils/common');
 const { DDL_FIELD_NAMES } = require('../../utils/constants');
 const { getRoleById } = require('./role.service');
 const Sequelize = require('sequelize');
@@ -103,15 +103,15 @@ const get_Bank_Branch_MasterData = async () => {
   return Bank_Branch_MasterData
 };
 
-const getEmployeesMasterData = async (Id) => {
-  const userById = await User_Model.findOne({
-    where: { Id: Id },
-  });
-  let sub=userById.subsidiaryId
+const getEmployeesMasterData = async (req) => {
+  // const userById = await User_Model.findOne({
+  //   where: { Id: Id },
+  // });
+  // let sub=userById.subsidiaryId
 
   const EmployeesMasterData = await EmployeeProfileModel.findAll({
     where: { isActive: true,subsidiaryId: {
-      [Op.in]: sub  // Use the Op.in operator here
+      [Op.in]: await currentSubsidiaryPermission(req)  // Use the Op.in operator here
     } },
     attributes: ['Id', 'firstName', 'middleName', 'lastName']
   })
@@ -448,6 +448,21 @@ const getCompanyMasterData = async () => {
   return comapnyData
 };
 
+
+const getEmployeesNoNeedPermission = async (req) => {
+
+  const EmployeesMasterData = await EmployeeProfileModel.findAll({
+    where: { isActive: true },
+    attributes: ['Id', 'firstName', 'middleName', 'lastName']
+  })
+  return EmployeesMasterData?.map(el => {
+    return {
+      label: createEmployeeNameLabel(el),
+      value: el.Id
+    }
+  }) || []
+};
+
 module.exports = {
   getRolesMasterData,
   getResourcesMasterData,
@@ -470,6 +485,6 @@ module.exports = {
   getLeaveTypesDataBySubsidiary,
   getActiveFiscalYearData,
   getEmployeesMasterDataBySubsidiary,
-  getCompanyMasterData,
+  getCompanyMasterData,getEmployeesNoNeedPermission,
 
 };

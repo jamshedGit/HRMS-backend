@@ -75,7 +75,7 @@ const getAllEmp_profile = catchAsync(async (req, res) => {
   // const options = pick(req.body, ["sortBy", "limit", "page"]);
   const options = pick(req.body, ['sortOrder', 'pageSize', 'pageNumber','isActive']);
   const searchQuery = req.body.filter.searchQuery ? req.body.filter.searchQuery : '';
-  const result = await Emp_profileformService.EmpProfileServicePage.queryEmp_profile(filter, options, searchQuery);
+  const result = await Emp_profileformService.EmpProfileServicePage.queryEmp_profile(req,filter, options, searchQuery);
 
   res.send({
     code: HttpStatusCodes.OK,
