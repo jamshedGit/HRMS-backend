@@ -4,6 +4,15 @@ const Handlebars = require('handlebars');
 const pdf = require('html-pdf-node');
 const templatePath = path.join(__dirname + '/../docs/pdf_templates/')
 
+Handlebars.registerHelper('increment', function(index) {
+  return index + 1;
+});
+
+
+Handlebars.registerHelper('toFixed', function(value) {
+  if(!value) return '';
+  return Number(value).toFixed(2);
+});
 
 /**
  * Generates a PDF from a Handlebars template and returns it as a buffer.
@@ -11,7 +20,7 @@ const templatePath = path.join(__dirname + '/../docs/pdf_templates/')
  * @param {object} data - Data to populate the template.
  * @returns {Promise<Buffer>} - Resolves to a buffer containing the PDF content.
  */
-async function generatePdf(fileName, data) {
+async function generatePdf(fileName, data, options = {}) {
   try {
     // Read the template file
     const templateSource = fs.readFileSync(templatePath + fileName, 'utf-8');
@@ -24,7 +33,7 @@ async function generatePdf(fileName, data) {
 
     // Return the PDF as a buffer
     return new Promise((resolve) => {
-      pdf.generatePdf(file, { preferCSSPageSize: true, printBackground: true})
+      pdf.generatePdf(file, { preferCSSPageSize: true, printBackground: true, ...options })
         .then((pdfBuffer) => resolve(pdfBuffer))
         .catch((error) => reject(error));
     });
@@ -36,4 +45,4 @@ async function generatePdf(fileName, data) {
   }
 }
 
-module.exports = generatePdf;
+module.exports = { generatePdf };

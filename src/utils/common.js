@@ -342,4 +342,21 @@ const currentSubsidiaryPermission=async(req)=>{
 }
 
 
-module.exports = { handleNestedData, getRouteSlugs, getDdlItems, getAlarmTimesItems, customPaginate, paginationFacts, createDatetime, getPathStorageFromUrl, formatDates, getDateDiffInDays, addDaysInDate, check_range_exist, createFiscalYearLabel, createEmployeeShiftLabel, createTaxYearSetupLabel, createEmployeeNameLabel, digitsToWords,currentSubsidiaryPermission };
+
+const groupBy = (data, key) => {
+  const value = data.reduce((prev, current) => {
+    if (prev[current[key]]) {
+      prev[current[key]].push(current)
+    }
+    else {
+      prev[current[key]] = [current]
+    }
+    return prev;
+  }, {})
+  return value;
+}
+
+
+
+
+module.exports = { handleNestedData, getRouteSlugs, getDdlItems, getAlarmTimesItems, customPaginate, paginationFacts, createDatetime, getPathStorageFromUrl, formatDates, getDateDiffInDays, addDaysInDate, check_range_exist, createFiscalYearLabel, createEmployeeShiftLabel, createTaxYearSetupLabel, createEmployeeNameLabel, digitsToWords,currentSubsidiaryPermission,groupBy };
