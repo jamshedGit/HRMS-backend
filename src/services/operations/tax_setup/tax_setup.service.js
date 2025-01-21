@@ -4,7 +4,7 @@ const TaxSetupModel = require("../../../models/index");
 const ApiError = require("../../../utils/ApiError");
 const sequelize = require("../../../config/db");
 const Sequelize = require('sequelize');
-const { paginationFacts, check_range_exist, formatDates } = require("../../../utils/common");
+const { paginationFacts, check_range_exist, formatDates, currentSubsidiaryPermission } = require("../../../utils/common");
 const https = require('https');
 const { XMLParser, XMLBuilder, XMLValidator } = require("fast-xml-parser");
 const fns = require('date-fns')
@@ -74,7 +74,7 @@ const createTaxSetup = async (req, TaxSetupBody) => {
  * @param {number} [options.page] - Current page (default = 1)
  * @returns {Promise<QueryResult>}
  */
-const queryTaxSetups = async (filter, options, searchQuery) => {
+const queryTaxSetups = async (req,filter, options, searchQuery) => {
 
   let limit = options.pageSize;
   let offset = 0 + (options.pageNumber - 1) * limit;
@@ -93,6 +93,11 @@ const queryTaxSetups = async (filter, options, searchQuery) => {
     ],
     where: {
       [Op.or]: queryFilters,
+    
+        subsidiaryId: {
+          [Op.in]: await currentSubsidiaryPermission(req)  // Filter banks based on subsidiaryId
+        }
+
       // isActive: true
     },
     offset: offset,

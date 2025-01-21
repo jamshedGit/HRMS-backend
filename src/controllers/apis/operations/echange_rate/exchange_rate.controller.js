@@ -44,7 +44,7 @@ const getAllExchangeRate = catchAsync(async (req, res) => {
   // const options = pick(req.body, ["sortBy", "limit", "page"]);
   const options = pick(req.body, ['sortOrder', 'pageSize', 'pageNumber']);
   const searchQuery = req.body.filter.searchQuery ? req.body.filter.searchQuery : '';
-  const result = await ExchangeRateformService.ExchangeRateServicePage.SP_getAllExchangeRateInfo(filter, options, searchQuery, req.body.id);
+  const result = await ExchangeRateformService.ExchangeRateServicePage.SP_getAllExchangeRateInfo(req,filter, options, searchQuery, req.body.id);
 
   res.send({
     code: HttpStatusCodes.OK,

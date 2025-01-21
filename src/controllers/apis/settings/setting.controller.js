@@ -129,7 +129,7 @@ const getAllSubsidiaries = catchAsync(async (req, res) => {
   res.send({  
     code: HttpStatusCodes.OK,
     message: HttpResponseMessages.OK,
-    data: await settingService.getAllSubsidiaryData(),
+    data: await settingService.getAllSubsidiaryData(req),
   });
 });
 

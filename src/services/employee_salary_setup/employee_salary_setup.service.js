@@ -4,7 +4,7 @@ const EmployeeSalaryModel = require("../../models/index");
 const ApiError = require("../../utils/ApiError");
 const sequelize = require("../../config/db");
 const Sequelize = require('sequelize');
-const { paginationFacts } = require("../../utils/common");
+const { paginationFacts, currentSubsidiaryPermission } = require("../../utils/common");
 const https = require('https');
 const { XMLParser, XMLBuilder, XMLValidator } = require("fast-xml-parser");
 const fns = require('date-fns')
@@ -60,13 +60,16 @@ const queryEmployeeSalarys = async (filter, options, searchQuery) => {
 
 };
 
-const SP_getAllEmployeeSalaryInfo = async (filter, options, searchQuery, empId, transactionType) => {
+const SP_getAllEmployeeSalaryInfo = async (req,filter, options, searchQuery, empId, transactionType) => {
   try {
-    const results = await sequelize.query('CALL usp_GetAllActiveEmployeeSalaries(:id,:transactionType)', {
+    const resultFirst = await sequelize.query('CALL usp_GetAllActiveEmployeeSalaries(:id,:transactionType)', {
       replacements: { id: empId || 'null', transactionType: transactionType },
       type: Sequelize.QueryTypes.RAW // Use RAW type for executing stored procedures
     });
+    const subsidiaryIds = await currentSubsidiaryPermission(req) 
+    const numericSubsidiaryIds = subsidiaryIds.map(id => Number(id)); // Use the Op.in operator here
 
+    const results = resultFirst.filter(o => numericSubsidiaryIds.includes(o.subsidiaryId));
     let limit = options.pageSize;
     let offset = 0 + (options.pageNumber - 1) * limit;
     searchQuery = searchQuery.toLowerCase();

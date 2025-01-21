@@ -334,9 +334,11 @@ const getEncashmentLeaveTypeData = async (employeeId, yearId) => {
 };
 
 
-const getAllSubsidiaryData = async () => {
+const getAllSubsidiaryData = async (req) => {
   const subsidiaryData = getDdlItems(DDL_FIELD_NAMES.Subsidiary, await SubsidiaryModel.findAll({
-    where: { isActive: true },
+    where: { isActive: true,Id: {
+      [Op.in]: await currentSubsidiaryPermission(req)  // Use the Op.in operator here
+    } },
     attributes: ['name', 'Id', 'currencyId','companyId']
   }));
   return subsidiaryData
