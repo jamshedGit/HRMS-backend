@@ -54,7 +54,7 @@ const getAllloan_management_configuration= catchAsync(async (req, res) => {
   const options = pick(req.body, ['sortOrder', 'pageSize', 'pageNumber']);
   const searchQuery = req.body.filter.searchQuery? req.body.filter.searchQuery : '';
  
-  const result = await loan_management_configurationService.loan_management_configurationService.queryloan_management_configuration(filter, options,searchQuery);
+  const result = await loan_management_configurationService.loan_management_configurationService.queryloan_management_configuration(req,filter, options,searchQuery);
 
   res.send({
     code: HttpStatusCodes.OK,

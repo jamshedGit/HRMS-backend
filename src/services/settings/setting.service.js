@@ -350,10 +350,15 @@ const getAllSubsidiaryData = async (req) => {
  * 
  * @returns 
  */
-const getAllEmployeeShift = async () => {
+const getAllEmployeeShift = async (req) => {
   const result = [];
   const shiftData = await Employee_ShiftModel.findAll({
-    where: { isActive: true },
+    where: { isActive: true,
+      subsidiaryId: {
+        [Op.in]: await currentSubsidiaryPermission(req)  // Filter banks based on subsidiaryId
+      },
+     },
+    
     attributes: ['name', 'Id', 'startTime', 'endTime','subsidiaryId']
   })
   if (shiftData?.length) {

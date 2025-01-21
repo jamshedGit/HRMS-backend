@@ -51,7 +51,7 @@ const getAllaccrue_gratuity_configuration = catchAsync(async (req, res) => {
     const options = pick(req.body, ['sortOrder', 'pageSize', 'pageNumber']);
     const searchQuery = req.body.filter.searchQuery ? req.body.filter.searchQuery : '';
 
-    const result = await accrue_gratuity_configurationService.queryaccrue_gratuity_configuration(filter, options, searchQuery);
+    const result = await accrue_gratuity_configurationService.queryaccrue_gratuity_configuration(req,filter, options, searchQuery);
 
     res.send({
         code: HttpStatusCodes.OK,

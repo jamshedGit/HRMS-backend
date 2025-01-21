@@ -3,7 +3,7 @@ const {Loan_management_configurationModel,Loan_management_detailModel,LoanTypeMo
 
 const ApiError = require("../../../utils/ApiError");
 const Sequelize = require("sequelize");
-const { paginationFacts } = require("../../../utils/common");
+const { paginationFacts, currentSubsidiaryPermission } = require("../../../utils/common");
 const { HttpStatusCodes } = require("../../../utils/constants");
 
 const Op = Sequelize.Op;
@@ -194,7 +194,7 @@ const createloan_management_configuration = async (
 //   return paginationFacts(count, limit, options.pageNumber, rows);
 // };
 
-const queryloan_management_configuration = async (filter, options, searchQuery) => {
+const queryloan_management_configuration = async (req,filter, options, searchQuery) => {
   let limit = options.pageSize;
   let offset = 0 + (options.pageNumber - 1) * limit;
 
@@ -218,6 +218,9 @@ const queryloan_management_configuration = async (filter, options, searchQuery) 
     ],
     where: {
       [Op.or]: queryFilters,
+      subsidiaryId: {
+        [Op.in]: await currentSubsidiaryPermission(req)  // Filter banks based on subsidiaryId
+      }
       // isActive: true
     },
     offset: offset,

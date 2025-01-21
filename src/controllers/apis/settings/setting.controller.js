@@ -113,7 +113,7 @@ const getAllEmployeeShift = catchAsync(async (req, res) => {
   res.send({  
     code: HttpStatusCodes.OK,
     message: HttpResponseMessages.OK,
-    data: await settingService.getAllEmployeeShift(),
+    data: await settingService.getAllEmployeeShift(req),
   });
 });
 

@@ -51,7 +51,7 @@ const getAllreimbursement_configuration = catchAsync(async (req, res) => {
     const options = pick(req.body, ['sortOrder', 'pageSize', 'pageNumber']);
     const searchQuery = req.body.filter.searchQuery ? req.body.filter.searchQuery : '';
 
-    const result = await reimbursement_configurationService.queryreimbursement_configuration(filter, options, searchQuery);
+    const result = await reimbursement_configurationService.queryreimbursement_configuration(req,filter, options, searchQuery);
    
     res.send({
         code: HttpStatusCodes.OK,

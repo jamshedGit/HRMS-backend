@@ -4,7 +4,7 @@ const EmployeeShiftModel = require("../../../models/index");
 const ApiError = require("../../../utils/ApiError");
 const sequelize = require("../../../config/db");
 const Sequelize = require('sequelize');
-const { paginationFacts } = require("../../../utils/common");
+const { paginationFacts, currentSubsidiaryPermission } = require("../../../utils/common");
 const https = require('https');
 const { XMLParser, XMLBuilder, XMLValidator } = require("fast-xml-parser");
 const fns = require('date-fns')
@@ -60,7 +60,11 @@ const queryEmployeeShifts = async (req) => {
 
   const { count, rows } = await EmployeeShiftModel.Employee_ShiftModel.findAndCountAll({
     where: {
-      [Op.and]: queryFilters // Apply the query filters
+      [Op.and]: queryFilters, // Apply the query filters
+      subsidiaryId: {
+        [Op.in]: await currentSubsidiaryPermission(req)  // Filter banks based on subsidiaryId
+      }
+    
     },
     order: [
       ['createdAt', 'DESC'],

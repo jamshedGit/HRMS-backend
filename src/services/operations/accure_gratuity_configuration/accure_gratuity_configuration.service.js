@@ -4,7 +4,7 @@ const { FormModel } = require("../../../models/index");
 
 const ApiError = require("../../../utils/ApiError");
 const Sequelize = require("sequelize");
-const { paginationFacts } = require("../../../utils/common");
+const { paginationFacts, currentSubsidiaryPermission } = require("../../../utils/common");
 const { HttpStatusCodes } = require("../../../utils/constants");
 
 const Op = Sequelize.Op;
@@ -76,7 +76,7 @@ const createaccrue_gratuity_configuration = async (
  * @param {number} [options.page] - Current page (default = 1)
  * @returns {Promise<QueryResult>}
  */
-const queryaccrue_gratuity_configuration = async (
+const queryaccrue_gratuity_configuration = async (req,
   filter,
   options,
   searchQuery
@@ -108,6 +108,9 @@ const queryaccrue_gratuity_configuration = async (
       ],
       where: {
         [Op.or]: queryFilters,
+        subsidiaryId: {
+          [Op.in]: await currentSubsidiaryPermission(req)  // Filter banks based on subsidiaryId
+        }
         // isActive: true
       },
       offset: offset,

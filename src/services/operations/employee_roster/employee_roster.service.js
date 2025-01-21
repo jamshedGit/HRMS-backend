@@ -2,8 +2,9 @@ const httpStatus = require("http-status");
 const { EmployeeRosterModel, EmployeeRosterDetailModel, EmployeeProfileModel, Employee_ShiftModel } = require("../../../models/index");
 const ApiError = require("../../../utils/ApiError");
 const Sequelize = require('sequelize');
-const { paginationFacts, getDateDiffInDays, addDaysInDate, handleNestedData } = require("../../../utils/common");
+const { paginationFacts, getDateDiffInDays, addDaysInDate, handleNestedData, currentSubsidiaryPermission } = require("../../../utils/common");
 const pick = require("../../../utils/pick");
+const { where } = require("underscore");
 
 const Op = Sequelize.Op;
 
@@ -115,7 +116,12 @@ const getAllEmployeeRoster = async (req) => {
     where: {
       isActive: true
     },
-    include: [{ model: EmployeeProfileModel, attributes: ['firstName'] }, { model: Employee_ShiftModel, attributes: ['name'] }],
+    include: [{ model: EmployeeProfileModel,
+      where:{
+        subsidiaryId: {
+          [Op.in]: await currentSubsidiaryPermission(req)  
+        }
+      }, attributes: ['firstName'] }, { model: Employee_ShiftModel, attributes: ['name'] }],
     attributes: employeeRosterAttributes,
     offset: offset,
     limit: limit,

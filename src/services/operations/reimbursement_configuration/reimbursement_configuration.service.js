@@ -4,7 +4,7 @@ const { FormModel } = require("../../../models/index");
 
 const ApiError = require("../../../utils/ApiError");
 const Sequelize = require("sequelize");
-const { paginationFacts } = require("../../../utils/common");
+const { paginationFacts, currentSubsidiaryPermission } = require("../../../utils/common");
 const { HttpStatusCodes } = require("../../../utils/constants");
 
 const Op = Sequelize.Op;
@@ -114,7 +114,7 @@ const createreimbursement_configuration = async (req, reimbursement_configuratio
  * @param {number} [options.page] - Current page (default = 1)
  * @returns {Promise<QueryResult>}
  */
-const queryreimbursement_configuration = async (
+const queryreimbursement_configuration = async (req,
   filter,
   options,
   searchQuery
@@ -139,6 +139,9 @@ const queryreimbursement_configuration = async (
     ],
     where: {
       [Op.or]: queryFilters,
+      subsidiaryId: {
+        [Op.in]: await currentSubsidiaryPermission(req)  // Filter banks based on subsidiaryId
+      }
       // isActive: true
     },
     offset: offset,
