@@ -35,7 +35,7 @@ const getAll_Payroll_Process_Policy = catchAsync(async (req, res) => {
   // const options = pick(req.body, ["sortBy", "limit", "page"]);
   const options = pick(req.body, ['sortOrder', 'pageSize', 'pageNumber']);
   const searchQuery = req.body.filter.searchQuery? req.body.filter.searchQuery : '';
-  const result = await PayrollProcessPolicy.PayrollProcessPolicy.queryPayrollPolicy(filter, options,searchQuery);
+  const result = await PayrollProcessPolicy.PayrollProcessPolicy.queryPayrollPolicy(req,filter, options,searchQuery);
   res.send({
     code: HttpStatusCodes.OK,
     message: HttpResponseMessages.OK,
