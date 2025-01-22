@@ -604,7 +604,7 @@ const generatePayrollRegisterExcel = async (req) => {
       createGroupHeader(worksheet, [key], { bold: true, color: { argb: 'FF000000' } }, { type: 'pattern', pattern: 'solid', fgColor: { argb: 'F1A983' } }, columns.length)
 
       currentData.forEach((row, index) => {
-        const data = worksheet.addRow({ ...row, sno: index + 1 })
+        const data = worksheet.addRow({ ...row, sno: (index + 1).toString() })
         data.numFmt = '#,##0.00'
       })
 
