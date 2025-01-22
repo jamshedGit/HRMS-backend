@@ -5,7 +5,7 @@ const { generatePdf } = require("../../../utils/pdf");
 const ApiError = require("../../../utils/ApiError");
 const httpStatus = require("http-status");
 const sequelize = require("../../../config/db");
-const { createExcelSheet, generateExcel, createHeader, createFilters, createTableHeader, createGroupHeader, createSubtotal } = require('../../../utils/xslx');
+const { createExcelSheet, generateExcel, createHeader, createFilters, createTableHeader, createGroupHeader, createSubtotal, createGrandTotal } = require('../../../utils/xslx');
 
 const PRINT_REGISTER_EMPLOYEE_QUERY = `SELECT
     pf.Id AS employeeId,
@@ -561,22 +561,13 @@ const generatePayrollRegisterExcel = async (req) => {
   const dobCol = worksheet.getRow(1);
   dobCol.hidden = true
 
-  createHeader(worksheet, ['Payroll Register'], { bold: true, size: 18, })
+  createHeader(worksheet, ['Payroll Register'], { bold: true, size: 18, }, null)
 
-  createFilters(worksheet, labels, [{ label: 'monthLabel', message: 'For the Month of:' }, { label: 'subsidiaryLabel', message: 'Subsidiary:' }, { label: 'groupWiseLabel', message: 'Group By:' }], {
-    bold: true,
-  })
+  createFilters(worksheet, labels, [{ label: 'monthLabel', message: 'For the Month of:' }, { label: 'subsidiaryLabel', message: 'Subsidiary:' }, { label: 'groupWiseLabel', message: 'Group By:' }], { bold: true, })
 
   worksheet.addRow([]);
 
-  createTableHeader(worksheet, columns, {
-    bold: true,
-    color: { argb: 'FFFFFFFF' }
-  }, {
-    type: 'pattern',
-    pattern: 'solid',
-    fgColor: { argb: '0093DD' },
-  });
+  createTableHeader(worksheet, columns, { bold: true, color: { argb: 'FFFFFFFF' } }, { type: 'pattern', pattern: 'solid', fgColor: { argb: '0093DD' } }, columns.length);
 
 
   if (filter.groupBy) {
@@ -610,64 +601,29 @@ const generatePayrollRegisterExcel = async (req) => {
       }, {})
       totals.netPayableSalary = Number(totals.totalAllowances) - Number(totals.totalDeductions)
 
-      createGroupHeader(worksheet, [key], {
-        bold: true,        // Make the font bold
-        color: { argb: 'FF000000' }
-      }, {
-        type: 'pattern',
-        pattern: 'solid',
-        fgColor: { argb: 'F1A983' },
-      })
+      createGroupHeader(worksheet, [key], { bold: true, color: { argb: 'FF000000' } }, { type: 'pattern', pattern: 'solid', fgColor: { argb: 'F1A983' } }, columns.length)
 
       currentData.forEach((row, index) => {
-        const data = worksheet.addRow({ ...row, sno: index + 1 })
+        const data = worksheet.addRow({ ...row, sno: (index + 1).toString() })
+        data.numFmt = '#,##0.00'
       })
 
-      createSubtotal(worksheet, { ...totals, sno: 'Sub total' },
-        {
-          bold: true,
-          color: { argb: 'FF000000' }
-        }, {
-        type: 'pattern',
-        pattern: 'solid',
-        fgColor: { argb: 'F1A983' },
-      })
+      createSubtotal(worksheet, { ...totals, sno: 'Sub Total' }, { bold: true, color: { argb: 'FF000000' } }, { type: 'pattern', pattern: 'solid', fgColor: { argb: 'F1A983' } }, columns.length)
 
     })
-    worksheet.addRow({ ...totals, sno: 'Grand Total' })
 
-    const lastRow = worksheet.lastRow;
-
-    lastRow.font = {
-      bold: true,
-      color: { argb: 'FFFFFFFF' }
-    }
-
-    lastRow.fill = {
-      type: 'pattern',
-      pattern: 'solid',
-      fgColor: { argb: '0093DD' }, // Yellow background
-    }
+    createGrandTotal(worksheet, { ...totals, sno: 'Grand Total' }, { bold: true, color: { argb: 'FFFFFFFF' } }, { type: 'pattern', pattern: 'solid', fgColor: { argb: '0093DD' } }, columns.length)
     const pdfStream = await generateExcel(workbook);
     return pdfStream
   }
   else {
-    [...employeeData, { ...totals, sno: 'Grand Total' }].forEach((row) => {
-      worksheet.addRow(row);
+    [...employeeData].forEach((row) => {
+      const rows = worksheet.addRow(row);
+      rows.numFmt = '#,##0.00'
     })
 
-    const lastRow = worksheet.lastRow;
+    createGrandTotal(worksheet, { ...totals, sno: 'Grand Total' }, { bold: true, color: { argb: 'FFFFFFFF' } }, { type: 'pattern', pattern: 'solid', fgColor: { argb: '0093DD' } }, columns.length)
 
-    lastRow.font = {
-      bold: true,
-      color: { argb: 'FFFFFFFF' }
-    }
-
-    lastRow.fill = {
-      type: 'pattern',
-      pattern: 'solid',
-      fgColor: { argb: '0093DD' }, // Yellow background
-    }
     const pdfStream = await generateExcel(workbook);
     return pdfStream
   }
