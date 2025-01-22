@@ -97,7 +97,7 @@ const SP_getAllStoppageAllowanceInfoByEmpId = async (empId) => {
   }
 };
 
-const SP_GetAllEarningDeductionList = async (flagId, subsidiary, employeeId) => {
+const SP_GetAllEarningDeductionList = async (flagId, subsidiary, employeeId, excludeBasic = false) => {
   try {
     let subsidiaryId = subsidiary || '';
     let results = [];
@@ -111,22 +111,54 @@ const SP_GetAllEarningDeductionList = async (flagId, subsidiary, employeeId) => 
 
     if (subsidiaryId) {
       if (flagId == 1) {
-        results = await StoppageAllowanceModel.EarningModel.findAll({
-          attributes: [
-            ['Id', 'value'],
-            ['earningName', 'label']
-          ],
-          include: [
-            {
-              model: StoppageAllowanceModel.EarningSetupAccessModel,
-              where: {
-                subsidiaryId: subsidiaryId
-              },
-              attributes: [],
-              required: true
-            }
-          ]
-        })
+        if(excludeBasic){
+          const payrollData = await StoppageAllowanceModel.PayrollPolicyModel.findOne({
+            where: {
+              subsidiaryId: subsidiaryId
+            },
+            attributes: ['basicSalaryId']
+          })
+
+          results = await StoppageAllowanceModel.EarningModel.findAll({
+            where: {
+              Id: {
+                [Op.ne]: payrollData?.basicSalaryId || ''
+              }
+            },
+            attributes: [
+              ['Id', 'value'],
+              ['earningName', 'label']
+            ],
+            include: [
+              {
+                model: StoppageAllowanceModel.EarningSetupAccessModel,
+                where: {
+                  subsidiaryId: subsidiaryId
+                },
+                attributes: [],
+                required: true
+              }
+            ]
+          })
+        }
+        else{
+          results = await StoppageAllowanceModel.EarningModel.findAll({
+            attributes: [
+              ['Id', 'value'],
+              ['earningName', 'label']
+            ],
+            include: [
+              {
+                model: StoppageAllowanceModel.EarningSetupAccessModel,
+                where: {
+                  subsidiaryId: subsidiaryId
+                },
+                attributes: [],
+                required: true
+              }
+            ]
+          })
+        }
       }
       else {
         results = await StoppageAllowanceModel.DeductionModel.findAll({

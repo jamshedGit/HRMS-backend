@@ -154,6 +154,23 @@ const deleteEmployeeSalaryById = async (Id) => {
   return Item;
 };
 
+/**
+ * Approve Item by id
+ * @param {String|Number} Id
+ * @param {String|Number} updatedBy
+ * @returns {Promise<ReceiptModel>}
+ */
+const approveEmployeeSalary = async (Id, updatedBy) => {
+  let Item = await EmployeeSalaryModel.EmployeeSalaryModel.findOne({ where: { employeeId: Id } });
+
+  if (!Item) {
+    throw new ApiError(httpStatus.NOT_FOUND, "Item not found");
+  }
+  Object.assign(Item, { approved: true, updatedBy: updatedBy });
+  await Item.save({ fields: ['approved', 'updatedBy'] });
+  return Item;
+};
+
 
 
 module.exports = {
@@ -163,5 +180,6 @@ module.exports = {
   updateEmployeeSalaryById,
   deleteEmployeeSalaryById,
   SP_getAllEmployeeSalaryInfo,
-  SP_getAllEmployeeSalaryInfoByEmpId
+  SP_getAllEmployeeSalaryInfoByEmpId,
+  approveEmployeeSalary
 };
