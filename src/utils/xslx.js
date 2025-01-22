@@ -103,6 +103,36 @@ async function createSubtotal(worksheet, data, font = null, fill = null, length 
   }
 }
 
+async function getExcelSheetData(buffer) {
+  const workbook = new ExcelJS.Workbook();
+
+  // Load the file from buffer
+  await workbook.xlsx.load(buffer);
+  workbook.properties.date1904 = true;
+
+  const obj = {};
+
+  let i = 1;
+  while (true) {
+    const worksheet = workbook.getWorksheet(i);
+
+    if(!worksheet){
+      break;
+    }
+
+    const data = [];
+    worksheet.eachRow((row) => {
+      data.push(row.values);
+    });
+
+    obj[worksheet._name] = data;
+    i++
+  }
+
+
+  return obj
+}
+
 async function createGrandTotal(worksheet, data, font = null, fill = null, length = 0){
   const grandTotalRow = worksheet.addRow(data)
   grandTotalRow.numFmt = '#,##0.00'
@@ -117,4 +147,4 @@ async function createGrandTotal(worksheet, data, font = null, fill = null, lengt
   }
 }
 
-module.exports = { createExcelSheet, generateExcel, createHeader, createFilters, createTableHeader, createGroupHeader, createSubtotal, createGrandTotal };
+module.exports = { createExcelSheet, generateExcel, createHeader, createFilters, createTableHeader, createGroupHeader, createSubtotal, createGrandTotal, getExcelSheetData };

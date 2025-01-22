@@ -49,7 +49,7 @@ const loan_type = require('./operations/loan_type/loan_type.route')
 const payroll_process_policy = require('./operations/payroll_process_policy/payroll_process_policy.route')
 const leave_management_configuration = require('./operations/leave_management_configuration/leave_management_configuration.route')
 const leave_application = require('./operations/leave_application/leave_application.route');
-const uploadImage = require("../../middlewares/fileUpload.middleware");
+const {uploadImage} = require("../../middlewares/fileUpload.middleware");
 const ApiError = require("../../utils/ApiError");
 const httpStatus = require("http-status");
 const gratuity_configuration = require('./operations/gratuity_configuration/gratuity_configuration.route')
@@ -69,6 +69,7 @@ const attendance=require('./operations/attendance/attendance.route')
 const employee_roster = require('./operations/employee_roster/employee_roster.route');
 const leave_register = require('./operations/leave_register/leave_register.route');
 const payroll_register = require('./operations/payroll_register/payroll_register.route');
+const upload = require('./operations/upload/upload.route');
 
 const router = express.Router();
 
@@ -340,6 +341,10 @@ const defaultRoutes = [
   {
     path: "/payroll_register",
     route: payroll_register
+  },
+  {
+    path: "/upload",
+    route: upload
   },
 
 ];

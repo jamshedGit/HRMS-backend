@@ -14,6 +14,7 @@ module.exports.leaveManagementConfiguration = require('./operations/leave_manage
 module.exports.leaveApplication = require('./operations/leave_application/leave_application.controller')
 module.exports.attendance_configuration = require('./operations/attendance_configuration/attendance_configuration.controller')
 module.exports.employee_shift = require('./operations/employee_shift/employee_shift.controller')
+module.exports.upload = require('./operations/upload/upload.controller')
 
 
 
