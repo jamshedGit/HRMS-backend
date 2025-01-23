@@ -188,7 +188,7 @@ const generatePaySlip = async (req) => {
     throw new ApiError(httpStatus.BAD_REQUEST, 'Please Provide Employee and Month.');
   }
 
-  const employeeDataQuery = `Select 
+  let employeeDataQuery = `Select 
 	  CONCAT(emppro.firstName, ' ', IFNULL(emppro.middleName, ''), ' ', IFNULL(emppro.lastName, '')) AS EmployeeName,
     emppro.employeeCode,
     pe.EmpId,
@@ -222,6 +222,9 @@ pe.SubsidiaryId = ${filter.subsidiaryId}
 AND 
 pe.MonthId = ${filter.monthId}`;
 
+  if (filter.employeeId) {
+    employeeDataQuery += ` AND pe.EmpId = ${filter.employeeId}`
+  }
 
   const [employeeData] = await sequelize.query(employeeDataQuery, {
     type: Sequelize.QueryTypes.RAW
@@ -329,10 +332,7 @@ lb.SubsidiaryId = ${filter.subsidiaryId}
     data.push(payload)
   }
 
-console.log('::::::data::::',data);
-
-
-  const pdfStream = await generatePdf('payslip.hbs', {data:data});
+  const pdfStream = await generatePdf('payslip.hbs', { data: data });
 
   return pdfStream
 };
