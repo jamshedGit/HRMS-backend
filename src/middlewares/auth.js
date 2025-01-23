@@ -11,7 +11,7 @@ const verifyCallback = (req, resolve, reject) => async (err, user, info) => {
   // console.log("info",info)
 
   if (err || info || !user) {
-    return reject(new ApiError(httpStatus.UNAUTHORIZED, 'Please authenticate'));
+    return reject(new ApiError(httpStatus.PERMANENT_REDIRECT, 'Please authenticate'));
   }
   req.user = user;
 
