@@ -185,7 +185,7 @@ const generatePaySlip = async (req) => {
   const data = [];
 
   if (!(filter.subsidiaryId && filter.monthId)) {
-    throw new ApiError(httpStatus.BAD_REQUEST, 'Please Provide Employee and Month.');
+    throw new ApiError(httpStatus.BAD_REQUEST, 'Please Provide Subsidiary and Month.');
   }
 
   let employeeDataQuery = `Select 
@@ -231,7 +231,7 @@ pe.MonthId = ${filter.monthId}`;
   })
 
   if (!employeeData.length) {
-    throw new ApiError(httpStatus.NOT_FOUND, 'Cannot generate Payslip');
+    throw new ApiError(httpStatus.NOT_FOUND, 'Cannot generate Payslip.');
   }
 
   for (const emp of employeeData) {
