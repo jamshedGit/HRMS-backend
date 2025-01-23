@@ -18,7 +18,7 @@ const Loan_management_detail = sequelize.define("t_loan_management_detail", {
   },
   loan_typeId: { type: Sequelize.INTEGER },
   max_loan_amount: { type: Sequelize.INTEGER, allowNull: false },
-  basis: { type: Sequelize.INTEGER, allowNull: false },
+  basis: { type: Sequelize.INTEGER, allowNull: true },
   salary_count: {
     type: Sequelize.INTEGER,
     allowNull: false,
