@@ -13,6 +13,7 @@ router.route("/delete-reimbursement-configuration").patch(auth(),reimbursement_c
 
 
 router.route("/create-reimbursement-configuration").post(auth(),reimbursement_configurationController.createreimbursement_configuration);
+router.route("/delete-reimbursement-configuration-policy").patch(auth(true),reimbursement_configurationController.deleteReimbursementPolicyById);
 
 
 module.exports = router;

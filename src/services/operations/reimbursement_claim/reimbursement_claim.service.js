@@ -13,9 +13,12 @@ const Op = Sequelize.Op;
 const createreimbursement_claim = async (req, reimbursement_claimBody) => {
   try {
  
-
+    const Emp_subsidiaryId = await EmployeeProfileModel.findOne({
+      where:{Id:reimbursement_claimBody.employeeId}
+    });
+ 
     let dataExists;
-
+    reimbursement_claimBody.subsidiaryId=Emp_subsidiaryId.subsidiaryId
     if (reimbursement_claimBody.Id) {
       // Check if a record with this ID already exists
       dataExists = await Reimbursement_claimModel.findOne({

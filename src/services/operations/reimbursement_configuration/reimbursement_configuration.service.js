@@ -6,6 +6,7 @@ const ApiError = require("../../../utils/ApiError");
 const Sequelize = require("sequelize");
 const { paginationFacts, currentSubsidiaryPermission } = require("../../../utils/common");
 const { HttpStatusCodes } = require("../../../utils/constants");
+const Reimbursement_claim = require("../../../models/operations/reimbursement_claim/reimbursement_claim.model");
 
 const Op = Sequelize.Op;
 
@@ -509,22 +510,56 @@ const updatereimbursement_configurationById = async (
  */
 
 const deletereimbursement_configurationById = async (Id) => {
+  
   const Item = await Reimbursement_configurationModel.findByPk(Id);
 
   if (!Item) {
     throw new ApiError(httpStatus.NOT_FOUND, "Item not found");
   }
 
+  const checkClaimApplied = await Reimbursement_claim.findOne({
+    where: { subsidiaryId: Item.subsidiaryId }
+  });
+  if (checkClaimApplied) {
+    throw new ApiError(httpStatus.FORBIDDEN, HttpResponseMessages.ASSOCIATED_RECORD);
+  }
+
+
   await Item.destroy();
   return Item;
 };
 
+const deleteReimbursementPolicyById = async (data) => {
 
+  const checkReim_claimApplied = await Reimbursement_claim.findOne({
+    where: {
+      reimbursement_typeId: data.reimbursement_typeId,
+      subsidiaryId: data.subsidiaryId
+    }
+
+  })
+  
+  if (checkReim_claimApplied) {
+    throw new ApiError(httpStatus.FORBIDDEN, HttpResponseMessages.ASSOCIATED_RECORD);
+  }
+  else {
+    const Item = await Reimbursement_policies_detailModel.findOne({
+      where: {
+        Id: data.Id
+      }
+
+    })
+    await Item.destroy();
+    return Item;
+  }
+
+
+};
 
 module.exports = {
   createreimbursement_configuration,
   getreimbursement_configurationById,
   updatereimbursement_configurationById,
   deletereimbursement_configurationById,
-  queryreimbursement_configuration,
+  queryreimbursement_configuration,deleteReimbursementPolicyById,
 };

@@ -110,12 +110,23 @@ const deletereimbursement_configuration = catchAsync(async (req, res) => {
 });
 
 
+//deleteReimbursementDetailById
+
+const deleteReimbursementPolicyById = catchAsync(async (req, res) => {
+
+    const Receipt = await reimbursement_configurationService.deleteReimbursementPolicyById(req.body);
+    res.send({
+        code: HttpStatusCodes.OK,
+        message: HttpResponseMessages.OK,
+        data: Receipt,
+    });
+});
 
 module.exports = {
     createreimbursement_configuration,
     getAllreimbursement_configuration,
     getreimbursement_configurationById,
     updatereimbursement_configuration,
-    deletereimbursement_configuration,
+    deletereimbursement_configuration,deleteReimbursementPolicyById,
 
 };
