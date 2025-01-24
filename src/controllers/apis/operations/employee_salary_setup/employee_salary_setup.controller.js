@@ -93,6 +93,15 @@ const deleteEmployeeSalary = catchAsync(async (req, res) => {
   });
 });
 
+const approveEmployeeSalary = catchAsync(async (req, res) => {
+  const response = await EmployeeSalarySetupServicePage.EmployeeSalarySetupServicePage.approveEmployeeSalary(req.body.Id, req.user.Id);
+  res.send({
+    code: HttpStatusCodes.OK,
+    message: HttpResponseMessages.OK,
+    data: response,
+  });
+});
+
 
 module.exports = {
   createEmployeeSalary,
@@ -100,5 +109,6 @@ module.exports = {
   getEmployeeSalaryById,
   updateEmployeeSalary,
   deleteEmployeeSalary,
-  SP_getAllEmployeeSalaryInfoByEmpId
+  SP_getAllEmployeeSalaryInfoByEmpId,
+  approveEmployeeSalary
 };

@@ -5,7 +5,7 @@ const { generatePdf } = require("../../../utils/pdf");
 const ApiError = require("../../../utils/ApiError");
 const httpStatus = require("http-status");
 const sequelize = require("../../../config/db");
-const { createExcelSheet, generateExcel, createHeader, createFilters, createTableHeader, createGroupHeader, createSubtotal } = require('../../../utils/xslx');
+const { createExcelSheet, generateExcel, createHeader, createFilters, createTableHeader, createGroupHeader, createSubtotal, createGrandTotal } = require('../../../utils/xslx');
 
 const PRINT_REGISTER_EMPLOYEE_QUERY = `SELECT
     pf.Id AS employeeId,
@@ -182,23 +182,24 @@ WHERE`;
 const generatePaySlip = async (req) => {
   const filter = req?.body || {};
   const labels = filter?.labels || {};
+  const data = [];
 
-  if (!(filter.employeeId && filter.monthId)) {
-    throw new ApiError(httpStatus.BAD_REQUEST, 'Please Provide Employee and Month.');
+  if (!(filter.subsidiaryId && filter.monthId)) {
+    throw new ApiError(httpStatus.BAD_REQUEST, 'Please Provide Subsidiary and Month.');
   }
 
-  const employeeDataQuery = `Select 
+  let employeeDataQuery = `Select 
 	  CONCAT(emppro.firstName, ' ', IFNULL(emppro.middleName, ''), ' ', IFNULL(emppro.lastName, '')) AS EmployeeName,
     emppro.employeeCode,
+    pe.EmpId,
     desig.formName AS designationName,
     grade.formName AS gradeName,
-    pm.month_days AS monthDays,
-    sum.PresentDays AS paidDays,
-    sum.LeaveDays AS leaveCount,
-    sum.AbsentDays_LateCount AS lateCount,
-    sum.AbsentDays_LateCount AS lateCount,
-    sum.LatePerDayAmount,
-    sum.LateDaysCount,
+    ROUND(CAST(pm.month_days AS FLOAT), 2) AS monthDays,
+    ROUND(CAST(sum.PresentDays AS FLOAT), 2) AS paidDays,
+    ROUND(CAST(sum.LeaveDays AS FLOAT), 2) AS leaveCount,
+    ROUND(CAST(sum.AbsentDays_LateCount AS FLOAT), 2) AS lateCount,
+    ROUND(CAST(sum.LatePerDayAmount AS FLOAT), 2) AS LatePerDayAmount,
+    ROUND(CAST(sum.LateDaysCount AS FLOAT), 2) AS LateDaysCount,
     bank.Name AS bankName,
     sal.emp_bank_accNo AS accountNumber,
     sal.grossSalary,
@@ -216,11 +217,24 @@ LEFT JOIN t_employee_salary_benefits sal ON sal.employeeId = pe.EmpId
 LEFT JOIN t_subsidiary sub ON sub.Id = pe.SubsidiaryId
 LEFT JOIN t_company comp ON comp.Id = sub.companyId
 WHERE 
-pe.EmpId = ${filter.employeeId}
+pe.SubsidiaryId = ${filter.subsidiaryId}
 AND 
 pe.MonthId = ${filter.monthId}`;
 
-  const salaryDataQuery = `SELECT 
+  if (filter.employeeId) {
+    employeeDataQuery += ` AND pe.EmpId = ${filter.employeeId}`
+  }
+
+  const [employeeData] = await sequelize.query(employeeDataQuery, {
+    type: Sequelize.QueryTypes.RAW
+  })
+
+  if (!employeeData.length) {
+    throw new ApiError(httpStatus.NOT_FOUND, 'Cannot generate Payslip.');
+  }
+
+  for (const emp of employeeData) {
+    const salaryDataQuery = `SELECT 
     y.employeeCode AS EmployeeCode, 
     CONCAT(y.firstName, ' ', IFNULL(y.middleName, ''), ' ', IFNULL(y.lastName, '')) AS EmployeeName,
     z.shortFormat AS MonthName, 
@@ -236,82 +250,88 @@ FROM t_payrollearningdeduction X
 INNER JOIN t_employee_profile y ON x.EmpId = y.Id
 INNER JOIN t_payroll_month_setup z ON x.SubsidiaryId = z.subsidiaryId 
 WHERE
-y.Id = ${filter.employeeId}
+y.Id = ${emp.EmpId}
 AND
-x.MonthId = ${filter.monthId}`;
+x.MonthId = ${filter.monthId}
+AND
+x.SubsidiaryId = ${filter.subsidiaryId}
+`;
 
-  const loanQuery = `SELECT ls.name, OutstandingInstallment, OutStandingBalance FROM t_payroll_loandetail ld
+    const loanQuery = `SELECT ls.name, OutstandingInstallment, OutStandingBalance FROM t_payroll_loandetail ld
 LEFT JOIN t_loan_type_setup ls ON ls.Id = ld.LoanTypeId
 WHERE
-ld.EmpId = ${filter.employeeId}
+ld.EmpId = ${emp.EmpId}
 AND
-ld.MonthId = ${filter.monthId}`;
+ld.MonthId = ${filter.monthId}
+AND
+ld.SubsidiaryId  = ${filter.subsidiaryId}
+`;
 
-  const leaveQuery = `SELECT lb.allocatedCount, lb.remainingCount, lt.name 
+    const leaveQuery = `SELECT lb.allocatedCount, lb.remainingCount, lt.name 
 FROM t_payroll_leave_balance lb
 LEFT JOIN t_leave_type lt ON lt.Id = lb.leaveType
 WHERE
-lb.employeeId = ${filter.employeeId}
+lb.employeeId = ${emp.EmpId}
 AND
-lb.MonthId = ${filter.monthId}`;
+lb.MonthId = ${filter.monthId}
+AND
+lb.SubsidiaryId = ${filter.subsidiaryId}
+`;
 
-  const [employeeData] = await sequelize.query(employeeDataQuery, {
-    type: Sequelize.QueryTypes.RAW
-  })
 
-  if (!employeeData.length) {
-    throw new ApiError(httpStatus.NOT_FOUND, 'Cannot generate Payslip');
+
+    const [salaryData] = await sequelize.query(salaryDataQuery, {
+      type: Sequelize.QueryTypes.RAW
+    })
+
+    const [loanDetailData] = await sequelize.query(loanQuery, {
+      type: Sequelize.QueryTypes.RAW
+    })
+
+    const [leaveDetailData] = await sequelize.query(leaveQuery, {
+      type: Sequelize.QueryTypes.RAW
+    })
+
+    const loanData = [];
+    const earningData = [];
+    const deductionData = [];
+    let deductionAmount = 0;
+    let earningAmount = 0;
+
+    salaryData.forEach(element => {
+      if (element.TransactionType == 'Earning') {
+        earningData.push(element);
+        earningAmount += Number(element.Amount_Actual)
+      }
+      else if (element.TransactionType == 'Deduction') {
+        deductionData.push(element);
+        deductionAmount += Number(element.Amount_Actual)
+      }
+      else if (element.TransactionType == 'LoanType') {
+        loanData.push(element);
+        deductionAmount += Number(element.Amount_Actual)
+      }
+    });
+
+    const payload = {
+      employeeData: emp,
+      earningData: earningData,
+      deductionData: deductionData || [],
+      loanData: loanData || [],
+      totalDeductionAmount: deductionAmount.toFixed(2),
+      totalEarningAmount: earningAmount.toFixed(2),
+      earningDeductionDifference: (Number(earningAmount) - Number(deductionAmount)).toFixed(2),
+      earningDeductionDifferenceInWords: digitsToWords(Number(earningAmount) - Number(deductionAmount)),
+      loanDetailData: loanDetailData || [],
+      leaveDetailData: leaveDetailData || [],
+      monthName: labels.monthLabel,
+      grossSalary: Number(emp.grossSalary || 0).toFixed(2)
+    }
+
+    data.push(payload)
   }
 
-  const [salaryData] = await sequelize.query(salaryDataQuery, {
-    type: Sequelize.QueryTypes.RAW
-  })
-
-  const [loanDetailData] = await sequelize.query(loanQuery, {
-    type: Sequelize.QueryTypes.RAW
-  })
-
-  const [leaveDetailData] = await sequelize.query(leaveQuery, {
-    type: Sequelize.QueryTypes.RAW
-  })
-
-  const loanData = [];
-  const earningData = [];
-  const deductionData = [];
-  let deductionAmount = 0;
-  let earningAmount = 0;
-
-  salaryData.forEach(element => {
-    if (element.TransactionType == 'Earning') {
-      earningData.push(element);
-      earningAmount += Number(element.Amount_Actual)
-    }
-    else if (element.TransactionType == 'Deduction') {
-      deductionData.push(element);
-      deductionAmount += Number(element.Amount_Actual)
-    }
-    else if (element.TransactionType == 'LoanType') {
-      loanData.push(element);
-      deductionAmount += Number(element.Amount_Actual)
-    }
-  });
-
-  const data = {
-    employeeData: employeeData[0],
-    earningData: earningData,
-    deductionData: deductionData || [],
-    loanData: loanData || [],
-    totalDeductionAmount: deductionAmount.toFixed(2),
-    totalEarningAmount: earningAmount.toFixed(2),
-    earningDeductionDifference: (Number(earningAmount) - Number(deductionAmount)).toFixed(2),
-    earningDeductionDifferenceInWords: digitsToWords(Number(earningAmount) - Number(deductionAmount)),
-    loanDetailData: loanDetailData || [],
-    leaveDetailData: leaveDetailData || [],
-    monthName: labels.monthLabel,
-    grossSalary: Number(employeeData?.[0].grossSalary || 0).toFixed(2)
-  }
-
-  const pdfStream = await generatePdf('payslip.hbs', data);
+  const pdfStream = await generatePdf('payslip.hbs', { data: data });
 
   return pdfStream
 };
@@ -561,22 +581,13 @@ const generatePayrollRegisterExcel = async (req) => {
   const dobCol = worksheet.getRow(1);
   dobCol.hidden = true
 
-  createHeader(worksheet, ['Payroll Register'], { bold: true, size: 18, })
+  createHeader(worksheet, ['Payroll Register'], { bold: true, size: 18, }, null)
 
-  createFilters(worksheet, labels, [{ label: 'monthLabel', message: 'For the Month of:' }, { label: 'subsidiaryLabel', message: 'Subsidiary:' }, { label: 'groupWiseLabel', message: 'Group By:' }], {
-    bold: true,
-  })
+  createFilters(worksheet, labels, [{ label: 'monthLabel', message: 'For the Month of:' }, { label: 'subsidiaryLabel', message: 'Subsidiary:' }, { label: 'groupWiseLabel', message: 'Group By:' }], { bold: true, })
 
   worksheet.addRow([]);
 
-  createTableHeader(worksheet, columns, {
-    bold: true,
-    color: { argb: 'FFFFFFFF' }
-  }, {
-    type: 'pattern',
-    pattern: 'solid',
-    fgColor: { argb: '0093DD' },
-  });
+  createTableHeader(worksheet, columns, { bold: true, color: { argb: 'FFFFFFFF' } }, { type: 'pattern', pattern: 'solid', fgColor: { argb: '0093DD' } }, columns.length);
 
 
   if (filter.groupBy) {
@@ -610,64 +621,29 @@ const generatePayrollRegisterExcel = async (req) => {
       }, {})
       totals.netPayableSalary = Number(totals.totalAllowances) - Number(totals.totalDeductions)
 
-      createGroupHeader(worksheet, [key], {
-        bold: true,        // Make the font bold
-        color: { argb: 'FF000000' }
-      }, {
-        type: 'pattern',
-        pattern: 'solid',
-        fgColor: { argb: 'F1A983' },
-      })
+      createGroupHeader(worksheet, [key], { bold: true, color: { argb: 'FF000000' } }, { type: 'pattern', pattern: 'solid', fgColor: { argb: 'F1A983' } }, columns.length)
 
       currentData.forEach((row, index) => {
-        const data = worksheet.addRow({ ...row, sno: index + 1 })
+        const data = worksheet.addRow({ ...row, sno: (index + 1).toString() })
+        data.numFmt = '#,##0.00'
       })
 
-      createSubtotal(worksheet, { ...totals, sno: 'Sub total' },
-        {
-          bold: true,
-          color: { argb: 'FF000000' }
-        }, {
-        type: 'pattern',
-        pattern: 'solid',
-        fgColor: { argb: 'F1A983' },
-      })
+      createSubtotal(worksheet, { ...totals, sno: 'Sub Total' }, { bold: true, color: { argb: 'FF000000' } }, { type: 'pattern', pattern: 'solid', fgColor: { argb: 'F1A983' } }, columns.length)
 
     })
-    worksheet.addRow({ ...totals, sno: 'Grand Total' })
 
-    const lastRow = worksheet.lastRow;
-
-    lastRow.font = {
-      bold: true,
-      color: { argb: 'FFFFFFFF' }
-    }
-
-    lastRow.fill = {
-      type: 'pattern',
-      pattern: 'solid',
-      fgColor: { argb: '0093DD' }, // Yellow background
-    }
+    createGrandTotal(worksheet, { ...totals, sno: 'Grand Total' }, { bold: true, color: { argb: 'FFFFFFFF' } }, { type: 'pattern', pattern: 'solid', fgColor: { argb: '0093DD' } }, columns.length)
     const pdfStream = await generateExcel(workbook);
     return pdfStream
   }
   else {
-    [...employeeData, { ...totals, sno: 'Grand Total' }].forEach((row) => {
-      worksheet.addRow(row);
+    [...employeeData].forEach((row) => {
+      const rows = worksheet.addRow(row);
+      rows.numFmt = '#,##0.00'
     })
 
-    const lastRow = worksheet.lastRow;
+    createGrandTotal(worksheet, { ...totals, sno: 'Grand Total' }, { bold: true, color: { argb: 'FFFFFFFF' } }, { type: 'pattern', pattern: 'solid', fgColor: { argb: '0093DD' } }, columns.length)
 
-    lastRow.font = {
-      bold: true,
-      color: { argb: 'FFFFFFFF' }
-    }
-
-    lastRow.fill = {
-      type: 'pattern',
-      pattern: 'solid',
-      fgColor: { argb: '0093DD' }, // Yellow background
-    }
     const pdfStream = await generateExcel(workbook);
     return pdfStream
   }

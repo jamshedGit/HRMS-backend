@@ -36,16 +36,18 @@ async function createHeader(worksheet, title, font = null, fill = null) {
     headerRow.font = font;
   }
   if (fill) {
-    headerRow.fill = fill;
+    headerRow.eachCell((cell) => {
+      cell.fill = fill;
+    })
   }
 }
 
 async function createFilters(worksheet, data, labelsArr, font = null, fill = null) {
   labelsArr.forEach(element => {
-    if (data[element.label]){
+    if (data[element.label]) {
       const row = worksheet.addRow([element.message, data[element.label]]);
       const Row = worksheet.getRow(row._number);
-      
+
       if (font) {
         Row.getCell(2).font = font;
       }
@@ -56,7 +58,7 @@ async function createFilters(worksheet, data, labelsArr, font = null, fill = nul
   });
 }
 
-async function createTableHeader(worksheet, columns, font = null, fill = null) {
+async function createTableHeader(worksheet, columns, font = null, fill = null, length = 0) {
   const tableHeader = worksheet.addRow(columns.map((el) => el.header));
 
   const columnRow = worksheet.getRow(tableHeader._number);
@@ -64,11 +66,14 @@ async function createTableHeader(worksheet, columns, font = null, fill = null) {
     columnRow.font = font;
   }
   if (fill) {
-    columnRow.fill = fill;
+    for(let i = 1 ; i <= length; i++){
+      const cell = columnRow.getCell(i)
+      cell.fill = fill
+    }
   }
 }
 
-async function createGroupHeader(worksheet, header, font = null, fill = null) {
+async function createGroupHeader(worksheet, header, font = null, fill = null, length = 0) {
   const groupHeaderRow = worksheet.addRow(header)
   const groupByHeaderRow = worksheet.getRow(groupHeaderRow._number);
 
@@ -76,11 +81,14 @@ async function createGroupHeader(worksheet, header, font = null, fill = null) {
     groupByHeaderRow.font = font;
   }
   if (fill) {
-    groupByHeaderRow.fill = fill;
+    for(let i = 1 ; i <= length; i++){
+      const cell = groupByHeaderRow.getCell(i)
+      cell.fill = fill
+    }
   }
 }
 
-async function createSubtotal(worksheet, data, font = null, fill = null) {
+async function createSubtotal(worksheet, data, font = null, fill = null, length = 0) {
   const subtotal = worksheet.addRow(data)
   const subTotalRow = worksheet.getRow(subtotal._number);
 
@@ -88,8 +96,55 @@ async function createSubtotal(worksheet, data, font = null, fill = null) {
     subTotalRow.font = font;
   }
   if (fill) {
-    subTotalRow.fill = fill;
+    for(let i = 1 ; i <= length; i++){
+      const cell = subTotalRow.getCell(i)
+      cell.fill = fill
+    }
   }
 }
 
-module.exports = { createExcelSheet, generateExcel, createHeader, createFilters, createTableHeader, createGroupHeader, createSubtotal };
+async function getExcelSheetData(buffer) {
+  const workbook = new ExcelJS.Workbook();
+
+  // Load the file from buffer
+  await workbook.xlsx.load(buffer);
+  workbook.properties.date1904 = true;
+
+  const obj = {};
+
+  let i = 1;
+  while (true) {
+    const worksheet = workbook.getWorksheet(i);
+
+    if(!worksheet){
+      break;
+    }
+
+    const data = [];
+    worksheet.eachRow((row) => {
+      data.push(row.values);
+    });
+
+    obj[worksheet._name] = data;
+    i++
+  }
+
+
+  return obj
+}
+
+async function createGrandTotal(worksheet, data, font = null, fill = null, length = 0){
+  const grandTotalRow = worksheet.addRow(data)
+  grandTotalRow.numFmt = '#,##0.00'
+  if (font) {
+    grandTotalRow.font = font;
+  }
+  if (fill) {
+    for(let i = 1 ; i <= length; i++){
+      const cell = grandTotalRow.getCell(i)
+      cell.fill = fill
+    }
+  }
+}
+
+module.exports = { createExcelSheet, generateExcel, createHeader, createFilters, createTableHeader, createGroupHeader, createSubtotal, createGrandTotal, getExcelSheetData };
