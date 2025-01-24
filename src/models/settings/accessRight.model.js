@@ -34,6 +34,7 @@ accessRight.belongsTo(ResourceModel,{
     foreignKey:'resourceId',
     onDelete:'CASCADE',
     onUpdate:'CASCADE',
+	// as:"Resource",
 });
 
 accessRight.belongsTo(RoleModel,{

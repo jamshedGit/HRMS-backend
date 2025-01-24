@@ -16,7 +16,7 @@ const createPayroll_Process = catchAsync(async (req, res) => {
 
     const Payroll_Process = await Payroll_ProcessService.createPayroll_Process(req, req.body);
 
-    if (Payroll_Process?.status && Payroll_Process.status === "error") {
+    if (Payroll_Process?.status && Payroll_Process?.status === "error") {
 
       res.status(HttpStatusCodes.INTERNAL_SERVER_ERROR).send({
         code: HttpStatusCodes.INTERNAL_SERVER_ERROR,
@@ -31,7 +31,7 @@ const createPayroll_Process = catchAsync(async (req, res) => {
 
       res.status(httpStatus.CREATED).send({
         code: HttpStatusCodes.CREATED,
-        message: Payroll_Process.message,
+        message: Payroll_Process?.message,
         data: Payroll_Process
       });
     }

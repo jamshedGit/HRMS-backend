@@ -2,7 +2,7 @@ const httpStatus = require("http-status");
 const { LeaveTypeModel, SubsidiaryModel, LeaveTypeModelAccess } = require("../../../models/index");
 const ApiError = require("../../../utils/ApiError");
 const Sequelize = require('sequelize');
-const { paginationFacts } = require("../../../utils/common");
+const { paginationFacts, currentSubsidiaryPermission } = require("../../../utils/common");
 const pick = require("../../../utils/pick");
 const { LEAVE_TYPE, FORBIDDEN_CODES } = require("../../../models/operations/leave_type/enum/leave_type.enum");
 
@@ -16,6 +16,7 @@ const leaveTypeAttributes = [
   'name',
   'Id',
   'isActive',
+  'subsidiaryId'
 ]
 
 /**
@@ -70,13 +71,23 @@ const getAllLeaveType = async (req) => {
   ]
 
   const { count, rows } = await LeaveTypeModel.findAndCountAll({
-    order: [
-      ['createdAt', 'DESC']
-    ],
+    // order: [
+    //   ['createdAt', 'DESC']
+    // ],
     where: {
       [Op.or]: queryFilters,
       // isActive: true
     },
+    include: [{
+      model: LeaveTypeModelAccess,
+      where: {
+        subsidiaryId: {
+          [Op.in]: await currentSubsidiaryPermission(req)  // Filter banks based on subsidiaryId
+        },
+      },
+      required:true,
+      attributes:[]
+    }],
     attributes: leaveTypeAttributes,
     offset: offset,
     limit: limit,

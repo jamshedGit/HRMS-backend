@@ -24,7 +24,7 @@ const getRouteSlugs = (req) => {
 };
 
 const getDdlItems = (
-  columns = { labelField: "", valueField: "", codeField: "", mergeLabel: "", subsidiaryId: "", currencyId: "" },
+  columns = { labelField: "", valueField: "", codeField: "", mergeLabel: "", subsidiaryId: "", currencyId: "", companyId:"" },
   data = [],
   mergeLabel = false,
   parentId = null
@@ -39,7 +39,8 @@ const getDdlItems = (
     code: i[columns.codeField],
     subsidiaryId: i[columns.subsidiaryId],
     currencyId: i[columns?.currencyId],
-    type: i[columns.typeField]
+    type: i[columns.typeField],
+    companyId:i[columns.companyId]
 
 
 
@@ -332,6 +333,16 @@ const digitsToWords = (number, config = null) => {
   return toWords.convert(number)
 }
 
+const currentSubsidiaryPermission=async(req)=>{
+    const userById = await modelMapping.User_Model.findOne({
+      where: { Id: req?.user?.Id },
+    });
+
+    return userById.subsidiaryId
+}
+
+
+
 const groupBy = (data, key) => {
   const value = data.reduce((prev, current) => {
     if (prev[current[key]]) {
@@ -366,4 +377,5 @@ const formatExcelData = (data, keys) => {
 
 
 
-module.exports = { handleNestedData, getRouteSlugs, getDdlItems, getAlarmTimesItems, customPaginate, paginationFacts, createDatetime, getPathStorageFromUrl, formatDates, getDateDiffInDays, addDaysInDate, check_range_exist, createFiscalYearLabel, createEmployeeShiftLabel, createTaxYearSetupLabel, createEmployeeNameLabel, digitsToWords, groupBy, formatExcelData };
+
+module.exports = { handleNestedData, getRouteSlugs, getDdlItems, getAlarmTimesItems, customPaginate, paginationFacts, createDatetime, getPathStorageFromUrl, formatDates, getDateDiffInDays, addDaysInDate, check_range_exist, createFiscalYearLabel, createEmployeeShiftLabel, createTaxYearSetupLabel, createEmployeeNameLabel, digitsToWords, groupBy, formatExcelData,currentSubsidiaryPermission };

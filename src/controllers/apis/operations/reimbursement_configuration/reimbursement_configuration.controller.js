@@ -51,7 +51,7 @@ const getAllreimbursement_configuration = catchAsync(async (req, res) => {
     const options = pick(req.body, ['sortOrder', 'pageSize', 'pageNumber']);
     const searchQuery = req.body.filter.searchQuery ? req.body.filter.searchQuery : '';
 
-    const result = await reimbursement_configurationService.queryreimbursement_configuration(filter, options, searchQuery);
+    const result = await reimbursement_configurationService.queryreimbursement_configuration(req,filter, options, searchQuery);
    
     res.send({
         code: HttpStatusCodes.OK,
@@ -110,12 +110,23 @@ const deletereimbursement_configuration = catchAsync(async (req, res) => {
 });
 
 
+//deleteReimbursementDetailById
+
+const deleteReimbursementPolicyById = catchAsync(async (req, res) => {
+
+    const Receipt = await reimbursement_configurationService.deleteReimbursementPolicyById(req.body);
+    res.send({
+        code: HttpStatusCodes.OK,
+        message: HttpResponseMessages.OK,
+        data: Receipt,
+    });
+});
 
 module.exports = {
     createreimbursement_configuration,
     getAllreimbursement_configuration,
     getreimbursement_configurationById,
     updatereimbursement_configuration,
-    deletereimbursement_configuration,
+    deletereimbursement_configuration,deleteReimbursementPolicyById,
 
 };

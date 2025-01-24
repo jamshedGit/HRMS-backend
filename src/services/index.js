@@ -65,4 +65,5 @@ module.exports.AttendanceServicePage=require("./operations/attendance/attendance
 module.exports.EmployeeRosterServicePage = require('./operations/employee_roster/employee_roster.service')
 module.exports.LeaveRegisterServicePage = require('./operations/leave_register/leave_register.service')
 module.exports.PayrollRegisterServicePage = require('./operations/payroll_register/payroll_register.service')
+module.exports.UserService = require('./operations/user/user.service')
 module.exports.UploadServicePage = require('./operations/upload/upload.service')

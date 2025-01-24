@@ -4,7 +4,7 @@ const { PayrollPolicyModel, PayrollEmailRecipentModel, PayrollEOBIAllowancesMode
 const ApiError = require("../../../utils/ApiError");
 const sequelize = require("../../../config/db");
 const Sequelize = require('sequelize');
-const { paginationFacts } = require("../../../utils/common");
+const { paginationFacts, currentSubsidiaryPermission } = require("../../../utils/common");
 const https = require('https');
 const { XMLParser, XMLBuilder, XMLValidator } = require("fast-xml-parser");
 const fns = require('date-fns')
@@ -96,7 +96,7 @@ const createPayrollPolicy = async (req, payollBodyObj) => {
  * @param {number} [options.page] - Current page (default = 1)
  * @returns {Promise<QueryResult>}
  */
-const queryPayrollPolicy = async (filter, options, searchQuery) => {
+const queryPayrollPolicy = async (req,filter, options, searchQuery) => {
 
   let limit = options.pageSize;
   let offset = 0 + (options.pageNumber - 1) * limit;
@@ -113,6 +113,9 @@ const queryPayrollPolicy = async (filter, options, searchQuery) => {
     ],
     where: {
       [Op.or]: queryFilters,
+      subsidiaryId: {
+        [Op.in]: await currentSubsidiaryPermission(req)  // Filter banks based on subsidiaryId
+      }
       // isActive: true
     },
     include: [{ model: SubsidiaryModel, attributes: ['name'] }],

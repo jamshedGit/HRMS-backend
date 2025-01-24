@@ -4,7 +4,7 @@ const BranchModel = require("../../../models/index");
 const ApiError = require("../../../utils/ApiError");
 const sequelize = require("../../../config/db");
 const Sequelize = require('sequelize');
-const { paginationFacts } = require("../../../utils/common");
+const { paginationFacts, currentSubsidiaryPermission } = require("../../../utils/common");
 const https = require('https');
 const { XMLParser, XMLBuilder, XMLValidator } = require("fast-xml-parser");
 const fns = require('date-fns')
@@ -39,7 +39,7 @@ const createBranch = async (req, BranchBody) => {
  * @param {number} [options.page] - Current page (default = 1)
  * @returns {Promise<QueryResult>}
  */
-const queryBranch = async (filter, options, searchQuery) => {
+const queryBranch = async (req,filter, options, searchQuery) => {
 
 
 
@@ -72,6 +72,11 @@ const queryBranch = async (filter, options, searchQuery) => {
         model: BranchModel.BankModel,
         as: 'bank',
         attributes: ['Id', 'Name'],
+        where: {
+          subsidiaryId: {
+            [Op.in]: await currentSubsidiaryPermission(req)  // Filter banks based on subsidiaryId
+          }
+        }
       }],
     offset: offset,
     limit: limit,

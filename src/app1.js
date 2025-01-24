@@ -99,6 +99,8 @@ EarningModel,
 DeductionSetupAccessModel,
 DeductionModel,
 DepartmentSetupAccessModel,
+User_Model,
+UserAccessModel,
 } = require('./models');
 
 // Tax_slabModel.sync({ force: true }); 
@@ -140,6 +142,12 @@ DepartmentSetupAccessModel,
 // DeductionModel.sync({alter:true});
 // DepartmentSetupAccessModel.sync({force:true});
 // send back a 404 error for any unknown api request
+
+
+// User_Model.sync({force:true});
+// UserAccessModel.sync({force:true});
+
+// CompanyModel.sync({force:true});
 app.use((req, res, next) => {
   next(new ApiError(httpStatus.NOT_FOUND, "Not found"));
 });

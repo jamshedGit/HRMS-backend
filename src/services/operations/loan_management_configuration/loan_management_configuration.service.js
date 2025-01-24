@@ -1,9 +1,9 @@
 const httpStatus = require("http-status");
-const {Loan_management_configurationModel,Loan_management_detailModel,LoanTypeModel,FormModel,SubsidiaryModel} = require("../../../models/index");
+const { Loan_management_configurationModel, Loan_management_detailModel, LoanTypeModel, FormModel, SubsidiaryModel, Employee_loan_requestModel } = require("../../../models/index");
 
 const ApiError = require("../../../utils/ApiError");
 const Sequelize = require("sequelize");
-const { paginationFacts } = require("../../../utils/common");
+const { paginationFacts, currentSubsidiaryPermission } = require("../../../utils/common");
 const { HttpStatusCodes } = require("../../../utils/constants");
 
 const Op = Sequelize.Op;
@@ -31,9 +31,9 @@ const createloan_management_configuration = async (
     });
 
     if (existingConfiguration) {
-   
-      let result={"message":'This subsidiary already exists. Save not allowed.',"status":"error"}
-        return result;
+
+      let result = { "message": 'This subsidiary already exists. Save not allowed.', "status": "error" }
+      return result;
     }
 
     // Create the loan management configuration
@@ -42,7 +42,7 @@ const createloan_management_configuration = async (
         loan_management_configurationBody
       );
 
-  
+
     // Check for details and save them
     if (
       addedloan_management_configurationObj &&
@@ -71,7 +71,7 @@ const createloan_management_configuration = async (
       where: { Id: addedloan_management_configurationObj.Id },
       include: [
         {
-          model:Loan_management_detailModel,
+          model: Loan_management_detailModel,
           as: "details",
           include: [
             {
@@ -98,14 +98,14 @@ const createloan_management_configuration = async (
           as: "EmpLoanAccount",
         },
 
-        
-        
+
+
       ],
     });
 
     return populatedConfiguration;
   } catch (error) {
-  
+
     throw error; // Rethrow or handle the error as needed
   }
 };
@@ -144,9 +144,9 @@ const createloan_management_configuration = async (
 //         order: [
 //           [Sequelize.col("Subsidiary.name"), "ASC"],   // Order by Subsidiary name
 //           [Sequelize.col("Account.formName"), "ASC"],  // Order by Contract Type (formName)
-      
+
 //         ],
-      
+
 //         where: {
 //           [Op.or]: queryFilters,
 //           // isActive: true
@@ -168,13 +168,13 @@ const createloan_management_configuration = async (
 //                 model: LoanTypeModel,
 //                 attributes: ["code", "name"],
 //                 as: "Loan_Type",
-             
+
 //               },
 //             ]
-         
+
 //           },
-  
-     
+
+
 //           {
 //             model:FormModel,
 //             attributes: ["formName", "formCode"],
@@ -186,7 +186,7 @@ const createloan_management_configuration = async (
 //             attributes: ["formName", "formCode"],
 //             as: "EmpLoanAccount",
 //           },
-       
+
 //         ],
 //       }
 //     );
@@ -194,22 +194,22 @@ const createloan_management_configuration = async (
 //   return paginationFacts(count, limit, options.pageNumber, rows);
 // };
 
-const queryloan_management_configuration = async (filter, options, searchQuery) => {
+const queryloan_management_configuration = async (req, filter, options, searchQuery) => {
   let limit = options.pageSize;
   let offset = 0 + (options.pageNumber - 1) * limit;
 
   searchQuery = searchQuery.toLowerCase();
   const queryFilters = [
-   {
-         subsidiary: Sequelize.where(
-           Sequelize.fn("", Sequelize.col("installment_deduction_percentage")),
-           "LIKE",
-           "%" + searchQuery + "%"
-         ),
-       },
+    {
+      subsidiary: Sequelize.where(
+        Sequelize.fn("", Sequelize.col("installment_deduction_percentage")),
+        "LIKE",
+        "%" + searchQuery + "%"
+      ),
+    },
 
-    
-    
+
+
   ];
 
   const { count, rows } = await Loan_management_configurationModel.findAndCountAll({
@@ -218,6 +218,9 @@ const queryloan_management_configuration = async (filter, options, searchQuery) 
     ],
     where: {
       [Op.or]: queryFilters,
+      subsidiaryId: {
+        [Op.in]: await currentSubsidiaryPermission(req)  // Filter banks based on subsidiaryId
+      }
       // isActive: true
     },
     offset: offset,
@@ -251,7 +254,7 @@ const queryloan_management_configuration = async (filter, options, searchQuery) 
       },
     ],
   });
-  
+
 
   return paginationFacts(rows.length, limit, options.pageNumber, rows);
 };
@@ -263,7 +266,7 @@ const queryloan_management_configuration = async (filter, options, searchQuery) 
  */
 const getloan_management_configurationById = async (id) => {
   return Loan_management_configurationModel.findOne({
-    where: { Id:id },
+    where: { Id: id },
     include: [
       {
         model: Loan_management_detailModel,
@@ -286,7 +289,7 @@ const getloan_management_configurationById = async (id) => {
         attributes: ["formName", "formCode"],
         as: "Account",
       },
-      
+
     ],
   });
 
@@ -312,24 +315,24 @@ const updateloan_management_configurationById = async (
   updatedBy
 ) => {
 
-  const { subsidiaryId} = updateBody;
+  const { subsidiaryId } = updateBody;
 
 
   const overlappingSubsidiary = await Loan_management_configurationModel.findOne({
     where: {
-        Id: { [Op.ne]: Id },
+      Id: { [Op.ne]: Id },
       [Op.or]: [
-        { subsidiaryId:subsidiaryId },
-        
-       
+        { subsidiaryId: subsidiaryId },
+
+
       ]
     }
   });
   if (overlappingSubsidiary) {
 
-let result={"message":'Record already exist.',"status":"error"}
-return result;
-}
+    let result = { "message": 'Record already exist.', "status": "error" }
+    return result;
+  }
   const Item = await Loan_management_configurationModel.findOne({
     where: { Id: Id },
     include: [
@@ -354,10 +357,10 @@ return result;
     const newDetailIds = [];
 
     for (const detail of updateBody.details) {
-  
+
       if (detail.Id) {
         // Update existing detail
-   
+
         const childDetail = await Loan_management_detailModel.findOne({
           where: { Id: detail.Id }
         });
@@ -376,7 +379,7 @@ return result;
         newDetailIds.push(detail.Id);
       } else {
         // Create new detail if Id is not present
-      
+
         detail.loan_management_configurationId = Item.Id; // Associate with the configuration ID
         await Loan_management_detailModel.create(detail);
         newDetailIds.push(detail.Id); // Add the new detail's Id
@@ -387,14 +390,14 @@ return result;
     for (const existingId of existingDetailIds) {
 
       if (!newDetailIds.includes(existingId)) {
- 
+
         await Loan_management_detailModel.destroy({
           where: { Id: existingId }
         });
       }
     }
   }
-    // Update parent record
+  // Update parent record
   updateBody.updatedBy = updatedBy;
   delete updateBody.id;
   Object.assign(Item, updateBody);
@@ -426,8 +429,15 @@ const deleteloan_management_configurationById = async (Id) => {
     throw new ApiError(httpStatus.NOT_FOUND, "Item not found");
   }
 
+  const checkLoanApplied = await Employee_loan_requestModel.findOne({
+    where: { subsidiaryId: Item.subsidiaryId }
+  });
+  if (checkLoanApplied) {
+    throw new ApiError(httpStatus.FORBIDDEN, HttpResponseMessages.ASSOCIATED_RECORD);
+  }
+
   // Delete child records
-  if (Item.details && Array.isArray(Item.details)) {
+  else if (Item.details && Array.isArray(Item.details)) {
     for (const detail of Item.details) {
       await detail.destroy(); // Remove each detail record
     }
@@ -440,11 +450,11 @@ const deleteloan_management_configurationById = async (Id) => {
 
 const queryLoanTypes = async () => {
 
-  const result= await LoanTypeModel.findAndCountAll({
+  const result = await LoanTypeModel.findAndCountAll({
     order: [
       ['createdAt', 'DESC']
     ],
-    attributes: ['Id', 'code', 'name','subsidiaryId'],
+    attributes: ['Id', 'code', 'name', 'subsidiaryId'],
   });
 
   const transformedResults = [
@@ -453,12 +463,38 @@ const queryLoanTypes = async () => {
       value: item.Id,
       code: item.code,
       label: item.name, // Rename 'name' to 'value'
-      subsidiaryId:item.subsidiaryId
+      subsidiaryId: item.subsidiaryId
     })),
   ];
 
 
   return transformedResults;
+
+};
+
+const deleteLoanDetailById = async (data) => {
+
+  const checkLoanDetailApplied = await Employee_loan_requestModel.findOne({
+    where: {
+      loan_typeId: data.loan_typeId,
+      subsidiaryId: data.subsidiaryId
+    }
+
+  })
+  if (checkLoanDetailApplied) {
+    throw new ApiError(httpStatus.FORBIDDEN, HttpResponseMessages.ASSOCIATED_RECORD);
+  }
+  else {
+    const Item = await Loan_management_detailModel.findOne({
+      where: {
+        Id: data.Id
+      }
+
+    })
+    await Item.destroy();
+    return Item;
+  }
+
 
 };
 
@@ -468,5 +504,5 @@ module.exports = {
   getloan_management_configurationById,
   updateloan_management_configurationById,
   deleteloan_management_configurationById,
-  queryLoanTypes,
+  queryLoanTypes, deleteLoanDetailById,
 };

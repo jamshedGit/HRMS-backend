@@ -54,7 +54,7 @@ const getAllloan_management_configuration= catchAsync(async (req, res) => {
   const options = pick(req.body, ['sortOrder', 'pageSize', 'pageNumber']);
   const searchQuery = req.body.filter.searchQuery? req.body.filter.searchQuery : '';
  
-  const result = await loan_management_configurationService.loan_management_configurationService.queryloan_management_configuration(filter, options,searchQuery);
+  const result = await loan_management_configurationService.loan_management_configurationService.queryloan_management_configuration(req,filter, options,searchQuery);
 
   res.send({
     code: HttpStatusCodes.OK,
@@ -82,7 +82,7 @@ const updateloan_management_configuration = catchAsync(async (req, res) => {
   const loan_management_configuration = await loan_management_configurationService.loan_management_configurationService.updateloan_management_configurationById(req.body.Id, req.body, req.user.Id);
   
   
-  if(loan_management_configuration.status=="error"){
+  if(loan_management_configuration?.status=="error"){
 
     res.status(HttpStatusCodes.INTERNAL_SERVER_ERROR).send({
       code: HttpStatusCodes.INTERNAL_SERVER_ERROR,
@@ -130,12 +130,23 @@ const getAllLoanType = catchAsync(async (req, res) => {
   });
 });
 
+
+const deleteLoanDetailById = catchAsync(async (req, res) => {
+
+  const Receipt = await loan_management_configurationService.loan_management_configurationService.deleteLoanDetailById(req.body);
+  res.send({
+    code: HttpStatusCodes.OK,
+    message: HttpResponseMessages.OK,
+    data: Receipt,
+  });
+});
+
 module.exports = {
   createloan_management_configuration,
   getAllloan_management_configuration,
   getloan_management_configurationById,
   updateloan_management_configuration,
   deleteloan_management_configuration,
-  getAllLoanType,
+  getAllLoanType,deleteLoanDetailById,
  
 };

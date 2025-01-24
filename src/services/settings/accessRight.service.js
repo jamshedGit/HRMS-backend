@@ -26,7 +26,8 @@ const getAllAccessRightsByRoleId = async (filter, options) => {
             // },
             {
                 model: ResourceModel,
-                attributes: ['name', 'parentName', 'slug']
+            
+                attributes: ['name', 'parentName', 'slug','sortOrder']
             }
         ],
         attributes: ['isAccess', 'isActive', 'roleId', 'resourceId'],
@@ -34,6 +35,8 @@ const getAllAccessRightsByRoleId = async (filter, options) => {
         //     ['id', 'ASC']
         // ]
     });
+
+
     const formatedData = [];
     accessRights.forEach((element) => {
         formatedData.push({
@@ -44,6 +47,7 @@ const getAllAccessRightsByRoleId = async (filter, options) => {
             isActive: element.isActive,
             roleId: element.roleId,
             resourceId: element.resourceId,
+            sortOrder:element.t_resource.sortOrder,
         })
     });
 

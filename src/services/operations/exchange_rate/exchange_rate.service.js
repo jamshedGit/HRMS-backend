@@ -4,7 +4,7 @@ const ExchangeRateModel = require("../../../models/index");
 const ApiError = require("../../../utils/ApiError");
 const sequelize = require("../../../config/db");
 const Sequelize = require('sequelize');
-const { paginationFacts } = require("../../../utils/common");
+const { paginationFacts, currentSubsidiaryPermission } = require("../../../utils/common");
 const https = require('https');
 const { XMLParser, XMLBuilder, XMLValidator } = require("fast-xml-parser");
 const fns = require('date-fns')
@@ -20,10 +20,10 @@ const createExchangeRate = async (req, ExchangeRateBody) => {
 
 
     ExchangeRateBody.createdBy = req.user.id;
- 
+
     const addedExchangeRateObj = await ExchangeRateModel.ExchangeRateModel.create(ExchangeRateBody);
-    
- 
+
+
     return addedExchangeRateObj;
 
   } catch (error) {
@@ -71,16 +71,22 @@ const queryExchangeRates = async (filter, options, searchQuery) => {
 
 };
 
-const SP_getAllExchangeRateInfo = async (filter, options, searchQuery, empId) => {
+const SP_getAllExchangeRateInfo = async (req, filter, options, searchQuery, empId) => {
   try {
-   
-    const results = await sequelize.query('CALL usp_GetAllCurrecnyExchangeRate()');
+
+    const resultFirst = await sequelize.query('CALL usp_GetAllCurrecnyExchangeRate()');
+
+    const subsidiaryIds = await currentSubsidiaryPermission(req) 
+    const numericSubsidiaryIds = subsidiaryIds.map(id => Number(id)); // Use the Op.in operator here
+
+    const results = resultFirst.filter(o => numericSubsidiaryIds.includes(o.subsidiaryId));
+
 
     let limit = options.pageSize;
     let offset = 0 + (options.pageNumber - 1) * limit;
     searchQuery = searchQuery.toLowerCase();
     let searchlist = filterByValue(results, searchQuery);
-    
+
     let count = searchlist.length;
     const rows = searchlist.slice(offset, offset + limit)
 
@@ -93,7 +99,7 @@ const SP_getAllExchangeRateInfo = async (filter, options, searchQuery, empId) =>
 
 const SP_getAllExchangeRateInfoByEmpId = async (empId) => {
   try {
-   
+
     const results = await sequelize.query('CALL usp_GetAllExchangeRatesByEmpId(:employeeId)', {
       replacements: { employeeId: empId || 'null' },
       type: Sequelize.QueryTypes.RAW // Use RAW type for executing stored procedures
@@ -107,7 +113,7 @@ const SP_getAllExchangeRateInfoByEmpId = async (empId) => {
 
 const SP_GetAllEarningDeductionList = async (flagId) => {
   try {
-   
+
     const results = await sequelize.query('CALL usp_GetEarningDeductionResultSet(:flag)', {
       replacements: { flag: flagId || 1 },
       type: Sequelize.QueryTypes.RAW // Use RAW type for executing stored procedures
@@ -160,7 +166,7 @@ const updateExchangeRateById = async (Id, updateBody, updatedBy) => {
   }
 
   // if (updateBody.effective_date) {
-  
+
   // }
   updateBody.updatedBy = updatedBy;
   delete updateBody.id;
@@ -199,7 +205,7 @@ const getLastExchangeRateBySubsidiary = async (data) => {
       currency_to_convert_id: data.currency_to_convert_id
     }
   });
-  
+
 };
 
 module.exports = {

@@ -4,7 +4,7 @@ const EmployeeSalaryEarningModel = require("../../models/index");
 const ApiError = require("../../utils/ApiError");
 const sequelize = require("../../config/db");
 const Sequelize = require('sequelize');
-const { paginationFacts } = require("../../utils/common");
+const { paginationFacts, currentSubsidiaryPermission } = require("../../utils/common");
 const https = require('https');
 const { XMLParser, XMLBuilder, XMLValidator } = require("fast-xml-parser");
 const fns = require('date-fns')
@@ -66,13 +66,16 @@ const queryEmployeeSalarys = async (filter, options, searchQuery) => {
 };
 
 
-const SP_getAllEmployeeSalaryInfoForDDL = async (employeeId) => {
+const SP_getAllEmployeeSalaryInfoForDDL = async (employeeId,req) => {
   try {
-    const results = await sequelize.query('CALL usp_GetAllActiveEmployeesSalaryDDL(:employeeId)', {
-      replacements: { employeeId: employeeId || null },
+    const subsidiaryIdArray = await currentSubsidiaryPermission(req); // Example: ['4', '2']
+    const subsidiaryIdString = subsidiaryIdArray.join(','); // Converts to '4,2'
+
+    const results = await sequelize.query('CALL usp_GetAllActiveEmployeesSalaryDDL(:employeeId,:subsidiaryId)', {
+      replacements: { employeeId: employeeId || null ,subsidiaryId:subsidiaryIdString || null},
       type: Sequelize.QueryTypes.RAW // Use RAW type for executing stored procedures
     });
-   console.log("ddl salary", employeeId)
+
     return results
   } catch (error) {
     throw new ApiError(httpStatus.INTERNAL_SERVER_ERROR, error);

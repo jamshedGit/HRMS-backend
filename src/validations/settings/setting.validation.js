@@ -215,6 +215,12 @@ const getEmpSalaryRevisionByEmpId = {
 };
 
 
+const getAllCompanies = {
+  query: Joi.disallow(),
+  params: Joi.disallow(),
+  body: Joi.disallow(),
+}
+
 module.exports = {
   getRolesMasterData,
   getResourcesMasterData,

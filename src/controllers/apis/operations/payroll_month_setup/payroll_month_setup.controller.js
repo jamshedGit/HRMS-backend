@@ -24,7 +24,7 @@ const createPayrollMonth = catchAsync(async (req, res) => {
 
   } catch (error) {
 
-    if (error.parent.errno === 1062) {
+    if (error?.parent?.errno === 1062) {
       throw new ApiError(httpStatus.NOT_FOUND, "Duplicate entry not allowed!");
     }
     else {
@@ -41,7 +41,7 @@ const getAllPayrollMonth = catchAsync(async (req, res) => {
   // const options = pick(req.body, ["sortBy", "limit", "page"]);
   const options = pick(req.body, ['sortOrder', 'pageSize', 'pageNumber']);
   const searchQuery = req.body.filter.searchQuery ? req.body.filter.searchQuery : '';
-  const result = await PayrollMonthServicePage.PayrollMonthServicePage.queryPayrollMonths(filter, options, searchQuery);
+  const result = await PayrollMonthServicePage.PayrollMonthServicePage.queryPayrollMonths(req,filter, options, searchQuery);
 
   res.send({
     code: HttpStatusCodes.OK,

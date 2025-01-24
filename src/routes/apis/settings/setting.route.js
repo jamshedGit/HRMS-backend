@@ -34,23 +34,26 @@ router.route('/read-all-resources-master-data').get(auth(), validate(settingVali
 router.route('/read-all-countries-master-data').get(auth(), validate(settingValidation.getCountriesMasterData), settingController.getCountriesMasterData);
 router.route('/read-all-cities-master-data').post(auth(), validate(settingValidation.getCitiesMasterData), settingController.getCitiesMasterData);
 router.route('/read-all-status-types-master-data').post(auth(), validate(settingValidation.getStatusMasterData), settingController.getStatusMasterData)
-router.route('/read-all-banks').get(auth(), validate(settingValidation.getBanksMasterData), settingController.getBanksMasterData);
-router.route('/read-all-branch').get(auth(), validate(settingValidation.getBanksMasterData), settingController.get_Bank_Branch_MasterData);
+router.route('/read-all-banks').get(auth(true), validate(settingValidation.getBanksMasterData), settingController.getBanksMasterData);
+router.route('/read-all-branch').get(auth(true), validate(settingValidation.getBanksMasterData), settingController.get_Bank_Branch_MasterData);
 router.route('/read-all-dept').post(auth(), validate(settingValidation.getDeptMasterData), settingController.getDeptMasterData);
-router.route('/read-all-form').post(auth(), validate(settingValidation.getFormMenuMasterData), settingController.getFormMenusMasterData);
+router.route('/read-all-form').post(auth(true), validate(settingValidation.getFormMenuMasterData), settingController.getFormMenusMasterData);
 router.route('/read-all-child-forms').get(auth(), validate(settingValidation.getFormMenuMasterData), settingController.getChildsMenusByParentId);
-router.route('/read-all-profile').post(auth(), validate(settingValidation.getAllEmployees), settingController.getEmployeesMasterData);
-router.route('/read-all-profile-by-subsidiary').post(auth(), validate(settingValidation.getAllEmployeesBySubsidiary), settingController.getEmployeesMasterDataBySubsidiary);
+router.route('/read-all-profile').post(auth(true), validate(settingValidation.getAllEmployees), settingController.getEmployeesMasterData);
+router.route('/read-all-profile-by-subsidiary').post(auth(true), validate(settingValidation.getAllEmployeesBySubsidiary), settingController.getEmployeesMasterDataBySubsidiary);
 router.route('/read-salary-revision-by-employeeId').post( validate(settingValidation.getEmpSalaryRevisionByEmpId), settingController.getRevisionHistoryByEmpId);
-router.route('/read-all-leave-types').post(auth(), validate(settingValidation.getAllLeaveType), settingController.getAllLeaveType);
-router.route('/read-all-leave-types-by-subsidiary').post(auth(), validate(settingValidation.getAllLeaveTypeBySubsidiary), settingController.getAllLeaveTypeBySubsidiary);
+router.route('/read-all-leave-types').post(auth(true), validate(settingValidation.getAllLeaveType), settingController.getAllLeaveType);
+router.route('/read-all-leave-types-by-subsidiary').post(auth(true), validate(settingValidation.getAllLeaveTypeBySubsidiary), settingController.getAllLeaveTypeBySubsidiary);
 router.route('/read-all-subsidiaries').get(auth(), validate(settingValidation.getAllSubsidiaries), settingController.getAllSubsidiaries);
-router.route('/read-all-fiscal-year').post(auth(), validate(settingValidation.getAllFiscalYear), settingController.getAllFiscalYears);
+router.route('/read-all-fiscal-year').post(auth(true), validate(settingValidation.getAllFiscalYear), settingController.getAllFiscalYears);
 router.route('/read-encashment-leave-types').post(auth(), validate(settingValidation.getAllLeaveType), settingController.getEncashmentLeaveType);
 router.route('/read-all-employee-shift').post(auth(), validate(settingValidation.getAllShiftType), settingController.getAllEmployeeShift);
 router.route('/read-current-fiscal-year').post(auth(), validate(settingValidation.getAllLeaveTypeBySubsidiary), settingController.getCurrentFiscalYears);
 
 router.route('/get-max-tableId').post(validate(settingValidation.getFormMenuMasterData),  settingController.GetLastInserted_ID_ByTableName);
 
+router.route('/read-all-companies').get( validate(settingValidation.getAllCompanies), settingController.getCompanyMasterData);
+
+router.route('/read-all-profile-with-no-permission').get(auth(true), validate(settingValidation.getAllEmployees), settingController.getEmployeesNoNeedPermission);
 module.exports = router;
 

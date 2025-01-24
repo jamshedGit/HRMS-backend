@@ -7,6 +7,7 @@ const Sequelize = require("sequelize");
 const {
   paginationFacts,
   check_range_exist,
+  currentSubsidiaryPermission,
   // update_range_exist,
 } = require("../../../utils/common");
 const { HttpStatusCodes } = require("../../../utils/constants");
@@ -96,7 +97,7 @@ const createholidays = async (
  * @param {number} [options.page] - Current page (default = 1)
  * @returns {Promise<QueryResult>}
  */
-const queryholidays = async (filter, options, searchQuery) => {
+const queryholidays = async (req,filter, options, searchQuery) => {
   let limit = options.pageSize;
   let offset = 0 + (options.pageNumber - 1) * limit;
 
@@ -119,6 +120,9 @@ const queryholidays = async (filter, options, searchQuery) => {
     ],
     where: {
       [Op.or]: queryFilters,
+      subsidiaryId: {
+        [Op.in]: await currentSubsidiaryPermission(req)  // Filter banks based on subsidiaryId
+      }
       // isActive: true
     },
     offset: offset,

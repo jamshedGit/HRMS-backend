@@ -4,7 +4,7 @@ const Compensation_BeneftisModel = require("../../../models/index");
 const ApiError = require("../../../utils/ApiError");
 const sequelize = require("../../../config/db");
 const Sequelize = require('sequelize');
-const { paginationFacts } = require("../../../utils/common");
+const { paginationFacts, currentSubsidiaryPermission } = require("../../../utils/common");
 const https = require('https');
 const { XMLParser, XMLBuilder, XMLValidator } = require("fast-xml-parser");
 const fns = require('date-fns');
@@ -74,13 +74,16 @@ const queryCompensation_Beneftiss = async (filter, options, searchQuery) => {
 
 };
 
-const SP_getAllCompensation_BeneftisInfo = async (filter, options, searchQuery, pkId) => {
+const SP_getAllCompensation_BeneftisInfo = async (req,filter, options, searchQuery, pkId) => {
   try {
-    const results = await sequelize.query('CALL usp_GetAllCompensationBenefitsPolicy(:pkId)', {
+    const resultFirst = await sequelize.query('CALL usp_GetAllCompensationBenefitsPolicy(:pkId)', {
       replacements: { pkId: pkId || 'null' },
       type: Sequelize.QueryTypes.RAW // Use RAW type for executing stored procedures
     });
+    const subsidiaryIds = await currentSubsidiaryPermission(req) 
+    const numericSubsidiaryIds = subsidiaryIds.map(id => Number(id)); // Use the Op.in operator here
 
+    const results = resultFirst.filter(o => numericSubsidiaryIds.includes(o.subsidiaryId));
     let limit = options.pageSize;
     let offset = 0 + (options.pageNumber - 1) * limit;
     searchQuery = searchQuery.toLowerCase();

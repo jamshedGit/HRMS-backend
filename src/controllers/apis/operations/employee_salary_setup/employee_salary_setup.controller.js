@@ -34,7 +34,7 @@ const getAllEmployeeSalary = catchAsync(async (req, res) => {
   const filter = obj;
   const options = pick(req.body, ['sortOrder', 'pageSize', 'pageNumber']);
   const searchQuery = req.body.filter.searchQuery? req.body.filter.searchQuery : '';
-  const result = await EmployeeSalarySetupServicePage.EmployeeSalarySetupServicePage.SP_getAllEmployeeSalaryInfo(filter, options,searchQuery,req.body.id,req.body.transactionType);
+  const result = await EmployeeSalarySetupServicePage.EmployeeSalarySetupServicePage.SP_getAllEmployeeSalaryInfo(req,filter, options,searchQuery,req.body.id,req.body.transactionType);
   console.log(result);
   res.send({
     code: HttpStatusCodes.OK,

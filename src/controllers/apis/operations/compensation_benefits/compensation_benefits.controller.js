@@ -26,7 +26,7 @@ const getAllCompensation_Beneftis = catchAsync(async (req, res) => {
   const filter = obj;
   const options = pick(req.body, ['sortOrder', 'pageSize', 'pageNumber']);
   const searchQuery = req.body.filter.searchQuery ? req.body.filter.searchQuery : '';
-  const result = await Compensation_BeneftisformService.CompensationBenefitsServicePage.SP_getAllCompensation_BeneftisInfo(filter, options, searchQuery);
+  const result = await Compensation_BeneftisformService.CompensationBenefitsServicePage.SP_getAllCompensation_BeneftisInfo(req,filter, options, searchQuery);
   res.send({
     code: HttpStatusCodes.OK,
     message: HttpResponseMessages.OK,

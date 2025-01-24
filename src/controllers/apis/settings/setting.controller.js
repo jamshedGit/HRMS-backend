@@ -49,10 +49,11 @@ const get_Bank_Branch_MasterData = catchAsync(async (req, res) => {
 
 
 const getEmployeesMasterData = catchAsync(async (req, res) => {
+
   res.send({
     code: HttpStatusCodes.OK,
     message: HttpResponseMessages.OK,
-    data: await settingService.getEmployeesMasterData(),
+    data: await settingService.getEmployeesMasterData(req),
   });
 });
 
@@ -112,7 +113,7 @@ const getAllEmployeeShift = catchAsync(async (req, res) => {
   res.send({  
     code: HttpStatusCodes.OK,
     message: HttpResponseMessages.OK,
-    data: await settingService.getAllEmployeeShift(),
+    data: await settingService.getAllEmployeeShift(req),
   });
 });
 
@@ -128,7 +129,7 @@ const getAllSubsidiaries = catchAsync(async (req, res) => {
   res.send({  
     code: HttpStatusCodes.OK,
     message: HttpResponseMessages.OK,
-    data: await settingService.getAllSubsidiaryData(),
+    data: await settingService.getAllSubsidiaryData(req),
   });
 });
 
@@ -187,6 +188,25 @@ const GetLastInserted_ID_ByTableName = catchAsync(async (req, res) => {
   });
 });
 
+
+const getCompanyMasterData = catchAsync(async (req, res) => {
+  res.send({
+    code: HttpStatusCodes.OK,
+    message: HttpResponseMessages.OK,
+    data: await settingService.getCompanyMasterData(),
+  });
+});
+
+const getEmployeesNoNeedPermission= catchAsync(async (req, res) => {
+
+  res.send({
+    code: HttpStatusCodes.OK,
+    message: HttpResponseMessages.OK,
+    data: await settingService.getEmployeesNoNeedPermission(),
+  });
+});
+
+
 module.exports = {
   getRolesMasterData,
   getResourcesMasterData,
@@ -208,5 +228,6 @@ module.exports = {
   getAllEmployeeShift,
   getAllLeaveTypeBySubsidiary,
   getCurrentFiscalYears,
-  getEmployeesMasterDataBySubsidiary
+  getEmployeesMasterDataBySubsidiary,
+  getCompanyMasterData,getEmployeesNoNeedPermission,
 };

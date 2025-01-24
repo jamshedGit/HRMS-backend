@@ -4,19 +4,25 @@ const ApiError = require('../utils/ApiError');
 // const { roleRights } = require('../config/roles');
 const { userService } = require('../services');
 const { getRouteSlugs } = require('../utils/common');
-
-const verifyCallback = (req, resolve, reject) => async (err, user, info) => {
+const {UserService}=require("../services/index")
+const verifyCallback = (req, resolve, reject,byPass) => async (err, user, info) => {
   // console.log("err",err)
   // console.log("user",user)
   // console.log("info",info)
 
   if (err || info || !user) {
+ 
+   
     return reject(new ApiError(httpStatus.PERMANENT_REDIRECT, 'Please authenticate'));
   }
   req.user = user;
+  if (byPass) {
+    return resolve(); // Resolve immediately, skipping the access check
+  }
 
   // console.log("UserRoleId",user.roleId);
-  const hasAccess = await userService.getUserAccessForMiddleware(user.roleId, getRouteSlugs(req))
+  // const hasAccess = await userService.getUserAccessForMiddleware(user.roleId, getRouteSlugs(req))
+  const hasAccess = await UserService.getUserAccessForMiddleware(user.roleId, getRouteSlugs(req))
   
   if(!hasAccess){
     return reject(new ApiError(httpStatus.FORBIDDEN, 'Restricted Access'));
@@ -25,9 +31,10 @@ const verifyCallback = (req, resolve, reject) => async (err, user, info) => {
   resolve();
 };
 
-const auth = () => async (req, res, next) => {
+const auth = (byPass=false) => async (req, res, next) => {
+
   return new Promise((resolve, reject) => {
-    passport.authenticate('jwt', { session: false }, verifyCallback(req, resolve, reject))(req, res, next);
+    passport.authenticate('jwt', { session: false }, verifyCallback(req, resolve, reject,byPass))(req, res, next);
   })
     .then(() => next())
     .catch((err) => next(err));

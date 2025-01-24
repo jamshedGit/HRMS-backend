@@ -41,7 +41,7 @@ const getAllEmployeeSalary = catchAsync(async (req, res) => {
 
 const SP_getAllEmployeeSalaryInfoForDDL = catchAsync(async (req, res) => {
  
-  const result = await Employee_Salary_Earning_Deduction_formService.EmployeeSalaryEarningDeductionServicePage.SP_getAllEmployeeSalaryInfoForDDL(req.body.employeeId);
+  const result = await Employee_Salary_Earning_Deduction_formService.EmployeeSalaryEarningDeductionServicePage.SP_getAllEmployeeSalaryInfoForDDL(req.body.employeeId,req);
   res.send({
     code: HttpStatusCodes.OK,
     message: HttpResponseMessages.OK,

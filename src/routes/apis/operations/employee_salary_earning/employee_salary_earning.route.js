@@ -9,7 +9,7 @@ const router = express.Router();
 
 router.route("/read-employee-salary-earning").post(auth(), validate(employeeSalaryValidation.createEmployeeSalaryValidation1), empSalController.getEmployeeSalaryById);
 router.route("/read-all-employee-salary-earning").post(auth(), empSalController.getAllEmployeeSalary);
-router.route("/read-all-employee-salary-ddl").post( empSalController.SP_getAllEmployeeSalaryInfoForDDL);
+router.route("/read-all-employee-salary-ddl").post(auth(true), empSalController.SP_getAllEmployeeSalaryInfoForDDL);
 
 // router.route("/read-all-deduction-transaction").post(auth(), earningTranController.getAllEarningTran);
 router.route("/read-all-emp-earning_byId").post(empSalController.usp_GetAllSalary_Earning_DeductionByEmpId);

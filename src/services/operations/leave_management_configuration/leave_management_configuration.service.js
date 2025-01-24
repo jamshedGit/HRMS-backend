@@ -2,7 +2,7 @@ const httpStatus = require("http-status");
 const { LeaveManagementConfigurationModel, LeaveTypePoliciesModel, LeaveTypeSalaryDeductionPoliciesModel, FormModel, SubsidiaryModel, LeaveTypeModel } = require("../../../models/index");
 const ApiError = require("../../../utils/ApiError");
 const Sequelize = require('sequelize');
-const { paginationFacts, handleNestedData } = require("../../../utils/common");
+const { paginationFacts, handleNestedData, currentSubsidiaryPermission } = require("../../../utils/common");
 const pick = require("../../../utils/pick");
 
 const Op = Sequelize.Op;
@@ -101,6 +101,9 @@ const getAllleaveManagementConfiguration = async (req) => {
         attributes: [['name', 'subsidiaryName']],
         where: {
           [Op.or]: queryFilters,
+          Id: {
+            [Op.in]: await currentSubsidiaryPermission(req)  // Filter banks based on subsidiaryId
+          }
         }
       },
       /*{

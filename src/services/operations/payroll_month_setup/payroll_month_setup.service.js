@@ -4,7 +4,7 @@ const PayrollMonthModel = require("../../../models/index");
 const ApiError = require("../../../utils/ApiError");
 const sequelize = require("../../../config/db");
 const Sequelize = require('sequelize');
-const { paginationFacts, formatDates } = require("../../../utils/common");
+const { paginationFacts, formatDates, currentSubsidiaryPermission } = require("../../../utils/common");
 const https = require('https');
 const { XMLParser, XMLBuilder, XMLValidator } = require("fast-xml-parser");
 const fns = require('date-fns')
@@ -16,11 +16,57 @@ const Op = Sequelize.Op;
  * @returns {Promise<PayrollMonth>}
  */
 const createPayrollMonth = async (req, PayrollMonthBody) => {
-  PayrollMonthBody.startDate= formatDates(PayrollMonthBody.startDate, 'yyyy-MM-dd')
-  PayrollMonthBody.endDate=formatDates(PayrollMonthBody.endDate, 'yyyy-MM-dd')
+  PayrollMonthBody.startDate = formatDates(PayrollMonthBody.startDate, 'yyyy-MM-dd')
+  PayrollMonthBody.endDate = formatDates(PayrollMonthBody.endDate, 'yyyy-MM-dd')
 
   PayrollMonthBody.createdBy = req.user.id;
- 
+  let a=  await PayrollMonthModel.FiscalSetupModel.findOne({
+    where: {
+      subsidiaryId: PayrollMonthBody.subsidiaryId}
+    });
+
+
+
+  const fiscalYear = await PayrollMonthModel.FiscalSetupModel.findOne({
+    where: {
+      subsidiaryId: PayrollMonthBody.subsidiaryId,
+      startDate: { [Op.lte]: sequelize.fn('DATE', PayrollMonthBody.startDate) }, // Ignore time part
+      endDate: { [Op.gte]: sequelize.fn('DATE', PayrollMonthBody.endDate) }
+    }
+  });
+
+  // Check if fiscal year found
+  if (!fiscalYear) {
+    throw new Error('Payroll month dates are out of the fiscal year range.');
+  }
+  //PayrollPolicyModel
+
+
+  const toCheckTaxYear = await PayrollMonthModel.PayrollPolicyModel.findOne({
+    where: {
+      subsidiaryId: PayrollMonthBody.subsidiaryId,
+      isEnableTax: true,
+    }
+  });
+
+  // Check if fiscal year found
+  if (toCheckTaxYear) {
+    const taxYear = await PayrollMonthModel.TaxSetupModel.findOne({
+      where: {
+        subsidiaryId: PayrollMonthBody.subsidiaryId,
+        startDate: { [Op.lte]: sequelize.fn('DATE', PayrollMonthBody.startDate) }, // Ignore time part
+      endDate: { [Op.gte]: sequelize.fn('DATE', PayrollMonthBody.endDate) }
+      }
+    });
+
+    // Check if fiscal year found
+    if (!taxYear) {
+      throw new Error('Payroll month dates are out of the tax year range.');
+    }
+  }
+
+
+
   const resp = await sequelize.query(' update t_payroll_month_Setup set isActive = 0 where subsidiaryId =  ' + PayrollMonthBody.subsidiaryId);
 
   const addedPayrollMonthObj = await PayrollMonthModel.PayrollMonthModel.create(PayrollMonthBody);
@@ -39,11 +85,11 @@ const createPayrollMonth = async (req, PayrollMonthBody) => {
  * @param {number} [options.page] - Current page (default = 1)
  * @returns {Promise<QueryResult>}
  */
-const queryPayrollMonths = async (filter, options, searchQuery) => {
-  
+const queryPayrollMonths = async (req, filter, options, searchQuery) => {
+
   let limit = options.pageSize;
   let offset = 0 + (options.pageNumber - 1) * limit;
-  
+
   searchQuery = searchQuery.toLowerCase();
   const queryFilters = [
     { startDate: Sequelize.where(Sequelize.fn('LOWER', Sequelize.col('startDate')), 'LIKE', '%' + searchQuery + '%') },
@@ -60,6 +106,9 @@ const queryPayrollMonths = async (filter, options, searchQuery) => {
     ],
     where: {
       [Op.or]: queryFilters,
+      subsidiaryId: {
+        [Op.in]: await currentSubsidiaryPermission(req)  // Filter banks based on subsidiaryId
+      }
       // isActive: true
     },
     offset: offset,
@@ -75,7 +124,7 @@ const queryPayrollMonths = async (filter, options, searchQuery) => {
 
 
   return paginationFacts(count, limit, options.pageNumber, rows);
-  
+
 };
 
 
@@ -87,7 +136,7 @@ const SP_GetActivePreviousPayrollMonth = async (p_subsidiaryId, employeeId) => {
         attributes: ['Id', 'subsidiaryId']
       })
 
-      if(data.subsidiaryId){
+      if (data.subsidiaryId) {
         subsidiaryId = data.subsidiaryId;
       }
     }

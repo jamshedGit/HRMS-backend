@@ -1,5 +1,5 @@
-const { RoleModel, ResourceModel, CountryModel, CityModel, StatusTypeModel, BankModel, DeptModel, FormModel, EmployeeProfileModel, BranchModel, EmployeeSalaryRevisionModel, LeaveTypeModel, FiscalSetupModel, SubsidiaryModel, LeaveManagementConfigurationModel, LeaveTypePoliciesModel, AllocateLeavesModel, Employee_ShiftModel, LeaveTypeModelAccess } = require('../../models');
-const { getDdlItems, getAlarmTimesItems, formatDates, createFiscalYearLabel, createEmployeeShiftLabel, createEmployeeNameLabel } = require('../../utils/common');
+const { RoleModel, ResourceModel, CountryModel, CityModel, StatusTypeModel, BankModel, DeptModel, FormModel, EmployeeProfileModel, BranchModel, EmployeeSalaryRevisionModel, LeaveTypeModel, FiscalSetupModel, SubsidiaryModel, LeaveManagementConfigurationModel, LeaveTypePoliciesModel, AllocateLeavesModel, Employee_ShiftModel, LeaveTypeModelAccess, CompanyModel, User_Model } = require('../../models');
+const { getDdlItems, getAlarmTimesItems, formatDates, createFiscalYearLabel, createEmployeeShiftLabel, createEmployeeNameLabel, currentSubsidiaryPermission } = require('../../utils/common');
 const { DDL_FIELD_NAMES } = require('../../utils/constants');
 const { getRoleById } = require('./role.service');
 const Sequelize = require('sequelize');
@@ -103,9 +103,16 @@ const get_Bank_Branch_MasterData = async () => {
   return Bank_Branch_MasterData
 };
 
-const getEmployeesMasterData = async () => {
+const getEmployeesMasterData = async (req) => {
+  // const userById = await User_Model.findOne({
+  //   where: { Id: Id },
+  // });
+  // let sub=userById.subsidiaryId
+
   const EmployeesMasterData = await EmployeeProfileModel.findAll({
-    where: { isActive: true },
+    where: { isActive: true,subsidiaryId: {
+      [Op.in]: await currentSubsidiaryPermission(req)  // Use the Op.in operator here
+    } },
     attributes: ['Id', 'firstName', 'middleName', 'lastName']
   })
   return EmployeesMasterData?.map(el => {
@@ -327,10 +334,12 @@ const getEncashmentLeaveTypeData = async (employeeId, yearId) => {
 };
 
 
-const getAllSubsidiaryData = async () => {
+const getAllSubsidiaryData = async (req) => {
   const subsidiaryData = getDdlItems(DDL_FIELD_NAMES.Subsidiary, await SubsidiaryModel.findAll({
-    where: { isActive: true },
-    attributes: ['name', 'Id', 'currencyId']
+    where: { isActive: true,Id: {
+      [Op.in]: await currentSubsidiaryPermission(req)  // Use the Op.in operator here
+    } },
+    attributes: ['name', 'Id', 'currencyId','companyId']
   }));
   return subsidiaryData
 };
@@ -341,10 +350,15 @@ const getAllSubsidiaryData = async () => {
  * 
  * @returns 
  */
-const getAllEmployeeShift = async () => {
+const getAllEmployeeShift = async (req) => {
   const result = [];
   const shiftData = await Employee_ShiftModel.findAll({
-    where: { isActive: true },
+    where: { isActive: true,
+      subsidiaryId: {
+        [Op.in]: await currentSubsidiaryPermission(req)  // Filter banks based on subsidiaryId
+      },
+     },
+    
     attributes: ['name', 'Id', 'startTime', 'endTime','subsidiaryId']
   })
   if (shiftData?.length) {
@@ -431,6 +445,31 @@ const GetLastInserted_ID_ByTableName = async (p_TableName, pkIdColumnName, where
 };
 
 
+const getCompanyMasterData = async () => {
+
+
+  const comapnyData = getDdlItems(DDL_FIELD_NAMES.Company, await CompanyModel.findAll({
+    where: { isActive: true },
+    attributes: ['companyLegalName', 'Id']
+  }));
+  return comapnyData
+};
+
+
+const getEmployeesNoNeedPermission = async (req) => {
+
+  const EmployeesMasterData = await EmployeeProfileModel.findAll({
+    where: { isActive: true },
+    attributes: ['Id', 'firstName', 'middleName', 'lastName']
+  })
+  return EmployeesMasterData?.map(el => {
+    return {
+      label: createEmployeeNameLabel(el),
+      value: el.Id
+    }
+  }) || []
+};
+
 module.exports = {
   getRolesMasterData,
   getResourcesMasterData,
@@ -452,5 +491,7 @@ module.exports = {
   getAllEmployeeShift,
   getLeaveTypesDataBySubsidiary,
   getActiveFiscalYearData,
-  getEmployeesMasterDataBySubsidiary
+  getEmployeesMasterDataBySubsidiary,
+  getCompanyMasterData,getEmployeesNoNeedPermission,
+
 };

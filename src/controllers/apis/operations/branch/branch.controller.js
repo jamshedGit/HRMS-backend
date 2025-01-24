@@ -47,7 +47,7 @@ const getAllBranch = catchAsync(async (req, res) => {
   // const options = pick(req.body, ["sortBy", "limit", "page"]);
   const options = pick(req.body, ['sortOrder', 'pageSize', 'pageNumber']);
   const searchQuery = req.body.filter.searchQuery? req.body.filter.searchQuery : '';
-  const result = await branchformService.branchFormService.queryBranch(filter, options,searchQuery);
+  const result = await branchformService.branchFormService.queryBranch(req,filter, options,searchQuery);
  
   res.send({
     code: HttpStatusCodes.OK,
