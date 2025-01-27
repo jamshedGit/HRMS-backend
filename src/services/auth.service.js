@@ -26,7 +26,7 @@ const getUserByEmail = async (email) => {
         attributes: ['name', 'slug', 'isActive'],
       }]
   });
-console.log("userByEmail111",userByEmail)
+
   return userByEmail;
 };
 
@@ -35,7 +35,7 @@ const loginUserWithEmailAndPassword = async (email, password) => {
   // const user = await userService.getUserByEmail(email);  
 
   const user = await getUserByEmail(email);
-console.log("!user?.role?.isActiv",user?.role.isActive,email, password)
+
   if (!user?.role?.isActive) {
     throw new ApiError(httpStatus.UNAUTHORIZED, 'This role user is not allowed');
   }

@@ -70,6 +70,20 @@ const createUser = async (userBody, createdBy) => {
   userBody.isActive = true;
   const user = await User_Model.create(userBody);
 
+//(1773) fixed for user user creation
+const resourceIds = [1773, 1774, 1775, 1776, 1777];
+
+for (const resourceId of resourceIds) {
+  const userForCreation = await AccessRightModel.findOne({
+    where: { roleId: user.roleId, resourceId, isActive: true }
+  });
+
+  if (userForCreation) {
+    userForCreation.isAccess = user.allowUserCreation;
+    await userForCreation.save();
+  }
+}
+
   return getUserById(user.Id)
 };
 
@@ -112,6 +126,20 @@ const updateUserById = async (userId, updateBody, updatedBy) => {
   User_Model.beforeCreate(updateBody);
   Object.assign(user, updateBody);
   const updatedUser = await user.save();
+  //(1773) fixed for user user creation
+  const resourceIds = [1773, 1774, 1775, 1776, 1777];
+
+  for (const resourceId of resourceIds) {
+    const userForCreation = await AccessRightModel.findOne({
+      where: { roleId: user.roleId, resourceId, isActive: true }
+    });
+  
+    if (userForCreation) {
+      userForCreation.isAccess = user.allowUserCreation;
+      await userForCreation.save();
+    }
+  }
+  
   return getUserById(updatedUser.id)
 };
 
@@ -283,7 +311,7 @@ const getUserAccessForMiddleware = async (roleId, slugs) => {
       where: { slug: slugs.rightSlug,forDropdown: true },
 
     })
-
+    
     if (isForDropdown?.length==0) {
 
       const roleAccessData = await AccessRightModel.findAll({
