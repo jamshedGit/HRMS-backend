@@ -10,7 +10,8 @@
             font-family: Arial, sans-serif;
             margin: 20px;
             background-color: #f9f9f9;
-            transform: scale(0.6); /* Adjust the scale as needed */
+            transform: scale(0.6);
+            /* Adjust the scale as needed */
             transform-origin: top left;
         }
 
@@ -44,7 +45,7 @@
             color: #555;
         }
 
-        .payroll-table tfoot td {
+        .payroll-table .tfoot td {
             font-weight: bold;
             background-color: #ffeb3b;
         }
@@ -80,34 +81,32 @@
     </div>
 
     <table class="payroll-table">
-        <thead>
-            <tr>
-                <th>S. No.</th>
-                <th>Employee Code</th>
-                <th>Employee Name</th>
-                <th>Department</th>
-                <th>Grade</th>
-                <th>Designation</th>
-                <th>Date of Joining</th>
-                <th>Gross Salary</th>
-                <th>Working Days</th>
-                <th>Payable Days</th>
-                <th>Absent Days</th>
-                <th>Overtime Hours</th>
-                {{#each earningColumns}}
-                <th>{{this}}</th>
-                {{/each}}
-                <th>Total Allowances</th>
-                {{#each deductionColumns}}
-                <th>{{this}}</th>
-                {{/each}}
-                {{#each loanColumns}}
-                <th>{{this}}</th>
-                {{/each}}
-                <th>Total Deduction</th>
-                <th>Net Payable Salary</th>
-            </tr>
-        </thead>
+        <tr>
+            <th>S. No.</th>
+            <th>Employee Code</th>
+            <th>Employee Name</th>
+            <th>Department</th>
+            <th>Grade</th>
+            <th>Designation</th>
+            <th>Date of Joining</th>
+            <th>Gross Salary</th>
+            <th>Working Days</th>
+            <th>Payable Days</th>
+            <th>Absent Days</th>
+            <th>Overtime Hours</th>
+            {{#each earningColumns}}
+            <th>{{this}}</th>
+            {{/each}}
+            <th>Total Allowances</th>
+            {{#each deductionColumns}}
+            <th>{{this}}</th>
+            {{/each}}
+            {{#each loanColumns}}
+            <th>{{this}}</th>
+            {{/each}}
+            <th>Total Deduction</th>
+            <th>Net Payable Salary</th>
+        </tr>
         <tbody>
             {{#each obj}}
             <tr>
@@ -159,11 +158,7 @@
                 <td>{{toFixed totals.netPayableSalary}}</td>
             </tr>
             {{/each}}
-
-
-        </tbody>
-        <tfoot>
-            <tr>
+            <tr class="tfoot">
                 <td colspan="7" class="left">Grand Total</td>
                 <td>{{toFixed totals.grossSalary}}</td>
                 <td colspan="4"></td>
@@ -180,7 +175,9 @@
                 <td>{{toFixed totals.totalDeductions}}</td>
                 <td>{{toFixed totals.netPayableSalary}}</td>
             </tr>
-        </tfoot>
+
+        </tbody>
+
     </table>
 
 </body>
