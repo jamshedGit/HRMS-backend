@@ -13,11 +13,56 @@ const {
 
 const Op = Sequelize.Op;
 
+ // for all role , not delete
+// const queryUser = async (
+//   filter,
+//   options,
+//   searchQuery
+// ) => {
+//   let limit = options.pageSize;
+//   let offset = 0 + (options.pageNumber - 1) * limit;
+
+//   searchQuery = searchQuery.toLowerCase();
+//   const queryFilters = [
+
+//     { name1: Sequelize.where(Sequelize.fn('LOWER', Sequelize.col('email')), 'LIKE', '%' + searchQuery + '%') },
+
+//   ];
+
+//   const { count, rows } =
+//     await User_Model.findAndCountAll({
+//       order: [
+//         ["email", "ASC"],   // Use the alias and attribute name
+//       ],
+//       where: {
+//         [Op.or]: queryFilters,
+//         // isActive: true
+//       },
+//       offset: offset,
+//       limit: limit,
+//       include: [
+//         {
+//           model: RoleModel,
+//           as: 'role',
+//           attributes: ['id', 'name'],
+//         }],
+
+
+
+//     });
+
+
+
+
+
+
+//   return paginationFacts(count, limit, options.pageNumber, rows);
+// };
 
 const queryUser = async (
   filter,
   options,
-  searchQuery
+  searchQuery,currentUserId
 ) => {
   let limit = options.pageSize;
   let offset = 0 + (options.pageNumber - 1) * limit;
@@ -29,13 +74,74 @@ const queryUser = async (
 
   ];
 
-  const { count, rows } =
+
+  const rolesMasterData = await RoleModel.findAll({
+    where: { isActive: true },
+    attributes: ['id', 'name']
+  });
+
+  const currentUser = await User_Model.findOne({
+    where: { Id: currentUserId },  // Assuming currentUserId is passed for the logged-in user
+  });
+
+
+  const allUsers = await User_Model.findAll({
+    where: { isActive: true },
+    attributes: ['Id', 'roleId', 'supervisedbyId']
+  });
+// Recursive function to get all users under a specific supervisorId (direct and indirect supervision)
+const getUsersUnderSupervision = (supervisorId) => {
+  // Find all users directly supervised by the given supervisorId
+  const directSupervisedUsers = allUsers.filter(user => user.supervisedbyId === supervisorId);
+  
+  // Initialize an array to store all supervised users (direct + indirect)
+  let allSupervisedUsers = [...directSupervisedUsers];
+  
+  // For each directly supervised user, check if they have further subordinates (recursive step)
+  directSupervisedUsers.forEach(user => {
+    // Recursively find users supervised by this user
+    const indirectSupervisedUsers = getUsersUnderSupervision(user.roleId);
+    allSupervisedUsers = [...allSupervisedUsers, ...indirectSupervisedUsers];
+  });
+
+  // Return all users (direct + indirect)
+  return allSupervisedUsers;
+};
+
+// Function to filter roles based on user's supervisor hierarchy (both direct and indirect supervision)
+const filteredRoles = rolesMasterData.filter(role => {
+  // If the current user is Admin (roleId === 1), they can see all roles
+  if (currentUser.roleId === 1) {
+    return true;  // Super Admin can view all roles
+  }
+
+  // For non-admin users, check based on their direct and indirect subordinates
+  const allSupervisedUsers = getUsersUnderSupervision(currentUser.roleId);  // Get all users under the current user's supervision
+ 
+
+  // Check if the roleId of the current role matches any supervised users' roleId
+  const isRoleSupervised = allSupervisedUsers.some(user => user.roleId === role.id);
+
+  // Return true if the role is supervised by the current user, otherwise false
+
+  return isRoleSupervised;
+});
+
+
+
+
+
+      const { count, rows } =
     await User_Model.findAndCountAll({
       order: [
         ["email", "ASC"],   // Use the alias and attribute name
       ],
       where: {
         [Op.or]: queryFilters,
+        roleId: {
+          [Op.in]: filteredRoles.map(role => role.id),  // Extract the id from filteredRoles
+        },
+        
         // isActive: true
       },
       offset: offset,
@@ -56,9 +162,10 @@ const queryUser = async (
 
 
 
+
+
   return paginationFacts(count, limit, options.pageNumber, rows);
 };
-
 
 const createUser = async (userBody, createdBy) => {
 
@@ -221,10 +328,10 @@ const getUserCompleteRoleAccess = async (roleId) => {
 //   // Loop through each item in roleAccessData
 //   roleAccessData.forEach((item) => {
 //     const resource = item.t_resource;
-//     console.log("resource.forDropdown", resource.forDropdown)
+//     
 //     // Check if sortOrder is 1 - this is a special case where we show the data immediately
 //     if (resource.forDropdown == 1) {
-//       console.log("roleAccessData111")
+//      
 //       formatedData.push({
 //         isResourceShow: resource.isResourceShow,
 //         name: resource.name,
@@ -297,7 +404,7 @@ const getUserCompleteRoleAccess = async (roleId) => {
 //     // return 1
 //     // return roleAccessData;
 //   } catch (error) {
-//     console.log(error)
+//    
 //     return false;
 //   }
 // };

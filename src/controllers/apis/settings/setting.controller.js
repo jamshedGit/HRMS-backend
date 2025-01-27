@@ -11,7 +11,7 @@ const getRolesMasterData = catchAsync(async (req, res) => {
   res.send({
     code: HttpStatusCodes.OK,
     message: HttpResponseMessages.OK,
-    data: await settingService.getRolesMasterData(req.user.roleId),
+    data: await settingService.getRolesMasterData(req.user.roleId,req.user.Id),
   });
 });
 

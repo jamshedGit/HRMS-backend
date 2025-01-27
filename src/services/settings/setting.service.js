@@ -7,23 +7,113 @@ const sequelize = require('../../config/db');
 const ApiError = require('../../utils/ApiError');
 const Op = Sequelize.Op;
 
-const getRolesMasterData = async (roleId) => {
-  var userRole = await getRoleById(roleId);
-  userRole = userRole.slug == 'super-admin' ? true : false;
 
-  let whereClause;
-  if (userRole !== true) {
-    whereClause = {
-      slug: { [Op.not]: ['super-admin', 'admin'] },
-    };
-  }
-  const rolesMasterData = getDdlItems(DDL_FIELD_NAMES.default, await RoleModel.findAll({
-    where: { isActive: true },
-    where: whereClause,
-    attributes: ['id', 'name']
-  }));
-  return rolesMasterData
+
+ // for all role , not delete
+
+// const getRolesMasterData = async (roleId) => {
+//   var userRole = await getRoleById(roleId);
+//   userRole = userRole.slug == 'super-admin' ? true : false;
+
+//   let whereClause;
+//   if (userRole !== true) {
+//     whereClause = {
+//       slug: { [Op.not]: ['super-admin', 'admin'] },
+//     };
+//   }
+//   const rolesMasterData = getDdlItems(DDL_FIELD_NAMES.default, await RoleModel.findAll({
+//     where: { isActive: true },
+//     where: whereClause,
+//     attributes: ['id', 'name']
+//   }));
+//   return rolesMasterData
+// };
+
+
+
+const getRolesMasterData = async (roleId,currentUserId) => {
+  try {
+  
+    const currentUser = await User_Model.findOne({
+      where: { Id: currentUserId },  // Assuming currentUserId is passed for the logged-in user
+    });
+
+    // If user not found, throw error
+    if (!currentUser) {
+      throw new Error('User not found');
+    }
+
+  
+const rolesMasterData = await RoleModel.findAll({
+  where: { isActive: true },
+  attributes: ['id', 'name']
+});
+
+// Fetch all active users data to check their supervision hierarchy
+const allUsers = await User_Model.findAll({
+  where: { isActive: true },
+  attributes: ['Id', 'roleId', 'supervisedbyId']
+});
+
+
+
+// Recursive function to get all users under a specific supervisorId (direct and indirect supervision)
+const getUsersUnderSupervision = (supervisorId) => {
+  // Find all users directly supervised by the given supervisorId
+  const directSupervisedUsers = allUsers.filter(user => user.supervisedbyId === supervisorId);
+  
+  // Initialize an array to store all supervised users (direct + indirect)
+  let allSupervisedUsers = [...directSupervisedUsers];
+  
+  // For each directly supervised user, check if they have further subordinates (recursive step)
+  directSupervisedUsers.forEach(user => {
+    // Recursively find users supervised by this user
+    const indirectSupervisedUsers = getUsersUnderSupervision(user.roleId);
+    allSupervisedUsers = [...allSupervisedUsers, ...indirectSupervisedUsers];
+  });
+
+  // Return all users (direct + indirect)
+  return allSupervisedUsers;
 };
+
+// Function to filter roles based on user's supervisor hierarchy (both direct and indirect supervision)
+const filteredRoles = rolesMasterData.filter(role => {
+  // If the current user is Admin (roleId === 1), they can see all roles
+  if (currentUser.roleId === 1) {
+    return true;  // Super Admin can view all roles
+  }
+
+  // For non-admin users, check based on their direct and indirect subordinates
+  const allSupervisedUsers = getUsersUnderSupervision(currentUser.roleId);  // Get all users under the current user's supervision
+ 
+
+  // Check if the roleId of the current role matches any supervised users' roleId
+  // const isRoleSupervised = allSupervisedUsers.some(user => user.roleId === role.id);
+
+  const isRoleSupervised = allSupervisedUsers.some(user => user.roleId === role.id);
+
+// Check if the role has no users assigned
+const isRoleWithoutUsers = !allUsers.some(user => user.roleId === role.id);
+
+// Return true if the role is supervised by the current user, or if it has no users assigned
+const shouldShowRole = isRoleSupervised || isRoleWithoutUsers;
+
+
+
+  return shouldShowRole;
+});
+
+
+
+
+ 
+    return getDdlItems(DDL_FIELD_NAMES.default, filteredRoles);
+  } catch (error) {
+    console.error('Error fetching roles:', error);
+    throw error;
+  }
+};
+
 
 const getStatusMasterData = async (check) => {
 
