@@ -11,6 +11,6 @@ router.route("/read-all-payroll-month").post(auth(), validate(itemValidation.cre
 router.route("/create-payroll-month").post(auth(), validate(itemValidation.createItem), form_controller.createPayrollMonth);
 router.route("/update-payroll-month").put(auth(), validate(itemValidation.updateItem), form_controller.updatePayrollMonth);
 router.route("/delete-payroll-month").patch(auth(),validate(itemValidation.deleteItem),form_controller.deletePayrollMonth);
-router.route("/get-payroll-month-previous-date").post(form_controller.SP_GetActivePreviousPayrollMonth);
+router.route("/get-payroll-month-previous-date").post(auth(true),form_controller.SP_GetActivePreviousPayrollMonth);
 // router.route("/donation-report").post(auth(),validate(receiptValidation.getDonationReceiptByBookNo),receiptController.getDonationReceiptReport);
 module.exports = router;

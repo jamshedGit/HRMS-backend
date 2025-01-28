@@ -16,6 +16,7 @@ const employeeRosterAttributes = [
   'shiftId',
   'Id',
   'isActive',
+  'subsidiaryId'
 ]
 
 /**
@@ -108,13 +109,20 @@ const getAllEmployeeRoster = async (req) => {
   const options = pick(req.body, ['sortOrder', 'pageSize', 'pageNumber']);
   const limit = options.pageSize;
   const offset = 0 + (options.pageNumber - 1) * limit;
+  
+  const filter = req.body?.filter || {};
+
+  if(!filter.subsidiaryId){
+    return paginationFacts(0, limit, options.pageNumber, []);
+  }
 
   const { count, rows } = await EmployeeRosterModel.findAndCountAll({
     order: [
       ['from', 'DESC']
     ],
     where: {
-      isActive: true
+      isActive: true,
+      subsidiaryId: filter.subsidiaryId
     },
     include: [{ model: EmployeeProfileModel,
       where:{
@@ -148,6 +156,7 @@ const getEmployeeRosterById = async (id, options = null) => {
     to: rosterData[0].to,
     shiftId: rosterData[0].shiftId,
     Id: rosterData[0].Id,
+    subsidiaryId: rosterData[0].subsidiaryId,
     list: [{ employeeId: rosterData[0].employeeId }]
   }
 
