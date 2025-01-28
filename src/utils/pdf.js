@@ -14,6 +14,13 @@ Handlebars.registerHelper('toFixed', function(value) {
   return Number(value).toFixed(2);
 });
 
+Handlebars.registerHelper('isMultipleOf', function(index, multiple, options) {
+  if ((index + 1) % multiple === 0) {
+      return options.fn(this);
+  }
+  return options.inverse(this);
+});
+
 /**
  * Generates a PDF from a Handlebars template and returns it as a buffer.
  * @param {string} templatePath - Path to the Handlebars template file.

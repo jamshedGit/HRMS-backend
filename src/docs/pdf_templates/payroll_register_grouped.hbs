@@ -10,9 +10,8 @@
             font-family: Arial, sans-serif;
             margin: 20px;
             background-color: #f9f9f9;
-            transform: scale(0.6);
-            /* Adjust the scale as needed */
-            transform-origin: top left;
+            zoom: 0.6
+                /* Adjust the zoom scale as needed */
         }
 
         h1 {
@@ -21,7 +20,7 @@
         }
 
         .payroll-table {
-            width: 100%;
+            width: 60%;
             border-collapse: collapse;
             margin-top: 20px;
             background-color: #fff;
@@ -50,6 +49,16 @@
             background-color: #ffeb3b;
         }
 
+        .payroll-table .totals-row td {
+            font-weight: bold;
+            background-color: #83f183;
+        }
+
+        .payroll-table .category-name td {
+            font-weight: bold;
+            background-color: #f1ce83;
+        }
+
         .header-info {
             margin-bottom: 20px;
         }
@@ -60,6 +69,16 @@
 
         .left {
             text-align: left !important;
+        }
+
+        @media print {
+            .page-break {
+                display: block;
+                height: 1px;
+                /* Small height to visually divide */
+                margin: 20px 0;
+                page-break-after: always;
+            }
         }
     </style>
 </head>
@@ -81,36 +100,39 @@
     </div>
 
     <table class="payroll-table">
-        <tr>
-            <th>S. No.</th>
-            <th>Employee Code</th>
-            <th>Employee Name</th>
-            <th>Department</th>
-            <th>Grade</th>
-            <th>Designation</th>
-            <th>Date of Joining</th>
-            <th>Gross Salary</th>
-            <th>Working Days</th>
-            <th>Payable Days</th>
-            <th>Absent Days</th>
-            <th>Overtime Hours</th>
-            {{#each earningColumns}}
-            <th>{{this}}</th>
-            {{/each}}
-            <th>Total Allowances</th>
-            {{#each deductionColumns}}
-            <th>{{this}}</th>
-            {{/each}}
-            {{#each loanColumns}}
-            <th>{{this}}</th>
-            {{/each}}
-            <th>Total Deduction</th>
-            <th>Net Payable Salary</th>
-        </tr>
+        <thead>
+            <tr>
+                <th>S. No.</th>
+                <th>Employee Code</th>
+                <th>Employee Name</th>
+                <th>Department</th>
+                <th>Grade</th>
+                <th>Designation</th>
+                <th>Date of Joining</th>
+                <th>Gross Salary</th>
+                <th>Working Days</th>
+                <th>Payable Days</th>
+                <th>Absent Days</th>
+                <th>Overtime Hours</th>
+                {{#each earningColumns}}
+                <th>{{this}}</th>
+                {{/each}}
+                <th>Total Allowances</th>
+                {{#each deductionColumns}}
+                <th>{{this}}</th>
+                {{/each}}
+                {{#each loanColumns}}
+                <th>{{this}}</th>
+                {{/each}}
+                <th>Total Deduction</th>
+                <th>Net Payable Salary</th>
+            </tr>
+        </thead>
         <tbody>
             {{#each obj}}
-            <tr>
+            <tr class="category-name">
                 <td colspan="3" class="left">{{@key}}</td>
+                <td></td>
             </tr>
             {{#each this.data}}
             <tr>
@@ -139,6 +161,9 @@
                 <td>{{toFixed totalDeductions}}</td>
                 <td>{{toFixed netPayableSalary}}</td>
             </tr>
+            {{#isMultipleOf @index 20}}
+            <tr class="page-break"></tr>
+            {{/isMultipleOf}}
             {{/each}}
             <tr class="totals-row">
                 <td colspan="7" class="left">Subtotal</td>
