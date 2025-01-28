@@ -43,7 +43,21 @@ const updateUser = {
     }),
 };
 
+
+const resetPassword = {
+    query: Joi.disallow(),
+    params: Joi.disallow(),
+    body: Joi.object().keys({
+    
+        email: Joi.string().trim(),
+        currentPassword: Joi.string().trim(),
+        password: Joi.string().trim(),
+        companyId: Joi.number().allow(null),
+        subsidiaryId: Joi.number().allow(null),
+
+    }),
+};
 module.exports = {
-    createUser,updateUser
+    createUser,updateUser,resetPassword
 
 };

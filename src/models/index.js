@@ -173,3 +173,4 @@ module.exports.DepartmentSetupAccessModel=require("./operations/department/depar
 
 module.exports.User_Model = require('./operations/user/user.model');
 module.exports.UserAccessModel =require('./operations/user/user.model');
+module.exports.Password_history=require('./operations/user/password_history.model');

@@ -101,6 +101,7 @@ DeductionModel,
 DepartmentSetupAccessModel,
 User_Model,
 UserAccessModel,
+Password_history,
 } = require('./models');
 
 // Tax_slabModel.sync({ force: true }); 
@@ -146,7 +147,7 @@ UserAccessModel,
 
 // User_Model.sync({force:true});
 // UserAccessModel.sync({force:true});
-
+// Password_history.sync({force:true})
 // CompanyModel.sync({force:true});
 app.use((req, res, next) => {
   next(new ApiError(httpStatus.NOT_FOUND, "Not found"));
