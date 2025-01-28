@@ -4,7 +4,7 @@ const ApiError = require("../../../utils/ApiError");
 const Sequelize = require('sequelize');
 const { paginationFacts, getDateDiffInDays, addDaysInDate, handleNestedData, currentSubsidiaryPermission } = require("../../../utils/common");
 const pick = require("../../../utils/pick");
-const { where } = require("underscore");
+const { startOfDay, endOfDay } = require("date-fns");
 
 const Op = Sequelize.Op;
 
@@ -36,14 +36,14 @@ const createEmployeeRoster = async (req) => {
       isActive: true,
       [Sequelize.Op.or]: [
         {
-          from: { [Sequelize.Op.between]: [rest.from, rest.to] }
+          from: { [Sequelize.Op.between]: [startOfDay(rest.from), endOfDay(rest.to)] }
         },
         {
-          to: { [Sequelize.Op.between]: [rest.from, rest.to] }
+          to: { [Sequelize.Op.between]: [startOfDay(rest.from), endOfDay(rest.to)] }
         },
         {
-          from: { [Sequelize.Op.lte]: rest.from },
-          to: { [Sequelize.Op.gte]: rest.to }
+          from: { [Sequelize.Op.lte]: startOfDay(rest.from) },
+          to: { [Sequelize.Op.gte]: endOfDay(rest.to) }
         }
       ]
     },
