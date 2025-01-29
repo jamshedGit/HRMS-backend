@@ -10,8 +10,8 @@
             font-family: Arial, sans-serif;
             margin: 20px;
             background-color: #f9f9f9;
-            transform: scale(0.6); /* Adjust the scale as needed */
-            transform-origin: top left;
+            zoom: 0.6
+                /* Adjust the zoom scale as needed */
         }
 
         h1 {
@@ -20,7 +20,7 @@
         }
 
         .payroll-table {
-            width: 100%;
+            width: 60%;
             border-collapse: collapse;
             margin-top: 20px;
             background-color: #fff;
@@ -44,7 +44,7 @@
             color: #555;
         }
 
-        .payroll-table tfoot td {
+        .payroll-table .tfoot td {
             font-weight: bold;
             background-color: #ffeb3b;
         }
@@ -59,6 +59,16 @@
 
         .left {
             text-align: left !important;
+        }
+
+        @media print {
+            .page-break {
+                display: block;
+                height: 1px;
+                /* Small height to visually divide */
+                margin: 20px 0;
+                page-break-after: always;
+            }
         }
     </style>
 </head>
@@ -99,10 +109,10 @@
                 {{/each}}
                 <th>Total Allowances</th>
                 {{#each deductionColumns}}
-                <th>Deduction {{this}}</th>
+                <th>{{this}}</th>
                 {{/each}}
                 {{#each loanColumns}}
-                <th>Loan {{this}}</th>
+                <th>{{this}}</th>
                 {{/each}}
                 <th>Total Deduction</th>
                 <th>Net Payable Salary</th>
@@ -136,10 +146,11 @@
                 <td>{{toFixed totalDeductions}}</td>
                 <td>{{toFixed netPayableSalary}}</td>
             </tr>
+            {{#isMultipleOf @index 20}}
+            <tr class="page-break"></tr>
+            {{/isMultipleOf}}
             {{/each}}
-        </tbody>
-        <tfoot>
-            <tr>
+            <tr class="tfoot">
                 <td colspan="7" class="left">Grand Total</td>
                 <td>{{toFixed totals.grossSalary}}</td>
                 <td colspan="4"></td>
@@ -156,9 +167,8 @@
                 <td>{{toFixed totals.totalDeductions}}</td>
                 <td>{{toFixed totals.netPayableSalary}}</td>
             </tr>
-        </tfoot>
+        </tbody>
     </table>
-
 </body>
 
 </html>
