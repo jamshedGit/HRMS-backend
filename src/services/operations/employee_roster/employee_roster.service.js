@@ -129,7 +129,7 @@ const getAllEmployeeRoster = async (req) => {
         subsidiaryId: {
           [Op.in]: await currentSubsidiaryPermission(req)  
         }
-      }, attributes: ['firstName'] }, { model: Employee_ShiftModel, attributes: ['name'] }],
+      }, attributes: [[Sequelize.literal(`CONCAT(firstName, ' ', lastName)`), 'firstName']] }, { model: Employee_ShiftModel, attributes: ['name'] }],
     attributes: employeeRosterAttributes,
     offset: offset,
     limit: limit,
