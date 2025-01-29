@@ -10,6 +10,7 @@ const createItem = {
     from: Joi.date().required(),
     to: Joi.date().required(),
     shiftId: Joi.number().required(),
+    subsidiaryId: Joi.number().required(),
     list: Joi.array().items(
       Joi.object().keys({
         employeeId: Joi.number().required(),
@@ -29,6 +30,7 @@ const updateItem = {
     from: Joi.date().optional(),
     to: Joi.date().optional(),
     shiftId: Joi.number().required(),
+    subsidiaryId: Joi.number().required(),
     list: Joi.array().items(
       Joi.object().keys({
         employeeId: Joi.number().optional(),
@@ -59,7 +61,8 @@ const getAllItem = {
     pageSize: Joi.number().required(),
     pageNumber: Joi.number().required(),
     filter: Joi.object().keys({
-      searchQuery: Joi.optional()
+      searchQuery: Joi.optional(),
+      subsidiaryId: Joi.optional()
     })
   }),
 };
