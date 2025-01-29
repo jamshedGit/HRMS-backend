@@ -177,6 +177,13 @@ const createUser = async (userBody, createdBy) => {
   userBody.isActive = true;
   const user = await User_Model.create(userBody);
 
+ const passwordBody = {
+   userId: user.Id,
+   password:user.password,
+   isActive: true
+ };
+await Password_history.create(passwordBody);
+
   //(1773) fixed for user user creation
   const resourceIds = [1773, 1774, 1775, 1776, 1777];
 
@@ -451,7 +458,9 @@ const getUserAccessForMiddleware = async (roleId, slugs) => {
 
 const getUserByEmail = async (email) => {
 
-  return User_Model.findOne({email});
+return User_Model.findOne({
+  where: { email: email }  // Ensure the 'where' clause is included
+});
 };
 
 const resetPassword = async (req,data) => {
@@ -466,17 +475,13 @@ const resetPassword = async (req,data) => {
     throw new ApiError(httpStatus.BAD_REQUEST, 'Incorrect email or password');
   }
 
-
-  // if ( await Password_history.isPasswordTaken(userData.Id, data.password)) {
-  //   throw new ApiError(httpStatus.BAD_REQUEST, 'Password already taken');
-  // }
-
   const existingPasswords = await Password_history.findAll({
     where: { userId: userData.Id },
   });
 
   // Check if the new password matches any of the previous passwords
   for (let passwordRecord of existingPasswords) {
+  
     const isMatch = bcrypt.compareSync(data.password, passwordRecord.password);
     if (isMatch) {
       throw new ApiError(httpStatus.BAD_REQUEST, 'Password has been used previously');

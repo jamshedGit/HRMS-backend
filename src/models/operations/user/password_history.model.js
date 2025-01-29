@@ -16,7 +16,7 @@ const Password_history = sequelize.define('t_PasswordHistory', {
     subsidiaryId: { type: Sequelize.INTEGER, allowNull: true },
     companyId: { type: Sequelize.INTEGER, allowNull: true },
     changeDate: { type: Sequelize.DATE, allowNull: true },
-    changedById: { type: Sequelize.INTEGER, allowNull: false },
+    changedById: { type: Sequelize.INTEGER, allowNull: true },
 
     isActive: { type: Sequelize.BOOLEAN, allowNull: true, default: true },
     createdAt: { type: Sequelize.DATE, allowNull: true },
