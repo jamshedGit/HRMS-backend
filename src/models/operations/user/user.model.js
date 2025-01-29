@@ -2,7 +2,7 @@ const Sequelize = require('sequelize')
 const { Op } = require("sequelize");
 const bcrypt = require('bcryptjs');
 
-const { RoleModel, EmployeeProfileModel, SubsidiaryModel } = require('../../index');
+const { RoleModel, EmployeeProfileModel, SubsidiaryModel, CompanyModel } = require('../../index');
 //import Database connection configurations.
 const sequelize = require('../../../config/db')
 const user = sequelize.define('t_user', {
@@ -75,6 +75,11 @@ user.belongsTo(RoleModel, {
 	foreignKey: 'employeeIdMapping',
 	targetKey: 'Id',
 		as:"EmployeeMapping"
+  });
+  user.belongsTo(CompanyModel, {
+	foreignKey: 'companyId',
+	targetKey: 'Id',
+		as:"Company"
   });
 
 

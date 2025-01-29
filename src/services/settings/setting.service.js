@@ -424,16 +424,36 @@ const getEncashmentLeaveTypeData = async (employeeId, yearId) => {
 };
 
 
+// const getAllSubsidiaryData = async (req) => {
+//   const subsidiaryData = getDdlItems(DDL_FIELD_NAMES.Subsidiary, await SubsidiaryModel.findAll({
+//     where: { isActive: true,Id: {
+//       [Op.in]: await currentSubsidiaryPermission(req)  // Use the Op.in operator here
+//     } },
+//     attributes: ['name', 'Id', 'currencyId','companyId']
+//   }));
+//   return subsidiaryData
+// };
+
+
+
 const getAllSubsidiaryData = async (req) => {
-  const subsidiaryData = getDdlItems(DDL_FIELD_NAMES.Subsidiary, await SubsidiaryModel.findAll({
-    where: { isActive: true,Id: {
-      [Op.in]: await currentSubsidiaryPermission(req)  // Use the Op.in operator here
-    } },
-    attributes: ['name', 'Id', 'currencyId','companyId']
-  }));
+  let subsidiaryData;
+  if(req.user.roleId==1){
+    subsidiaryData = getDdlItems(DDL_FIELD_NAMES.Subsidiary, await SubsidiaryModel.findAll({
+      where: { isActive: true},
+      attributes: ['name', 'Id', 'currencyId','companyId']
+    }));
+  }else{
+     subsidiaryData = getDdlItems(DDL_FIELD_NAMES.Subsidiary, await SubsidiaryModel.findAll({
+      where: { isActive: true,Id: {
+        [Op.in]: await currentSubsidiaryPermission(req)  // Use the Op.in operator here
+      } },
+      attributes: ['name', 'Id', 'currencyId','companyId']
+    }));
+  }
+
   return subsidiaryData
 };
-
 /**
  * 
  * Get All Employee Shifts data for dropdown.
@@ -535,14 +555,19 @@ const GetLastInserted_ID_ByTableName = async (p_TableName, pkIdColumnName, where
 };
 
 
-const getCompanyMasterData = async () => {
+const getCompanyMasterData = async (req) => {
 
-
+if(req.user.roleId==1){
   const comapnyData = getDdlItems(DDL_FIELD_NAMES.Company, await CompanyModel.findAll({
     where: { isActive: true },
     attributes: ['companyLegalName', 'Id']
   }));
   return comapnyData
+}
+else{
+  return []
+}
+  
 };
 
 

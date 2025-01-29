@@ -6,7 +6,7 @@ const UserModel = require('../models/user.model');
 const ApiError = require('../utils/ApiError');
 const { tokenTypes } = require('../config/tokens');
 const { HttpStatusCodes, HttpResponseMessages } = require('../utils/constants');
-const { User_Model, RoleModel } = require('../models/index');
+const { User_Model, RoleModel, CompanyModel } = require('../models/index');
 const { UserService } = require('./index');
 
 /**
@@ -24,7 +24,14 @@ const getUserByEmail = async (email) => {
         model: RoleModel,
         as: 'role',
         attributes: ['name', 'slug', 'isActive'],
-      }]
+      },
+
+      {
+        model: CompanyModel,
+        as: 'Company',
+        attributes: ['Id','name', 'CompanyLegalName'],
+      }
+    ]
   });
 
   return userByEmail;

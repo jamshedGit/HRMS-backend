@@ -193,7 +193,7 @@ const getCompanyMasterData = catchAsync(async (req, res) => {
   res.send({
     code: HttpStatusCodes.OK,
     message: HttpResponseMessages.OK,
-    data: await settingService.getCompanyMasterData(),
+    data: await settingService.getCompanyMasterData(req),
   });
 });
 
