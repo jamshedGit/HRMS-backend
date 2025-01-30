@@ -11,6 +11,7 @@ const EmployeePolicyModel = sequelize.define('t_employeepolicy', {
 		primaryKey: true
 	},
 	subsidiaryId: { type: Sequelize.INTEGER, allowNull: true },
+	companyId: { type: Sequelize.INTEGER, allowNull: true },
 	currencyId: { type: Sequelize.INTEGER, allowNull: true },
 	isEmployeeCodeGenerationAuto: { type: Sequelize.BOOLEAN, allowNull: true },
 	retirementAgeMale: { type: Sequelize.INTEGER, allowNull: true },

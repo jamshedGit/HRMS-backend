@@ -9,7 +9,7 @@ const Op = Sequelize.Op;
 
 
 
- // for all role , not delete
+// for all role , not delete
 
 // const getRolesMasterData = async (roleId) => {
 //   var userRole = await getRoleById(roleId);
@@ -31,11 +31,18 @@ const Op = Sequelize.Op;
 
 
 
-const getRolesMasterData = async (roleId,currentUserId) => {
+const getRolesMasterData = async (roleId, currentUserId) => {
   try {
-  
+
     const currentUser = await User_Model.findOne({
       where: { Id: currentUserId },  // Assuming currentUserId is passed for the logged-in user
+      include: [
+        {
+          model: RoleModel,
+          as: 'role',
+          attributes: ['id', 'name'],
+        }],
+
     });
 
     // If user not found, throw error
@@ -43,71 +50,105 @@ const getRolesMasterData = async (roleId,currentUserId) => {
       throw new Error('User not found');
     }
 
-  
-const rolesMasterData = await RoleModel.findAll({
-  where: { isActive: true },
-  attributes: ['id', 'name']
-});
 
-// Fetch all active users data to check their supervision hierarchy
-const allUsers = await User_Model.findAll({
-  where: { isActive: true },
-  attributes: ['Id', 'roleId', 'supervisedbyId']
-});
+    const rolesMasterData = await RoleModel.findAll({
+      where: { isActive: true },
+      attributes: ['id', 'name']
+    });
 
-
-
-// Recursive function to get all users under a specific supervisorId (direct and indirect supervision)
-const getUsersUnderSupervision = (supervisorId) => {
-  // Find all users directly supervised by the given supervisorId
-  const directSupervisedUsers = allUsers.filter(user => user.supervisedbyId === supervisorId);
-  
-  // Initialize an array to store all supervised users (direct + indirect)
-  let allSupervisedUsers = [...directSupervisedUsers];
-  
-  // For each directly supervised user, check if they have further subordinates (recursive step)
-  directSupervisedUsers.forEach(user => {
-    // Recursively find users supervised by this user
-    const indirectSupervisedUsers = getUsersUnderSupervision(user.roleId);
-    allSupervisedUsers = [...allSupervisedUsers, ...indirectSupervisedUsers];
-  });
-
-  // Return all users (direct + indirect)
-  return allSupervisedUsers;
-};
-
-// Function to filter roles based on user's supervisor hierarchy (both direct and indirect supervision)
-const filteredRoles = rolesMasterData.filter(role => {
-  // If the current user is Admin (roleId === 1), they can see all roles
-  if (currentUser.roleId === 1) {
-    return true;  // Super Admin can view all roles
-  }
-
-  // For non-admin users, check based on their direct and indirect subordinates
-  const allSupervisedUsers = getUsersUnderSupervision(currentUser.roleId);  // Get all users under the current user's supervision
- 
-
-  // Check if the roleId of the current role matches any supervised users' roleId
-  // const isRoleSupervised = allSupervisedUsers.some(user => user.roleId === role.id);
-
-  const isRoleSupervised = allSupervisedUsers.some(user => user.roleId === role.id);
-
-// Check if the role has no users assigned
-const isRoleWithoutUsers = !allUsers.some(user => user.roleId === role.id);
-
-// Return true if the role is supervised by the current user, or if it has no users assigned
-const shouldShowRole = isRoleSupervised || isRoleWithoutUsers;
+    // Fetch all active users data to check their supervision hierarchy
+    const allUsers = await User_Model.findAll({
+      where: { isActive: true },
+      attributes: ['Id', 'roleId', 'supervisedbyId']
+    });
 
 
+let isRoleWithoutUsers=''
+    // Recursive function to get all users under a specific supervisorId (direct and indirect supervision)
+    const getUsersUnderSupervision = (supervisorId) => {
+      // Find all users directly supervised by the given supervisorId
+      const directSupervisedUsers = allUsers.filter(user => user.supervisedbyId === supervisorId);
 
-  return shouldShowRole;
-});
+      // Initialize an array to store all supervised users (direct + indirect)
+      let allSupervisedUsers = [...directSupervisedUsers];
+
+      // For each directly supervised user, check if they have further subordinates (recursive step)
+      directSupervisedUsers.forEach(user => {
+        // Recursively find users supervised by this user
+        const indirectSupervisedUsers = getUsersUnderSupervision(user.roleId);
+        allSupervisedUsers = [...allSupervisedUsers, ...indirectSupervisedUsers];
+      });
+
+      // Return all users (direct + indirect)
+      return allSupervisedUsers;
+    };
+
+    // Function to filter roles based on user's supervisor hierarchy (both direct and indirect supervision)
+    const filteredRoles = rolesMasterData.filter(role => {
+      // If the current user is Admin (roleId === 1), they can see all roles
+      if (currentUser.roleId === 1) {
+        return true;  // Super Admin can view all roles
+      }
+
+      // For non-admin users, check based on their direct and indirect subordinates
+      const allSupervisedUsers = getUsersUnderSupervision(currentUser.roleId);  // Get all users under the current user's supervision
+
+
+      // Check if the roleId of the current role matches any supervised users' roleId
+      // const isRoleSupervised = allSupervisedUsers.some(user => user.roleId === role.id);
+
+      const isRoleSupervised = allSupervisedUsers.some(user => user.roleId === role.id);
+
+      // Check if the role has no users assigned
+       isRoleWithoutUsers = !allUsers.some(user => user.roleId === role.id);
+
+      // Return true if the role is supervised by the current user, or if it has no users assigned
+      const shouldShowRole = isRoleSupervised || isRoleWithoutUsers;
 
 
 
+      return shouldShowRole;
+    });
 
- 
-    return getDdlItems(DDL_FIELD_NAMES.default, filteredRoles);
+
+
+
+
+    // return getDdlItems(DDL_FIELD_NAMES.default, filteredRoles);
+
+    let role = getDdlItems(DDL_FIELD_NAMES.default, filteredRoles);
+    let supervisedBy = [
+      ...role,
+      {
+        label: currentUser.role.name,  // Modify the label as needed
+        value: currentUser.roleId
+      }
+    ];
+    
+
+
+    supervisedBy = supervisedBy.filter((item) => {
+      // Include roles that have users or are supervised by the current user
+      const hasUsers = allUsers.some(user => user.roleId === item.value);  // Check if the role has users
+      
+      if (item.value === currentUser.roleId) {
+        return true; // Always include the current user's role
+      }
+      
+      return hasUsers || !isRoleWithoutUsers; // Include roles with users or if it's not a "role without users" situation
+    });
+    
+    // Remove duplicates based on the 'value' property
+    let uniqueSupervisedBy = supervisedBy.filter((value, index, self) =>
+      index === self.findIndex((t) => t.value === value.value)
+    );
+    
+    let data = {
+      role: role,
+      supervisedBy: uniqueSupervisedBy
+    };
+
+    return data;
   } catch (error) {
     console.error('Error fetching roles:', error);
     throw error;
@@ -200,9 +241,11 @@ const getEmployeesMasterData = async (req) => {
   // let sub=userById.subsidiaryId
 
   const EmployeesMasterData = await EmployeeProfileModel.findAll({
-    where: { isActive: true,subsidiaryId: {
-      [Op.in]: await currentSubsidiaryPermission(req)  // Use the Op.in operator here
-    } },
+    where: {
+      isActive: true, subsidiaryId: {
+        [Op.in]: await currentSubsidiaryPermission(req)  // Use the Op.in operator here
+      }
+    },
     attributes: ['Id', 'firstName', 'middleName', 'lastName']
   })
   return EmployeesMasterData?.map(el => {
@@ -228,9 +271,9 @@ const getEmployeesMasterDataBySubsidiary = async (subsidiaryId) => {
 };
 
 
-const getDeptMasterData = async (Id) => {
+const getDeptMasterData = async (req, Id) => {
   const deptMasterData = await DeptModel.findAll({
-    where: { isActive: true },
+    where: { isActive: true, companyId: req.user.companyId },
     attributes: ['deptId', 'deptName', 'subsidiaryId']
   });
 
@@ -240,7 +283,7 @@ const getDeptMasterData = async (Id) => {
   //   deptId: x.deptId,
   //   deptName: x.deptName,
   //   subsidiaryId: x.subsidiaryId,
-   
+
   // }));
 
 
@@ -256,7 +299,7 @@ const getDeptMasterData = async (Id) => {
       }));
   }
 
-const processedDeptMasterData = getDdlItems(DDL_FIELD_NAMES.DeptName, filteredDeptMasterData);
+  const processedDeptMasterData = getDdlItems(DDL_FIELD_NAMES.DeptName, filteredDeptMasterData);
 
 
   return processedDeptMasterData
@@ -438,17 +481,19 @@ const getEncashmentLeaveTypeData = async (employeeId, yearId) => {
 
 const getAllSubsidiaryData = async (req) => {
   let subsidiaryData;
-  if(req.user.roleId==1){
+  if (req.user.roleId == 1) {
     subsidiaryData = getDdlItems(DDL_FIELD_NAMES.Subsidiary, await SubsidiaryModel.findAll({
-      where: { isActive: true},
-      attributes: ['name', 'Id', 'currencyId','companyId']
+      where: { isActive: true },
+      attributes: ['name', 'Id', 'currencyId', 'companyId']
     }));
-  }else{
-     subsidiaryData = getDdlItems(DDL_FIELD_NAMES.Subsidiary, await SubsidiaryModel.findAll({
-      where: { isActive: true,Id: {
-        [Op.in]: await currentSubsidiaryPermission(req)  // Use the Op.in operator here
-      } },
-      attributes: ['name', 'Id', 'currencyId','companyId']
+  } else {
+    subsidiaryData = getDdlItems(DDL_FIELD_NAMES.Subsidiary, await SubsidiaryModel.findAll({
+      where: {
+        isActive: true, Id: {
+          [Op.in]: await currentSubsidiaryPermission(req)  // Use the Op.in operator here
+        }
+      },
+      attributes: ['name', 'Id', 'currencyId', 'companyId']
     }));
   }
 
@@ -463,20 +508,21 @@ const getAllSubsidiaryData = async (req) => {
 const getAllEmployeeShift = async (req) => {
   const result = [];
   const shiftData = await Employee_ShiftModel.findAll({
-    where: { isActive: true,
+    where: {
+      isActive: true,
       subsidiaryId: {
         [Op.in]: await currentSubsidiaryPermission(req)  // Filter banks based on subsidiaryId
       },
-     },
-    
-    attributes: ['name', 'Id', 'startTime', 'endTime','subsidiaryId']
+    },
+
+    attributes: ['name', 'Id', 'startTime', 'endTime', 'subsidiaryId']
   })
   if (shiftData?.length) {
     shiftData.forEach(el => {
       result.push({
         label: createEmployeeShiftLabel(el.name, el.endTime, el.startTime),
         value: el.Id,
-        subsidiaryId:el.subsidiaryId
+        subsidiaryId: el.subsidiaryId
       })
     })
   }
@@ -490,7 +536,7 @@ const getAllFiscalYearData = async (employeeId) => {
     if (employeeData?.subsidiaryId) {
 
       const yearData = await FiscalSetupModel.findAll({
-        where: {subsidiaryId: employeeData?.subsidiaryId},
+        where: { subsidiaryId: employeeData?.subsidiaryId },
         attributes: ['startDate', 'endDate', 'Id']
       });
       if (yearData.length) {
@@ -542,7 +588,7 @@ const getCitiesMasterData = async (countryId) => {
 
 const GetLastInserted_ID_ByTableName = async (p_TableName, pkIdColumnName, whereClause) => {
   try {
-
+   
     const results = await sequelize.query('CALL usp_GenerateDynamicId(:p_TableName,:p_IdColumn,:p_WhereClause)', {
       replacements: { p_TableName: p_TableName, p_IdColumn: pkIdColumnName, p_WhereClause: whereClause },
       type: Sequelize.QueryTypes.RAW // Use RAW type for executing stored procedures
@@ -557,17 +603,17 @@ const GetLastInserted_ID_ByTableName = async (p_TableName, pkIdColumnName, where
 
 const getCompanyMasterData = async (req) => {
 
-if(req.user.roleId==1){
-  const comapnyData = getDdlItems(DDL_FIELD_NAMES.Company, await CompanyModel.findAll({
-    where: { isActive: true },
-    attributes: ['companyLegalName', 'Id']
-  }));
-  return comapnyData
-}
-else{
-  return []
-}
-  
+  if (req.user.roleId == 1) {
+    const comapnyData = getDdlItems(DDL_FIELD_NAMES.Company, await CompanyModel.findAll({
+      where: { isActive: true },
+      attributes: ['companyLegalName', 'Id']
+    }));
+    return comapnyData
+  }
+  else {
+    return []
+  }
+
 };
 
 
@@ -607,6 +653,6 @@ module.exports = {
   getLeaveTypesDataBySubsidiary,
   getActiveFiscalYearData,
   getEmployeesMasterDataBySubsidiary,
-  getCompanyMasterData,getEmployeesNoNeedPermission,
+  getCompanyMasterData, getEmployeesNoNeedPermission,
 
 };

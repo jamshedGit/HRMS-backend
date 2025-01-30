@@ -15,6 +15,8 @@ const FormModel = sequelize.define('t_form_menu', {
 	parentFormID: { type: Sequelize.NUMBER, allowNull: true },
 	level: { type: Sequelize.NUMBER, allowNull: true },
 	isDeleted: { type: Sequelize.BOOLEAN, allowNull: true, defaultValue: true },
+	subsidiaryId: { type: Sequelize.INTEGER, allowNull: true },
+	companyId: { type: Sequelize.INTEGER, allowNull: true },
 	isActive: { type: Sequelize.BOOLEAN, allowNull: true, defaultValue: true },
 	createdBy: {
 		type: Sequelize.INTEGER,
@@ -26,6 +28,7 @@ const FormModel = sequelize.define('t_form_menu', {
 	},
 	createdAt: { type: Sequelize.DATE, allowNull: true },
 	updatedAt: { type: Sequelize.DATE, allowNull: true },
+
 
 });
 

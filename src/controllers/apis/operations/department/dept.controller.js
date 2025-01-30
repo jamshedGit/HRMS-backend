@@ -17,7 +17,7 @@ const createDept = catchAsync(async (req, res) => {
   try {
 
 
-    req.body.createdBY = req.user.id;
+    // req.body.createdBY = req.user.Id;
     const Bank = await deptFormService.createDept(req, req.body);
 
     res.status(httpStatus.CREATED).send({

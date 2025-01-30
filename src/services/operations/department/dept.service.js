@@ -19,7 +19,9 @@ const createDept = async (req, DeptBody) => {
  
   // DeptBody.slug = DeptBody.name.replace(/ /g, "-").toLowerCase();
 
-  DeptBody.createdBy = req.user.deptId;
+  DeptBody.createdBy = req.user.Id;
+  DeptBody.companyId=req.user.companyId;
+
   //DeptBody.parentDept = 1;
 
   if (DeptBody.parentDept == '') { DeptBody.parentDept = null }

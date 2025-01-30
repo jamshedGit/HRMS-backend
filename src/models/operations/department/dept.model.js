@@ -14,6 +14,7 @@ const department = sequelize.define('t_department', {
     deptName: { type: Sequelize.STRING, allowNull: true },
     deptCode: { type: Sequelize.STRING, allowNull: true },
     budgetStrength: { type: Sequelize.STRING, allowNull: true },
+    companyId: { type: Sequelize.INTEGER, allowNull: true },
     // subsidiaryId: { type: Sequelize.INTEGER, allowNull: true },
     subsidiaryId: {
 		type: DataTypes.JSON,
