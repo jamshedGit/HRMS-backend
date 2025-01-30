@@ -7,7 +7,7 @@ const createEmp_profileValidation = {
         firstName: Joi.string(),
         subsidiaryId: Joi.number(),
         lastName: Joi.string(),
-        middleName: Joi.string(),
+        middleName: Joi.string().allow(""),
         title: Joi.string(),
         employeeCode: Joi.string().trim().pattern(/^\S+$/).replace(/\s+/g, ''),
         profile_image: Joi.string(),
