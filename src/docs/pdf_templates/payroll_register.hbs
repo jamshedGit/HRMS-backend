@@ -99,7 +99,7 @@
                 <th>Grade</th>
                 <th>Designation</th>
                 <th>Date of Joining</th>
-                <th>Gross Salary</th>
+                <th>Gross Package</th>
                 <th>Working Days</th>
                 <th>Payable Days</th>
                 <th>Absent Days</th>
@@ -128,7 +128,7 @@
                 <td>{{gradeName}}</td>
                 <td>{{designationName}}</td>
                 <td>{{dateOfJoining}}</td>
-                <td>{{GrossSalary}}</td>
+                <td>{{GrossPackage}}</td>
                 <td>{{monthDays}}</td>
                 <td>{{paidDays}}</td>
                 <td>{{AbsentDays}}</td>
@@ -152,7 +152,7 @@
             {{/each}}
             <tr class="tfoot">
                 <td colspan="7" class="left">Grand Total</td>
-                <td>{{toFixed totals.grossSalary}}</td>
+                <td>{{toFixed totals.grossPackage}}</td>
                 <td colspan="4"></td>
                 {{#each earningColumns}}
                 <td>{{toFixed (lookup ../totals this)}}</td>
