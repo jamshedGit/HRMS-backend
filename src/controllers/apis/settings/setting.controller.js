@@ -203,7 +203,7 @@ const getEmployeesNoNeedPermission= catchAsync(async (req, res) => {
   res.send({
     code: HttpStatusCodes.OK,
     message: HttpResponseMessages.OK,
-    data: await settingService.getEmployeesNoNeedPermission(),
+    data: await settingService.getEmployeesNoNeedPermission(req),
   });
 });
 

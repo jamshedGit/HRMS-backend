@@ -18,15 +18,21 @@ const Op = Sequelize.Op;
 const createForm = async (req, FormBody) => {
  
   // FormBody.slug = FormBody.name.replace(/ /g, "-").toLowerCase();
-
+try{
   FormBody.createdBy = req.user.Id;
   FormBody.formName = FormBody.formName;
   FormBody.companyId=req.user.companyId;
   FormBody.parentFormID = FormBody.parentFormID || null;
- 
+
   const addedFormObj = await FormModel.FormModel.create(FormBody);
   //authSMSSend(addedBankObj.dataValues);  // Quick send message at the time of donation
-  return addedFormObj;
+
+    return addedFormObj;
+   
+} catch (error) {
+  throw error   
+}
+
 };
 
 /**

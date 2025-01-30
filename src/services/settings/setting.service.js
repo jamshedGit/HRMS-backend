@@ -325,7 +325,7 @@ const getRevisionHistoryByEmpId = async (employeeId) => {
 
 const getFormMenusMasterData = async (req, res) => {
   const FormMenusMasterData = getDdlItems(DDL_FIELD_NAMES.FormMenus, await FormModel.findAll({
-    where: { isActive: true, parentFormID: req.body.Id || null },
+    where: { isActive: true, parentFormID: req.body.Id || null,companyId:req.user.companyId },
     attributes: ['formName', 'Id', 'formCode']
   }), req.body.mergeLabel);
 
@@ -620,7 +620,7 @@ const getCompanyMasterData = async (req) => {
 const getEmployeesNoNeedPermission = async (req) => {
 
   const EmployeesMasterData = await EmployeeProfileModel.findAll({
-    where: { isActive: true },
+    where: { isActive: true ,companyId:req.user.companyId},
     attributes: ['Id', 'firstName', 'middleName', 'lastName']
   })
   return EmployeesMasterData?.map(el => {

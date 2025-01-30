@@ -4,8 +4,8 @@ const createForm = {
     query: Joi.disallow(),
     params: Joi.disallow(),
     body: Joi.object().keys({
-        formName: Joi.string(),
-        formCode: Joi.string(),
+        formName: Joi.string().trim(),
+        formCode: Joi.string().trim(),
         parentFormID: Joi.any().optional(),
         level: Joi.number(),
         Id: Joi.any().optional(),
@@ -13,7 +13,19 @@ const createForm = {
     }),
 };
 
+const updateForm = {
+    query: Joi.disallow(),
+    params: Joi.disallow(),
+    body: Joi.object().keys({
+        formName: Joi.string().trim(),
+        formCode: Joi.string().trim(),
+        parentFormID: Joi.any().optional(),
+        level: Joi.number(),
+        Id: Joi.any().optional(),
+        isActive:Joi.boolean(),
+    }),
+};
 
 module.exports = {
-    createForm
+    createForm,updateForm
 };

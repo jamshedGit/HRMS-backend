@@ -25,7 +25,7 @@ const createForm = catchAsync(async (req, res) => {
     });
 
   } catch (error) {
-
+    throw error    
   }
 });
 
