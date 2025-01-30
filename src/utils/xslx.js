@@ -88,7 +88,7 @@ async function createGroupHeader(worksheet, header, font = null, fill = null, le
   }
 }
 
-async function createSubtotal(worksheet, data, font = null, fill = null, length = 0) {
+async function createSubtotal(worksheet, data, font = null, fill = null, length = 0, numfmt= null) {
   const subtotal = worksheet.addRow(data)
   const subTotalRow = worksheet.getRow(subtotal._number);
 
@@ -100,6 +100,9 @@ async function createSubtotal(worksheet, data, font = null, fill = null, length 
       const cell = subTotalRow.getCell(i)
       cell.fill = fill
     }
+  }
+  if(numfmt){
+    subTotalRow.numFmt = numfmt;
   }
 }
 

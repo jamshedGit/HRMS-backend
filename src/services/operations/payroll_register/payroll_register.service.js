@@ -642,7 +642,7 @@ const generatePayrollRegisterExcel = async (req) => {
         data.numFmt = '#,##0.00'
       })
 
-      createSubtotal(worksheet, { ...totals, sno: 'Sub Total' }, { bold: true, color: { argb: 'FF000000' } }, { type: 'pattern', pattern: 'solid', fgColor: { argb: 'F1A983' } }, columns.length)
+      createSubtotal(worksheet, { ...totals, sno: 'Sub Total' }, { bold: true, color: { argb: 'FF000000' } }, { type: 'pattern', pattern: 'solid', fgColor: { argb: 'F1A983' } }, columns.length, '#,##0.00')
 
     })
 
