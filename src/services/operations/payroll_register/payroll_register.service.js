@@ -20,6 +20,7 @@ const PRINT_REGISTER_EMPLOYEE_QUERY = `SELECT
     pf.employeeCode,
     desig.formName AS designationName,
     grade.formName AS gradeName,
+    pay.formName AS paymentModeName,
     loc.formName AS locationName,
     paygrp.formName AS payrollGroup,
     dp.deptName AS departmentName,
@@ -41,6 +42,8 @@ LEFT JOIN t_form_menu desig ON
     desig.Id = pe.designationId
 LEFT JOIN t_form_menu loc ON
     loc.Id = pe.locationId
+LEFT JOIN t_form_menu pay ON
+    pay.Id = pe.payment_mode_Id
 LEFT JOIN t_form_menu paygrp ON
     paygrp.Id = pe.PayrollGroupId
 LEFT JOIN t_attendancesummary SUM ON
@@ -550,7 +553,7 @@ const generatePayrollRegisterExcel = async (req) => {
 
   employeeData.forEach((emp, i) => {
     const employeeEarning = earningData.filter((el) => el.EmpId == emp.employeeId);
-    emp.sno = i + 1;
+    emp.sno = (i + 1).toString();
     totals.GrossPackage += Number(emp.GrossPackage);
 
     employeeEarning.forEach(earn => {
