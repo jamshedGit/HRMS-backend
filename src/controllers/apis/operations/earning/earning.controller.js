@@ -41,7 +41,7 @@ const getAllEarning = catchAsync(async (req, res) => {
   // const options = pick(req.body, ["sortBy", "limit", "page"]);
   const options = pick(req.body, ['sortOrder', 'pageSize', 'pageNumber']);
   const searchQuery = req.body.filter.searchQuery ? req.body.filter.searchQuery : '';
-  const result = await EarningformService.EarningServicePage.SP_getAllEarningInfo(filter, options, searchQuery, req.body.id);
+  const result = await EarningformService.EarningServicePage.SP_getAllEarningInfo(req,filter, options, searchQuery, req.body.id);
  
   res.send({
     code: HttpStatusCodes.OK,

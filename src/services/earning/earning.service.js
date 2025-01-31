@@ -19,8 +19,10 @@ const createEarning = async (req, EarningBody) => {
  
   // EarningBody.slug = EarningBody.name.replace(/ /g, "-").toLowerCase();
  
-  EarningBody.createdBy = req.user.id;
+  EarningBody.createdBy = req.user.Id;
   EarningBody.earningName=EarningBody.earningName.trimStart();
+  EarningBody.companyId=req.user.companyId;
+
   const addedEarningObj = await EarningModel.create(EarningBody);
   //authSMSSend(addedEarningObj.dataValues);  // Quick send message at the time of donation
     if (addedEarningObj) {
@@ -73,55 +75,59 @@ const queryEarnings = async (filter, options, searchQuery) => {
 
 };
 
-const SP_getAllEarningInfo = async (filter, options, searchQuery, empId) => {
+const SP_getAllEarningInfo = async (req,filter, options, searchQuery, empId) => {
   try {
  
-    const results = await sequelize.query('CALL usp_GetAllEmpEarnings(:employeeId)', {
-      replacements: { employeeId: empId || 'null' },
-      type: Sequelize.QueryTypes.RAW // Use RAW type for executing stored procedures
-    });
-
-
-    // const results = await EarningModel.findAll({
-    //   attributes: [
-    //     'Id',
-    //     'subsidiaryid',
-    //     'earningCode',
-    //     'earningName',
-    //     "mappedAllowance",
-    //     "account",
-    //     'isActive',
-    //     'createdBy',
-    //     'createdAt',
-    //     'updatedBy',
-    //     'updatedAt',
-    //     // [sequelize.col('subsidiary.name'), 'subsidiary'], // Get the subsidiary name
-    //     // Simplified CASE statements using sequelize.fn and sequelize.col
-    //     [
-    //       sequelize.fn('IF', sequelize.col('linkedAttendance'), 'Yes', 'No'), 
-    //       'linkedAttendance',
-    //     ],
-    //     [
-    //       sequelize.fn('IF', sequelize.col('isTaxable'), 'Yes', 'No'), 
-    //       'isTaxable',
-    //     ],
-        
-    //     [
-    //       sequelize.fn('CONCAT', sequelize.col('Account.formCode'), ' - ', sequelize.col('Account.formName')),
-    //       'account',
-    //     ],
-    //   ],
-    //   include: [
-      
-    //     {
-    //       model: FormModel,
-    //       attributes: ["formName", "formCode"],
-    //       as: "Account",
-    //     },
-
-    //   ],
-    //   // Optional: add any filters, such as `where` or `order`, depending on your use case
+    // const results = await sequelize.query('CALL usp_GetAllEmpEarnings(:employeeId)', {
+    //   replacements: { employeeId: empId || 'null' },
+    //   type: Sequelize.QueryTypes.RAW // Use RAW type for executing stored procedures
     // });
+
+ 
+
+    const results = await EarningModel.findAll({
+      where: {
+        companyId: req.user.companyId
+      },
+      attributes: [
+        'Id',
+        'subsidiaryid',
+        'earningCode',
+        'earningName',
+        "mappedAllowance",
+        "account",
+        'isActive',
+        'createdBy',
+        'createdAt',
+        'updatedBy',
+        'updatedAt',
+        // [sequelize.col('subsidiary.name'), 'subsidiary'], // Get the subsidiary name
+        // Simplified CASE statements using sequelize.fn and sequelize.col
+        [
+          sequelize.fn('IF', sequelize.col('linkedAttendance'), 'Yes', 'No'), 
+          'linkedAttendance',
+        ],
+        [
+          sequelize.fn('IF', sequelize.col('isTaxable'), 'Yes', 'No'), 
+          'isTaxable',
+        ],
+        
+        [
+          sequelize.fn('CONCAT', sequelize.col('Account.formCode'), ' - ', sequelize.col('Account.formName')),
+          'account',
+        ],
+      ],
+      include: [
+      
+        {
+          model: FormModel,
+          attributes: ["formName", "formCode"],
+          as: "Account",
+        },
+
+      ],
+      // Optional: add any filters, such as `where` or `order`, depending on your use case
+    });
 
     // return earnings;
     let limit = options.pageSize;

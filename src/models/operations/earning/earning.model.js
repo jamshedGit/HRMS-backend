@@ -45,7 +45,7 @@ const EarningModel = sequelize.define('t_employee_earning', {
 	createdAt: { type: Sequelize.DATE, allowNull: true },
 	updatedAt: { type: Sequelize.DATE, allowNull: true },
 
-
+	companyId : { type: Sequelize.INTEGER, allowNull: true},
 
 });
 
