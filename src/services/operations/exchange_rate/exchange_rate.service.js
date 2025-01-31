@@ -19,8 +19,8 @@ const createExchangeRate = async (req, ExchangeRateBody) => {
   try {
 
 
-    ExchangeRateBody.createdBy = req.user.id;
-
+    ExchangeRateBody.createdBy = req.user.Id;
+    ExchangeRateBody.comapny=req.user.compnayId;
     const addedExchangeRateObj = await ExchangeRateModel.ExchangeRateModel.create(ExchangeRateBody);
 
 
