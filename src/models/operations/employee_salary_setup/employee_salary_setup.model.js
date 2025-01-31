@@ -46,6 +46,7 @@ const EmpSalaryModel = sequelize.define('t_employee_salary_benefits', {
     company_branchId: { type: Sequelize.INTEGER, allowNull: true },
     company_from_accNo: { type: Sequelize.STRING, allowNull: true },
     approved: {type: Sequelize.BOOLEAN, allowNull: true, defaultValue: false},
+    grossPackage: {type: Sequelize.INTEGER, allowNull: true, defaultValue: 0},
     isActive: { type: Sequelize.BOOLEAN, allowNull: true, defaultValue: true },
     createdBy: {
         type: Sequelize.INTEGER,

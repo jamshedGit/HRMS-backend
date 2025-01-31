@@ -91,6 +91,7 @@ const getAllLeaveType = async (req) => {
     attributes: leaveTypeAttributes,
     offset: offset,
     limit: limit,
+    distinct: true
   });
 
   //Send paginated data

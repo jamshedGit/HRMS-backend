@@ -4,7 +4,7 @@ const ApiError = require("../../../utils/ApiError");
 const Sequelize = require('sequelize');
 const { paginationFacts, getDateDiffInDays, addDaysInDate, handleNestedData, currentSubsidiaryPermission } = require("../../../utils/common");
 const pick = require("../../../utils/pick");
-const { where } = require("underscore");
+const { startOfDay, endOfDay } = require("date-fns");
 
 const Op = Sequelize.Op;
 
@@ -16,6 +16,7 @@ const employeeRosterAttributes = [
   'shiftId',
   'Id',
   'isActive',
+  'subsidiaryId'
 ]
 
 /**
@@ -36,14 +37,14 @@ const createEmployeeRoster = async (req) => {
       isActive: true,
       [Sequelize.Op.or]: [
         {
-          from: { [Sequelize.Op.between]: [rest.from, rest.to] }
+          from: { [Sequelize.Op.between]: [startOfDay(rest.from), endOfDay(rest.to)] }
         },
         {
-          to: { [Sequelize.Op.between]: [rest.from, rest.to] }
+          to: { [Sequelize.Op.between]: [startOfDay(rest.from), endOfDay(rest.to)] }
         },
         {
-          from: { [Sequelize.Op.lte]: rest.from },
-          to: { [Sequelize.Op.gte]: rest.to }
+          from: { [Sequelize.Op.lte]: startOfDay(rest.from) },
+          to: { [Sequelize.Op.gte]: endOfDay(rest.to) }
         }
       ]
     },
@@ -108,20 +109,27 @@ const getAllEmployeeRoster = async (req) => {
   const options = pick(req.body, ['sortOrder', 'pageSize', 'pageNumber']);
   const limit = options.pageSize;
   const offset = 0 + (options.pageNumber - 1) * limit;
+  
+  const filter = req.body?.filter || {};
+
+  if(!filter.subsidiaryId){
+    return paginationFacts(0, limit, options.pageNumber, []);
+  }
 
   const { count, rows } = await EmployeeRosterModel.findAndCountAll({
     order: [
       ['from', 'DESC']
     ],
     where: {
-      isActive: true
+      isActive: true,
+      subsidiaryId: filter.subsidiaryId
     },
     include: [{ model: EmployeeProfileModel,
       where:{
         subsidiaryId: {
           [Op.in]: await currentSubsidiaryPermission(req)  
         }
-      }, attributes: ['firstName'] }, { model: Employee_ShiftModel, attributes: ['name'] }],
+      }, attributes: [[Sequelize.literal(`CONCAT(firstName, ' ', lastName)`), 'firstName']] }, { model: Employee_ShiftModel, attributes: ['name'] }],
     attributes: employeeRosterAttributes,
     offset: offset,
     limit: limit,
@@ -148,6 +156,7 @@ const getEmployeeRosterById = async (id, options = null) => {
     to: rosterData[0].to,
     shiftId: rosterData[0].shiftId,
     Id: rosterData[0].Id,
+    subsidiaryId: rosterData[0].subsidiaryId,
     list: [{ employeeId: rosterData[0].employeeId }]
   }
 

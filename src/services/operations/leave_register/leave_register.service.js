@@ -3,9 +3,9 @@ const Sequelize = require('sequelize');
 const { paginationFacts, handleNestedData, formatDates } = require("../../../utils/common");
 const pick = require("../../../utils/pick");
 const { startOfDay, endOfDay } = require("date-fns");
-const generatePdf = require("../../../utils/pdf");
 const ApiError = require("../../../utils/ApiError");
 const httpStatus = require("http-status");
+const { generatePdf } = require("../../../utils/pdf");
 
 const Op = Sequelize.Op;
 

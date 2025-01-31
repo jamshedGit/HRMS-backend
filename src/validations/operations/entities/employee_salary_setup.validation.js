@@ -8,6 +8,7 @@ const createEmployeeSalarySetupValidation = {
         employeeId: Joi.number(),
         currencyId: Joi.number(),
         grossSalary: Joi.number(),
+        grossPackage: Joi.number().optional(),
         basicSalary: Joi.number(),
         gratuity_member: Joi.any().optional(),
         gratuity_startDate: Joi.any().optional(),

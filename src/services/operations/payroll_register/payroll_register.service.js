@@ -24,6 +24,7 @@ const PRINT_REGISTER_EMPLOYEE_QUERY = `SELECT
     paygrp.formName AS payrollGroup,
     dp.deptName AS departmentName,
     CAST(pe.GrossSalary AS FLOAT) AS GrossSalary,
+    CAST(pe.GrossPackage AS FLOAT) AS GrossPackage,
     pm.month_days AS monthDays,
     CAST(sum.PresentDays AS FLOAT) AS paidDays,
     CAST(sum.AbsentDays AS FLOAT) AS AbsentDays,
@@ -50,6 +51,7 @@ LEFT JOIN t_payroll_month_setup pm ON
 
 const PRINT_REGISTER_EARNING_DEDUCTION_QUERY = `SELECT
     ped.EmpId,
+    pe.Id,
     ped.TransactionType,
      CASE 
         WHEN ped.TransactionType = 'Earning' THEN (SELECT e.earningName FROM t_employee_earning e WHERE ped.earning_deduction_id = e.Id)
@@ -120,6 +122,9 @@ INNER JOIN t_payroll_month_setup z ON x.SubsidiaryId = z.subsidiaryId
 WHERE`;
 
   const array = [];
+
+  //This is to exclude garbage data if any
+  array.push(`(X.Amount_TakeHome IS NOT NULL)`)
 
   if (employeeFilter.subsidiaryId) {
     array.push(`(y.subsidiaryId = ${employeeFilter.subsidiaryId})`)
@@ -250,6 +255,8 @@ FROM t_payrollearningdeduction X
 INNER JOIN t_employee_profile y ON x.EmpId = y.Id
 INNER JOIN t_payroll_month_setup z ON x.SubsidiaryId = z.subsidiaryId 
 WHERE
+X.Amount_TakeHome IS NOT NULL
+AND
 y.Id = ${emp.EmpId}
 AND
 x.MonthId = ${filter.monthId}
@@ -393,7 +400,7 @@ const generatePayrollRegisterPdf = async (req) => {
   const loanColumns = new Set();
 
   const totals = {
-    grossSalary: 0,
+    grossPackage: 0,
     totalAllowances: 0,
     totalDeductions: 0,
     netPayableSalary: 0
@@ -402,26 +409,30 @@ const generatePayrollRegisterPdf = async (req) => {
   employeeData.forEach((emp, i) => {
     const employeeEarning = earningData.filter((el) => el.EmpId == emp.employeeId);
     emp.sno = i + 1;
-    totals.grossSalary += Number(emp.GrossSalary);
+    totals.grossPackage += Number(emp.GrossPackage);
+
 
     employeeEarning.forEach(earn => {
-      emp[earn.EarningName] = earn.Amount_Actual;
-      if (earn.TransactionType == 'Earning') {
-        earningColumns.add(earn.EarningName);
-        emp.totalAllowances = (emp.totalAllowances || 0) + Number(earn.Amount_Actual);
-        totals.totalAllowances += Number(earn.Amount_Actual);
+      if (earn.EarningName) {
+
+        emp[earn.EarningName] = earn.Amount_Actual;
+        if (earn.TransactionType == 'Earning') {
+          earningColumns.add(earn.EarningName);
+          emp.totalAllowances = (emp.totalAllowances || 0) + Number(earn.Amount_Actual);
+          totals.totalAllowances += Number(earn.Amount_Actual);
+        }
+        else if (earn.TransactionType == 'Deduction') {
+          deductionColumns.add(earn.EarningName);
+          emp.totalDeductions = (emp.totalDeductions || 0) + Number(earn.Amount_Actual);
+          totals.totalDeductions += Number(earn.Amount_Actual);
+        }
+        else if (earn.TransactionType == 'LoanType') {
+          loanColumns.add(earn.EarningName);
+          emp.totalDeductions = (emp.totalDeductions || 0) + Number(earn.Amount_Actual);
+          totals.totalDeductions += Number(earn.Amount_Actual);
+        }
+        totals[earn.EarningName] = totals[earn.EarningName] ? totals[earn.EarningName] + Number(earn.Amount_Actual) : Number(earn.Amount_Actual);
       }
-      else if (earn.TransactionType == 'Deduction') {
-        deductionColumns.add(earn.EarningName);
-        emp.totalDeductions = (emp.totalDeductions || 0) + Number(earn.Amount_Actual);
-        totals.totalDeductions += Number(earn.Amount_Actual);
-      }
-      else if (earn.TransactionType == 'LoanType') {
-        loanColumns.add(earn.EarningName);
-        emp.totalDeductions = (emp.totalDeductions || 0) + Number(earn.Amount_Actual);
-        totals.totalDeductions += Number(earn.Amount_Actual);
-      }
-      totals[earn.EarningName] = totals[earn.EarningName] ? totals[earn.EarningName] + Number(earn.Amount_Actual) : Number(earn.Amount_Actual);
     });
 
     emp.netPayableSalary = Number(emp.totalAllowances) - Number(emp.totalDeductions)
@@ -453,8 +464,8 @@ const generatePayrollRegisterPdf = async (req) => {
             prev.totalDeductions = (prev.totalDeductions || 0) + Number(curr[col])
           }
         })
-        if (curr.GrossSalary) {
-          prev.grossSalary = (prev.grossSalary || 0) + Number(curr.GrossSalary)
+        if (curr.GrossPackage) {
+          prev.grossPackage = (prev.grossPackage || 0) + Number(curr.GrossPackage)
         }
         return prev
       }, {})
@@ -531,7 +542,7 @@ const generatePayrollRegisterExcel = async (req) => {
   const loanColumns = new Set();
 
   const totals = {
-    GrossSalary: 0,
+    GrossPackage: 0,
     totalAllowances: 0,
     totalDeductions: 0,
     netPayableSalary: 0
@@ -540,26 +551,29 @@ const generatePayrollRegisterExcel = async (req) => {
   employeeData.forEach((emp, i) => {
     const employeeEarning = earningData.filter((el) => el.EmpId == emp.employeeId);
     emp.sno = i + 1;
-    totals.GrossSalary += Number(emp.GrossSalary);
+    totals.GrossPackage += Number(emp.GrossPackage);
 
     employeeEarning.forEach(earn => {
-      emp[earn.EarningName] = earn.Amount_Actual;
-      if (earn.TransactionType == 'Earning') {
-        earningColumns.add(earn.EarningName);
-        emp.totalAllowances = (emp.totalAllowances || 0) + Number(earn.Amount_Actual);
-        totals.totalAllowances += Number(earn.Amount_Actual);
+      if (earn.EarningName) {
+
+        emp[earn.EarningName] = earn.Amount_Actual;
+        if (earn.TransactionType == 'Earning') {
+          earningColumns.add(earn.EarningName);
+          emp.totalAllowances = (emp.totalAllowances || 0) + Number(earn.Amount_Actual);
+          totals.totalAllowances += Number(earn.Amount_Actual);
+        }
+        else if (earn.TransactionType == 'Deduction') {
+          deductionColumns.add(earn.EarningName);
+          emp.totalDeductions = (emp.totalDeductions || 0) + Number(earn.Amount_Actual);
+          totals.totalDeductions += Number(earn.Amount_Actual);
+        }
+        else if (earn.TransactionType == 'LoanType') {
+          loanColumns.add(earn.EarningName);
+          emp.totalDeductions = (emp.totalDeductions || 0) + Number(earn.Amount_Actual);
+          totals.totalDeductions += Number(earn.Amount_Actual);
+        }
+        totals[earn.EarningName] = totals[earn.EarningName] ? totals[earn.EarningName] + Number(earn.Amount_Actual) : Number(earn.Amount_Actual);
       }
-      else if (earn.TransactionType == 'Deduction') {
-        deductionColumns.add(earn.EarningName);
-        emp.totalDeductions = (emp.totalDeductions || 0) + Number(earn.Amount_Actual);
-        totals.totalDeductions += Number(earn.Amount_Actual);
-      }
-      else if (earn.TransactionType == 'LoanType') {
-        loanColumns.add(earn.EarningName);
-        emp.totalDeductions = (emp.totalDeductions || 0) + Number(earn.Amount_Actual);
-        totals.totalDeductions += Number(earn.Amount_Actual);
-      }
-      totals[earn.EarningName] = totals[earn.EarningName] ? totals[earn.EarningName] + Number(earn.Amount_Actual) : Number(earn.Amount_Actual);
     });
 
     emp.netPayableSalary = Number(emp.totalAllowances) - Number(emp.totalDeductions)
@@ -614,8 +628,8 @@ const generatePayrollRegisterExcel = async (req) => {
             prev.totalDeductions = (prev.totalDeductions || 0) + Number(curr[col])
           }
         })
-        if (curr.GrossSalary) {
-          prev.GrossSalary = (prev.GrossSalary || 0) + Number(curr.GrossSalary)
+        if (curr.GrossPackage) {
+          prev.GrossPackage = (prev.GrossPackage || 0) + Number(curr.GrossPackage)
         }
         return prev
       }, {})
@@ -628,7 +642,7 @@ const generatePayrollRegisterExcel = async (req) => {
         data.numFmt = '#,##0.00'
       })
 
-      createSubtotal(worksheet, { ...totals, sno: 'Sub Total' }, { bold: true, color: { argb: 'FF000000' } }, { type: 'pattern', pattern: 'solid', fgColor: { argb: 'F1A983' } }, columns.length)
+      createSubtotal(worksheet, { ...totals, sno: 'Sub Total' }, { bold: true, color: { argb: 'FF000000' } }, { type: 'pattern', pattern: 'solid', fgColor: { argb: 'F1A983' } }, columns.length, '#,##0.00')
 
     })
 
@@ -668,7 +682,7 @@ const createColumns = (earningColumns, deductionColumns, loanColumns) => {
     { header: "Grade", key: "gradeName", width: 15 },
     { header: "Designation", key: "designationName", width: 20 },
     { header: "Date of Joining", key: "dateOfJoining", width: 20 },
-    { header: "Gross Salary", key: "GrossSalary", width: 20 },
+    { header: "Gross Package", key: "GrossPackage", width: 20 },
     { header: "Working Days", key: "monthDays", width: 15 },
     { header: "Payable Days", key: "paidDays", width: 15 },
     { header: "Absent Days", key: "AbsentDays", width: 15 },
