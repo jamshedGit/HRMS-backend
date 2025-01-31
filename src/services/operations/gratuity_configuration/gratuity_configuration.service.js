@@ -20,7 +20,7 @@ const creategratuity_configuration = async (
 ) => {
   try {
  
-    gratuity_configurationBody.createdBy = req.user.id;
+    gratuity_configurationBody.createdBy = req.user.Id;
 
     //check
     const { max_year, min_year } = gratuity_configurationBody;
@@ -46,6 +46,8 @@ const creategratuity_configuration = async (
     }
 
     // Create the Gratuity configuration
+
+    gratuity_configurationBody.companyId=req.user.companyId;
     const gratuity_configurationObj = await Gratuity_configurationModel.create(
       gratuity_configurationBody
     );

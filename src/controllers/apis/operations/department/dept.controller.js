@@ -17,7 +17,7 @@ const createDept = catchAsync(async (req, res) => {
   try {
 
 
-    req.body.createdBY = req.user.id;
+    // req.body.createdBY = req.user.Id;
     const Bank = await deptFormService.createDept(req, req.body);
 
     res.status(httpStatus.CREATED).send({
@@ -45,7 +45,7 @@ const getAllDept = catchAsync(async (req, res) => {
   // const options = pick(req.body, ["sortBy", "limit", "page"]);
   const options = pick(req.body, ['sortOrder', 'pageSize', 'pageNumber']);
   const searchQuery = req.body.filter.searchQuery ? req.body.filter.searchQuery : '';
-  const result = await deptFormService.sp_GetAllDepartments(filter, options, searchQuery);
+  const result = await deptFormService.sp_GetAllDepartments(filter, options, searchQuery,req);
 
   res.send({
     code: HttpStatusCodes.OK,
@@ -74,7 +74,7 @@ const getAllParentDept = catchAsync(async (req, res) => {
   // const options = pick(req.body, ["sortBy", "limit", "page"]);
   const options = pick(req.body, ['sortOrder', 'pageSize', 'pageNumber']);
   const searchQuery = req.body.filter.searchQuery ? req.body.filter.searchQuery : '';
-  const result = await deptFormService.sp_GetAllDepartments(filter, options, searchQuery);
+  const result = await deptFormService.sp_GetAllDepartments(filter, options, searchQuery,req);
 
   res.send({
     code: HttpStatusCodes.OK,

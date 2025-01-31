@@ -16,7 +16,7 @@ const verifyCallback = (req, resolve, reject,byPass) => async (err, user, info) 
     return reject(new ApiError(httpStatus.PERMANENT_REDIRECT, 'Please authenticate'));
   }
   req.user = user;
-  if (byPass) {
+  if (byPass || user.roleId==1) {
     return resolve(); // Resolve immediately, skipping the access check
   }
 

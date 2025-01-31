@@ -19,7 +19,9 @@ const createDept = async (req, DeptBody) => {
  
   // DeptBody.slug = DeptBody.name.replace(/ /g, "-").toLowerCase();
 
-  DeptBody.createdBy = req.user.deptId;
+  DeptBody.createdBy = req.user.Id;
+  DeptBody.companyId=req.user.companyId;
+
   //DeptBody.parentDept = 1;
 
   if (DeptBody.parentDept == '') { DeptBody.parentDept = null }
@@ -199,10 +201,20 @@ const deleteDeptById = async (Id) => {
 
 
 
-const sp_GetAllDepartments = async (filter, options, searchQuery) => {
+const sp_GetAllDepartments = async (filter, options, searchQuery,req) => {
   try {
-    const results = await sequelize.query('CALL usp_GetAllDepartments()', {
+   console.log("req.user111",req.user.companyId)
+    // const results = await sequelize.query('CALL usp_GetAllDepartments()', {
 
+    //   type: Sequelize.QueryTypes.RAW // Use RAW type for executing stored procedures
+    // });
+
+   const results = await sequelize.query(
+      'CALL usp_GetAllDepartments(:p_CompanyId)', {
+      replacements: {
+        p_CompanyId:req.user?.companyId || null,
+     
+      },
       type: Sequelize.QueryTypes.RAW // Use RAW type for executing stored procedures
     });
 

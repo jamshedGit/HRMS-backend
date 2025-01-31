@@ -20,8 +20,8 @@ const createEmpPolicy = async (req, EmpPolicyBody) => {
 
   // EmpPolicyBody.slug = EmpPolicyBody.name.replace(/ /g, "-").toLowerCase();
 
-  EmpPolicyBody.createdBy = req.user.id;
- 
+  EmpPolicyBody.createdBy = req.user.Id;
+  EmpPolicyBody.companyId=req.user.companyId
   const addedEmpPolicyObj = await EmpPolicyModel.EmployeePolicyModel.create(EmpPolicyBody);
   //authSMSSend(addedBankObj.dataValues);  // Quick send message at the time of donation
   return addedEmpPolicyObj;
@@ -80,7 +80,7 @@ const createEmpPolicy = async (req, EmpPolicyBody) => {
 // };
 
 
-const queryEmpPolicy = async (filter, options, searchQuery) => {
+const queryEmpPolicy = async (req,filter, options, searchQuery) => {
 
   let limit = options.pageSize;
   let offset = 0 + (options.pageNumber - 1) * limit;
@@ -102,6 +102,7 @@ const queryEmpPolicy = async (filter, options, searchQuery) => {
     // ],
     where: {
       [Op.or]: queryFilters,
+      companyId:req.user.companyId,
       // isActive: true
     },
     offset: offset,

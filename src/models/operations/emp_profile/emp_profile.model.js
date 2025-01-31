@@ -74,7 +74,7 @@ const DesigModel = sequelize.define('t_employee_profile', {
 	codePrefix: { type: Sequelize.STRING, allowNull: true },
 	isActive: { type: Sequelize.BOOLEAN, allowNull: true, defaultValue: true },
 	employeeStatusId: { type: Sequelize.INTEGER, allowNull: true },
-
+	companyId: { type: Sequelize.INTEGER, allowNull: true },
 	createdBy: {
 		type: Sequelize.INTEGER,
 		allowNull: true,

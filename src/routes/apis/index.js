@@ -73,7 +73,7 @@ const user = require("./operations/user/user.route");
 
 
 const upload = require('./operations/upload/upload.route');
-
+const password = require("./operations/user/password.route");
 const router = express.Router();
 
 const defaultRoutes = [
@@ -353,6 +353,11 @@ const defaultRoutes = [
     path: "/upload",
     route: upload
   },
+  {
+    path: "/password",
+    route: password
+  },
+
 
 ];
 

@@ -30,7 +30,7 @@ const Model = sequelize.define('t_loan_type_setup', {
 			return storedValue;
 		}
 	},
-	companyId : { type: Sequelize.INTEGER, allowNull: true, defaultValue: true },
+	companyId : { type: Sequelize.INTEGER, allowNull: true },
 	isActive: { type: Sequelize.BOOLEAN, allowNull: true, defaultValue: true },
 	createdBy: {
 		type: Sequelize.INTEGER,

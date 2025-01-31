@@ -11,7 +11,7 @@ const getRolesMasterData = catchAsync(async (req, res) => {
   res.send({
     code: HttpStatusCodes.OK,
     message: HttpResponseMessages.OK,
-    data: await settingService.getRolesMasterData(req.user.roleId),
+    data: await settingService.getRolesMasterData(req.user.roleId,req.user.Id),
   });
 });
 
@@ -71,7 +71,7 @@ const getDeptMasterData = catchAsync(async (req, res) => {
   res.send({
     code: HttpStatusCodes.OK,
     message: HttpResponseMessages.OK,
-    data: await settingService.getDeptMasterData(req?.body?.Id),
+    data: await settingService.getDeptMasterData(req,req?.body?.Id),
   });
 });
 
@@ -178,6 +178,7 @@ const getRevisionHistoryByEmpId = catchAsync(async (req, res) => {
 const GetLastInserted_ID_ByTableName = catchAsync(async (req, res) => {
 
   const Receipt = await settingService.GetLastInserted_ID_ByTableName(req.body.tableName,req.body.pkIdColumn,req.body.whereClause);
+
   if (!Receipt) {
     throw new ApiError(httpStatus.NOT_FOUND, "Receipt not found");
   }
@@ -193,7 +194,7 @@ const getCompanyMasterData = catchAsync(async (req, res) => {
   res.send({
     code: HttpStatusCodes.OK,
     message: HttpResponseMessages.OK,
-    data: await settingService.getCompanyMasterData(),
+    data: await settingService.getCompanyMasterData(req),
   });
 });
 
@@ -202,7 +203,7 @@ const getEmployeesNoNeedPermission= catchAsync(async (req, res) => {
   res.send({
     code: HttpStatusCodes.OK,
     message: HttpResponseMessages.OK,
-    data: await settingService.getEmployeesNoNeedPermission(),
+    data: await settingService.getEmployeesNoNeedPermission(req),
   });
 });
 

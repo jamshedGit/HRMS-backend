@@ -1,6 +1,6 @@
 const httpStatus = require("http-status");
 const axios = require("axios")
-const {DeductionModel,DeductionSetupAccessModel, SubsidiaryModel} = require("../../../models/index");
+const {DeductionModel,DeductionSetupAccessModel, SubsidiaryModel, FormModel} = require("../../../models/index");
 const ApiError = require("../../../utils/ApiError");
 const sequelize = require("../../../config/db");
 const Sequelize = require('sequelize');
@@ -19,8 +19,9 @@ const createDeduction = async (req, DeductionBody) => {
   
   // DeductionBody.slug = DeductionBody.name.replace(/ /g, "-").toLowerCase();
 
-  DeductionBody.createdBy = req.user.id;
+  DeductionBody.createdBy = req.user.Id;
   DeductionBody.deductionName=DeductionBody.deductionName.trimStart();
+  DeductionBody.companyId=req.user.companyId;
   const addedDeductionObj = await DeductionModel.create(DeductionBody);
     //authSMSSend(addedEarningObj.dataValues);  // Quick send message at the time of donation
     if (addedDeductionObj) {
@@ -85,16 +86,59 @@ const queryDeductions = async (filter, options, searchQuery) => {
 
 };
 
-const SP_getAllDeductionInfo = async (filter, options, searchQuery,empId) => {
+const SP_getAllDeductionInfo = async (req,filter, options, searchQuery,empId) => {
   try {
    
-    const results = await sequelize.query('CALL usp_GetAllDeductionsByEmpId(:employeeId)', {
-      replacements: { employeeId: empId || 'null' },
-      type: Sequelize.QueryTypes.RAW // Use RAW type for executing stored procedures
+    // const results = await sequelize.query('CALL usp_GetAllDeductionsByEmpId(:employeeId)', {
+    //   replacements: { employeeId: empId || 'null' },
+    //   type: Sequelize.QueryTypes.RAW // Use RAW type for executing stored procedures
+    // });
+
+    const results = await DeductionModel.findAll({
+      where: {
+        companyId: req.user.companyId
+      },
+      attributes: [
+        'Id',
+        'subsidiaryid',
+        'deductionCode',
+        'deductionName',
+        "mappedDeduction",
+        "account",
+        'isActive',
+        'createdBy',
+        'createdAt',
+        'updatedBy',
+        'updatedAt',
+        // [sequelize.col('subsidiary.name'), 'subsidiary'], // Get the subsidiary name
+        // Simplified CASE statements using sequelize.fn and sequelize.col
+        [
+          sequelize.fn('IF', sequelize.col('linkedAttendance'), 'Yes', 'No'), 
+          'linkedAttendance',
+        ],
+        [
+          sequelize.fn('IF', sequelize.col('loan'), 'Yes', 'No'), 
+          'loan',
+        ],
+        
+        [
+          sequelize.fn('CONCAT', sequelize.col('Account.formCode'), ' - ', sequelize.col('Account.formName')),
+          'account',
+        ],
+      ],
+      include: [
+      
+        {
+          model: FormModel,
+          attributes: ["formName", "formCode"],
+          as: "Account",
+        },
+
+      ],
+      // Optional: add any filters, such as `where` or `order`, depending on your use case
     });
 
-    
-
+console.log("results111",results)
     let limit = options.pageSize;
     let offset = 0 + (options.pageNumber - 1) * limit;
     searchQuery = searchQuery.toLowerCase();
@@ -107,6 +151,9 @@ const SP_getAllDeductionInfo = async (filter, options, searchQuery,empId) => {
   } catch (error) {
     throw new ApiError(httpStatus.INTERNAL_SERVER_ERROR, error);
   }
+
+
+  
 };
 
 

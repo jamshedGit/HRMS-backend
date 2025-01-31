@@ -25,7 +25,7 @@ const createForm = catchAsync(async (req, res) => {
     });
 
   } catch (error) {
-
+    throw error    
   }
 });
 
@@ -78,7 +78,7 @@ const getAllChildForms = catchAsync(async (req, res) => {
     req.body.parentId = req.body.id;
   }
 
-  const result = await FormformService.FormServicePage.getAllChildForms(req.body.parentId, filter, options, searchQuery);
+  const result = await FormformService.FormServicePage.getAllChildForms(req,req.body.parentId, filter, options, searchQuery);
 
   res.send({
     code: HttpStatusCodes.OK,

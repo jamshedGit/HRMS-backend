@@ -13,9 +13,9 @@ const ExchangeRateModel = sequelize.define('t_exchange_rate', {
 		primaryKey: true
 	},
 	
-	subsidiaryId: { type: Sequelize.STRING, allowNull: true, defaultValue: true },
-    base_currency_id: { type: Sequelize.NUMBER, allowNull: true, defaultValue: true },
-    currency_to_convert_id : { type: Sequelize.NUMBER, allowNull: true, defaultValue: true },
+	subsidiaryId: { type: Sequelize.INTEGER, allowNull: true, defaultValue: true },
+    base_currency_id: { type: Sequelize.INTEGER, allowNull: true, defaultValue: true },
+    currency_to_convert_id : { type: Sequelize.INTEGER, allowNull: true, defaultValue: true },
     exchange_rate : { type: Sequelize.DOUBLE, allowNull: true, defaultValue: true },
     effective_date : { type: Sequelize.DATE, allowNull: true, defaultValue: true },
 	// effective_date: {
@@ -37,6 +37,7 @@ const ExchangeRateModel = sequelize.define('t_exchange_rate', {
 	},
 	createdAt: { type: Sequelize.DATE, allowNull: true },
 	updatedAt: { type: Sequelize.DATE, allowNull: true },
+	companyId: { type: Sequelize.INTEGER, allowNull: true}
 
 });
 

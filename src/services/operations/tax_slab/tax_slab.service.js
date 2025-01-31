@@ -56,7 +56,7 @@ const get_all_taxYear_setup = async (req, res) => {
 }
 
 const createtax_slab = async (req, tax_slabBody) => {
-  tax_slabBody.createdBy = req.user.id;
+  tax_slabBody.createdBy = req.user.Id;
 
 
   const { from_amount, to_amount } = tax_slabBody;
@@ -118,7 +118,7 @@ const createtax_slab = async (req, tax_slabBody) => {
     // return 'New tax slab overlaps with existing slabs. Cannot insert the record.';
     // throw new ApiError(httpStatus.NOT_FOUND, "New tax slab overlaps with existing slabs. Cannot insert the record.");
   }
-
+  tax_slabBody.companyId=req.user.companyId;
   const addedtax_slabObj = await Tax_slabModel.create(tax_slabBody);
 
   return addedtax_slabObj;

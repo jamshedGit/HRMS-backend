@@ -18,9 +18,10 @@ const Op = Sequelize.Op;
  */
 const createEmp_profile = async (req, Emp_profileBody) => {
 
-  Emp_profileBody.createdBy = req.user.id;
+  Emp_profileBody.createdBy = req.user.Id;
 
-  
+
+  Emp_profileBody.companyId = req.user.companyId;
 
 
   const checkDateOverlap = (startDate1, endDate1, startDate2, endDate2) => {

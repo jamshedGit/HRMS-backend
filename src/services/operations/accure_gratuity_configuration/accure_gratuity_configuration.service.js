@@ -26,7 +26,8 @@ const createaccrue_gratuity_configuration = async (
       };
     }
 
-    accrue_gratuity_configurationBody.createdBy = req.user.id;
+    accrue_gratuity_configurationBody.createdBy = req.user.Id;
+    accrue_gratuity_configurationBody.companyId = req.user.companyId;
     const addedaccrue_gratuity_configurationObj =
       await accrue_gratuity_configurationModel.create(
         accrue_gratuity_configurationBody

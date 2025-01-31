@@ -6,7 +6,7 @@ const UserModel = require('../models/user.model');
 const ApiError = require('../utils/ApiError');
 const { tokenTypes } = require('../config/tokens');
 const { HttpStatusCodes, HttpResponseMessages } = require('../utils/constants');
-const { User_Model, RoleModel } = require('../models/index');
+const { User_Model, RoleModel, CompanyModel } = require('../models/index');
 const { UserService } = require('./index');
 
 /**
@@ -24,9 +24,16 @@ const getUserByEmail = async (email) => {
         model: RoleModel,
         as: 'role',
         attributes: ['name', 'slug', 'isActive'],
-      }]
+      },
+
+      {
+        model: CompanyModel,
+        as: 'Company',
+        attributes: ['Id','name', 'CompanyLegalName'],
+      }
+    ]
   });
-console.log("userByEmail111",userByEmail)
+
   return userByEmail;
 };
 
@@ -35,7 +42,7 @@ const loginUserWithEmailAndPassword = async (email, password) => {
   // const user = await userService.getUserByEmail(email);  
 
   const user = await getUserByEmail(email);
-console.log("!user?.role?.isActiv",user?.role.isActive,email, password)
+
   if (!user?.role?.isActive) {
     throw new ApiError(httpStatus.UNAUTHORIZED, 'This role user is not allowed');
   }

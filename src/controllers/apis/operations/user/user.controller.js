@@ -8,7 +8,7 @@ const { HttpStatusCodes, HttpResponseMessages } = require('../../../../utils/con
 
 const createUser = catchAsync(async (req, res) => {
   const user = await UserService.createUser(req.body, req.user.id);
-  console.log("user111",user)
+
   res.status(httpStatus.CREATED).send({
     code: HttpStatusCodes.CREATED,
     message: HttpResponseMessages.CREATED,
@@ -24,7 +24,7 @@ const getAllUser= catchAsync(async (req, res) => {
     const options = pick(req.body, ['sortOrder', 'pageSize', 'pageNumber']);
     const searchQuery = req.body.filter.searchQuery? req.body.filter.searchQuery : '';
  
-    const result = await UserService.queryUser(filter, options,searchQuery);
+    const result = await UserService.queryUser(filter, options,searchQuery,req.user.Id);
   
     res.send({
       code: HttpStatusCodes.OK,
@@ -32,6 +32,11 @@ const getAllUser= catchAsync(async (req, res) => {
       data: result,
     });
   });
+
+
+
+
+
 
 const getUser = catchAsync(async (req, res) => {
   const user = await UserService.getUserById(req.body.Id);
@@ -65,6 +70,21 @@ const deleteUser = catchAsync(async (req, res) => {
     data: user
   });
 });
+
+
+const resetPassword = catchAsync(async (req, res) => {
+  // req.body.isActive = false;
+  console.log("req.body",req.body)
+  const user = await UserService.resetPassword(req,req.body);
+
+  res.send({
+    code: HttpStatusCodes.OK,
+    message: HttpResponseMessages.OK,
+    data: user
+  });
+});
+
+
 
 const getUserRoleAccess = catchAsync(async (req, res) => {
   const roleData = await UserService.getUserRoleAccess(req.body.roleId, req.body.resourceSlug, req.body.rightSlug);
@@ -134,7 +154,7 @@ module.exports = {
   getAllUser,
   getUser,
   updateUser,
-  deleteUser,
+  deleteUser,resetPassword,
 //   getUserRoleAccess,
 //   getUserAccessForMiddleware,
 //   getUserByToken,

@@ -18,15 +18,21 @@ const Op = Sequelize.Op;
 const createForm = async (req, FormBody) => {
  
   // FormBody.slug = FormBody.name.replace(/ /g, "-").toLowerCase();
-
-  FormBody.createdBy = req.user.id;
+try{
+  FormBody.createdBy = req.user.Id;
   FormBody.formName = FormBody.formName;
-
+  FormBody.companyId=req.user.companyId;
   FormBody.parentFormID = FormBody.parentFormID || null;
- 
+
   const addedFormObj = await FormModel.FormModel.create(FormBody);
   //authSMSSend(addedBankObj.dataValues);  // Quick send message at the time of donation
-  return addedFormObj;
+
+    return addedFormObj;
+   
+} catch (error) {
+  throw error   
+}
+
 };
 
 /**
@@ -157,18 +163,26 @@ const getAllParentChildForms = async (filter, options, searchQuery) => {
 
 
 
-const getAllChildForms = async (id) => {
+const getAllChildForms = async (req,id) => {
   try {
 
    // const results = await sequelize.query('exec usp_GetAllChildFormById(:param1)',{replacements:{ parentMenuId: 1 },transaction: param});
-   
+
    const parentMenuId = id; // Example parameter value
 
-   const results = await sequelize.query('call usp_GetAllChildFormById(:parentMenuId)', {
-     replacements: { parentMenuId },
-     type: Sequelize.QueryTypes.RAW // Use RAW type for executing stored procedures
-   });
-   
+  //  const results = await sequelize.query('call usp_GetAllChildFormById(:parentMenuId)', {
+  //    replacements: { parentMenuId },
+  //    type: Sequelize.QueryTypes.RAW // Use RAW type for executing stored procedures
+  //  });
+
+//I have updated only this line of code instead of the entire procedure.
+  const results=await FormModel.FormModel.findAll({
+    where:{
+      parentFormId:parentMenuId,
+      companyId:req.user.companyId
+    }
+  })
+
   
     let limit = 100; // options.pageSize;
     //let offset = 0 + (options.pageNumber - 1) * limit;
