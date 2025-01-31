@@ -68,7 +68,7 @@ const createPayrollMonth = async (req, PayrollMonthBody) => {
 
 
   const resp = await sequelize.query(' update t_payroll_month_Setup set isActive = 0 where subsidiaryId =  ' + PayrollMonthBody.subsidiaryId);
-
+  PayrollMonthBody.companyId=req.user.companyId;
   const addedPayrollMonthObj = await PayrollMonthModel.PayrollMonthModel.create(PayrollMonthBody);
   //authSMSSend(addedPayrollMonthObj.dataValues);  // Quick send message at the time of donation
   return addedPayrollMonthObj;

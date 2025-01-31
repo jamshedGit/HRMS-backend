@@ -323,17 +323,86 @@ const getRevisionHistoryByEmpId = async (employeeId) => {
 
 
 
-const getFormMenusMasterData = async (req, res) => {
-  const FormMenusMasterData = getDdlItems(DDL_FIELD_NAMES.FormMenus, await FormModel.findAll({
-    where: { isActive: true, parentFormID: req.body.Id || null,companyId:req.user.companyId },
-    attributes: ['formName', 'Id', 'formCode']
-  }), req.body.mergeLabel);
+// const getFormMenusMasterData = async (req, res) => {
+//   const FormMenusMasterData = getDdlItems(DDL_FIELD_NAMES.FormMenus, await FormModel.findAll({
+//     where: { isActive: true, parentFormID: req.body.Id || null,companyId:req.user.companyId, },
+//     attributes: ['formName', 'Id', 'formCode']
+//   }), req.body.mergeLabel);
 
-  // if (FormMenusMasterData.length > 0) {
-  //   FormMenusMasterData.unshift({ label: req.body.text || '--Select--', value: null, code: null, mergeLabel: "--Select--" })
-  // }
+//   // if (FormMenusMasterData.length > 0) {
+//   //   FormMenusMasterData.unshift({ label: req.body.text || '--Select--', value: null, code: null, mergeLabel: "--Select--" })
+//   // }
+//   return FormMenusMasterData
+// };
+
+
+const getFormMenusMasterData = async (req, res) => {
+let FormMenusMasterData;
+  const FormParent = await FormModel.findOne({
+    where: {Id: req.body.Id},
+    attributes: ['formName', 'Id', 'formCode','isActive']
+  });
+
+  
+  if(FormParent?.isActive){
+    FormMenusMasterData = getDdlItems(DDL_FIELD_NAMES.FormMenus, await FormModel.findAll({
+      where: { isActive: true, parentFormID: req.body.Id || null,companyId:req.user.companyId, },
+      attributes: ['formName', 'Id', 'formCode']
+    }), req.body.mergeLabel);
+  }else{
+    FormMenusMasterData = getDdlItems(DDL_FIELD_NAMES.FormMenus, await FormModel.findAll({
+      where: { isActive: true, parentFormID: req.body.Id},
+      attributes: ['formName', 'Id', 'formCode']
+    }), req.body.mergeLabel);
+  }
+
   return FormMenusMasterData
 };
+
+// const getFormMenusMasterData = async (req, res) => {
+//   console.log("active111",req.body.Id)
+//   // First, fetch the records, checking the 'isActive' flag
+//   const formRecords = await FormModel.findAll({
+//     where: {
+//       parentFormID: req.body.Id || null
+//     },
+//     attributes: ['formName', 'Id', 'formCode', 'isActive', 'companyId']
+//   });
+
+  
+//   let whereCondition = {
+//     parentFormID: req.body.Id || null
+//   };
+
+
+//   const formIdsToInclude = formRecords.map(record => {
+//     if (record.isActive) {
+     
+//       whereCondition.companyId = req.user.companyId;
+//       return record.Id;
+//     } else {
+     
+     
+//       return record.Id;
+//     }
+//   });
+// console.log("formIdsToInclude111",formIdsToInclude)
+ 
+//   const FormMenusMasterData = getDdlItems(
+//     DDL_FIELD_NAMES.FormMenus,
+//     await FormModel.findAll({
+//       where: {
+//         ...whereCondition,
+//         Id: formIdsToInclude,  // Ensure to include only relevant records
+//       },
+//       attributes: ['formName', 'Id', 'formCode']
+//     }),
+//     req.body.mergeLabel
+//   );
+
+//   return FormMenusMasterData;
+// };
+
 
 /**
  * 

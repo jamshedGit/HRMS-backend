@@ -17,7 +17,7 @@ const createaccrue_gratuity_configuration = catchAsync(async (req, res) => {
 
         const accrue_gratuity_configuration = await accrue_gratuity_configurationService.createaccrue_gratuity_configuration(req, req.body);
 
-        if (accrue_gratuity_configuration?.status && accrue_gratuity_configuration.status === "error") {
+        if (accrue_gratuity_configuration?.status && accrue_gratuity_configuration?.status === "error") {
 
             res.status(HttpStatusCodes.INTERNAL_SERVER_ERROR).send({
                 code: HttpStatusCodes.INTERNAL_SERVER_ERROR,
