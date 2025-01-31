@@ -19,9 +19,9 @@ const createLoanType = async (req, LoanTypeBody) => {
   
   // LoanTypeBody.slug = LoanTypeBody.name.replace(/ /g, "-").toLowerCase();
 
-  LoanTypeBody.createdBy = req.user.id;
+  LoanTypeBody.createdBy = req.user.Id;
   LoanTypeBody.name=LoanTypeBody.name.trimStart();
-  
+  LoanTypeBody.companyId=req.user.companyId;
   const addedLoanTypeObj = await LoanTypeModel.create(LoanTypeBody);
   if (addedLoanTypeObj) {
     for (const subId of addedLoanTypeObj.subsidiaryId) {
@@ -46,7 +46,7 @@ const createLoanType = async (req, LoanTypeBody) => {
  * @param {number} [options.page] - Current page (default = 1)
  * @returns {Promise<QueryResult>}
  */
-const queryLoanTypes = async (filter, options, searchQuery) => {
+const queryLoanTypes = async (req,filter, options, searchQuery) => {
 
   let limit = options.pageSize;
   let offset = 0 + (options.pageNumber - 1) * limit;
@@ -66,6 +66,7 @@ const queryLoanTypes = async (filter, options, searchQuery) => {
     // ],
     where: {
       [Op.or]: queryFilters,
+      companyId:req.user.companyId,
       // isActive: true
     },
     offset: offset,

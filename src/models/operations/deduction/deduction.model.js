@@ -2,7 +2,8 @@ const Sequelize = require('sequelize');
 const { ResourceModel } = require('../../..');
 const { DataTypes } = require('sequelize');
 //import Database connection configurations.
-const sequelize = require('../../../config/db')
+const sequelize = require('../../../config/db');
+const { FormModel } = require('../..');
 
 const DeductionModel = sequelize.define('t_employee_deduction', {
 	Id: {
@@ -10,30 +11,30 @@ const DeductionModel = sequelize.define('t_employee_deduction', {
 		autoIncrement: true,
 		primaryKey: true
 	},
-	
-	deductionCode : { type: Sequelize.STRING, allowNull: true, defaultValue: true },
-	deductionName : { type: Sequelize.STRING, allowNull: true, defaultValue: true },
-	linkedAttendance : { type: Sequelize.BOOLEAN, allowNull: true, defaultValue: true },
+
+	deductionCode: { type: Sequelize.STRING, allowNull: true, defaultValue: true },
+	deductionName: { type: Sequelize.STRING, allowNull: true, defaultValue: true },
+	linkedAttendance: { type: Sequelize.BOOLEAN, allowNull: true, defaultValue: true },
 	loan: { type: Sequelize.BOOLEAN, allowNull: true, defaultValue: true },
-	mappedDeduction : { type: Sequelize.STRING, allowNull: true, defaultValue: true },
-	account : { type: Sequelize.INTEGER, allowNull: true, defaultValue: true },
+	mappedDeduction: { type: Sequelize.STRING, allowNull: true, defaultValue: true },
+	account: { type: Sequelize.INTEGER, allowNull: true, defaultValue: true },
 	// subsidiaryId : { type: Sequelize.NUMBER, allowNull: true, defaultValue: true },
-	companyId : { type: Sequelize.NUMBER, allowNull: true, defaultValue: true },
+	companyId: { type: Sequelize.INTEGER, allowNull: true },
 	isActive: { type: Sequelize.BOOLEAN, allowNull: true, defaultValue: true },
 	subsidiaryId: {
 		type: DataTypes.JSON,
 		allowNull: true,
 		set(value) {
-		  this.setDataValue('subsidiaryId', value.map((v) => Number(v)));
+			this.setDataValue('subsidiaryId', value.map((v) => Number(v)));
 		},
 		get() {
-		  const storedValue = this.getDataValue('subsidiaryId');
-		  if (storedValue && typeof storedValue == 'string') {
-			return JSON.parse(storedValue).map((v) => String(v));
-		  }
-		  return storedValue;
+			const storedValue = this.getDataValue('subsidiaryId');
+			if (storedValue && typeof storedValue == 'string') {
+				return JSON.parse(storedValue).map((v) => String(v));
+			}
+			return storedValue;
 		}
-	  },
+	},
 	createdBy: {
 		type: Sequelize.INTEGER,
 		allowNull: true,
@@ -45,6 +46,11 @@ const DeductionModel = sequelize.define('t_employee_deduction', {
 	createdAt: { type: Sequelize.DATE, allowNull: true },
 	updatedAt: { type: Sequelize.DATE, allowNull: true },
 
+});
+DeductionModel.belongsTo(FormModel, {
+	foreignKey: 'account',
+	targetKey: 'Id',
+	as: "Account"
 });
 
 module.exports = DeductionModel;

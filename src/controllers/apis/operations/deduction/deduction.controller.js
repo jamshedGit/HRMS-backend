@@ -40,7 +40,7 @@ const getAllDeduction = catchAsync(async (req, res) => {
   // const options = pick(req.body, ["sortBy", "limit", "page"]);
   const options = pick(req.body, ['sortOrder', 'pageSize', 'pageNumber']);
   const searchQuery = req.body.filter.searchQuery? req.body.filter.searchQuery : '';
-  const result = await DeductionformService.DeductionServicePage.SP_getAllDeductionInfo(filter, options,searchQuery,req.body.id);
+  const result = await DeductionformService.DeductionServicePage.SP_getAllDeductionInfo(req,filter, options,searchQuery,req.body.id);
  
   res.send({
     code: HttpStatusCodes.OK,
