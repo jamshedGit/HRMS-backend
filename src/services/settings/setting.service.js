@@ -240,14 +240,28 @@ const getEmployeesMasterData = async (req) => {
   // });
   // let sub=userById.subsidiaryId
 
-  const EmployeesMasterData = await EmployeeProfileModel.findAll({
-    where: {
-      isActive: true, subsidiaryId: {
-        [Op.in]: await currentSubsidiaryPermission(req)  // Use the Op.in operator here
-      }
-    },
-    attributes: ['Id', 'firstName', 'middleName', 'lastName']
-  })
+// 
+//
+//   EmployeesMasterData = await EmployeeProfileModel.findAll({
+//     where: {
+//       isActive: true, subsidiaryId: {
+//         [Op.in]: await currentSubsidiaryPermission(req)  // Use the Op.in operator here
+//       }
+//     },
+//     attributes: ['Id', 'firstName', 'middleName', 'lastName']
+//   })
+
+
+
+const whereCondition = req.user?.roleId == 1 && req.body?.companyId 
+  ? { isActive: true, companyId: req.body?.companyId } 
+  : { isActive: true, subsidiaryId: { [Op.in]: await currentSubsidiaryPermission(req) } };
+
+const EmployeesMasterData = await EmployeeProfileModel.findAll({
+  where: whereCondition,
+  attributes: ['Id', 'firstName', 'middleName', 'lastName']
+});
+
   return EmployeesMasterData?.map(el => {
     return {
       label: createEmployeeNameLabel(el),
