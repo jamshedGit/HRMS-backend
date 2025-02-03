@@ -89,7 +89,6 @@ const BANK_ADVICE_EMPLOYEE_QUERY = `SELECT
     branch.Name AS branchName,
     bankPolicy.bankAccountNo AS companyAccountNo,
     pe.emp_bank_accNo AS accountNo
-    
 FROM
     t_payrollemployees pe
 LEFT JOIN t_employee_profile pf ON
@@ -103,7 +102,8 @@ LEFT JOIN t_bank bank ON
 LEFT JOIN t_bank_branch branch ON 
 	branch.Id = pe.emp_bank_branchId
 LEFT JOIN tran_payroll_policy_bank_info bankPolicy ON
-	bankPolicy.subsidiaryId = pe.SubsidiaryId`
+	bankPolicy.subsidiaryId = pe.SubsidiaryId
+`;
 
 /**
  * 
