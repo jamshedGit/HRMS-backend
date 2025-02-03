@@ -21,8 +21,7 @@ const createEmpPolicyValidation = {
         currencyId: Joi.number(),
         code: Joi.string(),
         codePrefix:Joi.string(),
-        
-        
+        salaryMethod:Joi.string(),
 
     }),
 };

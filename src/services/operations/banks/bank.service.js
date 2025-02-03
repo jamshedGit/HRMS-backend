@@ -17,8 +17,9 @@ const Op = Sequelize.Op;
  */
 const createBank = async (req, BankBody) => {
 
-  BankBody.createdBy = req.user.id;
+  BankBody.createdBy = req.user.Id;
   BankBody.Name=BankBody.Name.trimStart();
+  BankBody.companyId=req.user.companyId;
   const addedBankObj = await BankModel.BankModel.create(BankBody);
   //authSMSSend(addedBankObj.dataValues);  // Quick send message at the time of donation
   const fetchRecord = await getBankById(addedBankObj.Id);
