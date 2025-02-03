@@ -87,7 +87,7 @@ const createPayroll_Process = async (req, payroll_processBody) => {
         addedPayroll_Process.completed = 1;
         await addedPayroll_Process.save();
       }
-      console.log("result000",result)
+
       return result[0]
 
 
@@ -97,7 +97,7 @@ const createPayroll_Process = async (req, payroll_processBody) => {
 
     else {
       for (const payrollGroup of allPayrollGroup) {
-        console.log("payrollGroup?.Id111",payrollGroup?.Id)
+      
         if (payrollGroup?.Id) {
           try {
             result = await sequelize.query(
@@ -109,7 +109,7 @@ const createPayroll_Process = async (req, payroll_processBody) => {
               },
               type: Sequelize.QueryTypes.RAW // Use RAW type for executing stored procedures
             });
-            console.log("result111",result)
+          
             final_result.TaxCalculated += result[0].TaxCalculated;
             final_result.TaxNotCalculated += result[0].TaxNotCalculated;
             final_result.LoanProcess += result[0].LoanProcess;
