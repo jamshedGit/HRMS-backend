@@ -216,9 +216,9 @@ const getCountriesMasterData = async () => {
   return countriesMasterData
 };
 
-const getBanksMasterData = async () => {
+const getBanksMasterData = async (req) => {
   const BanksMasterData = getDdlItems(DDL_FIELD_NAMES.BankName, await BankModel.findAll({
-    where: { isActive: true },
+    where: { isActive: true ,subsidiaryId: { [Op.in]: await currentSubsidiaryPermission(req) }},
     attributes: ['Id', 'Name', "subsidiaryId"]
   }));
   return BanksMasterData
@@ -226,9 +226,9 @@ const getBanksMasterData = async () => {
 
 
 
-const get_Bank_Branch_MasterData = async () => {
+const get_Bank_Branch_MasterData = async (req) => {
   const Bank_Branch_MasterData = getDdlItems(DDL_FIELD_NAMES.BranchName, await BranchModel.findAll({
-    where: { isActive: true },
+    where: { isActive: true,subsidiaryId: { [Op.in]: await currentSubsidiaryPermission(req) } },
     attributes: ['Id', 'Name']
   }));
   return Bank_Branch_MasterData

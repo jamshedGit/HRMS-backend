@@ -35,7 +35,7 @@ const getBanksMasterData = catchAsync(async (req, res) => {
   res.send({
     code: HttpStatusCodes.OK,
     message: HttpResponseMessages.OK,
-    data: await settingService.getBanksMasterData(),
+    data: await settingService.getBanksMasterData(req),
   });
 });
 
@@ -43,7 +43,7 @@ const get_Bank_Branch_MasterData = catchAsync(async (req, res) => {
   res.send({
     code: HttpStatusCodes.OK,
     message: HttpResponseMessages.OK,
-    data: await settingService.get_Bank_Branch_MasterData(),
+    data: await settingService.get_Bank_Branch_MasterData(req),
   });
 });
 

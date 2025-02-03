@@ -14,7 +14,7 @@ router.route("/read-all-emp-earning_byId").post( empSalController.SP_getAllEmplo
 router.route("/create-employee-salary").post(auth(), validate(employeeSalaryValidation.createEmployeeSalarySetupValidation), empSalController.createEmployeeSalary);
 router.route("/update-employee-salary").put(auth(), empSalController.updateEmployeeSalary);
 router.route("/delete-employee-salary").patch(auth(), empSalController.deleteEmployeeSalary);
-router.route("/approve-employee-salary").put(auth(), empSalController.approveEmployeeSalary);
+router.route("/approve-employee-salary").put(auth(true), empSalController.approveEmployeeSalary);
 
 router.route("/read-all-employees-salary").post( empSalController.getAllEmployeeSalary);
 
