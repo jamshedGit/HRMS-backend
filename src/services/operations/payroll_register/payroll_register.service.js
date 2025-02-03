@@ -850,7 +850,7 @@ const generateBankAdviceExcel = async (req) => {
     })
   })
 
-  const { workbook, worksheet } = await createExcelSheet('payroll_register')
+  const { workbook, worksheet } = await createExcelSheet('bank_advice')
   const columns = [
     { header: "S. No.", key: "sno", width: 20 },
     { header: "Employee Code", key: "employeeCode", width: 15 },
