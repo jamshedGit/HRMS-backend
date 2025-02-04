@@ -90,7 +90,8 @@ app.use(express.static(path.join(__dirname, "public")));
 // Import the sequelize object on which
 // we have defined model.
 const sequelize = require("./config/db");
-
+const { Payroll_Stop_LoanModel } = require("./models");
+// Payroll_Stop_LoanModel.sync({ force: true }); 
 // send back a 404 error for any unknown api request
 app.use((req, res, next) => {
   next(new ApiError(httpStatus.NOT_FOUND, "Not found"));

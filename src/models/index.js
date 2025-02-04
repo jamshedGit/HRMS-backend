@@ -174,3 +174,5 @@ module.exports.DepartmentSetupAccessModel=require("./operations/department/depar
 module.exports.User_Model = require('./operations/user/user.model');
 module.exports.UserAccessModel =require('./operations/user/user.model');
 module.exports.Password_history=require('./operations/user/password_history.model');
+module.exports.Payroll_Stop_SalaryModel=require('./operations/payroll_process/payroll_stop_salary.model');
+module.exports.Payroll_Stop_LoanModel=require('./operations/payroll_process/payroll_stop_loan.model');
