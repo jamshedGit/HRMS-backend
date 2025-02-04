@@ -764,6 +764,9 @@ const generateBankAdviceExcel = async (req) => {
 
   const array = [];
 
+  //Get Data for Bank Transfer Payment Mode Only
+  array.push(`(pe.payment_mode_Id = 153)`)
+
   if (filter.subsidiaryId) {
     array.push(`(pe.SubsidiaryId = ${filter.subsidiaryId})`)
   }
