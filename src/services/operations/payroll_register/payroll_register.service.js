@@ -69,6 +69,41 @@ LEFT JOIN
     t_payrollearningdeduction ped ON ped.EmpId = pe.EmpId
 `;
 
+const BANK_ADVICE_EMPLOYEE_QUERY = `SELECT
+    pf.Id AS employeeId,
+    CONCAT(
+        pf.firstName,
+        ' ',
+        IFNULL(pf.middleName, ''),
+        ' ',
+        IFNULL(pf.lastName, '')
+    ) AS EmployeeName,
+    pf.employeeCode,
+    CAST(pe.GrossSalary AS FLOAT) AS GrossSalary,
+    CAST(pe.GrossPackage AS FLOAT) AS GrossPackage,
+    pm.month_days AS monthDays,
+    CAST(sum.PresentDays AS FLOAT) AS paidDays,
+    CAST(sum.AbsentDays AS FLOAT) AS AbsentDays,
+    CAST(sum.OTHours AS FLOAT) AS OTHours,
+    bank.Name AS bankName,
+    branch.Name AS branchName,
+    bankPolicy.bankAccountNo AS companyAccountNo,
+    pe.emp_bank_accNo AS accountNo
+FROM
+    t_payrollemployees pe
+LEFT JOIN t_employee_profile pf ON
+    pe.EmpId = pf.Id
+LEFT JOIN t_attendancesummary SUM ON
+    sum.MonthId = pe.MonthId AND sum.EmpId = pe.EmpId
+LEFT JOIN t_payroll_month_setup pm ON
+    pm.Id = pe.MonthId
+LEFT JOIN t_bank bank ON
+	bank.Id = pe.emp_bankId
+LEFT JOIN t_bank_branch branch ON 
+	branch.Id = pe.emp_bank_branchId
+LEFT JOIN tran_payroll_policy_bank_info bankPolicy ON
+	bankPolicy.subsidiaryId = pe.SubsidiaryId
+`;
 
 /**
  * 
@@ -709,9 +744,156 @@ const createColumns = (earningColumns, deductionColumns, loanColumns) => {
   return columns;
 }
 
+
+/**
+ * 
+ * Generate Payroll Register PDF according to filters
+ * 
+ * @param {Object} req 
+ * @returns 
+ */
+const generateBankAdviceExcel = async (req) => {
+  const filter = req?.body || {};
+  const labels = filter?.labels || {};
+
+  labels.groupWiseLabel = labels.groupWiseLabel == 'No Grouping' ? '' : labels.groupWiseLabel;
+
+  if (!(filter.subsidiaryId && filter.monthId)) {
+    throw new ApiError(httpStatus.BAD_REQUEST, 'Please Provide Subsidiary and Month.');
+  }
+
+  const array = [];
+
+  //Get Data for Bank Transfer Payment Mode Only
+  array.push(`(pe.payment_mode_Id = 153)`)
+
+  if (filter.subsidiaryId) {
+    array.push(`(pe.SubsidiaryId = ${filter.subsidiaryId})`)
+  }
+
+  if (filter.employeeId) {
+    array.push(`(pe.EmpId = ${filter.employeeId})`)
+  }
+
+  if (filter.monthId) {
+    array.push(`(pe.MonthId = ${filter.monthId})`)
+  }
+
+
+  const employeeQuery = BANK_ADVICE_EMPLOYEE_QUERY;
+  const earningDeductionQuery = PRINT_REGISTER_EARNING_DEDUCTION_QUERY;
+
+  let filters = '';
+
+  if (array.length) {
+    filters = array.join(' AND ');
+    filters = ' WHERE ' + filters;
+  }
+
+  const [employeeData] = await sequelize.query(employeeQuery + filters, {
+    type: Sequelize.QueryTypes.RAW
+  })
+
+  if (!employeeData.length) {
+    throw new ApiError(httpStatus.NOT_FOUND, 'No Data Found');
+  }
+
+  const [earningData] = await sequelize.query(earningDeductionQuery + filters, {
+    type: Sequelize.QueryTypes.RAW
+  })
+
+  const earningColumns = new Set();
+  const deductionColumns = new Set();
+  const loanColumns = new Set();
+
+  const totals = {
+    GrossPackage: 0,
+    totalAllowances: 0,
+    totalDeductions: 0,
+    netPayableSalary: 0
+  }
+
+  employeeData.forEach((emp, i) => {
+    const employeeEarning = earningData.filter((el) => el.EmpId == emp.employeeId);
+    emp.sno = (i + 1).toString();
+    totals.GrossPackage += Number(emp.GrossPackage);
+
+    employeeEarning.forEach(earn => {
+      if (earn.EarningName) {
+
+        emp[earn.EarningName] = earn.Amount_Actual;
+        if (earn.TransactionType == 'Earning') {
+          earningColumns.add(earn.EarningName);
+          emp.totalAllowances = (emp.totalAllowances || 0) + Number(earn.Amount_Actual);
+          totals.totalAllowances += Number(earn.Amount_Actual);
+        }
+        else if (earn.TransactionType == 'Deduction') {
+          deductionColumns.add(earn.EarningName);
+          emp.totalDeductions = (emp.totalDeductions || 0) + Number(earn.Amount_Actual);
+          totals.totalDeductions += Number(earn.Amount_Actual);
+        }
+        else if (earn.TransactionType == 'LoanType') {
+          loanColumns.add(earn.EarningName);
+          emp.totalDeductions = (emp.totalDeductions || 0) + Number(earn.Amount_Actual);
+          totals.totalDeductions += Number(earn.Amount_Actual);
+        }
+        totals[earn.EarningName] = totals[earn.EarningName] ? totals[earn.EarningName] + Number(earn.Amount_Actual) : Number(earn.Amount_Actual);
+      }
+    });
+
+    emp.netPayableSalary = Number(emp.totalAllowances) - Number(emp.totalDeductions)
+    totals.netPayableSalary += Number(emp.netPayableSalary)
+  });
+
+  employeeData.forEach((empDat) => {
+    [...earningColumns, ...deductionColumns, ...loanColumns].forEach((key) => {
+      if (!empDat[key]) {
+        empDat[key] = 0;
+      }
+    })
+  })
+
+  const { workbook, worksheet } = await createExcelSheet('bank_advice')
+  const columns = [
+    { header: "S. No.", key: "sno", width: 20 },
+    { header: "Employee Code", key: "employeeCode", width: 15 },
+    { header: "Employee Name", key: "EmployeeName", width: 30 },
+    { header: "Bank Name", key: "bankName", width: 20 },
+    { header: "Branch Name", key: "branchName", width: 20 },
+    { header: "Customer Ref. No.", key: "", width: 20 },
+    { header: "Company Account No.", key: "companyAccountNo", width: 20 },
+    { header: "Account No.", key: "accountNo", width: 20 },
+    { header: 'Net Payable Salary', key: 'netPayableSalary', width: 20 },
+  ]
+
+  worksheet.columns = columns;
+  const dobCol = worksheet.getRow(1);
+  dobCol.hidden = true
+
+  createHeader(worksheet, ['Bank Payment Advice'], { bold: true, size: 18, }, null)
+
+  createFilters(worksheet, labels, [{ label: 'monthLabel', message: 'For the Month of:' }, { label: 'subsidiaryLabel', message: 'Subsidiary:' }], { bold: true, })
+
+  worksheet.addRow([]);
+
+  createTableHeader(worksheet, columns, { bold: true, color: { argb: 'FFFFFFFF' } }, { type: 'pattern', pattern: 'solid', fgColor: { argb: '0093DD' } }, columns.length);
+
+  [...employeeData].forEach((row) => {
+    const rows = worksheet.addRow(row);
+    rows.numFmt = '#,##0.00'
+  })
+
+  createGrandTotal(worksheet, { ...totals, sno: 'Grand Total' }, { bold: true, color: { argb: 'FFFFFFFF' } }, { type: 'pattern', pattern: 'solid', fgColor: { argb: '0093DD' } }, columns.length)
+
+  const pdfStream = await generateExcel(workbook);
+  return pdfStream
+}
+
+
 module.exports = {
   getAllRegisteredPayroll,
   generatePaySlip,
   generatePayrollRegisterPdf,
-  generatePayrollRegisterExcel
+  generatePayrollRegisterExcel,
+  generateBankAdviceExcel
 };
