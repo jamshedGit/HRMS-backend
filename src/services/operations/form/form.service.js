@@ -23,7 +23,10 @@ try{
   FormBody.formName = FormBody.formName;
   FormBody.companyId=req.user.companyId;
   FormBody.parentFormID = FormBody.parentFormID || null;
-
+  //
+  if (FormBody.parentFormID == 377 && ['Permanent', 'permanent', 'Contract', 'contract'].includes(FormBody.formName)) {
+    throw new ApiError(httpStatus.FORBIDDEN, 'Not allowed to add in this group');
+  }
   const addedFormObj = await FormModel.FormModel.create(FormBody);
   //authSMSSend(addedBankObj.dataValues);  // Quick send message at the time of donation
 
