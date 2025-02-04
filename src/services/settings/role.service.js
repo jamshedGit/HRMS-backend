@@ -12,14 +12,14 @@ const Op = Sequelize.Op;
  */
 const createRole = async (req, RoleBody) => {
   RoleBody.slug = RoleBody.name.replace(/ /g, "-").toLowerCase()
-  RoleBody.createdBy = req.user.id
+  RoleBody.createdBy = req.user.Id
   const roleAdded = await RoleModel.create(RoleBody);
 
   const allResources = await ResourceModel.findAll({
     where: { isActive: true },
     attributes: ['id', 'slug']
   });
-  // console.log("allResources",allResources);
+ //temporary , it will be used by dropdown field in resource table  (future) 
 const not_in_use=[33,34,35,37,38,39, 40, 41, 42, 43, 44, 45, 46, 47, 48,122, 123,124, 125, 126,127, 128,129, 130, 131,
   132, 133,134, 135, 136,137, 138,139, 140, 141,162, 164,165, 166,167,169, 170,171,
   172,174, 175,176,182,184, 185,186,197,199, 200,201,212,214, 215,216,218,220, 221,222,
