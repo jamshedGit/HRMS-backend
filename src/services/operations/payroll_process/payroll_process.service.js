@@ -1,5 +1,5 @@
 const httpStatus = require("http-status");
-const { Employee_loan_requestModel, FormModel, SubsidiaryModel, PayrollMonthModel, Payroll_ProcessModel, EmployeeProfileModel, EmployeeSalaryModel, Employee_loan_request_detailModel, Payroll_Stop_SalaryModel } = require("../../../models/index");
+const { Employee_loan_requestModel, FormModel, SubsidiaryModel, PayrollMonthModel, Payroll_ProcessModel, EmployeeProfileModel, EmployeeSalaryModel, Employee_loan_request_detailModel, Payroll_Stop_SalaryModel, Payroll_Stop_LoanModel, LoanTypeModel } = require("../../../models/index");
 
 const ApiError = require("../../../utils/ApiError");
 const Sequelize = require("sequelize");
@@ -424,7 +424,7 @@ const payroll_group_detail = async (subsidiaryId, payroll_groupId, payroll_month
       'fullName',  // Alias for the concatenated name
     ]]
   });
-
+ 
   const stop_salary_employees = await Payroll_Stop_SalaryModel.findAndCountAll({
     where: {
       ...(subsidiaryId && { subsidiaryId: subsidiaryId }),
@@ -433,8 +433,17 @@ const payroll_group_detail = async (subsidiaryId, payroll_groupId, payroll_month
     },
     attributes: ['Id','employeeId', 'subsidiaryId', 'payroll_groupId', 'payroll_monthId']
   });
-
-
+ 
+  const stop_loan_employees = await Payroll_Stop_LoanModel.findAndCountAll({
+    where: {
+      ...(subsidiaryId && { subsidiaryId: subsidiaryId }),
+      ...(payroll_groupId && { payroll_groupId: payroll_groupId }),
+      ...(payroll_monthId && { payroll_monthId: payroll_monthId }),
+    },
+    attributes: ['Id','employeeId', 'subsidiaryId', 'payroll_groupId', 'payroll_monthId','loan_typeId','loan_request_detailId']
+  });
+ 
+ 
   // Check if employees are found
   if (employees?.count === 0) {
     data = {
@@ -443,12 +452,13 @@ const payroll_group_detail = async (subsidiaryId, payroll_groupId, payroll_month
       loan_to_be_processed: 0,
       employees_list: [],
       stop_salary_employees_list: [],
+      for_loan_employees_list: [],
       stop_loan_employees_list: []
-
+ 
     }
     return data
   }
-
+ 
   // Step 2: Find all employees whose salary setup has not been created
   const employeesWithoutSalarySetup = await EmployeeSalaryModel.findAll({
     where: {
@@ -457,16 +467,16 @@ const payroll_group_detail = async (subsidiaryId, payroll_groupId, payroll_month
       },
     },
   });
-
+ 
   // Step 3: Get the count of employees whose salary setup is not created
   const employeesWithNoSalarySetupCount = employees.rows.filter((emp) => {
     // Check if this employee is NOT in the EmployeeSalaryModel
-
+ 
     return !employeesWithoutSalarySetup.some((salary) => salary.employeeId === emp.Id);
   }).length;
-
-
-
+ 
+ 
+ 
   const employeesApprovedLoanRequest = await Employee_loan_requestModel.findAll({
     where: {
       employeeId: {
@@ -475,16 +485,16 @@ const payroll_group_detail = async (subsidiaryId, payroll_groupId, payroll_month
       approved_status: 1
     },
   });
-
+ 
   const currentPayrollMonth = await PayrollMonthModel.findOne({
     where: {
-
-
+ 
+ 
       Id: payroll_monthId
-
+ 
     },
   });
-
+ 
   const employeesLoanToBeProcessed = await Employee_loan_request_detailModel.findAll({
     where: {
       // employeeId: {
@@ -498,22 +508,52 @@ const payroll_group_detail = async (subsidiaryId, payroll_groupId, payroll_month
         [Op.lte]: currentPayrollMonth?.endDate
       }
     },
-    attributes: ['Id','employeeId', 'emp_loan_reqId', 'amount_received', 'running_balance']
+    attributes: ['Id','employeeId', 'emp_loan_reqId', 'amount_received', 'running_balance'],
+    include: [
+      {
+        model: Employee_loan_requestModel,
+        attributes: ['employeeId'], // Specify the parent attribute you want
+        as: 'Employee_loan_request', // This should match the alias if defined in associations
+     
+        include: [
+          {
+            model: LoanTypeModel,
+            attributes: ['Id','name'], // Specify the parent attribute you want
+            as: 'LoanType', // This should match the alias if defined in associations
+         
+         
+          },
+          {
+            model: EmployeeProfileModel,
+            attributes: ['Id', [
+              literal(`CONCAT(firstName, ' ', COALESCE(middleName, ''), ' ', lastName)`),
+              'fullName',  // Alias for the concatenated name
+            ]],
+            as: 'Employee', // This should match the alias if defined in associations
+         
+         
+          },
+        ],
+ 
+   
+      },
+    ],
   });
-
-
-
+ 
+ 
+ 
   data = {
     total_employees: employees?.rows?.length,
     slary_setup_not_created: employeesWithNoSalarySetupCount,
     loan_to_be_processed: employeesLoanToBeProcessed?.length || 0,
     employees_list: employees?.rows,
     stop_salary_employees_list: stop_salary_employees?.rows,
-    stop_loan_employees_list:employeesLoanToBeProcessed,
+    for_loan_employees_list:employeesLoanToBeProcessed,
+    stop_loan_employees_list:stop_loan_employees?.rows,
   }
-
+ 
   return data
-
+ 
 };
 //t_payrollprocess_locking
 
@@ -909,23 +949,32 @@ const checkPayroll_EmployeesByIds = async (data) => {
 
 const createStopSalary = async (req) => {
   try {
-
-    
+ 
+   
     // Loop through selected employees and create entries
     const stopSalaryEntries = [];
+ 
+    if(!req.body.data?.payroll_groupId){
+      await Payroll_Stop_SalaryModel.destroy({
+        where: {
+          subsidiaryId: req.body.data?.subsidiaryId,
+          payroll_monthId: req.body.data?.payroll_monthId,
+        },
+      });
+ 
+    }
     await Payroll_Stop_SalaryModel.destroy({
       where: {
         subsidiaryId: req.body.data?.subsidiaryId,
         payroll_groupId: req.body.data?.payroll_groupId,
         payroll_monthId: req.body.data?.payroll_monthId,
-      
       },
     });
-
-    
-    
+   
+   
+   
     for (let employeeId of req.body.data?.selectedEmployees) {
-
+ 
       const employee = await EmployeeProfileModel.findOne({
         where: {
           Id:employeeId
@@ -940,7 +989,7 @@ const createStopSalary = async (req) => {
           employeeId: employeeId, // Check for each individual employeeId
         },
       });
-
+ 
       if (!stopSalaryExists) {
         let stopSalaryBody = {
           employeeId: employeeId,
@@ -950,124 +999,103 @@ const createStopSalary = async (req) => {
           companyId: req.user.companyId, // Using companyId from the user object
           createdBy:req.user.Id,
         };
-
+ 
         // Add the new entry to the array of entries to be created
         stopSalaryEntries.push(stopSalaryBody);
       }
     }
-
+ 
     // Bulk insert the entries for employees that don't already exist
     if (stopSalaryEntries.length > 0) {
       await Payroll_Stop_SalaryModel.bulkCreate(stopSalaryEntries);
      
-    
-    } 
+   
+    }
     return true;
   } catch (error) {
-    
+   
     throw new Error("Failed to create stop salary entries.");
   }
 };
-
 
 const createStopLoan = async (req) => {
   try {
-
-    
+ 
+ 
     // Loop through selected employees and create entries
-    const stopSalaryEntries = [];
-    await Payroll_Stop_SalaryModel.destroy({
+    const stopLoanEntries = [];
+ 
+    if(!req.body.data?.payroll_groupId){
+      await Payroll_Stop_LoanModel.destroy({
+        where: {
+          subsidiaryId: req.body.data?.subsidiaryId,
+          payroll_monthId: req.body.data?.payroll_monthId,
+       
+        },
+      });
+ 
+    }
+    await Payroll_Stop_LoanModel.destroy({
       where: {
         subsidiaryId: req.body.data?.subsidiaryId,
         payroll_groupId: req.body.data?.payroll_groupId,
         payroll_monthId: req.body.data?.payroll_monthId,
-      
+     
       },
     });
-
-    
-    
-    for (let employeeId of req.body.data?.selectedEmployees) {
-
+ 
+   
+   
+    for (let loan of req.body.data?.selectedLoans) {
+ 
       const employee = await EmployeeProfileModel.findOne({
         where: {
-          Id:employeeId
+          Id:loan.employeeId
         },
         attributes: ['Id','payrollGroupId']
       });
-      const stopSalaryExists = await Payroll_Stop_SalaryModel.findOne({
+      const stopLoanExists = await Payroll_Stop_LoanModel.findOne({
         where: {
           subsidiaryId: req.body.data?.subsidiaryId,
           payroll_groupId:  employee?.payrollGroupId ,
           payroll_monthId: req.body.data?.payroll_monthId,
-          employeeId: employeeId, // Check for each individual employeeId
+          employeeId: loan.employeeId, // Check for each individual employeeId
+          loan_typeId:loan.loan_typeId,
+       
         },
       });
-
-      if (!stopSalaryExists) {
-        let stopSalaryBody = {
-          employeeId: employeeId,
+ 
+      if (!stopLoanExists) {
+        let stopLoanBody = {
+          employeeId:loan.employeeId,
           subsidiaryId: req.body.data?.subsidiaryId,
           payroll_groupId:  employee?.payrollGroupId ,
           payroll_monthId: req.body.data?.payroll_monthId,
+          loan_typeId:loan.loan_typeId,
+          loan_request_detailId:loan.loan_request_detailId,
           companyId: req.user.companyId, // Using companyId from the user object
           createdBy:req.user.Id,
         };
-
+ 
         // Add the new entry to the array of entries to be created
-        stopSalaryEntries.push(stopSalaryBody);
+        stopLoanEntries.push(stopLoanBody);
       }
     }
-
+ 
     // Bulk insert the entries for employees that don't already exist
-    if (stopSalaryEntries.length > 0) {
-      await Payroll_Stop_SalaryModel.bulkCreate(stopSalaryEntries);
+    if (stopLoanEntries.length > 0) {
+      await Payroll_Stop_LoanModel.bulkCreate(stopLoanEntries);
      
-    
-    } 
+   
+    }
     return true;
   } catch (error) {
-    
-    throw new Error("Failed to create stop salary entries.");
+   
+    throw new Error("Failed to create stop loan entries.");
   }
 };
 
 
-// const createStopSalary = async (
-//   req,
-
-// ) => {
-//   try {
-
-
-//     console.log("stopSalaryBody111", req.body.data)
-//     // stopSalaryBody.createdBy = req.user.Id;
-
-//     const stopSalaryExists = await Payroll_Stop_SalaryModel.findOne({
-//       where: {
-//         subsidiaryId: req.body.data?.subsidiaryId,
-//         payroll_groupId: req.body.data?.payroll_groupId,
-//         payroll_monthId: req.body.data?.payroll_monthId,
-//         employeeId: {
-//           [Op.in]: req.body.data?.selectedEmployees, // Correct use of Op.in
-//         },
-//       },
-//     });
-//     let stopSalaryBody;
-//     if (!stopSalaryExists) {
-//       stopSalaryBody.employeeId = req.body.data.employeId,
-//         stopSalaryBody.subsidiaryId = req.body.data?.subsidiaryId,
-//         stopSalaryBody.payroll_groupId = eq.body.data?.payroll_groupId,
-//         stopSalaryBody.payroll_monthId = req.body.data?.payroll_monthId,
-//         stopSalaryBody.companyId = req.user.companyId,
-
-
-//         stopSalaryBody = await subsidiaryExists.save();
-//     }
-//   } catch (error) {
-//     throw error
-//   }
-// }
   module.exports = {
     createPayroll_Process,
     getPayroll_ProcessById,

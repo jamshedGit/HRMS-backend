@@ -16,6 +16,7 @@ const Payroll_Stop_LoanModel = sequelize.define('t_payroll_stop_loan', {
     subsidiaryId: { type: Sequelize.INTEGER, allowNull: false },
     companyId: { type: Sequelize.INTEGER, allowNull: false},
      loan_typeId: { type: Sequelize.INTEGER, allowNull: false },
+     loan_request_detailId: { type: Sequelize.INTEGER, allowNull: false },
     isActive: { type: Sequelize.BOOLEAN, allowNull: true, defaultValue: true },
     createdBy: {
         type: Sequelize.INTEGER,
