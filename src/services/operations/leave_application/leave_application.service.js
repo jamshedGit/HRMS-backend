@@ -5,6 +5,7 @@ const Sequelize = require('sequelize');
 const { paginationFacts, formatDates, addDaysInDate, getDateDiffInDays, handleNestedData } = require("../../../utils/common");
 const pick = require("../../../utils/pick");
 const { startOfDay, endOfDay } = require("date-fns");
+const { checkMonthFinalizedStatus } = require("../../../utils/dbValidators");
 
 const Op = Sequelize.Op;
 
@@ -28,6 +29,8 @@ const leaveApplicationAttributes = [
  */
 const createleaveApplication = async (req) => {
   const body = req.body;
+//Check if the date does not fall in closed or finalized month
+  await checkMonthFinalizedStatus(body, 'from', 'Unable to Create Leave - Date falls in closed Payroll Month', 'Unable to Create Leave - Date falls in Finalized Payroll Month')
 
   //Get Employee Data by Employee Id with Employee Leave balances of current active fiscal year
   const employeeData = await EmployeeProfileModel.findByPk(body.employeeId,
@@ -233,6 +236,8 @@ const getleaveApplicationData = async (filters, attributes = null, include = nul
  * @returns 
  */
 const updateleaveApplicationById = async (body, updatedBy) => {
+  //Check if the date does not fall in closed or finalized month
+  await checkMonthFinalizedStatus(body, 'from', 'Unable to Modify Leave - Date falls in closed Payroll Month', 'Unable to Modify Leave - Date falls in Finalized Payroll Month')
   const oldRecord = await getleaveApplicationById(body.Id)
   body.updatedBy = updatedBy;
   Object.assign(oldRecord, body);

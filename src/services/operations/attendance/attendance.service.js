@@ -6,6 +6,7 @@ const sequelize = require("../../../config/db");
 const { paginationFacts, handleNestedData, getDateDiffInDays, formatDates } = require("../../../utils/common");
 const pick = require("../../../utils/pick");
 const { startOfDay, endOfDay } = require("date-fns");
+const { checkMonthFinalizedStatus } = require("../../../utils/dbValidators");
 
 const Op = Sequelize.Op;
 
@@ -50,6 +51,8 @@ const attendanceAttributes = [
  */
 const createAttendance = async (req) => {
   const body = req.body;
+  //Check if the date does not fall in closed or finalized month
+  await checkMonthFinalizedStatus(body, 'attDateIn', 'Unable to Create Attendance - Date falls in closed Payroll Month', 'Unable to Create Attendance - Date falls in Finalized Payroll Month')
   const oldRecord = await getattendanceData({ employeeId: body.employeeId, attDate: body.attDateIn, isActive: true })
   if (oldRecord) {
     throw new ApiError(httpStatus.CONFLICT, 'Record Already Exists for this date')
@@ -275,6 +278,8 @@ const getattendanceData = async (filters, attributes = null, include = null) => 
  * @returns 
  */
 const updateAttendanceById = async (body, updatedBy) => {
+  //Check if the date does not fall in closed or finalized month
+  await checkMonthFinalizedStatus(body, 'attDateIn', 'Unable to Modify Attendance - Date falls in closed Payroll Month', 'Unable to Modify Attendance - Date falls in Finalized Payroll Month')
   const oldRecordWithId = await getattendanceData({ employeeId: body.employeeId, attDate: body.attDateIn, isActive: true, Id: { [Op.ne]: body.Id } });
   if (oldRecordWithId) {
     throw new ApiError(httpStatus.CONFLICT, 'Record already exists for this Date')
