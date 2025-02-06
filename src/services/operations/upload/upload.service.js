@@ -149,6 +149,15 @@ const leaveSheetValidation = async (sheetData) => {
     if (currentEmployeeLeaveBalance) {
       throw new ApiError(httpStatus.BAD_REQUEST, `Sheet Data Not Entered Correct. Balance already present for Employee Code: ${sd['Employee Code']} on Row: ${index}`);
     }
+
+    if(!sd['Leave Balance']){
+      throw new ApiError(httpStatus.BAD_REQUEST, `Sheet Data Not Entered Correct. Error Found on Leave balance: ${sd['Leave Balance'] || ''} on Row: ${index}`);
+    }
+
+    if(Number(sd['Leave Balance']) > 999 || Number(sd['Leave Balance']) < 1){
+      throw new ApiError(httpStatus.BAD_REQUEST, `Sheet Data Not Entered Correct. Please Enter Valid Leave Balance for Employee Code: ${sd['Employee Code']} on Row: ${index}`);
+    }
+
     index++;
   }
 }
