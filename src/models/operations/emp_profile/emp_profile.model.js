@@ -2,7 +2,8 @@ const Sequelize = require('sequelize');
 const { ResourceModel, DeptModel, FormModel, SubsidiaryModel } = require('../..');
 
 //import Database connection configurations.
-const sequelize = require('../../../config/db')
+const sequelize = require('../../../config/db');
+const { formatDates } = require('../../../utils/common');
 
 const DesigModel = sequelize.define('t_employee_profile', {
 	Id: {
@@ -43,8 +44,24 @@ const DesigModel = sequelize.define('t_employee_profile', {
 	countryId: { type: Sequelize.INTEGER, allowNull: true },
 	cityId: { type: Sequelize.INTEGER, allowNull: true },
 	reportTo: { type: Sequelize.INTEGER, allowNull: true },
-	dateOfJoining: { type: Sequelize.DATE, allowNull: true },
-	dateOfConfirmation: { type: Sequelize.DATE, allowNull: true },
+	// dateOfJoining: { type: Sequelize.DATE, allowNull: true },
+	dateOfJoining: {
+		type: Sequelize.DATE,
+		allowNull: false,
+		get() {
+			const rawValue = this.getDataValue('dateOfJoining');
+			return rawValue ? formatDates(rawValue) : null;
+		}
+	},
+	// dateOfConfirmation: { type: Sequelize.DATE, allowNull: true },
+	dateOfConfirmation: {
+		type: Sequelize.DATE,
+		allowNull: false,
+		get() {
+			const rawValue = this.getDataValue('dateOfConfirmation');
+			return rawValue ? formatDates(rawValue) : null;
+		}
+	},
 	dateOfConfirmationDue: { type: Sequelize.DATE, allowNull: true },
 	dateOfConfirmationEnter: { type: Sequelize.DATE, allowNull: true },
 	dateOfContractExpiry: { type: Sequelize.DATE, allowNull: true },
@@ -117,6 +134,22 @@ DesigModel.belongsTo(FormModel, {
 	targetKey: 'Id',
 	as: "employeeStatus"
 });
+
+
+DesigModel.belongsTo(FormModel, {
+	foreignKey: 'gradeId',
+	targetKey: 'Id',
+	as: "grade"
+});
+
+
+DesigModel.belongsTo(DesigModel, {
+	foreignKey: 'reportTo',
+	targetKey: 'Id',
+	as: "ReportTo"
+});
+
+
 
 
 
