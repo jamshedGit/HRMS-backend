@@ -70,9 +70,26 @@ const generateRegisteredPayrollExcel = catchAsync(async (req, res) => {
   res.end(data);
 });
 
+/**
+ * 
+ * Get Bank Advice in Excel
+ * 
+ * @param {Object} req 
+ * @returns res
+ */
+const generateBankAdviceExcel = catchAsync(async (req, res) => {
+  const data = await PayrollRegisterServicePage.generateBankAdviceExcel(req);
+  res.set({
+    "Content-Type": "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+    "Content-Disposition": 'attachment; filename="bank_advice.xlsx"',
+  });
+  res.end(data);
+});
+
 module.exports = {
   getAllRegisteredPayroll,
   generatePayslip,
   generateRegisteredPayrollPdf,
-  generateRegisteredPayrollExcel
+  generateRegisteredPayrollExcel,
+  generateBankAdviceExcel
 };
