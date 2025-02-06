@@ -323,7 +323,7 @@ const getUserCompleteRoleAccess = async (roleId) => {
 //       {
 //         model: ResourceModel,
 //         where: { isParentShow: true },
-//         attributes: ['name', 'parentName', 'parentSlug', 'slug', 'isResourceShow', 'sortOrder', 'forDropdown']
+//         attributes: ['name', 'parentName', 'parentSlug', 'slug', 'isResourceShow', 'sortOrder', 'isAccessFree']
 //       },
 //     ],
 //     attributes: ['isAccess', 'isActive', 'roleId', 'resourceId']
@@ -337,7 +337,7 @@ const getUserCompleteRoleAccess = async (roleId) => {
 //     const resource = item.t_resource;
 //     
 //     // Check if sortOrder is 1 - this is a special case where we show the data immediately
-//     if (resource.forDropdown == 1) {
+//     if (resource.isAccessFree == 1) {
 //      
 //       formatedData.push({
 //         isResourceShow: resource.isResourceShow,
@@ -422,7 +422,7 @@ const getUserAccessForMiddleware = async (roleId, slugs) => {
 
   try {
     const isForDropdown = await ResourceModel.findAll({
-      where: { slug: slugs.rightSlug, forDropdown: true },
+      where: { slug: slugs.rightSlug, isAccessFree: true },
 
     })
 
