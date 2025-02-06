@@ -142,6 +142,33 @@ const payroll_group_detail = catchAsync(async (req, res) => {
   });
   
 
+  const createStopSalary =catchAsync(async (req, res) => {
+
+    const Receipt = await Payroll_ProcessService.createStopSalary(req);
+    if (!Receipt) {
+      throw new ApiError(httpStatus.NOT_FOUND, "Data not found");
+    }
+    res.send({
+      code: HttpStatusCodes.OK,
+      message: HttpResponseMessages.OK,
+      data: Receipt,
+    });
+  });
+
+
+  const createStopLoan =catchAsync(async (req, res) => {
+ 
+    const Receipt = await Payroll_ProcessService.createStopLoan(req);
+    if (!Receipt) {
+      throw new ApiError(httpStatus.NOT_FOUND, "Data not found");
+    }
+    res.send({
+      code: HttpStatusCodes.OK,
+      message: HttpResponseMessages.OK,
+      data: Receipt,
+    });
+  });
+ 
 
 module.exports = {
   createPayroll_Process,
@@ -150,6 +177,6 @@ module.exports = {
   updatePayroll_Process,
   deletePayroll_Process,
   payroll_group_detail,
-  checkPayroll_EmployeesByIds
+  checkPayroll_EmployeesByIds,createStopSalary,createStopLoan
 
 };

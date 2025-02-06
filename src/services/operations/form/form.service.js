@@ -23,7 +23,7 @@ try{
   FormBody.formName = FormBody.formName;
   FormBody.companyId=req.user.companyId;
   FormBody.parentFormID = FormBody.parentFormID || null;
-  //
+  //According to the project manager's instructions, this will be constant for the employee type.
   if (FormBody.parentFormID == 377 && ['Permanent', 'permanent', 'Contract', 'contract'].includes(FormBody.formName)) {
     throw new ApiError(httpStatus.FORBIDDEN, 'Not allowed to add in this group');
   }

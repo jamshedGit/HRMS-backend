@@ -36,7 +36,7 @@ const getAccessRights = catchAsync(async (req, res) => {
     //   req.role.dealerId ? Object.assign(obj, { dealerId: req.role.dealerId }) : null;
     const filter = obj;
     const options = pick(req.body, ['roleId','sortBy', 'limit', 'page']);
-    const result = await accessRightService.getAllAccessRightsByRoleId(filter, options);
+    const result = await accessRightService.getAllAccessRightsByRoleId(req,filter, options);
     res.send({
         code: HttpStatusCodes.OK,
         message: HttpResponseMessages.OK,
