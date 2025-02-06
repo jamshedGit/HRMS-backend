@@ -4,6 +4,7 @@ const { formatDates } = require("./common");
 const httpStatus = require('http-status');
 const { HttpStatusCodes } = require('./constants');
 const ApiError = require('./ApiError');
+const { PayrollMonthModel } = require('../models');
 
 const Op = Sequelize.Op;
 
@@ -27,6 +28,7 @@ async function checkMonthFinalizedStatus(body, dateKey, monthError, finalizedErr
     const query = `SELECT
     locking.isFinalized,
     emp.Id,
+    emp.subsidiaryId,
     month.isActive
 FROM
     t_employee_profile emp
@@ -51,6 +53,19 @@ WHERE
     if (data[0].isActive == 0) {
       throw new ApiError(httpStatus.BAD_REQUEST, monthError)
     }
+
+    const currentActivePayrollMonth = await PayrollMonthModel.findOne({
+      where: {
+        subsidiaryId: data[0].subsidiaryId,
+        isActive: true
+      },
+      attributes: ['startDate']
+    })
+
+    if(currentActivePayrollMonth && currentActivePayrollMonth.startDate && new Date(formattedDate) < new Date(currentActivePayrollMonth.startDate)){
+      throw new ApiError(HttpStatusCodes.BAD_REQUEST, monthError)
+    }
+
 
     //If month is not closed but its payroll is finalized then throw error
     if (data[0].isFinalized) {
