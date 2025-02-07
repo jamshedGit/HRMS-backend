@@ -150,13 +150,13 @@ const getAllRegisteredPayroll = async (req) => {
     Amount_TakeHome AS Amount_Actual 
 FROM t_payrollearningdeduction X
 INNER JOIN t_employee_profile y ON x.EmpId = y.Id
-INNER JOIN t_payroll_month_setup z ON x.SubsidiaryId = z.subsidiaryId 
+INNER JOIN t_payroll_month_setup z ON x.SubsidiaryId = z.subsidiaryId AND z.Id = X.MonthId
 WHERE`;
 
   const countQuery = `SELECT COUNT(*) AS TotalCount
 FROM t_payrollearningdeduction X
 INNER JOIN t_employee_profile y ON x.EmpId = y.Id
-INNER JOIN t_payroll_month_setup z ON x.SubsidiaryId = z.subsidiaryId 
+INNER JOIN t_payroll_month_setup z ON x.SubsidiaryId = z.subsidiaryId AND z.Id = X.MonthId
 WHERE`;
 
   const array = [];
@@ -231,6 +231,9 @@ const generatePaySlip = async (req) => {
     throw new ApiError(httpStatus.BAD_REQUEST, 'Please Provide Subsidiary and Month.');
   }
 
+  //Validation to generate report for only finalized payroll Months 
+  await payrollMonthFinalizedValidation(filter);
+
   let employeeDataQuery = `Select 
 	  CONCAT(emppro.firstName, ' ', IFNULL(emppro.middleName, ''), ' ', IFNULL(emppro.lastName, '')) AS EmployeeName,
     emppro.employeeCode,
@@ -291,7 +294,7 @@ pe.MonthId = ${filter.monthId}`;
     Amount_TakeHome AS Amount_Actual
 FROM t_payrollearningdeduction X
 INNER JOIN t_employee_profile y ON x.EmpId = y.Id
-INNER JOIN t_payroll_month_setup z ON x.SubsidiaryId = z.subsidiaryId 
+INNER JOIN t_payroll_month_setup z ON x.SubsidiaryId = z.subsidiaryId AND z.Id = ${filter.monthId}
 WHERE
 X.Amount_TakeHome IS NOT NULL
 AND
@@ -395,6 +398,9 @@ const generatePayrollRegisterPdf = async (req) => {
   if (!(filter.subsidiaryId && filter.monthId)) {
     throw new ApiError(httpStatus.BAD_REQUEST, 'Please Provide Subsidiary and Month.');
   }
+
+  //Validation to generate report for only finalized payroll Months 
+  await payrollMonthFinalizedValidation(filter);
 
   const array = [];
 
@@ -537,6 +543,9 @@ const generatePayrollRegisterExcel = async (req) => {
   if (!(filter.subsidiaryId && filter.monthId)) {
     throw new ApiError(httpStatus.BAD_REQUEST, 'Please Provide Subsidiary and Month.');
   }
+
+  //Validation to generate report for only finalized payroll Months 
+  await payrollMonthFinalizedValidation(filter);
 
   const array = [];
 
@@ -762,6 +771,9 @@ const generateBankAdviceExcel = async (req) => {
     throw new ApiError(httpStatus.BAD_REQUEST, 'Please Provide Subsidiary and Month.');
   }
 
+  //Validation to generate report for only finalized payroll Months 
+  await payrollMonthFinalizedValidation(filter);
+
   const array = [];
 
   //Get Data for Bank Transfer Payment Mode Only
@@ -887,6 +899,35 @@ const generateBankAdviceExcel = async (req) => {
 
   const pdfStream = await generateExcel(workbook);
   return pdfStream
+}
+
+/**
+ * 
+ * Validation for Finalized Payroll Month
+ * 
+ * @param {Object} filters 
+ */
+const payrollMonthFinalizedValidation = async (filters) => {
+  const query = `SELECT
+    *
+FROM
+    t_payrollprocess_locking
+WHERE
+    MonthId = ${filters.monthId} AND SubsidiaryId = ${filters.subsidiaryId}`
+
+  const [lockingData] = await sequelize.query(query, {
+    type: Sequelize.QueryTypes.RAW
+  })
+
+  if (!lockingData.length) {
+    throw new ApiError(httpStatus.NOT_FOUND, 'Payroll Process is not finalized for this month');
+  }
+  else {
+    const notFinalized = lockingData.find(el => !Boolean(el.isFinalized))
+    if (notFinalized) {
+      throw new ApiError(httpStatus.NOT_FOUND, 'Payroll Process is not completely finalized for this month');
+    }
+  }
 }
 
 
