@@ -67,7 +67,15 @@ const DesigModel = sequelize.define('t_employee_profile', {
 	dateOfContractExpiry: { type: Sequelize.DATE, allowNull: true },
 	defaultShiftId: { type: Sequelize.INTEGER, allowNull: true },
 	attendanceType: { type: Sequelize.INTEGER,  defaultValue: true },
-	dateOfBirth: { type: Sequelize.DATE, allowNull: true },
+	// dateOfBirth: { type: Sequelize.DATE, allowNull: true },
+	dateOfBirth: {
+		type: Sequelize.DATE,
+		allowNull: false,
+		get() {
+			const rawValue = this.getDataValue('dateOfBirth');
+			return rawValue ? formatDates(rawValue) : null;
+		}
+	},
 	dateOfRetirement: { type: Sequelize.DATE, allowNull: true },
 	salesRep: { type: Sequelize.BOOLEAN, allowNull: true },
 	supportRep: { type: Sequelize.BOOLEAN, allowNull: true },
@@ -127,6 +135,7 @@ DesigModel.belongsTo(FormModel, {
 DesigModel.belongsTo(SubsidiaryModel, {
 	foreignKey: 'subsidiaryId',
 	targetKey: 'Id',
+	as: "subsidiary"
 });
 
 DesigModel.belongsTo(FormModel, {

@@ -2,7 +2,7 @@ const { EmployeeProfileModel, SubsidiaryModel, DeptModel, FormModel } = require(
 const Sequelize = require('sequelize');
 const { paginationFacts, handleNestedData, formatDates } = require("../../../utils/common");
 const pick = require("../../../utils/pick");
-
+const { startOfDay, endOfDay } = require("date-fns");
 const ApiError = require("../../../utils/ApiError");
 const httpStatus = require("http-status");
 const { generatePdf } = require("../../../utils/pdf");
@@ -19,7 +19,7 @@ const employeeAttributes = [
   'designationId',
   'departmentId',
   'reportTo',
-  'locationId','dateOfJoining','dateOfConfirmation',
+  'locationId','dateOfJoining','dateOfConfirmation','dateOfBirth',
   [
     Sequelize.literal(`CONCAT(t_employee_profile.firstName, ' ', COALESCE(t_employee_profile.middleName, ''), ' ', t_employee_profile.lastName)`),
     'fullName',  // Alias for the concatenated name
@@ -52,6 +52,123 @@ const getAllRegisteredEmployees = async (req) => {
   if (filter.employeeId) employeeFilter.Id = filter.employeeId;
 
 
+//   //date of Joining
+//   let dateOfJoiningFilter = {}; // Initialize this as an empty object
+
+//   // Handle the Date of Joining filter (dojFrom and dojTo)
+//   if (filter.dojFrom || filter.dojTo) {
+//     if (filter.dojFrom && filter.dojTo) {
+//       // Both from and to date are provided
+//       const startOfJoiningDate = startOfDay(new Date(filter.dojFrom));
+//       const endOfJoiningDate = endOfDay(new Date(filter.dojTo));
+  
+//       dateOfJoiningFilter.dateOfJoining = {
+//         [Op.between]: [startOfJoiningDate, endOfJoiningDate], // Ensure an array with two Date objects
+//       };
+//     } else if (filter.dojFrom) {
+//       // Only dojFrom is provided
+//       const startOfJoiningDate = startOfDay(new Date(filter.dojFrom));
+//       dateOfJoiningFilter.dateOfJoining = {
+//         [Op.gte]: startOfJoiningDate,
+//       };
+//     } else if (filter.dojTo) {
+//       // Only dojTo is provided
+//       const endOfJoiningDate = endOfDay(new Date(filter.dojTo));
+//       dateOfJoiningFilter.dateOfJoining = {
+//         [Op.lte]: endOfJoiningDate,
+//       };
+//     }
+//   }
+
+// // If the date filter exists, merge it with the employeeFilter
+// if (Object.keys(dateOfJoiningFilter).length) {
+//   employeeFilter.dateOfJoining = dateOfJoiningFilter.dateOfJoining;
+// }
+
+
+//   //date of Confirmation
+
+// let dateOfConfirmationFilter = {}; // Initialize this as an empty object
+
+
+// if (filter.docFrom || filter.docTo) {
+//   if (filter.docFrom && filter.docTo) {
+//     // Both from and to date are provided
+//     const startOfConfirmationDate = startOfDay(new Date(filter.docFrom));
+//     const endOfConfirmationDate = endOfDay(new Date(filter.docTo));
+
+//     dateOfConfirmationFilter.dateOfConfirmation = {
+//       [Op.between]: [startOfConfirmationDate, endOfConfirmationDate], // Ensure an array with two Date objects
+//     };
+//   } else if (filter.docFrom) {
+//     // Only dojFrom is provided
+//     const startOfConfirmationDate = startOfDay(new Date(filter.docFrom));
+//     dateOfConfirmationFilter.dateOfConfirmation = {
+//       [Op.gte]: startOfConfirmationDate,
+//     };
+//   } else if (filter.docTo) {
+//     // Only dojTo is provided
+//     const endOfConfirmationDate = endOfDay(new Date(filter.docTo));
+//     dateOfConfirmationFilter.dateOfConfirmation = {
+//       [Op.lte]: endOfConfirmationDate,
+//     };
+//   }
+// }
+
+// // If the date filter exists, merge it with the employeeFilter
+// if (Object.keys(dateOfConfirmationFilter).length) {
+// employeeFilter.dateOfConfirmation = dateOfConfirmationFilter.dateOfConfirmation;
+// }
+
+//common filter for date filters
+const  getDateFilter=(fromDate, toDate, dateField) =>{
+  let dateFilter = {}; // Initialize as an empty object
+
+  if (fromDate || toDate) {
+    if (fromDate && toDate) {
+      // Both from and to date are provided
+      const startDate = startOfDay(new Date(fromDate));
+      const endDate = endOfDay(new Date(toDate));
+
+      dateFilter[dateField] = {
+        [Op.between]: [startDate, endDate],
+      };
+    } else if (fromDate) {
+      // Only from date is provided
+      const startDate = startOfDay(new Date(fromDate));
+      dateFilter[dateField] = {
+        [Op.gte]: startDate,
+      };
+    } else if (toDate) {
+      // Only to date is provided
+      const endDate = endOfDay(new Date(toDate));
+      dateFilter[dateField] = {
+        [Op.lte]: endDate,
+      };
+    }
+  }
+
+  return dateFilter; // Return the constructed date filter
+}
+
+const dateOfJoiningFilter = getDateFilter(filter.dojFrom, filter.dojTo, "dateOfJoining");
+const dateOfConfirmationFilter = getDateFilter(filter.docFrom, filter.docTo, "dateOfConfirmation");
+const dateOfBirthFilter = getDateFilter(filter.dobFrom, filter.dobTo, "dateOfBirth");
+// If the date filter exists, merge it with the employeeFilter
+if (Object.keys(dateOfJoiningFilter).length) {
+  employeeFilter.dateOfJoining = dateOfJoiningFilter.dateOfJoining;
+}
+
+if (Object.keys(dateOfConfirmationFilter).length) {
+  employeeFilter.dateOfConfirmation = dateOfConfirmationFilter.dateOfConfirmation;
+}
+
+if (Object.keys(dateOfBirthFilter).length) {
+  employeeFilter.dateOfBirth = dateOfBirthFilter.dateOfBirth;
+}
+
+
+
   //If no filter is present then send back response with no data
   if (!Object.keys(employeeFilter).length) {
     return paginationFacts(0, limit, options.pageNumber, []);
@@ -65,6 +182,7 @@ const getAllRegisteredEmployees = async (req) => {
     ],
     where: {
       ...employeeFilter,
+
       isActive: true
     },
     offset: offset,
@@ -80,14 +198,14 @@ const getAllRegisteredEmployees = async (req) => {
       },
       {
         model: FormModel,
-        attributes: ['Id', 'formName'], // Specify the parent attribute you want
+        attributes: [ 'formName'], // Specify the parent attribute you want
         as: 'designation', // This should match the alias if defined in associations
 
 
       },
       {
         model: FormModel,
-        attributes: ['Id', 'formName'], // Specify the parent attribute you want
+        attributes: [ 'formName'], // Specify the parent attribute you want
         as: 'grade', // This should match the alias if defined in associations
 
 
@@ -95,7 +213,7 @@ const getAllRegisteredEmployees = async (req) => {
 
       {
         model: FormModel,
-        attributes: ['Id', 'formName'], // Specify the parent attribute you want
+        attributes: [ 'formName'], // Specify the parent attribute you want
         as: 'employeeType', // This should match the alias if defined in associations
 
 
@@ -103,7 +221,7 @@ const getAllRegisteredEmployees = async (req) => {
       {
         model: EmployeeProfileModel,
         attributes: [
-          'Id',
+      
           [
             Sequelize.literal(`CONCAT(ReportTo.firstName, ' ', COALESCE(ReportTo.middleName, ''), ' ', ReportTo.lastName)`),
             'reportName',  // Alias for the concatenated name
@@ -111,6 +229,14 @@ const getAllRegisteredEmployees = async (req) => {
         ],
         as: 'ReportTo', // Self-join alias
         required: false, // Allow employees without a ReportTo
+      },
+
+      {
+        model: SubsidiaryModel,
+        attributes: [ 'name'], // Specify the parent attribute you want
+        as: 'subsidiary', // This should match the alias if defined in associations
+
+
       },
       
     ]
@@ -220,7 +346,7 @@ const getAllRegisteredEmployeesForPdf = async (req) => {
     currentDate: formatDates(new Date(), 'dd/MMM/yyyy HH:ss'),
   }
 
-  const pdfStream = await generatePdf('employee_register.hbs', data);
+  const pdfStream = await generatePdf('employee_register.hbs', data,{ landscape: true });
 
   return pdfStream
 };

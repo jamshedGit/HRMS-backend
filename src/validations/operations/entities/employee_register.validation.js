@@ -18,7 +18,12 @@ const getAllItem = {
       designationId: Joi.number().allow('').optional(),
       locationId: Joi.number().allow('').optional(),
       employeeId: Joi.number().allow('').optional(),
-    
+      dojFrom: Joi.date().allow('').optional(),
+      dojTo: Joi.date().allow('').optional(),
+      docFrom: Joi.date().allow('').optional(),
+      docTo: Joi.date().allow('').optional(),
+      dobFrom: Joi.date().allow('').optional(),
+      dobTo: Joi.date().allow('').optional(),
     })
   }),
 };
@@ -35,6 +40,12 @@ const getItemForPdf = {
     designationId: Joi.number().allow('').optional(),
     locationId: Joi.number().allow('').optional(),
     employeeId: Joi.number().allow('').optional(),
+    dojFrom: Joi.date().allow('').optional(),
+    dojTo: Joi.date().allow('').optional(),
+    docFrom: Joi.date().allow('').optional(),
+    docTo: Joi.date().allow('').optional(),
+    dobFrom: Joi.date().allow('').optional(),
+    dobTo: Joi.date().allow('').optional(),
     labels: Joi.object().optional()
   }),
 }
