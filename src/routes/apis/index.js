@@ -74,6 +74,7 @@ const user = require("./operations/user/user.route");
 
 const upload = require('./operations/upload/upload.route');
 const password = require("./operations/user/password.route");
+const employee_register = require("./operations/employee_register/employee_register.route");
 const router = express.Router();
 
 const defaultRoutes = [
@@ -357,6 +358,11 @@ const defaultRoutes = [
     path: "/password",
     route: password
   },
+  {
+    path: "/employee_register",
+    route: employee_register
+  },
+
 
 
 ];

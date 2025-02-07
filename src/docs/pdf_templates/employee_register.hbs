@@ -1,0 +1,193 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <title>Employee Report</title>
+  <style>
+    /* Global Styles */
+    body {
+      font-family: Arial, sans-serif;
+      margin: 20px;
+      color: #333;
+      line-height: 1.6;
+    }
+
+    h3 {
+      text-align: left;
+      color: #444;
+    }
+
+    .filters {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 20px;
+      margin-bottom: 20px;
+    }
+
+    .right-filters {
+      position: absolute;
+      top: 75px; /* Adjust as needed */
+      right: 20px; /* Adjust as needed */
+  } 
+
+    .filter-item {
+      flex: 1 1 calc(50% - 20px);
+      /* Two columns per row */
+      box-sizing: border-box;
+      font-size: 10px;
+    }
+
+    .filter-item p {
+      margin: 5px 0;
+      font-size: 12px;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 20px;
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    }
+
+    th,
+    td {
+      border: 1px solid black;
+      padding: 12px;
+      text-align: left;
+      font-size: 12px;
+    }
+
+    th {
+      background-color: grey !important;
+      color: black;
+      font-weight: bold;
+      text-transform: uppercase;
+      font-size: 10px;
+    }
+
+    tr:nth-child(even) {
+      background-color: #f9f9f9;
+    }
+
+    tr:hover {
+      background-color: #f1f1f1;
+    }
+
+    .no-data {
+      text-align: center;
+      color: #888;
+      font-style: italic;
+      padding: 20px;
+    }
+
+    /* Responsive Design */
+    @media (max-width: 768px) {
+      .filter-item {
+        flex: 1 1 100%;
+        /* Stack items in one column */
+      }
+    }
+  </style>
+</head>
+
+<body>
+  <h3>Employee Analysis Report</h3>
+  <hr>
+  <div class="filters">
+    <div class="left-filters">
+      {{#if filters.subsidiaryLabel}}
+      <div class="filter-item">
+        <p><b>Subsidiary:</b> {{filters.subsidiaryLabel}}</p>
+      </div>
+      {{/if}}
+      {{#if filters.departmentLabel}}
+      <div class="filter-item">
+        <p><b>Department:</b> {{filters.departmentLabel}}</p>
+      </div>
+      {{/if}}
+      {{#if filters.reportToLabel}}
+      <div class="filter-item">
+        <p><b>Report To:</b> {{filters.reportToLabel}}</p>
+      </div>
+      {{/if}}
+      {{#if filters.gradeLabel}}
+      <div class="filter-item">
+        <p><b>Grade:</b> {{filters.gradeLabel}}</p>
+      </div>
+      {{/if}}
+      {{#if filters.designationLabel}}
+      <div class="filter-item">
+        <p><b>Designation:</b> {{filters.designationLabel}}</p>
+      </div>
+      {{/if}}
+      {{#if filters.locationLabel}}
+      <div class="filter-item">
+        <p><b>Location:</b> {{filters.locationLabel}}</p>
+      </div>
+      {{/if}}
+   
+      {{#if filters.employeeLabel}}
+      <div class="filter-item">
+        <p><b>Employee:</b> {{filters.employeeLabel}}</p>
+      </div>
+      {{/if}}
+ 
+    </div>
+    <div class="right-filters">
+      <div class="filter-item">
+        <p><b>Print Date:</b> {{currentDate}}</p>
+      </div>
+      {{#if filters.currentUser}}
+      <div class="filter-item">
+        <p><b>User ID:</b> {{filters.currentUser}}</p>
+      </div>
+      {{/if}}
+    </div>
+  </div>
+  <hr>
+  <table>
+    <thead>
+      <tr>
+        <th><b>Emp. Code</b></th>
+        <th><b>Employee Name</b></th>
+              <th><b>Department</b></th>
+               <th><b>Grade</b></th>
+                <th><b>Designation</b></th>
+                 <th><b>Employee Type</b></th>
+                  <th><b>Date Of Joining</b></th>
+                   <th><b>Date Of Confirmation</b></th>
+                    <th><b>Report To</b></th>
+           
+
+
+      </tr>
+    </thead>
+    <tbody>
+      {{#if employees.length}}
+      {{#each employees}}
+      <tr>
+        <td>{{employeeCode}}</td>
+        <td>{{fullName}}</td>
+
+                <td>{{department.deptName}}</td>
+                        <td>{{grade.formName}}</td>
+                                <td>{{designation.formName}}</td>
+                                        <td>{{employeeType.formName}}</td>
+                                                <td>{{dateOfJoining}}</td>
+                                                        <td>{{dateOfConfirmation}}</td>
+                                                              <td>{{ReportTo.reportName}}</td>
+
+      
+     
+      </tr>
+      {{/each}}
+      {{else}}
+      <tr>
+        <td colspan="8" class="no-data">No data found</td>
+      </tr>
+      {{/if}}
+    </tbody>
+  </table>
+</body>
+
+</html>

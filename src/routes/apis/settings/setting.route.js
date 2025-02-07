@@ -35,7 +35,7 @@ router.route('/read-all-countries-master-data').get(auth(), validate(settingVali
 router.route('/read-all-cities-master-data').post(auth(), validate(settingValidation.getCitiesMasterData), settingController.getCitiesMasterData);
 router.route('/read-all-status-types-master-data').post(auth(), validate(settingValidation.getStatusMasterData), settingController.getStatusMasterData)
 router.route('/read-all-banks').get(auth(true), validate(settingValidation.getBanksMasterData), settingController.getBanksMasterData);
-router.route('/read-all-branch').get(auth(true), validate(settingValidation.getBanksMasterData), settingController.get_Bank_Branch_MasterData);
+router.route('/read-all-branch').post(auth(true), validate(settingValidation.getBanksMasterData), settingController.get_Bank_Branch_MasterData);
 router.route('/read-all-dept').post(auth(), validate(settingValidation.getDeptMasterData), settingController.getDeptMasterData);
 router.route('/read-all-form').post(auth(true), validate(settingValidation.getFormMenuMasterData), settingController.getFormMenusMasterData);
 router.route('/read-all-child-forms').get(auth(), validate(settingValidation.getFormMenuMasterData), settingController.getChildsMenusByParentId);

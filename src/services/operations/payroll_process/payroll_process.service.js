@@ -757,26 +757,49 @@ const checkPayroll_EmployeesByIds = async (data) => {
 
   if (!revert && !finalize) {
     if (PayrollGroupId) {
-      return await sequelize.query(
-        'SELECT * FROM t_payrollprocess_locking WHERE SubsidiaryId = :SubsidiaryId AND MonthId = :MonthId AND isFinalized = :isFinalized' +
+      let forRevertbutton=await sequelize.query(
+        // 'SELECT * FROM t_payrollprocess_locking WHERE SubsidiaryId = :SubsidiaryId AND MonthId = :MonthId AND isFinalized = :isFinalized' +
+        'SELECT * FROM t_payrollprocess_locking WHERE SubsidiaryId = :SubsidiaryId AND MonthId = :MonthId' +
         (PayrollGroupId ? ' AND PayrollGroupId = :PayrollGroupId' : ''),
         {
-          replacements: { SubsidiaryId, PayrollGroupId, MonthId, isFinalized: 1 },
+          replacements: { SubsidiaryId, PayrollGroupId, MonthId,},
           type: sequelize.QueryTypes.SELECT
         }
       );
+      if(forRevertbutton && forRevertbutton[0].isFinalized==0){
+        return {
+          revert:true,
+          finalize:true,
+          
+        }
+      }
+      else if(forRevertbutton && forRevertbutton[0].isFinalized==1){
+        return {
+          revert:true,
+          finalize:false,
+          
+        }
+
+      }else{
+        return {
+          revert:false,
+          finalize:false,
+          
+        }
+      }
     } else {
       // allPayrollGroup
       let results = [];
       for (const payrollGroup of allPayrollGroup) {
         let record = await sequelize.query(
-          'SELECT * FROM t_payrollprocess_locking WHERE SubsidiaryId = :SubsidiaryId AND MonthId = :MonthId AND PayrollGroupId = :PayrollGroupId AND isFinalized = :isFinalized',
+          'SELECT * FROM t_payrollprocess_locking WHERE SubsidiaryId = :SubsidiaryId AND MonthId = :MonthId AND PayrollGroupId = :PayrollGroupId',
           {
-            replacements: { SubsidiaryId, PayrollGroupId: payrollGroup.Id, MonthId, isFinalized: 1 },
+            replacements: { SubsidiaryId, PayrollGroupId: payrollGroup.Id, MonthId},
             type: sequelize.QueryTypes.SELECT
           }
         );
         if (record.length > 0) {
+         
           results.push(record);
         }
 
@@ -784,10 +807,18 @@ const checkPayroll_EmployeesByIds = async (data) => {
 
       if (results.length != allPayrollGroup.length) {
 
-        return []
+        return {
+          revert:false,
+          finalize:false,
+          
+        }
       } else {
-
-        return results
+        return {
+          revert:true,
+          finalize:false,
+          
+        }
+        // return results
       }
 
     }

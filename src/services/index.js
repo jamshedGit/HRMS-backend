@@ -67,3 +67,5 @@ module.exports.LeaveRegisterServicePage = require('./operations/leave_register/l
 module.exports.PayrollRegisterServicePage = require('./operations/payroll_register/payroll_register.service')
 module.exports.UserService = require('./operations/user/user.service')
 module.exports.UploadServicePage = require('./operations/upload/upload.service')
+
+module.exports.EmployeeRegisterServicePage = require('./operations/employee_register/employee_register.service')

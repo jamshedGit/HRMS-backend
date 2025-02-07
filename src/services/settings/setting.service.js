@@ -228,7 +228,8 @@ const getBanksMasterData = async (req) => {
 
 const get_Bank_Branch_MasterData = async (req) => {
   const Bank_Branch_MasterData = getDdlItems(DDL_FIELD_NAMES.BranchName, await BranchModel.findAll({
-    where: { isActive: true,subsidiaryId: { [Op.in]: await currentSubsidiaryPermission(req) } },
+    where: { isActive: true,bankId:req.body.bankId
+      },
     attributes: ['Id', 'Name']
   }));
   return Bank_Branch_MasterData
