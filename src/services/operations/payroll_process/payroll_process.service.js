@@ -88,7 +88,17 @@ const createPayroll_Process = async (req, payroll_processBody) => {
         addedPayroll_Process.completed = 1;
         await addedPayroll_Process.save();
       }
+      let TaxCalculated = await sequelize.query(
+        'SELECT COUNT(1) AS COUNT FROM t_Payroll_IncomeTax WHERE SubsidiaryId = :SubsidiaryId AND PayrollGroupId = :PayrollGroupId AND MonthId = :MonthId AND TaxfortheMonth > 0',
+        {
+          replacements: { SubsidiaryId:payroll_processBody?.subsidiaryId, PayrollGroupId: payroll_processBody?.payroll_groupId, MonthId:payroll_processBody?.payroll_monthId },
+          type: sequelize.QueryTypes.SELECT
+        }
+      );
 
+
+
+      result[0].TaxCalculated = TaxCalculated[0].COUNT;
       return result[0]
 
 
@@ -111,7 +121,18 @@ const createPayroll_Process = async (req, payroll_processBody) => {
               type: Sequelize.QueryTypes.RAW // Use RAW type for executing stored procedures
             });
 
-            final_result.TaxCalculated += result[0].TaxCalculated;
+      
+            let TaxCalculated = await sequelize.query(
+              'SELECT COUNT(1) AS COUNT FROM t_Payroll_IncomeTax WHERE SubsidiaryId = :SubsidiaryId AND PayrollGroupId = :PayrollGroupId AND MonthId = :MonthId AND TaxfortheMonth > 0',
+              {
+                replacements: { SubsidiaryId:payroll_processBody?.subsidiaryId, PayrollGroupId: payrollGroup?.Id, MonthId:payroll_processBody?.payroll_monthId },
+                type: sequelize.QueryTypes.SELECT
+              }
+            );
+
+
+
+            final_result.TaxCalculated += TaxCalculated[0].COUNT;
             final_result.TaxNotCalculated += result[0].TaxNotCalculated;
             final_result.LoanProcess += result[0].LoanProcess;
             final_result.EmployeewithZeroSalary += result[0].EmployeewithZeroSalary;
@@ -123,6 +144,9 @@ const createPayroll_Process = async (req, payroll_processBody) => {
         }
       }
 
+      // (SELECT Count(1) FROM t_Payroll_IncomeTax WHERE EmpId = x.EmpId AND PayrollGroupId = p_PayrollGroupId AND MonthId = p_MonthId AND TaxfortheMonth > 0) TaxCalculated,
+   
+     
       return final_result
 
     }
@@ -418,6 +442,7 @@ const payroll_group_detail = async (subsidiaryId, payroll_groupId, payroll_month
     where: {
       ...(subsidiaryId && { subsidiaryId: subsidiaryId }),
       ...(payroll_groupId && { payrollGroupId: payroll_groupId }),
+      approvedForPayroll:1,
     },
     attributes: ['Id', 'employeeCode', 'subsidiaryId', 'payrollGroupId', 'firstName', 'middleName', 'lastName', [
       literal(`CONCAT(firstName, ' ', COALESCE(middleName, ''), ' ', lastName)`),
@@ -472,7 +497,7 @@ const payroll_group_detail = async (subsidiaryId, payroll_groupId, payroll_month
   const employeesWithNoSalarySetupCount = employees.rows.filter((emp) => {
     // Check if this employee is NOT in the EmployeeSalaryModel
  
-    return !employeesWithoutSalarySetup.some((salary) => salary.employeeId === emp.Id);
+    return employeesWithoutSalarySetup.some((salary) => salary.employeeId === emp.Id && salary.approved==1);
   }).length;
  
  
@@ -724,11 +749,11 @@ const payroll_group_detail = async (subsidiaryId, payroll_groupId, payroll_month
 // };
 
 
-const checkPayroll_EmployeesByIds = async (data) => {
+const checkPayroll_EmployeesByIds = async (req,data) => {
   const { SubsidiaryId, PayrollGroupId, MonthId, revert, finalize } = data;
 
   const allPayrollGroup = await FormModel.findAll({
-    where: { isActive: true, parentFormID: 127 },
+    where: { isActive: true, parentFormID: 127,companyId:req.user.companyId },
     attributes: ['formName', 'Id', 'formCode']
   });
 

@@ -126,11 +126,27 @@
       </div>
       {{/if}}
    
-      {{#if filters.employeeLabel}}
+      {{#if filters.dojFromLabel}}
       <div class="filter-item">
-        <p><b>Employee:</b> {{filters.employeeLabel}}</p>
+        <p><b>Date Of Joining:</b> {{filters.dojFromLabel}} - {{filters.dojToLabel}}</p>
       </div>
       {{/if}}
+      
+
+         {{#if filters.docFromLabel}}
+      <div class="filter-item">
+        <p><b>Date Of Confirmation:</b> {{filters.docFromLabel}} - {{filters.docToLabel}}</p>
+      </div>
+      {{/if}}
+
+   {{#if filters.dobFromLabel}}
+      <div class="filter-item">
+        <p><b>Date Of Birth:</b> {{filters.dobFromLabel}} - {{filters.dobToLabel}}</p>
+      </div>
+      {{/if}}
+      
+
+      
  
     </div>
     <div class="right-filters">

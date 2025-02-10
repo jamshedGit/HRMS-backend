@@ -7,7 +7,8 @@ const Sequelize = require('sequelize');
 const { paginationFacts, formatDates, currentSubsidiaryPermission } = require("../../../utils/common");
 const https = require('https');
 const { XMLParser, XMLBuilder, XMLValidator } = require("fast-xml-parser");
-const fns = require('date-fns')
+const fns = require('date-fns');
+const { checkMonthFinalizedStatus2 } = require("../../../utils/dbValidators");
 
 const Op = Sequelize.Op;
 /**
@@ -19,7 +20,7 @@ const createPayrollMonth = async (req, PayrollMonthBody) => {
   PayrollMonthBody.startDate = formatDates(PayrollMonthBody.startDate, 'yyyy-MM-dd')
   PayrollMonthBody.endDate = formatDates(PayrollMonthBody.endDate, 'yyyy-MM-dd')
 
-  PayrollMonthBody.createdBy = req.user.id;
+  PayrollMonthBody.createdBy = req.user.Id;
   let a=  await PayrollMonthModel.FiscalSetupModel.findOne({
     where: {
       subsidiaryId: PayrollMonthBody.subsidiaryId}
@@ -64,8 +65,11 @@ const createPayrollMonth = async (req, PayrollMonthBody) => {
       throw new Error('Payroll month dates are out of the tax year range.');
     }
   }
-
-
+let body={
+  companyId:req.user.companyId,
+  subsidiaryId:PayrollMonthBody.subsidiaryId,
+}
+  await checkMonthFinalizedStatus2(body)
 
   const resp = await sequelize.query(' update t_payroll_month_Setup set isActive = 0 where subsidiaryId =  ' + PayrollMonthBody.subsidiaryId);
   PayrollMonthBody.companyId=req.user.companyId;
@@ -130,6 +134,7 @@ const queryPayrollMonths = async (req, filter, options, searchQuery) => {
 
 const SP_GetActivePreviousPayrollMonth = async (p_subsidiaryId, employeeId) => {
   try {
+  
     let subsidiaryId = p_subsidiaryId;
     if (employeeId) {
       const data = await PayrollMonthModel.EmployeeProfileModel.findByPk(employeeId, {
