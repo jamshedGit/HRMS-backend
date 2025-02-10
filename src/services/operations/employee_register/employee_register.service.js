@@ -257,10 +257,11 @@ if (Object.keys(dateOfBirthFilter).length) {
  * @returns 
  */
 const getAllRegisteredEmployeesForPdf = async (req) => {
+
   const filter = req?.body || {};
   const labels = filter?.labels || {};
   labels.currentUser = req.user?.email || '';
-
+ 
   //Prepare Employee Table Filters if any
   const employeeFilter = {};
 
