@@ -130,7 +130,7 @@ const payroll_group_detail = catchAsync(async (req, res) => {
 
   const checkPayroll_EmployeesByIds = catchAsync(async (req, res) => {
 
-    const Receipt = await Payroll_ProcessService.checkPayroll_EmployeesByIds(req.body.data);
+    const Receipt = await Payroll_ProcessService.checkPayroll_EmployeesByIds(req,req.body.data);
     if (!Receipt) {
       throw new ApiError(httpStatus.NOT_FOUND, "Data not found");
     }

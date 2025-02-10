@@ -4,8 +4,8 @@ const { formatDates } = require("./common");
 const httpStatus = require('http-status');
 const { HttpStatusCodes } = require('./constants');
 const ApiError = require('./ApiError');
-const { PayrollMonthModel } = require('../models');
-
+const { PayrollMonthModel, FormModel, EmployeeProfileModel } = require('../models');
+const EmpSalaryModel = require('../models/operations/employee_salary_setup/employee_salary_setup.model');
 const Op = Sequelize.Op;
 
 /**
@@ -62,7 +62,7 @@ WHERE
       attributes: ['startDate']
     })
 
-    if(currentActivePayrollMonth && currentActivePayrollMonth.startDate && new Date(formattedDate) < new Date(currentActivePayrollMonth.startDate)){
+    if (currentActivePayrollMonth && currentActivePayrollMonth.startDate && new Date(formattedDate) < new Date(currentActivePayrollMonth.startDate)) {
       throw new ApiError(HttpStatusCodes.BAD_REQUEST, monthError)
     }
 
@@ -75,4 +75,78 @@ WHERE
 
 }
 
-module.exports = { checkMonthFinalizedStatus };
+const checkMonthFinalizedStatus2 = async (body, dateKey, monthError, finalizedError) => {
+  // const allPayrollGroup = await FormModel.findAll({
+  //   where: { isActive: true, parentFormID: 127, companyId: body.companyId },
+  //   attributes: ['formName', 'Id', 'formCode']
+  // });
+  let currentMonth = await PayrollMonthModel.findOne({
+    where: {
+      subsidiaryId: body.subsidiaryId,
+      isActive: true
+
+    },
+  });
+
+  if (!currentMonth) {
+    return true
+  }
+
+  const empSalary= await EmpSalaryModel.findAll({
+
+    where: {
+      approved:1
+    },
+    attributes: [
+      "employeeId","approved"
+    ],
+  });
+
+  const approvedEmployeeIds = empSalary.map(emp => emp.employeeId);
+  const allPayrollGroup = await EmployeeProfileModel.findAll({
+
+    where: {
+      isActive: true,
+      companyId: body.companyId,
+      subsidiaryId: body.subsidiaryId,
+      approvedForPayroll:1,
+      Id: {
+        [Sequelize.Op.in]: approvedEmployeeIds // Only employees whose salary is approved
+      }
+    },
+    attributes: [
+      [Sequelize.fn('DISTINCT', Sequelize.col('payrollGroupId')), 'payrollGroupId']
+    ],
+  });
+  const formattedData = allPayrollGroup.map(item => ({
+    payrollGroupId: item.payrollGroupId
+  }));
+
+  
+ 
+  let count = 0;
+
+  for (const payrollGroup of formattedData) {
+    let record = await sequelize.query(
+      'SELECT * FROM t_payrollprocess_locking WHERE SubsidiaryId = :SubsidiaryId AND MonthId = :MonthId AND PayrollGroupId = :PayrollGroupId',
+      {
+        replacements: { SubsidiaryId: body.subsidiaryId, PayrollGroupId: payrollGroup.payrollGroupId, MonthId: currentMonth.Id },
+        type: sequelize.QueryTypes.SELECT
+      }
+    );
+
+    if (record[0]?.isFinalized) {
+
+      count += 1;
+    }
+
+
+
+  }
+  if (count != allPayrollGroup.length) {
+
+    throw new Error('Payroll process of current Payroll month are not finalized.');
+  }
+
+}
+module.exports = { checkMonthFinalizedStatus, checkMonthFinalizedStatus2 };

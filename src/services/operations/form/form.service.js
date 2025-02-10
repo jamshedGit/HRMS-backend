@@ -108,7 +108,7 @@ const updateFormById = async (Id, updateBody, updatedBy) => {
 
   // updateBody.slug = updateBody.name.replace(/ /g, "-").toLowerCase()
   updateBody.updatedBy = updatedBy;
-  delete updateBody.id;
+  delete updateBody.Id;
   Object.assign(Item, updateBody);
   await Item.save();
   return;

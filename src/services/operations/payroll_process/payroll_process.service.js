@@ -442,6 +442,7 @@ const payroll_group_detail = async (subsidiaryId, payroll_groupId, payroll_month
     where: {
       ...(subsidiaryId && { subsidiaryId: subsidiaryId }),
       ...(payroll_groupId && { payrollGroupId: payroll_groupId }),
+      approvedForPayroll:1,
     },
     attributes: ['Id', 'employeeCode', 'subsidiaryId', 'payrollGroupId', 'firstName', 'middleName', 'lastName', [
       literal(`CONCAT(firstName, ' ', COALESCE(middleName, ''), ' ', lastName)`),
@@ -496,7 +497,7 @@ const payroll_group_detail = async (subsidiaryId, payroll_groupId, payroll_month
   const employeesWithNoSalarySetupCount = employees.rows.filter((emp) => {
     // Check if this employee is NOT in the EmployeeSalaryModel
  
-    return !employeesWithoutSalarySetup.some((salary) => salary.employeeId === emp.Id);
+    return employeesWithoutSalarySetup.some((salary) => salary.employeeId === emp.Id && salary.approved==1);
   }).length;
  
  
@@ -748,11 +749,11 @@ const payroll_group_detail = async (subsidiaryId, payroll_groupId, payroll_month
 // };
 
 
-const checkPayroll_EmployeesByIds = async (data) => {
+const checkPayroll_EmployeesByIds = async (req,data) => {
   const { SubsidiaryId, PayrollGroupId, MonthId, revert, finalize } = data;
 
   const allPayrollGroup = await FormModel.findAll({
-    where: { isActive: true, parentFormID: 127 },
+    where: { isActive: true, parentFormID: 127,companyId:req.user.companyId },
     attributes: ['formName', 'Id', 'formCode']
   });
 
