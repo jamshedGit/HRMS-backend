@@ -272,7 +272,59 @@ const getAllRegisteredEmployeesForPdf = async (req) => {
   if (filter.locationId) employeeFilter.locationId = filter.locationId;
   if (filter.employeeId) employeeFilter.Id = filter.employeeId;
 
-
+  const  getDateFilter=(fromDate, toDate, dateField) =>{
+    let dateFilter = {}; // Initialize as an empty object
+  
+    if (fromDate || toDate) {
+      if (fromDate && toDate) {
+        // Both from and to date are provided
+        const startDate = startOfDay(new Date(fromDate));
+        const endDate = endOfDay(new Date(toDate));
+  
+        dateFilter[dateField] = {
+          [Op.between]: [startDate, endDate],
+        };
+      } else if (fromDate) {
+        // Only from date is provided
+        const startDate = startOfDay(new Date(fromDate));
+        dateFilter[dateField] = {
+          [Op.gte]: startDate,
+        };
+      } else if (toDate) {
+        // Only to date is provided
+        const endDate = endOfDay(new Date(toDate));
+        dateFilter[dateField] = {
+          [Op.lte]: endDate,
+        };
+      }
+    }
+  
+    return dateFilter; // Return the constructed date filter
+  }
+  
+  const dateOfJoiningFilter = getDateFilter(filter.dojFrom, filter.dojTo, "dateOfJoining");
+  const dateOfConfirmationFilter = getDateFilter(filter.docFrom, filter.docTo, "dateOfConfirmation");
+  const dateOfBirthFilter = getDateFilter(filter.dobFrom, filter.dobTo, "dateOfBirth");
+  // If the date filter exists, merge it with the employeeFilter
+  if (Object.keys(dateOfJoiningFilter).length) {
+    employeeFilter.dateOfJoining = dateOfJoiningFilter.dateOfJoining;
+  }
+  
+  if (Object.keys(dateOfConfirmationFilter).length) {
+    employeeFilter.dateOfConfirmation = dateOfConfirmationFilter.dateOfConfirmation;
+  }
+  
+  if (Object.keys(dateOfBirthFilter).length) {
+    employeeFilter.dateOfBirth = dateOfBirthFilter.dateOfBirth;
+  }
+  
+  
+  
+    //If no filter is present then send back response with no data
+    if (!Object.keys(employeeFilter).length) {
+      return paginationFacts(0, limit, options.pageNumber, []);
+    }
+  
 
   //If no filter is present then send back response with no data
   if (!Object.keys(employeeFilter).length) {
