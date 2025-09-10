@@ -1,7 +1,7 @@
 {
     "apps": [
       {
-        "name": "backend",
+        "name": "backend-staging",
         "script": "src/index.js",
         "instances": 1,
         "autorestart": true,
